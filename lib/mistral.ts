@@ -1,3 +1,4 @@
+import { computeDataLimits } from "./data-limits";
 import type { AnalysisResult, TerritoryAnalysis, TerritoryProfile } from "./types";
 
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
@@ -7,11 +8,14 @@ const SYSTEM_PROMPT = `Tu es un analyste territorial spécialisé dans les commu
 Règles impératives :
 - Tu ne dois JAMAIS inventer de chiffres, statistiques ou faits non fournis dans les données.
 - Tu dois distinguer clairement les faits (présents dans les données), les hypothèses et les limites.
-- Si une information manque, indique-le explicitement dans dataLimits.
 - Base ton analyse uniquement sur les données territoriales fournies.
+- Les limites des sources sont calculées côté serveur : concentre-toi sur summary, strengths, watchPoints et opportunities.
+- Ne déclare JAMAIS qu'une donnée est absente si elle est présente dans le JSON (ex. tauxChomage1564 non null, equipements.total > 0, mutationsMaisons/mutationsAppartements renseignés).
 - Les champs marqués « échantillon » (SIRENE) décrivent un sous-ensemble d'entreprises, pas la commune entière : ne pas en déduire la structure économique réelle ni la part d'emploi.
 - Les comptages dans un échantillon (ex. tranches d'effectif) ne sont pas des proportions communales.
 - Les données RPLS (loués / vacants) décrivent le parc locatif social, pas le marché immobilier général.
+- La BPE dénombre des équipements (y compris enseignement et services publics de proximité) : ne pas écrire qu'il n'y a pas d'écoles ou de mairie si des comptages sont fournis.
+- Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
 - Si un prix immobilier est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
 - Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni texte autour.
 
@@ -20,9 +24,18 @@ Structure JSON attendue :
   "summary": "résumé court du territoire en 2-3 phrases",
   "strengths": ["point fort 1", "point fort 2"],
   "watchPoints": ["point d'attention 1"],
-  "opportunities": ["opportunité possible 1"],
-  "dataLimits": ["limite des données 1"]
+  "opportunities": ["opportunité possible 1"]
 }`;
+
+function emptyAnalysis(territory: TerritoryProfile): TerritoryAnalysis {
+  return {
+    summary: "",
+    strengths: [],
+    watchPoints: [],
+    opportunities: [],
+    dataLimits: computeDataLimits(territory),
+  };
+}
 
 function getMistralConfig(): { apiKey: string; model: string } | null {
   const apiKey = process.env.MISTRAL_API_KEY?.trim();
@@ -64,11 +77,13 @@ function buildUserPrompt(territory: TerritoryProfile): string {
       ? {
           unitesLegalesAvecEtablissement:
             territory.enrichment.enterprises.legalUnitsWithEstablishment,
-          secteursDominants:
+          tailleEchantillon: territory.enrichment.enterprises.sampleSize,
+          secteursDominantsEchantillon:
             territory.enrichment.enterprises.topActivitySections,
           essEchantillon: territory.enrichment.enterprises.essCount,
           rgeEchantillon: territory.enrichment.enterprises.rgeCount,
-          tranchesEffectif: territory.enrichment.enterprises.staffSizeBands,
+          tranchesEffectifEchantillon:
+            territory.enrichment.enterprises.staffSizeBands,
           note: territory.enrichment.enterprises.note,
         }
       : null,
@@ -150,7 +165,10 @@ function buildUserPrompt(territory: TerritoryProfile): string {
 ${JSON.stringify(facts, null, 2)}`;
 }
 
-function parseAnalysisContent(content: string): TerritoryAnalysis {
+function parseAnalysisContent(
+  content: string,
+  territory: TerritoryProfile,
+): TerritoryAnalysis {
   const parsed = JSON.parse(content) as Partial<TerritoryAnalysis>;
 
   return {
@@ -160,7 +178,7 @@ function parseAnalysisContent(content: string): TerritoryAnalysis {
     opportunities: Array.isArray(parsed.opportunities)
       ? parsed.opportunities
       : [],
-    dataLimits: Array.isArray(parsed.dataLimits) ? parsed.dataLimits : [],
+    dataLimits: computeDataLimits(territory),
   };
 }
 
@@ -191,7 +209,7 @@ export async function analyzeTerritory(
 
   if (!config) {
     return {
-      analysis: null,
+      analysis: emptyAnalysis(territory),
       configured: false,
       error: getMissingApiKeyMessage(),
     };
@@ -219,7 +237,7 @@ export async function analyzeTerritory(
       const errorBody = await response.text();
       console.error("Erreur Mistral:", response.status, errorBody);
       return {
-        analysis: null,
+        analysis: emptyAnalysis(territory),
         configured: true,
         error: `L'analyse IA a échoué (statut ${response.status}). Vérifiez la clé API et le modèle.`,
       };
@@ -233,20 +251,20 @@ export async function analyzeTerritory(
 
     if (!content) {
       return {
-        analysis: null,
+        analysis: emptyAnalysis(territory),
         configured: true,
         error: "Réponse Mistral vide ou inattendue.",
       };
     }
 
     return {
-      analysis: parseAnalysisContent(content),
+      analysis: parseAnalysisContent(content, territory),
       configured: true,
     };
   } catch (error) {
     console.error("Erreur lors de l'appel Mistral:", error);
     return {
-      analysis: null,
+      analysis: emptyAnalysis(territory),
       configured: true,
       error: "Erreur réseau lors de l'appel à l'API Mistral.",
     };

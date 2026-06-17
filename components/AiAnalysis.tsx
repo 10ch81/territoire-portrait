@@ -86,18 +86,24 @@ export function AiAnalysis({ result }: AiAnalysisProps) {
         </div>
       )}
 
-      <h3 className="mt-6 text-base font-semibold text-slate-900">Limites</h3>
-      <div className="mt-3">
+      <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+        <h3 className="text-sm font-semibold text-amber-900">
+          Limites de l&apos;analyse
+        </h3>
+        <p className="mt-1 text-sm text-amber-800">
+          Cette synthèse ne remplace pas un diagnostic territorial officiel.
+          Les limites ci-dessous sont calculées à partir des sources réellement
+          chargées pour cette commune.
+        </p>
         {result.analysis?.dataLimits.length ? (
-          <ul className="list-inside list-disc space-y-1 text-sm text-slate-600">
+          <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-amber-800">
             {result.analysis.dataLimits.map((limit) => (
               <li key={limit}>{limit}</li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-slate-500">
-            Cette analyse repose uniquement sur les données disponibles dans la
-            fiche. Aucune statistique n&apos;est inventée.
+          <p className="mt-2 text-sm text-amber-800">
+            Aucune limite spécifique identifiée pour cette commune.
           </p>
         )}
       </div>

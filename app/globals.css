@@ -17,3 +17,22 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+@media print {
+  body {
+    background: white;
+  }
+
+  header.border-b,
+  footer {
+    display: none;
+  }
+
+  .scroll-mt-16 {
+    scroll-margin-top: 0;
+  }
+
+  section {
+    break-inside: avoid;
+  }
+}

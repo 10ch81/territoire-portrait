@@ -1,0 +1,79 @@
+import type { TerritoryProfile } from "@/lib/types";
+
+export interface CompletenessResult {
+  available: number;
+  total: number;
+  percent: number;
+  label: string;
+}
+
+const ENRICHMENT_CHECKS: Array<{
+  id: string;
+  isAvailable: (territory: TerritoryProfile) => boolean;
+}> = [
+  {
+    id: "geo",
+    isAvailable: (t) => t.department !== null && t.region !== null,
+  },
+  {
+    id: "population-history",
+    isAvailable: (t) => t.enrichment?.populationHistory?.available === true,
+  },
+  {
+    id: "sociodemographics",
+    isAvailable: (t) => t.enrichment?.sociodemographics?.available === true,
+  },
+  {
+    id: "enterprises",
+    isAvailable: (t) => t.enrichment?.enterprises !== null,
+  },
+  {
+    id: "equipments",
+    isAvailable: (t) => t.enrichment?.equipments?.available === true,
+  },
+  {
+    id: "risks",
+    isAvailable: (t) => t.enrichment?.risks?.available === true,
+  },
+  {
+    id: "housing",
+    isAvailable: (t) => t.enrichment?.housing?.available === true,
+  },
+  {
+    id: "mobility",
+    isAvailable: (t) => t.enrichment?.mobility?.available === true,
+  },
+  {
+    id: "fiscal",
+    isAvailable: (t) => t.enrichment?.fiscal?.available === true,
+  },
+  {
+    id: "geography",
+    isAvailable: (t) =>
+      t.enrichment?.geography?.attractionArea?.available === true,
+  },
+  {
+    id: "property",
+    isAvailable: (t) => t.enrichment?.property?.available === true,
+  },
+  {
+    id: "mistral",
+    isAvailable: () => false,
+  },
+];
+
+export function computeCompleteness(
+  territory: TerritoryProfile,
+): CompletenessResult {
+  const checks = ENRICHMENT_CHECKS.filter((c) => c.id !== "mistral");
+  const available = checks.filter((c) => c.isAvailable(territory)).length;
+  const total = checks.length;
+  const percent = total > 0 ? Math.round((available / total) * 100) : 0;
+
+  return {
+    available,
+    total,
+    percent,
+    label: `${available}/${total} sources disponibles (${percent} %)`,
+  };
+}

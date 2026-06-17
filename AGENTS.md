@@ -55,8 +55,15 @@ npm run ingest:all       # toutes les ingestions
 - **GitHub** : dépôt public ou privé, `.env.local` jamais commité.
 - **Vercel** : définir `MISTRAL_API_KEY` et `MISTRAL_MODEL` dans les variables d'environnement du projet.
 
+## UX
+
+Feuille de route et statut d'implémentation : **`docs/ux-roadmap.md`**.
+
+Principes : KPI hero → synthèse IA → sections thématiques ; chargement progressif ; sources traçables ; pas d'invention de données.
+
 ## Prochaines étapes suggérées
 
 - Ingestion CSV/JSON depuis data.gouv.fr (population détaillée, équipements, SIRENE).
 - Cache local dans `data/cache/`.
 - Automatisation Cursor (ingestion planifiée, génération de rapports batch).
+- Comparaison de communes (`/compare`) — phase 2 UX.

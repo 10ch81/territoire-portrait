@@ -1,11 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AiAnalysis } from "@/components/AiAnalysis";
-import { EnrichmentCard } from "@/components/EnrichmentCard";
+import { AiAnalysisClient } from "@/components/AiAnalysisClient";
+import { AnalysisReadyProvider } from "@/components/AnalysisReadyProvider";
+import { CompletenessIndicator } from "@/components/CompletenessIndicator";
+import { EnrichmentIntro } from "@/components/DataSection";
+import { EnrichmentSections } from "@/components/enrichment/EnrichmentSections";
+import { KpiHero } from "@/components/KpiHero";
+import { RecentCommuneTracker } from "@/components/RecentCommuneTracker";
+import { SectionNav } from "@/components/SectionNav";
+import { ShareActions } from "@/components/ShareActions";
 import { SourcesList } from "@/components/SourcesList";
-import { TerritoryCard } from "@/components/TerritoryCard";
 import { getEnrichedTerritoryByInsee } from "@/lib/enrichment";
-import { analyzeTerritory } from "@/lib/mistral";
+import { computeCompleteness } from "@/lib/ux/completeness";
+import { extractHeroKpis } from "@/lib/ux/kpis";
+import { getVisibleSections } from "@/lib/ux/sections";
 
 interface CommunePageProps {
   params: Promise<{ codeInsee: string }>;
@@ -19,29 +27,60 @@ export default async function CommunePage({ params }: CommunePageProps) {
     notFound();
   }
 
-  const analysisResult = await analyzeTerritory(territory);
+  const kpis = extractHeroKpis(territory);
+  const completeness = computeCompleteness(territory);
+  const sections = getVisibleSections(territory);
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10">
-      <header className="space-y-2">
-        <Link
-          href="/"
-          className="inline-flex text-sm text-blue-700 hover:underline"
-        >
-          ← Nouvelle recherche
-        </Link>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-          {territory.name}
-        </h1>
-        <p className="text-sm text-slate-500">
-          Portrait territorial · INSEE {territory.inseeCode}
-        </p>
+    <AnalysisReadyProvider>
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10 print:max-w-none print:py-4">
+      <RecentCommuneTracker
+        inseeCode={territory.inseeCode}
+        name={territory.name}
+        departmentCode={territory.department?.code}
+      />
+
+      <header className="space-y-3 print:space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/"
+            className="inline-flex text-sm text-blue-700 hover:underline print:hidden"
+          >
+            ← Nouvelle recherche
+          </Link>
+          <ShareActions communeName={territory.name} />
+        </div>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              {territory.name}
+            </h1>
+            <p className="text-sm text-slate-500">
+              Portrait territorial · INSEE {territory.inseeCode}
+              {territory.department
+                ? ` · ${territory.department.name} (${territory.department.code})`
+                : ""}
+            </p>
+          </div>
+          <CompletenessIndicator completeness={completeness} />
+        </div>
       </header>
 
-      <TerritoryCard territory={territory} />
-      <EnrichmentCard territory={territory} />
-      <AiAnalysis result={analysisResult} />
-      <SourcesList sources={territory.sources} />
+      <KpiHero kpis={kpis} />
+
+      <SectionNav sections={sections} />
+
+      <AiAnalysisClient codeInsee={territory.inseeCode} />
+
+      <div className="space-y-4">
+        <EnrichmentIntro />
+        <EnrichmentSections territory={territory} />
+      </div>
+
+      <div id="sources">
+        <SourcesList sources={territory.sources} />
+      </div>
     </main>
+    </AnalysisReadyProvider>
   );
 }

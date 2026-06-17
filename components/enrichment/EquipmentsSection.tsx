@@ -1,0 +1,136 @@
+import { DataRow } from "@/components/DataRow";
+import { DataSection } from "@/components/DataSection";
+import { SectionUnavailable } from "@/components/SectionUnavailable";
+import { AcronymTooltip } from "@/components/AcronymTooltip";
+import type { TerritoryProfile } from "@/lib/types";
+
+interface EquipmentsSectionProps {
+  territory: TerritoryProfile;
+}
+
+export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
+  const equipments = territory.enrichment?.equipments;
+  const derived = territory.enrichment?.derived;
+
+  return (
+    <DataSection
+      id="equipements"
+      title="Équipements & transports"
+      subtitle={
+        <>
+          <AcronymTooltip term="BPE" /> — équipements et dessertes
+        </>
+      }
+      vintage={equipments?.year}
+    >
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Équipements
+          </h3>
+          {equipments?.available ? (
+            <dl className="mt-3 space-y-3">
+              <DataRow
+                label="Total équipements"
+                value={new Intl.NumberFormat("fr-FR").format(
+                  equipments.totalEquipments,
+                )}
+              />
+              {derived?.equipmentsPer1000Residents != null ? (
+                <DataRow
+                  label="Équipements pour 1 000 hab."
+                  value={new Intl.NumberFormat("fr-FR", {
+                    maximumFractionDigits: 1,
+                  }).format(derived.equipmentsPer1000Residents)}
+                />
+              ) : null}
+              {equipments.byDomain.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Par domaine
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {equipments.byDomain.map((domain) => (
+                        <li key={domain.code}>
+                          {domain.label} —{" "}
+                          {new Intl.NumberFormat("fr-FR").format(domain.count)}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
+              {equipments.byType.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Principaux types
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {equipments.byType.map((type) => (
+                        <li key={type.code}>
+                          {type.label}
+                          {type.label !== type.code ? ` (${type.code})` : ""} —{" "}
+                          {new Intl.NumberFormat("fr-FR").format(type.count)}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
+              <p className="text-xs text-slate-500">{equipments.note}</p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={
+                equipments?.note ??
+                "Données BPE non disponibles. Exécutez « npm run ingest:bpe »."
+              }
+            />
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">Transports</h3>
+          {equipments?.transport.available ? (
+            <dl className="mt-3 space-y-3">
+              <DataRow
+                label="Équipements recensés"
+                value={new Intl.NumberFormat("fr-FR").format(
+                  equipments.transport.totalEquipments,
+                )}
+              />
+              {equipments.transport.byType.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Types de dessertes
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {equipments.transport.byType.map((type) => (
+                        <li key={type.code}>
+                          {type.label}
+                          {type.label !== type.code ? ` (${type.code})` : ""} —{" "}
+                          {new Intl.NumberFormat("fr-FR").format(type.count)}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
+              <p className="text-xs text-slate-500">{equipments.transport.note}</p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={
+                equipments?.transport.note ??
+                "Données de transport non disponibles."
+              }
+            />
+          )}
+        </div>
+      </div>
+    </DataSection>
+  );
+}
