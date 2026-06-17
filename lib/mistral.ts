@@ -44,6 +44,9 @@ function buildUserPrompt(territory: TerritoryProfile): string {
     densiteHabKm2: territory.densityPerKm2,
     coordonnees: territory.coordinates,
     surfaceKm2: territory.surfaceKm2,
+    evolutionDemographique: territory.enrichment?.populationHistory?.available
+      ? territory.enrichment.populationHistory.history
+      : null,
     entreprises: territory.enrichment?.enterprises
       ? {
           unitesLegalesAvecEtablissement:
@@ -51,6 +54,8 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           secteursDominants:
             territory.enrichment.enterprises.topActivitySections,
           essEchantillon: territory.enrichment.enterprises.essCount,
+          rgeEchantillon: territory.enrichment.enterprises.rgeCount,
+          tranchesEffectif: territory.enrichment.enterprises.staffSizeBands,
           note: territory.enrichment.enterprises.note,
         }
       : null,
@@ -59,7 +64,57 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           annee: territory.enrichment.equipments.year,
           total: territory.enrichment.equipments.totalEquipments,
           parDomaine: territory.enrichment.equipments.byDomain,
+          parType: territory.enrichment.equipments.byType,
           note: territory.enrichment.equipments.note,
+        }
+      : null,
+    risques: territory.enrichment?.risks?.available
+      ? {
+          radon: territory.enrichment.risks.radon,
+          inondation: territory.enrichment.risks.flood,
+          catnat: territory.enrichment.risks.catNatEvents,
+          note: territory.enrichment.risks.note,
+        }
+      : null,
+    logementsSociaux: territory.enrichment?.housing?.available
+      ? {
+          annee: territory.enrichment.housing.year,
+          parcTotal: territory.enrichment.housing.totalUnits,
+          loues: territory.enrichment.housing.occupiedUnits,
+          vacants: territory.enrichment.housing.vacantUnits,
+          note: territory.enrichment.housing.note,
+        }
+      : null,
+    irve: territory.enrichment?.mobility?.available
+      ? {
+          pointsDeCharge: territory.enrichment.mobility.chargingPoints,
+          stations: territory.enrichment.mobility.stations,
+          note: territory.enrichment.mobility.note,
+        }
+      : null,
+    fiscalite: territory.enrichment?.fiscal?.available
+      ? {
+          annee: territory.enrichment.fiscal.year,
+          tauxTfb: territory.enrichment.fiscal.propertyTaxBuiltRate,
+          tauxTfnb: territory.enrichment.fiscal.propertyTaxUnbuiltRate,
+          note: territory.enrichment.fiscal.note,
+        }
+      : null,
+    geographie: {
+      aireAttraction: territory.enrichment?.geography?.attractionArea?.available
+        ? territory.enrichment.geography.attractionArea
+        : null,
+      comparatifEpci: territory.enrichment?.geography?.epciComparison?.available
+        ? territory.enrichment.geography.epciComparison
+        : null,
+    },
+    immobilier: territory.enrichment?.property?.available
+      ? {
+          annee: territory.enrichment.property.year,
+          prixM2: territory.enrichment.property.medianPricePerM2,
+          prixMoyen: territory.enrichment.property.averagePrice,
+          mutations: territory.enrichment.property.mutationCount,
+          note: territory.enrichment.property.note,
         }
       : null,
     sources: territory.sources.map((source) => source.name),

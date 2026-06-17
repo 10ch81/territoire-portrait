@@ -1,5 +1,9 @@
 import type { TerritoryProfile } from "@/lib/types";
-import { formatDensity } from "@/lib/enrichment";
+import {
+  formatCurrency,
+  formatDensity,
+  formatRate,
+} from "@/lib/enrichment";
 import {
   formatPopulation,
   formatSurface,
@@ -18,10 +22,21 @@ function DataRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function SectionUnavailable({ message }: { message: string }) {
+  return <p className="mt-2 text-sm text-amber-800">{message}</p>;
+}
+
 export function EnrichmentCard({ territory }: EnrichmentCardProps) {
   const enrichment = territory.enrichment;
+  const populationHistory = enrichment?.populationHistory;
   const enterprises = enrichment?.enterprises;
   const equipments = enrichment?.equipments;
+  const risks = enrichment?.risks;
+  const housing = enrichment?.housing;
+  const mobility = enrichment?.mobility;
+  const fiscal = enrichment?.fiscal;
+  const geography = enrichment?.geography;
+  const property = enrichment?.property;
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -29,7 +44,8 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
         Données enrichies
       </h2>
       <p className="mt-1 text-sm text-slate-600">
-        INSEE, SIRENE et BPE — sources publiques complémentaires.
+        INSEE, SIRENE, BPE, Géorisques, RPLS, IRVE, REI, AAV et DVF — sources
+        publiques complémentaires.
       </p>
 
       <div className="mt-6 space-y-6">
@@ -60,6 +76,31 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
 
         <div>
           <h3 className="text-base font-semibold text-slate-900">
+            Évolution démographique
+          </h3>
+          {populationHistory?.available ? (
+            <dl className="mt-3 space-y-3">
+              {populationHistory.history.map((point) => (
+                <DataRow
+                  key={point.year}
+                  label={String(point.year)}
+                  value={formatPopulation(point.population)}
+                />
+              ))}
+              <p className="text-xs text-slate-500">{populationHistory.note}</p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={
+                populationHistory?.note ??
+                "Historique population non disponible."
+              }
+            />
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
             Économie — SIRENE
           </h3>
           {enterprises ? (
@@ -80,6 +121,28 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
                   value={String(enterprises.essCount)}
                 />
               ) : null}
+              {enterprises.rgeCount !== null ? (
+                <DataRow
+                  label="RGE (échantillon)"
+                  value={String(enterprises.rgeCount)}
+                />
+              ) : null}
+              {enterprises.staffSizeBands.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Tranches d&apos;effectif (échantillon)
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {enterprises.staffSizeBands.map((band) => (
+                        <li key={band.code}>
+                          {band.label} — {band.count}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
               {enterprises.topActivitySections.length > 0 ? (
                 <div>
                   <dt className="text-sm font-medium text-slate-500">
@@ -99,9 +162,7 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
               <p className="text-xs text-slate-500">{enterprises.note}</p>
             </dl>
           ) : (
-            <p className="mt-2 text-sm text-slate-500">
-              Donnée non disponible
-            </p>
+            <p className="mt-2 text-sm text-slate-500">Donnée non disponible</p>
           )}
         </div>
 
@@ -134,13 +195,245 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
                   </dd>
                 </div>
               ) : null}
+              {equipments.byType.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Principaux types
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {equipments.byType.map((type) => (
+                        <li key={type.code}>
+                          {type.code} —{" "}
+                          {new Intl.NumberFormat("fr-FR").format(type.count)}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
               <p className="text-xs text-slate-500">{equipments.note}</p>
             </dl>
           ) : (
-            <p className="mt-2 text-sm text-amber-800">
-              {equipments?.note ??
-                "Données BPE non disponibles. Exécutez « npm run ingest:bpe »."}
-            </p>
+            <SectionUnavailable
+              message={
+                equipments?.note ??
+                "Données BPE non disponibles. Exécutez « npm run ingest:bpe »."
+              }
+            />
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Risques — Géorisques
+          </h3>
+          {risks?.available ? (
+            <dl className="mt-3 space-y-3">
+              {risks.radon ? (
+                <DataRow label="Radon" value={risks.radon.label} />
+              ) : null}
+              {risks.flood ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Inondation (AZI)
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {risks.flood.zones.map((zone) => (
+                        <li key={zone}>{zone}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
+              {risks.catNatEvents.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    CATNAT récentes
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {risks.catNatEvents.map((event) => (
+                        <li key={`${event.label}-${event.startDate}`}>
+                          {event.label}
+                          {event.startDate ? ` (${event.startDate})` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
+              <p className="text-xs text-slate-500">{risks.note}</p>
+            </dl>
+          ) : (
+            <p className="mt-2 text-sm text-slate-500">Donnée non disponible</p>
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Logements sociaux — RPLS
+          </h3>
+          {housing?.available ? (
+            <dl className="mt-3 space-y-3">
+              <DataRow
+                label="Parc total"
+                value={formatPopulation(housing.totalUnits)}
+              />
+              <DataRow
+                label="Logements loués"
+                value={formatPopulation(housing.occupiedUnits)}
+              />
+              <DataRow
+                label="Logements vacants"
+                value={formatPopulation(housing.vacantUnits)}
+              />
+              <p className="text-xs text-slate-500">{housing.note}</p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={housing?.note ?? "Données RPLS non disponibles."}
+            />
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Mobilité — IRVE
+          </h3>
+          {mobility?.available ? (
+            <dl className="mt-3 space-y-3">
+              <DataRow
+                label="Points de charge"
+                value={new Intl.NumberFormat("fr-FR").format(
+                  mobility.chargingPoints,
+                )}
+              />
+              <DataRow
+                label="Stations recensées"
+                value={new Intl.NumberFormat("fr-FR").format(mobility.stations)}
+              />
+              <p className="text-xs text-slate-500">{mobility.note}</p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={mobility?.note ?? "Données IRVE non disponibles."}
+            />
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Fiscalité locale — REI
+          </h3>
+          {fiscal?.available ? (
+            <dl className="mt-3 space-y-3">
+              <DataRow
+                label="Taux taxe foncière bâti"
+                value={formatRate(fiscal.propertyTaxBuiltRate)}
+              />
+              <DataRow
+                label="Taux taxe foncière non bâti"
+                value={formatRate(fiscal.propertyTaxUnbuiltRate)}
+              />
+              <p className="text-xs text-slate-500">{fiscal.note}</p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={fiscal?.note ?? "Données REI non disponibles."}
+            />
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Géographie — AAV & EPCI
+          </h3>
+          <dl className="mt-3 space-y-3">
+            {geography?.attractionArea?.available ? (
+              <>
+                <DataRow
+                  label="Aire d'attraction"
+                  value={geography.attractionArea.code}
+                />
+                <DataRow
+                  label="Typologie AAV"
+                  value={geography.attractionArea.categoryLabel}
+                />
+              </>
+            ) : (
+              <SectionUnavailable
+                message={
+                  geography?.attractionArea?.note ??
+                  "Données AAV non disponibles."
+                }
+              />
+            )}
+            {geography?.epciComparison?.available ? (
+              <>
+                <DataRow
+                  label="Rang population (EPCI)"
+                  value={
+                    geography.epciComparison.communeRankByPopulation !== null
+                      ? `${geography.epciComparison.communeRankByPopulation} / ${geography.epciComparison.communeCount}`
+                      : "Donnée non disponible"
+                  }
+                />
+                <DataRow
+                  label="Rang densité (EPCI)"
+                  value={
+                    geography.epciComparison.communeRankByDensity !== null
+                      ? `${geography.epciComparison.communeRankByDensity} / ${geography.epciComparison.communeCount}`
+                      : "Donnée non disponible"
+                  }
+                />
+                <DataRow
+                  label="Population moyenne EPCI"
+                  value={formatPopulation(
+                    geography.epciComparison.epciAveragePopulation,
+                  )}
+                />
+                <DataRow
+                  label="Densité moyenne EPCI"
+                  value={formatDensity(geography.epciComparison.epciAverageDensity)}
+                />
+                <p className="text-xs text-slate-500">
+                  {geography.epciComparison.note}
+                </p>
+              </>
+            ) : null}
+          </dl>
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Immobilier — DVF
+          </h3>
+          {property?.available ? (
+            <dl className="mt-3 space-y-3">
+              <DataRow
+                label="Prix médian au m²"
+                value={formatCurrency(property.medianPricePerM2)}
+              />
+              <DataRow
+                label="Prix moyen des mutations"
+                value={formatCurrency(property.averagePrice)}
+              />
+              <DataRow
+                label="Nombre de mutations"
+                value={
+                  property.mutationCount !== null
+                    ? new Intl.NumberFormat("fr-FR").format(property.mutationCount)
+                    : "Donnée non disponible"
+                }
+              />
+              <p className="text-xs text-slate-500">{property.note}</p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={property?.note ?? "Données DVF non disponibles."}
+            />
           )}
         </div>
       </div>

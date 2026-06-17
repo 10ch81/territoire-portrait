@@ -6,12 +6,32 @@ const BPE_DATASET_URL =
   "https://www.data.gouv.fr/datasets/denombrement-des-equipements-commerce-sport-services-sante/";
 const BPE_FILE_URL =
   "https://api.insee.fr/melodi/file/DS_BPE/DS_BPE_2024_CSV_FR";
+const POPULATION_HISTORY_URL =
+  "https://api.insee.fr/melodi/file/DS_POPULATIONS_HISTORIQUES/DS_POPULATIONS_HISTORIQUES_CSV_FR";
+const GEORISQUES_URL = "https://georisques.gouv.fr/";
+const RPLS_URL =
+  "https://www.data.gouv.fr/datasets/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/";
+const IRVE_URL =
+  "https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/";
+const REI_URL =
+  "https://www.data.gouv.fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-4/";
+const AAV_URL =
+  "https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/";
+const DVF_URL =
+  "https://www.data.gouv.fr/datasets/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/";
 
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
   RECHERCHE_ENTREPRISES: "recherche-entreprises",
   INSEE_BPE: "insee-bpe",
   INSEE_POPULATION: "insee-population",
+  INSEE_POPULATION_HISTORY: "insee-population-history",
+  GEORISQUES: "georisques",
+  RPLS: "rpls",
+  IRVE: "irve",
+  REI: "rei",
+  AAV: "aav2020",
+  DVF: "dvf",
 } as const;
 
 export function createGeoApiSource(accessedAt: string): DataSource {
@@ -54,6 +74,77 @@ export function createPopulationSource(accessedAt: string): DataSource {
     url: "https://www.data.gouv.fr/fr/datasets/populations-legales/",
     description:
       "Population municipale diffusée via l'API Géo (millésime populations légales).",
+    accessedAt,
+  };
+}
+
+export function createPopulationHistorySource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_POPULATION_HISTORY,
+    name: "INSEE — Populations historiques",
+    url: POPULATION_HISTORY_URL,
+    description: "Séries historiques de population municipale par commune.",
+    accessedAt,
+  };
+}
+
+export function createGeorisquesSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.GEORISQUES,
+    name: "Géorisques",
+    url: GEORISQUES_URL,
+    description: "Radon, inondations (AZI) et reconnaissances CATNAT par commune.",
+    accessedAt,
+  };
+}
+
+export function createRplsSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.RPLS,
+    name: "RPLS — Parc locatif social",
+    url: RPLS_URL,
+    description: "Répertoire des logements locatifs des bailleurs sociaux agrégé par commune.",
+    accessedAt,
+  };
+}
+
+export function createIrveSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.IRVE,
+    name: "IRVE — Bornes de recharge",
+    url: IRVE_URL,
+    description: "Fichier consolidé national des bornes de recharge pour véhicules électriques.",
+    accessedAt,
+  };
+}
+
+export function createReiSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.REI,
+    name: "REI — Fiscalité locale",
+    url: REI_URL,
+    description:
+      "Recensement des éléments d'imposition à la fiscalité directe locale (taux communaux).",
+    accessedAt,
+  };
+}
+
+export function createAavSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.AAV,
+    name: "INSEE — Aires d'attraction 2020",
+    url: AAV_URL,
+    description: "Zonage en aires d'attraction des villes (AAV2020) par commune.",
+    accessedAt,
+  };
+}
+
+export function createDvfSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.DVF,
+    name: "DVF — Indicateurs immobiliers",
+    url: DVF_URL,
+    description: "Prix et volumes de mutations immobilières agrégés par commune.",
     accessedAt,
   };
 }

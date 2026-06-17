@@ -77,22 +77,35 @@ data/cache/                       # Cache local (.gitkeep)
 docs/mcp-datagouv.md              # Guide MCP data.gouv.fr
 ```
 
-## Sources de données (MVP)
+## Sources de données
 
 | Source | Usage |
 | ------ | ----- |
-| API Géo | Communes, population, EPCI, coordonnées |
-| API Recherche Entreprises | SIRENE — entreprises avec établissement sur la commune |
-| INSEE BPE 2024 (cache local) | Équipements et services par domaine |
+| API Géo | Communes, population, EPCI, coordonnées, comparatif EPCI |
+| API Recherche Entreprises | SIRENE — entreprises, ESS, RGE, tranches d'effectif |
+| INSEE BPE 2024 (cache) | Équipements par domaine et par type |
+| INSEE populations historiques (cache) | Évolution démographique |
+| Géorisques (live) | Radon, inondation (AZI), CATNAT |
+| RPLS (cache) | Parc de logements sociaux |
+| IRVE national (cache) | Bornes de recharge par commune |
+| REI (cache) | Taux de fiscalité locale |
+| AAV 2020 (cache) | Aire d'attraction des villes |
+| DVF (cache) | Prix immobilier au m² |
 
-### Ingestion des données BPE
+### Ingestion des caches locaux
 
 ```bash
-npm run ingest:bpe    # télécharge et agrège la BPE INSEE (~13 Mo)
-npm run ingest:all    # toutes les ingestions
+npm run ingest:all        # toutes les ingestions
+npm run ingest:bpe        # équipements INSEE (~13 Mo)
+npm run ingest:population # séries démographiques
+npm run ingest:housing    # logements sociaux (RPLS)
+npm run ingest:irve       # bornes de recharge (~150 Mo)
+npm run ingest:rei        # fiscalité locale (~17 Mo)
+npm run ingest:geography  # aires d'attraction 2020
+npm run ingest:property   # indicateurs DVF
 ```
 
-Le cache est stocké dans `data/cache/bpe-by-commune.json` (versionné pour Vercel).
+Les caches agrégés sont stockés dans `data/cache/*-by-commune.json` (versionnés pour Vercel).
 
 ## MCP data.gouv.fr
 

@@ -38,6 +38,12 @@ yarn-error.log*
 /data/cache/*
 !/data/cache/.gitkeep
 !/data/cache/bpe-by-commune.json
+!/data/cache/population-by-commune.json
+!/data/cache/housing-by-commune.json
+!/data/cache/irve-by-commune.json
+!/data/cache/fiscal-by-commune.json
+!/data/cache/geography-by-commune.json
+!/data/cache/property-by-commune.json
 
 # vercel
 .vercel

@@ -10,6 +10,12 @@
     "typecheck": "tsc --noEmit",
     "analyze:sample": "tsx scripts/analyze-sample.ts",
     "ingest:bpe": "tsx scripts/ingest-bpe.ts",
+    "ingest:population": "tsx scripts/ingest-population.ts",
+    "ingest:housing": "tsx scripts/ingest-housing.ts",
+    "ingest:irve": "tsx scripts/ingest-irve.ts",
+    "ingest:rei": "tsx scripts/ingest-rei.ts",
+    "ingest:geography": "tsx scripts/ingest-geography.ts",
+    "ingest:property": "tsx scripts/ingest-property.ts",
     "ingest:all": "tsx scripts/ingest-all.ts"
   },
   "dependencies": {

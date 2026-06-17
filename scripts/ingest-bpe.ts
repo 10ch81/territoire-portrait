@@ -77,7 +77,7 @@ async function aggregateCommuneData(): Promise<BpeCommuneCache> {
       continue;
     }
 
-    const [geo, geoObject, facilityDom, , , , timePeriod, obsValueRaw] =
+    const [geo, geoObject, facilityDom, , facilityType, , timePeriod, obsValueRaw] =
       parseCsvLine(line);
 
     if (geoObject !== "COM") {
@@ -94,12 +94,17 @@ async function aggregateCommuneData(): Promise<BpeCommuneCache> {
       year,
       total: 0,
       byDomain: {},
+      byType: {},
     };
 
     if (facilityDom === "_T") {
       entry.total = count;
     } else if (BPE_DOMAINS.has(facilityDom)) {
       entry.byDomain[facilityDom] = count;
+    }
+
+    if (facilityType && facilityType !== "_T") {
+      entry.byType[facilityType] = count;
     }
 
     cache[geo] = entry;

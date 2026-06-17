@@ -6,6 +6,12 @@ import { spawnSync } from "node:child_process";
 
 const steps = [
   { name: "BPE (équipements INSEE)", script: "scripts/ingest-bpe.ts" },
+  { name: "Population historique (INSEE)", script: "scripts/ingest-population.ts" },
+  { name: "RPLS (logements sociaux)", script: "scripts/ingest-housing.ts" },
+  { name: "IRVE (bornes de recharge)", script: "scripts/ingest-irve.ts" },
+  { name: "REI (fiscalité locale)", script: "scripts/ingest-rei.ts" },
+  { name: "AAV (aires d'attraction)", script: "scripts/ingest-geography.ts" },
+  { name: "DVF (prix immobiliers)", script: "scripts/ingest-property.ts" },
 ];
 
 for (const step of steps) {
