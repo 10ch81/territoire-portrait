@@ -1,9 +1,9 @@
 "use client";
 
-import type { SectionDef } from "@/lib/ux/sections";
+import type { NavSection } from "@/lib/ux/sections";
 
 interface SectionNavProps {
-  sections: SectionDef[];
+  sections: NavSection[];
 }
 
 export function SectionNav({ sections }: SectionNavProps) {

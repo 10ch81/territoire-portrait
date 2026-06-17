@@ -1,8 +1,11 @@
 import type { TerritoryProfile } from "@/lib/types";
 
-export interface SectionDef {
+export interface NavSection {
   id: string;
   label: string;
+}
+
+interface SectionDef extends NavSection {
   isAvailable: (territory: TerritoryProfile) => boolean;
 }
 
@@ -61,6 +64,8 @@ export const ENRICHMENT_SECTIONS: SectionDef[] = [
   },
 ];
 
-export function getVisibleSections(territory: TerritoryProfile): SectionDef[] {
-  return ENRICHMENT_SECTIONS.filter((s) => s.isAvailable(territory));
+export function getVisibleSections(territory: TerritoryProfile): NavSection[] {
+  return ENRICHMENT_SECTIONS.filter((s) => s.isAvailable(territory)).map(
+    ({ id, label }) => ({ id, label }),
+  );
 }
