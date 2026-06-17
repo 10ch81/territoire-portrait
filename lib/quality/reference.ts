@@ -1,9 +1,6 @@
 import { computeDerivedIndicators } from "../enrichment/derived";
 import { fetchEnterpriseSnapshot } from "../enrichment/enterprises";
-import { loadEquipmentSnapshot } from "../enrichment/equipments";
 import { getEnrichedTerritoryByInsee } from "../enrichment";
-import { loadIrveSnapshot } from "../enrichment/mobility";
-import { loadPropertyMarketSnapshot } from "../enrichment/property";
 import { loadJsonCache } from "../enrichment/cache";
 import type {
   BpeCommuneCache,

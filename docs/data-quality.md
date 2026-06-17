@@ -2,7 +2,7 @@
 
 Document de référence pour la validation automatique des jeux de données affichés par l'application.
 
-**Statut** : architecture définie — implémentation progressive (voir phases ci-dessous).
+**Statut** : implémenté (P0–P4). Voir phases ci-dessous.
 
 ## Objectif
 
@@ -57,7 +57,7 @@ Communes de référence pour les vérifications croisées (couverture géographi
 | Rennes | 35238 | Ville moyenne, exemple principal |
 | Nantes | 44109 | Métropole, déjà utilisée dans `analyze:sample` |
 | Paris | 75056 | Très grande commune |
-| Commune rurale | à définir | Petit territoire, cas limites jointure |
+| Commune rurale | 01001 | L'Abergement-Clémenciat — petit territoire |
 
 ## Règles de cohérence interne (option 2)
 
@@ -133,18 +133,22 @@ L'agent **ne corrige pas** les écarts `MILLESIME_DIFF` ou `DEFINITION_DIFF` —
 lib/quality/
   rules.ts              # règles pures (option 2)
   classify.ts           # typage des écarts (option 3)
+  compare.ts            # seuils et écarts numériques
   reference.ts          # fetch live + comparaison (option 1)
   golden-communes.ts    # liste INSEE de référence
+  staleness.ts          # détection cache obsolète (P4)
+  report.ts             # rapport JSON et échec CI
 
 scripts/
   validate-internal.ts
   verify-reference.ts
+  quality-all.ts
 
 data/quality/
   latest.json           # rapport CI (artefact ou versionné)
 ```
 
-## Commandes (planifiées)
+## Commandes
 
 ```bash
 npm run validate:internal   # cohérence interne du cache
@@ -152,17 +156,15 @@ npm run verify:reference    # golden communes vs APIs live
 npm run quality:all         # validate + verify (sans ingest)
 ```
 
-À ajouter dans `package.json` lors de l'implémentation.
-
 ## Phases d'implémentation
 
 | Phase | Contenu | Statut |
 | ----- | ------- | ------ |
-| **P0** | `lib/quality/rules.ts` + `scripts/validate-internal.ts` | À faire |
-| **P1** | `scripts/verify-reference.ts` (Rennes en premier) | À faire |
-| **P2** | Extension workflow CI + `data/quality/latest.json` | À faire |
-| **P3** | Automation Cursor sur échecs CI | À faire |
-| **P4** | Multi-source + classification millésime fine | À faire |
+| **P0** | `lib/quality/rules.ts` + `scripts/validate-internal.ts` | ✅ |
+| **P1** | `scripts/verify-reference.ts` + `reference.ts` | ✅ |
+| **P2** | Extension workflow CI + `data/quality/latest.json` | ✅ |
+| **P3** | Automation Cursor sur échecs CI | ✅ (voir `docs/automation-data-quality.md`) |
+| **P4** | Multi-source + classification + `staleness.ts` | ✅ |
 
 ## Indicateurs prioritaires pour verify
 
@@ -182,4 +184,5 @@ npm run quality:all         # validate + verify (sans ingest)
 - [docs/mcp-datagouv.md](./mcp-datagouv.md) — exploration de nouvelles sources
 - [lib/sources.ts](../lib/sources.ts) — métadonnées et liste blanche
 - [lib/enrichment/derived.ts](../lib/enrichment/derived.ts) — indicateurs dérivés à recroiser
+- [docs/automation-data-quality.md](./automation-data-quality.md) — automation Cursor (P3)
 - [AGENTS.md](../AGENTS.md) — workflow agent

@@ -131,8 +131,8 @@ Boucle automatique en cours de mise en place pour détecter erreurs de parsers, 
 | ------ | -------------------- | ---- |
 | Cohérence interne | `npm run validate:internal` | Densité, indicateurs dérivés, bornes |
 | Référence live | `npm run verify:reference` | Rennes, Nantes, … vs APIs officielles |
-| Pipeline CI | extension `refresh-cache.yml` | Ingest → validate → verify → commit |
-| Investigation | automation Cursor | PR sur bugs parser / jointure |
+| Pipeline CI | `refresh-cache.yml` | Ingest → quality:all → commit |
+| Investigation | automation Cursor | Voir `docs/automation-data-quality.md` |
 
 Pas de scraping web — sources limitées à la liste blanche `lib/sources.ts`.
 

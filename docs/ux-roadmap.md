@@ -55,15 +55,15 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] Accueil orienté **cas d'usage** (élus, prospecteurs, risques)
 - [ ] Comparaison de communes (phase 2 — page `/compare` à venir)
 
-## Sprint 5 — Qualité des données (planifié)
+## Sprint 5 — Qualité des données
 
-- [ ] `lib/quality/rules.ts` — cohérence interne (densité, dérivés, bornes)
-- [ ] `scripts/validate-internal.ts` — validation du cache agrégé
-- [ ] `scripts/verify-reference.ts` — golden communes vs APIs live
-- [ ] Classification des écarts (`MILLESIME_DIFF`, `PARSER_BUG`, …)
-- [ ] Extension CI `refresh-cache.yml` (validate + verify avant commit)
-- [ ] Rapport `data/quality/latest.json`
-- [ ] Automation Cursor sur échecs de code
+- [x] `lib/quality/rules.ts` — cohérence interne (densité, dérivés, bornes)
+- [x] `scripts/validate-internal.ts` — validation du cache agrégé
+- [x] `scripts/verify-reference.ts` — golden communes vs APIs live
+- [x] Classification des écarts (`MILLESIME_DIFF`, `PARSER_BUG`, …)
+- [x] Extension CI `refresh-cache.yml` (validate + verify avant commit)
+- [x] Rapport `data/quality/latest.json`
+- [x] Guide automation Cursor (`docs/automation-data-quality.md`)
 
 Référence : [docs/data-quality.md](./data-quality.md).
 

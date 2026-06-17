@@ -40,14 +40,6 @@ function isPercentInRange(
   return null;
 }
 
-function countsClose(
-  expected: number,
-  actual: number,
-  tolerance = COUNT_TOLERANCE,
-): boolean {
-  return Math.abs(expected - actual) <= tolerance;
-}
-
 function validateBpeCache(findings: QualityFinding[]): void {
   const cache = loadJsonCache<BpeCommuneCache>("bpe-by-commune.json");
 

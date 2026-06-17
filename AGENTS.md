@@ -20,7 +20,7 @@ Construire un système réutilisable pour produire des portraits territoriaux de
 | `lib/enrichment/`        | SIRENE (API live) + BPE (cache INSEE)             |
 | `lib/mistral.ts`         | Client Mistral centralisé (serveur uniquement)    |
 | `lib/sources.ts`         | Métadonnées des sources                           |
-| `lib/quality/`           | Règles et vérification qualité données (planifié) |
+| `lib/quality/`           | Règles et vérification qualité données            |
 | `scripts/`               | Ingestion, validation et outils CLI               |
 | `data/cache/`            | Snapshots agrégés par commune (versionnés pour Vercel) |
 | `data/quality/`          | Rapports de validation CI (`latest.json`)         |
@@ -52,9 +52,9 @@ npm run typecheck        # vérification TypeScript
 npm run analyze:sample   # test Mistral avec Nantes (44109)
 npm run ingest:bpe       # ingestion BPE INSEE → data/cache/
 npm run ingest:all       # toutes les ingestions
-npm run validate:internal   # cohérence interne cache (planifié)
-npm run verify:reference    # golden communes vs APIs live (planifié)
-npm run quality:all         # validate + verify (planifié)
+npm run validate:internal   # cohérence interne cache
+npm run verify:reference    # golden communes vs APIs live
+npm run quality:all         # validate + verify
 ```
 
 ## Déploiement
@@ -76,13 +76,12 @@ Boucle automatique documentée dans **`docs/data-quality.md`** :
 2. Golden communes (Rennes 35238, Nantes 44109, …) vs APIs officielles live.
 3. Classification des écarts (millésime vs bug parser).
 4. Pipeline CI post-ingest (`refresh-cache.yml`).
-5. Agent Cursor sur échecs de code (`PARSER_BUG`, `JOIN_KEY_ERROR`).
+5. Agent Cursor sur échecs de code (`PARSER_BUG`, `JOIN_KEY_ERROR`) — voir `docs/automation-data-quality.md`.
 
 Pas de scraping web — liste blanche `lib/sources.ts` uniquement.
 
 ## Prochaines étapes suggérées
 
-- Implémenter `lib/quality/` et scripts `validate-internal` / `verify-reference` (P0–P2).
 - Ingestion CSV/JSON depuis data.gouv.fr (nouvelles thématiques).
-- Automation Cursor sur échecs CI qualité données.
+- Configurer l'automation Cursor (`docs/automation-data-quality.md`).
 - Comparaison de communes (`/compare`) — phase 2 UX.
