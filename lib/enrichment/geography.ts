@@ -3,6 +3,7 @@ import { loadJsonCache } from "./cache";
 import type {
   AttractionAreaSnapshot,
   EpciComparisonSnapshot,
+  GeographyCommuneCache,
   GeographySnapshot,
   TerritoryProfile,
 } from "../types";
@@ -90,21 +91,13 @@ async function fetchEpciComparison(
 export async function loadGeographySnapshot(
   territory: TerritoryProfile,
 ): Promise<GeographySnapshot> {
-  const cache = loadJsonCache<
-    Record<
-      string,
-      {
-        aavCode: string;
-        categoryCode: string;
-        categoryLabel: string;
-      }
-    >
-  >(GEOGRAPHY_CACHE_FILE);
+  const cache = loadJsonCache<GeographyCommuneCache>(GEOGRAPHY_CACHE_FILE);
 
   const entry = cache?.[territory.inseeCode];
   const attractionArea: AttractionAreaSnapshot | null = entry
     ? {
         code: entry.aavCode,
+        label: entry.aavLabel ?? entry.aavCode,
         categoryCode: entry.categoryCode,
         categoryLabel: entry.categoryLabel,
         available: true,
@@ -112,6 +105,7 @@ export async function loadGeographySnapshot(
       }
     : {
         code: "",
+        label: "",
         categoryCode: "",
         categoryLabel: "",
         available: false,

@@ -86,6 +86,7 @@ export interface EquipmentSnapshot {
 export interface AgeBandCount {
   label: string;
   population: number;
+  sharePercent: number | null;
 }
 
 export interface SociodemographicsSnapshot {
@@ -133,6 +134,9 @@ export interface SocialHousingSnapshot {
   totalUnits: number | null;
   occupiedUnits: number | null;
   vacantUnits: number | null;
+  totalDwellings: number | null;
+  socialHousingSharePercent: number | null;
+  vacancyRatePercent: number | null;
   available: boolean;
   note: string;
 }
@@ -156,6 +160,7 @@ export interface LocalTaxSnapshot {
 
 export interface AttractionAreaSnapshot {
   code: string;
+  label: string;
   categoryCode: string;
   categoryLabel: string;
   available: boolean;
@@ -178,11 +183,35 @@ export interface GeographySnapshot {
   epciComparison: EpciComparisonSnapshot | null;
 }
 
+export interface PropertyYearPrice {
+  year: number;
+  averagePricePerM2: number | null;
+  mutationCount: number | null;
+}
+
 export interface PropertyMarketSnapshot {
   year: number;
   averagePricePerM2: number | null;
   averageTransactionPrice: number | null;
   mutationCount: number | null;
+  houseMutations: number | null;
+  apartmentMutations: number | null;
+  houseSharePercent: number | null;
+  apartmentSharePercent: number | null;
+  priceHistory: PropertyYearPrice[];
+  departmentCode: string | null;
+  departmentAveragePricePerM2: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface DerivedIndicatorsSnapshot {
+  populationGrowthPercent: number | null;
+  populationGrowthFromYear: number | null;
+  populationGrowthToYear: number | null;
+  irvePointsPer1000Residents: number | null;
+  socialHousingVacancyRatePercent: number | null;
+  equipmentsPer1000Residents: number | null;
   available: boolean;
   note: string;
 }
@@ -198,6 +227,7 @@ export interface TerritoryEnrichment {
   fiscal: LocalTaxSnapshot | null;
   geography: GeographySnapshot | null;
   property: PropertyMarketSnapshot | null;
+  derived: DerivedIndicatorsSnapshot | null;
   sources: DataSource[];
 }
 
@@ -295,6 +325,7 @@ export interface HousingCommuneCacheEntry {
   totalUnits: number;
   occupiedUnits: number;
   vacantUnits: number;
+  totalDwellings: number | null;
 }
 
 export type HousingCommuneCache = Record<string, HousingCommuneCacheEntry>;
@@ -318,6 +349,7 @@ export type FiscalCommuneCache = Record<string, FiscalCommuneCacheEntry>;
 
 export interface GeographyCommuneCacheEntry {
   aavCode: string;
+  aavLabel: string;
   categoryCode: string;
   categoryLabel: string;
 }
@@ -329,6 +361,13 @@ export interface PropertyCommuneCacheEntry {
   averagePricePerM2: number | null;
   averageTransactionPrice: number | null;
   mutationCount: number | null;
+  houseMutations: number | null;
+  apartmentMutations: number | null;
+  houseSharePercent: number | null;
+  apartmentSharePercent: number | null;
+  priceHistory: PropertyYearPrice[];
+  departmentCode: string;
+  departmentAveragePricePerM2: number | null;
 }
 
 export type PropertyCommuneCache = Record<string, PropertyCommuneCacheEntry>;

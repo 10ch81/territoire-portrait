@@ -1,14 +1,47 @@
-import { writeFileSync } from "node:fs";
+import {
+  createReadStream,
+  existsSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
+import { createInterface } from "node:readline";
 import { resolve } from "node:path";
-import { CACHE_DIR, parseCsvLine } from "./ingest-utils";
+import {
+  CACHE_DIR,
+  downloadFile,
+  extractZip,
+  parseCsvLine,
+  parseFrenchDecimal,
+} from "./ingest-utils";
 import type { HousingCommuneCache } from "../lib/types";
 
 const OUTPUT_PATH = resolve(CACHE_DIR, "housing-by-commune.json");
-const SOURCE_URL =
+const RPLS_URL =
   "https://static.data.gouv.fr/resources/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/20230309-150841/rpls-2021.csv";
+const LOGEMENT_ZIP = resolve(CACHE_DIR, "rp-logement-2021.zip");
+const LOGEMENT_DIR = resolve(CACHE_DIR, "rp-logement-2021-extract");
+const LOGEMENT_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/8202349/base-cc-logement-2021_csv.zip";
 
-async function aggregateHousing(): Promise<HousingCommuneCache> {
-  const response = await fetch(SOURCE_URL);
+function findCsvFile(directory: string, prefix: string): string {
+  const match = readdirSync(directory, { recursive: true })
+    .map(String)
+    .find(
+      (name) =>
+        name.toLowerCase().endsWith(".csv") &&
+        name.toLowerCase().includes(prefix.toLowerCase()) &&
+        !name.toLowerCase().includes("meta"),
+    );
+
+  if (!match) {
+    throw new Error(`CSV introuvable dans ${directory} (${prefix}).`);
+  }
+
+  return resolve(directory, match);
+}
+
+async function aggregateRpls(): Promise<HousingCommuneCache> {
+  const response = await fetch(RPLS_URL);
   if (!response.ok || !response.body) {
     throw new Error(`Téléchargement RPLS impossible (statut ${response.status}).`);
   }
@@ -52,14 +85,68 @@ async function aggregateHousing(): Promise<HousingCommuneCache> {
       totalUnits,
       occupiedUnits: Number.parseInt(loueRaw, 10) || 0,
       vacantUnits: Number.parseInt(vacantRaw, 10) || 0,
+      totalDwellings: null,
     };
   }
 
   return cache;
 }
 
+async function enrichWithTotalDwellings(
+  cache: HousingCommuneCache,
+): Promise<void> {
+  if (!existsSync(LOGEMENT_ZIP)) {
+    await downloadFile(LOGEMENT_URL, LOGEMENT_ZIP);
+  }
+  extractZip(LOGEMENT_ZIP, LOGEMENT_DIR);
+
+  const csvPath = findCsvFile(LOGEMENT_DIR, "base-cc-logement-2021");
+  const stream = createInterface({
+    input: createReadStream(csvPath, { encoding: "latin1" }),
+    crlfDelay: Infinity,
+  });
+
+  let headerIndex: Map<string, number> | null = null;
+  const dwellingsColumn = "P21_LOG";
+
+  for await (const line of stream) {
+    if (!line.trim()) {
+      continue;
+    }
+
+    if (!headerIndex) {
+      const headers = parseCsvLine(line);
+      headerIndex = new Map(headers.map((name, position) => [name, position]));
+      continue;
+    }
+
+    const cells = parseCsvLine(line);
+    const inseeCode = cells[0];
+    if (!inseeCode) {
+      continue;
+    }
+
+    const totalDwellings = parseFrenchDecimal(
+      cells[headerIndex.get(dwellingsColumn) ?? -1] ?? "",
+    );
+    if (totalDwellings === null) {
+      continue;
+    }
+
+    const entry = cache[inseeCode];
+    if (entry) {
+      entry.totalDwellings = Math.round(totalDwellings);
+    }
+  }
+}
+
 async function main(): Promise<void> {
-  const cache = await aggregateHousing();
+  console.log("Ingestion RPLS…");
+  const cache = await aggregateRpls();
+
+  console.log("Enrichissement parc de logements (RP 2021)…");
+  await enrichWithTotalDwellings(cache);
+
   writeFileSync(OUTPUT_PATH, JSON.stringify(cache));
   console.log(`\n✅ Cache RPLS généré : ${OUTPUT_PATH}`);
   console.log(`   Communes indexées : ${Object.keys(cache).length}`);

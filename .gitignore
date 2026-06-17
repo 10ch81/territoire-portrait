@@ -46,7 +46,6 @@ yarn-error.log*
 !/data/cache/bpe-type-labels.json
 !/data/cache/social-by-commune.json
 !/data/cache/property-by-commune.json
-!/data/cache/property-by-commune.json
 
 # vercel
 .vercel

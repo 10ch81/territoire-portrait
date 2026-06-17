@@ -2,6 +2,8 @@ import type { TerritoryProfile } from "@/lib/types";
 import {
   formatCurrency,
   formatDensity,
+  formatPercent,
+  formatPropertyPrice,
   formatRate,
 } from "@/lib/enrichment";
 import {
@@ -37,6 +39,7 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
   const fiscal = enrichment?.fiscal;
   const geography = enrichment?.geography;
   const property = enrichment?.property;
+  const derived = enrichment?.derived;
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -71,6 +74,12 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
               value={formatPopulation(territory.population)}
             />
             <DataRow label="Surface" value={formatSurface(territory.surfaceKm2)} />
+            {derived && derived.populationGrowthPercent != null ? (
+              <DataRow
+                label={`Croissance ${derived.populationGrowthFromYear ?? ""}→${derived.populationGrowthToYear ?? ""}`}
+                value={formatPercent(derived.populationGrowthPercent)}
+              />
+            ) : null}
           </dl>
         </div>
 
@@ -109,7 +118,11 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
                 <DataRow
                   key={band.label}
                   label={band.label}
-                  value={formatPopulation(band.population)}
+                  value={
+                    band.sharePercent !== null
+                      ? `${formatPopulation(band.population)} (${formatPercent(band.sharePercent)})`
+                      : formatPopulation(band.population)
+                  }
                 />
               ))}
               {territory.enrichment.sociodemographics.unemploymentRate !== null ? (
@@ -220,6 +233,14 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
                   equipments.totalEquipments,
                 )}
               />
+              {derived && derived.equipmentsPer1000Residents != null ? (
+                <DataRow
+                  label="Équipements pour 1 000 hab."
+                  value={new Intl.NumberFormat("fr-FR", {
+                    maximumFractionDigits: 1,
+                  }).format(derived.equipmentsPer1000Residents)}
+                />
+              ) : null}
               {equipments.byDomain.length > 0 ? (
                 <div>
                   <dt className="text-sm font-medium text-slate-500">
@@ -374,6 +395,24 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
                 label="Logements vacants"
                 value={formatPopulation(housing.vacantUnits)}
               />
+              {housing.totalDwellings !== null ? (
+                <DataRow
+                  label="Parc de logements (RP 2021)"
+                  value={formatPopulation(housing.totalDwellings)}
+                />
+              ) : null}
+              {housing.socialHousingSharePercent !== null ? (
+                <DataRow
+                  label="Part du parc global"
+                  value={formatPercent(housing.socialHousingSharePercent)}
+                />
+              ) : null}
+              {housing.vacancyRatePercent !== null ? (
+                <DataRow
+                  label="Taux de vacance (RPLS)"
+                  value={formatPercent(housing.vacancyRatePercent)}
+                />
+              ) : null}
               <p className="text-xs text-slate-500">{housing.note}</p>
             </dl>
           ) : (
@@ -399,6 +438,14 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
                 label="Stations recensées"
                 value={new Intl.NumberFormat("fr-FR").format(mobility.stations)}
               />
+              {derived && derived.irvePointsPer1000Residents != null ? (
+                <DataRow
+                  label="Points de charge pour 1 000 hab."
+                  value={new Intl.NumberFormat("fr-FR", {
+                    maximumFractionDigits: 1,
+                  }).format(derived.irvePointsPer1000Residents)}
+                />
+              ) : null}
               <p className="text-xs text-slate-500">{mobility.note}</p>
             </dl>
           ) : (
@@ -440,7 +487,11 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
               <>
                 <DataRow
                   label="Aire d'attraction"
-                  value={geography.attractionArea.code}
+                  value={
+                    geography.attractionArea.label
+                      ? `${geography.attractionArea.label} (${geography.attractionArea.code})`
+                      : geography.attractionArea.code
+                  }
                 />
                 <DataRow
                   label="Typologie AAV"
@@ -499,11 +550,17 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
             <dl className="mt-3 space-y-3">
               <DataRow
                 label="Prix moyen au m²"
-                value={formatCurrency(property.averagePricePerM2)}
+                value={formatPropertyPrice(
+                  property.averagePricePerM2,
+                  property.mutationCount,
+                )}
               />
               <DataRow
                 label="Prix moyen des mutations"
-                value={formatCurrency(property.averageTransactionPrice)}
+                value={formatPropertyPrice(
+                  property.averageTransactionPrice,
+                  property.mutationCount,
+                )}
               />
               <DataRow
                 label="Nombre de mutations"
@@ -513,6 +570,48 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
                     : "Donnée non disponible"
                 }
               />
+              {property.houseMutations !== null ? (
+                <DataRow
+                  label="Mutations maisons"
+                  value={new Intl.NumberFormat("fr-FR").format(
+                    property.houseMutations,
+                  )}
+                />
+              ) : null}
+              {property.apartmentMutations !== null ? (
+                <DataRow
+                  label="Mutations appartements"
+                  value={new Intl.NumberFormat("fr-FR").format(
+                    property.apartmentMutations,
+                  )}
+                />
+              ) : null}
+              {property.departmentAveragePricePerM2 !== null ? (
+                <DataRow
+                  label={`Prix m² moyen département (${property.departmentCode ?? "—"})`}
+                  value={formatCurrency(property.departmentAveragePricePerM2)}
+                />
+              ) : null}
+              {property.priceHistory.length > 1 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Évolution prix au m²
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {property.priceHistory.map((point) => (
+                        <li key={point.year}>
+                          {point.year} —{" "}
+                          {formatPropertyPrice(
+                            point.averagePricePerM2,
+                            point.mutationCount,
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
               <p className="text-xs text-slate-500">{property.note}</p>
             </dl>
           ) : (

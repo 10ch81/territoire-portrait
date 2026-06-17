@@ -16,6 +16,13 @@ export function loadPropertyMarketSnapshot(
       averagePricePerM2: null,
       averageTransactionPrice: null,
       mutationCount: null,
+      houseMutations: null,
+      apartmentMutations: null,
+      houseSharePercent: null,
+      apartmentSharePercent: null,
+      priceHistory: [],
+      departmentCode: null,
+      departmentAveragePricePerM2: null,
       available: false,
       note:
         "Cache DVF absent. Exécutez « npm run ingest:property » pour activer les prix immobiliers.",
@@ -27,9 +34,16 @@ export function loadPropertyMarketSnapshot(
     averagePricePerM2: entry.averagePricePerM2,
     averageTransactionPrice: entry.averageTransactionPrice,
     mutationCount: entry.mutationCount,
+    houseMutations: entry.houseMutations ?? null,
+    apartmentMutations: entry.apartmentMutations ?? null,
+    houseSharePercent: entry.houseSharePercent ?? null,
+    apartmentSharePercent: entry.apartmentSharePercent ?? null,
+    priceHistory: entry.priceHistory ?? [],
+    departmentCode: entry.departmentCode ?? null,
+    departmentAveragePricePerM2: entry.departmentAveragePricePerM2 ?? null,
     available: true,
     note:
-      "Indicateurs DVF agrégés par commune (prix moyen au m² et prix moyen des mutations).",
+      "Indicateurs DVF agrégés par commune (série 2014-2024, répartition maisons/appartements, comparatif départemental).",
   };
 }
 

@@ -41,12 +41,20 @@ export function loadSociodemographicsSnapshot(
     };
   }
 
-  const ageBands: AgeBandCount[] = Object.entries(entry.ageBands).map(
-    ([band, population]) => ({
-      label: AGE_BAND_LABELS[band] ?? band,
-      population: Math.round(population),
-    }),
-  );
+  const rawBands = Object.entries(entry.ageBands).map(([band, population]) => ({
+    label: AGE_BAND_LABELS[band] ?? band,
+    population: Math.round(population),
+  }));
+
+  const totalPopulation = rawBands.reduce((sum, band) => sum + band.population, 0);
+
+  const ageBands: AgeBandCount[] = rawBands.map((band) => ({
+    ...band,
+    sharePercent:
+      totalPopulation > 0
+        ? Math.round((band.population / totalPopulation) * 1000) / 10
+        : null,
+  }));
 
   return {
     year: entry.year,

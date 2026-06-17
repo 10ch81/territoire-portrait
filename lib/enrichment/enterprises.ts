@@ -72,7 +72,6 @@ async function fetchEnterprisePage(
     etat_administratif: "A",
     page: String(page),
     per_page: String(ENTERPRISE_PER_PAGE),
-    minimal: "true",
   });
 
   const response = await fetch(

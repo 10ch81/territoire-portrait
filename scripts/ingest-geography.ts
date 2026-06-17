@@ -1,6 +1,6 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { CACHE_DIR, downloadFile, parseCsvLine } from "./ingest-utils";
+import { CACHE_DIR, parseCsvLine } from "./ingest-utils";
 import type { GeographyCommuneCache } from "../lib/types";
 
 const OUTPUT_PATH = resolve(CACHE_DIR, "geography-by-commune.json");
@@ -8,6 +8,8 @@ const AAV_URL =
   "https://static.data.gouv.fr/resources/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/20220424-111604/table-appartenance-geo-communes-22.csv";
 const TYPO_URL =
   "https://static.data.gouv.fr/resources/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/20210521-183315/typo-zaav2020.csv";
+const AAV_LABELS_URL =
+  "https://static.data.gouv.fr/resources/zonage-en-aires-dattraction-des-villes-definition-2020-zaav2020/20201023-110507/aav2020.csv";
 
 async function loadTypology(): Promise<Map<string, string>> {
   const response = await fetch(TYPO_URL);
@@ -28,8 +30,32 @@ async function loadTypology(): Promise<Map<string, string>> {
   return labels;
 }
 
+async function loadAavLabels(): Promise<Map<string, string>> {
+  const response = await fetch(AAV_LABELS_URL);
+  const text = await response.text();
+  const labels = new Map<string, string>();
+
+  for (const line of text.split(/\r?\n/).slice(1)) {
+    if (!line.trim()) {
+      continue;
+    }
+
+    const [code, label] = parseCsvLine(line);
+    if (code && label) {
+      labels.set(code, label);
+    }
+  }
+
+  return labels;
+}
+
 async function aggregateGeography(): Promise<GeographyCommuneCache> {
-  const [response, labels] = await Promise.all([fetch(AAV_URL), loadTypology()]);
+  const [response, typology, aavLabels] = await Promise.all([
+    fetch(AAV_URL),
+    loadTypology(),
+    loadAavLabels(),
+  ]);
+
   if (!response.ok) {
     throw new Error(`Téléchargement AAV impossible (statut ${response.status}).`);
   }
@@ -52,8 +78,9 @@ async function aggregateGeography(): Promise<GeographyCommuneCache> {
 
     cache[codeGeo] = {
       aavCode,
+      aavLabel: aavLabels.get(aavCode) ?? aavCode,
       categoryCode,
-      categoryLabel: labels.get(categoryCode) ?? categoryCode,
+      categoryLabel: typology.get(categoryCode) ?? categoryCode,
     };
   }
 

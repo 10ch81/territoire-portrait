@@ -13,6 +13,7 @@ import { loadIrveSnapshot, createIrveSource } from "./mobility";
 import { loadLocalTaxSnapshot, createReiSource } from "./fiscal";
 import { loadGeographySnapshot, createAavSource } from "./geography";
 import { loadPropertyMarketSnapshot, createDvfSource } from "./property";
+import { computeDerivedIndicators } from "./derived";
 import {
   loadSociodemographicsSnapshot,
   createFilosofiSource,
@@ -100,8 +101,11 @@ export async function enrichTerritory(
     fiscal,
     geography,
     property,
+    derived: null,
     sources: [],
   };
+
+  enrichment.derived = computeDerivedIndicators(territory, enrichment);
 
   const enrichmentSources = collectEnrichmentSources(accessedAt, enrichment);
   enrichment.sources = enrichmentSources;
@@ -133,8 +137,12 @@ export function formatDensity(densityPerKm2: number | null): string {
   return `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(densityPerKm2)} hab./km²`;
 }
 
+function isDisplayableNumber(value: number | null): value is number {
+  return value !== null && Number.isFinite(value);
+}
+
 export function formatPercent(value: number | null): string {
-  if (value === null) {
+  if (!isDisplayableNumber(value)) {
     return "Donnée non disponible";
   }
 
@@ -142,7 +150,7 @@ export function formatPercent(value: number | null): string {
 }
 
 export function formatCurrency(value: number | null): string {
-  if (value === null) {
+  if (!isDisplayableNumber(value)) {
     return "Donnée non disponible";
   }
 
@@ -150,9 +158,24 @@ export function formatCurrency(value: number | null): string {
 }
 
 export function formatRate(value: number | null): string {
-  if (value === null) {
+  if (!isDisplayableNumber(value)) {
     return "Donnée non disponible";
   }
 
   return `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 }).format(value)} %`;
+}
+
+export function formatPropertyPrice(
+  value: number | null,
+  mutationCount: number | null,
+): string {
+  if (isDisplayableNumber(value)) {
+    return formatCurrency(value);
+  }
+
+  if (mutationCount !== null && mutationCount > 0) {
+    return `Non publié (${new Intl.NumberFormat("fr-FR").format(mutationCount)} mutations)`;
+  }
+
+  return "Donnée non disponible";
 }

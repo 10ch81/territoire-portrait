@@ -9,6 +9,10 @@ Règles impératives :
 - Tu dois distinguer clairement les faits (présents dans les données), les hypothèses et les limites.
 - Si une information manque, indique-le explicitement dans dataLimits.
 - Base ton analyse uniquement sur les données territoriales fournies.
+- Les champs marqués « échantillon » (SIRENE) décrivent un sous-ensemble d'entreprises, pas la commune entière : ne pas en déduire la structure économique réelle ni la part d'emploi.
+- Les comptages dans un échantillon (ex. tranches d'effectif) ne sont pas des proportions communales.
+- Les données RPLS (loués / vacants) décrivent le parc locatif social, pas le marché immobilier général.
+- Si un prix immobilier est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
 - Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni texte autour.
 
 Structure JSON attendue :
@@ -92,6 +96,9 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           parcTotal: territory.enrichment.housing.totalUnits,
           loues: territory.enrichment.housing.occupiedUnits,
           vacants: territory.enrichment.housing.vacantUnits,
+          parcLogementsGlobal: territory.enrichment.housing.totalDwellings,
+          partDuParcGlobal: territory.enrichment.housing.socialHousingSharePercent,
+          tauxVacance: territory.enrichment.housing.vacancyRatePercent,
           note: territory.enrichment.housing.note,
         }
       : null,
@@ -124,8 +131,16 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           prixM2Moyen: territory.enrichment.property.averagePricePerM2,
           prixMoyenMutation: territory.enrichment.property.averageTransactionPrice,
           mutations: territory.enrichment.property.mutationCount,
+          mutationsMaisons: territory.enrichment.property.houseMutations,
+          mutationsAppartements: territory.enrichment.property.apartmentMutations,
+          serieHistorique: territory.enrichment.property.priceHistory,
+          prixM2MoyenDepartement:
+            territory.enrichment.property.departmentAveragePricePerM2,
           note: territory.enrichment.property.note,
         }
+      : null,
+    indicateursDerives: territory.enrichment?.derived?.available
+      ? territory.enrichment.derived
       : null,
     sources: territory.sources.map((source) => source.name),
   };
