@@ -13,6 +13,12 @@ import { loadIrveSnapshot, createIrveSource } from "./mobility";
 import { loadLocalTaxSnapshot, createReiSource } from "./fiscal";
 import { loadGeographySnapshot, createAavSource } from "./geography";
 import { loadPropertyMarketSnapshot, createDvfSource } from "./property";
+import {
+  loadSociodemographicsSnapshot,
+  createFilosofiSource,
+  createRpEmploymentSource,
+  createRpPopulationSource,
+} from "./sociodemographics";
 
 function collectEnrichmentSources(
   accessedAt: string,
@@ -22,6 +28,15 @@ function collectEnrichmentSources(
 
   if (enrichment.populationHistory?.available) {
     sources.push(createPopulationHistorySource(accessedAt));
+  }
+  if (enrichment.sociodemographics?.available) {
+    sources.push(createRpPopulationSource(accessedAt));
+    if (enrichment.sociodemographics.unemploymentRate !== null) {
+      sources.push(createRpEmploymentSource(accessedAt));
+    }
+    if (enrichment.sociodemographics.medianDisposableIncome !== null) {
+      sources.push(createFilosofiSource(accessedAt));
+    }
   }
   if (enrichment.enterprises) {
     sources.push(createEnterpriseSource(accessedAt));
@@ -67,6 +82,7 @@ export async function enrichTerritory(
   ]);
 
   const populationHistory = loadPopulationHistorySnapshot(territory.inseeCode);
+  const sociodemographics = loadSociodemographicsSnapshot(territory.inseeCode);
   const equipments = loadEquipmentSnapshot(territory.inseeCode);
   const housing = loadSocialHousingSnapshot(territory.inseeCode);
   const mobility = loadIrveSnapshot(territory.inseeCode);
@@ -75,6 +91,7 @@ export async function enrichTerritory(
 
   const enrichment: TerritoryEnrichment = {
     populationHistory,
+    sociodemographics,
     enterprises,
     equipments,
     risks,

@@ -13,8 +13,8 @@ export function loadPropertyMarketSnapshot(
   if (!entry) {
     return {
       year: 2024,
-      medianPricePerM2: null,
-      averagePrice: null,
+      averagePricePerM2: null,
+      averageTransactionPrice: null,
       mutationCount: null,
       available: false,
       note:
@@ -24,11 +24,12 @@ export function loadPropertyMarketSnapshot(
 
   return {
     year: entry.year,
-    medianPricePerM2: entry.medianPricePerM2,
-    averagePrice: entry.averagePrice,
+    averagePricePerM2: entry.averagePricePerM2,
+    averageTransactionPrice: entry.averageTransactionPrice,
     mutationCount: entry.mutationCount,
     available: true,
-    note: "Indicateurs DVF agrégés par commune (prix au m² et volume de mutations).",
+    note:
+      "Indicateurs DVF agrégés par commune (prix moyen au m² et prix moyen des mutations).",
   };
 }
 

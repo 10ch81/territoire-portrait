@@ -66,11 +66,33 @@ export interface EnterpriseSnapshot {
   note: string;
 }
 
+export interface TransportSnapshot {
+  totalEquipments: number;
+  byType: EquipmentTypeCount[];
+  available: boolean;
+  note: string;
+}
+
 export interface EquipmentSnapshot {
   year: number;
   totalEquipments: number;
   byDomain: EquipmentDomainCount[];
   byType: EquipmentTypeCount[];
+  transport: TransportSnapshot;
+  available: boolean;
+  note: string;
+}
+
+export interface AgeBandCount {
+  label: string;
+  population: number;
+}
+
+export interface SociodemographicsSnapshot {
+  year: number;
+  ageBands: AgeBandCount[];
+  unemploymentRate: number | null;
+  medianDisposableIncome: number | null;
   available: boolean;
   note: string;
 }
@@ -158,8 +180,8 @@ export interface GeographySnapshot {
 
 export interface PropertyMarketSnapshot {
   year: number;
-  medianPricePerM2: number | null;
-  averagePrice: number | null;
+  averagePricePerM2: number | null;
+  averageTransactionPrice: number | null;
   mutationCount: number | null;
   available: boolean;
   note: string;
@@ -167,6 +189,7 @@ export interface PropertyMarketSnapshot {
 
 export interface TerritoryEnrichment {
   populationHistory: PopulationHistorySnapshot | null;
+  sociodemographics: SociodemographicsSnapshot | null;
   enterprises: EnterpriseSnapshot | null;
   equipments: EquipmentSnapshot | null;
   risks: RisksSnapshot | null;
@@ -177,6 +200,20 @@ export interface TerritoryEnrichment {
   property: PropertyMarketSnapshot | null;
   sources: DataSource[];
 }
+
+export interface SociodemographicsCommuneCacheEntry {
+  year: number;
+  ageBands: Record<string, number>;
+  unemploymentRate: number | null;
+  medianDisposableIncome: number | null;
+}
+
+export type SociodemographicsCommuneCache = Record<
+  string,
+  SociodemographicsCommuneCacheEntry
+>;
+
+export type BpeTypeLabels = Record<string, string>;
 
 export interface TerritoryProfile {
   name: string;
@@ -289,8 +326,8 @@ export type GeographyCommuneCache = Record<string, GeographyCommuneCacheEntry>;
 
 export interface PropertyCommuneCacheEntry {
   year: number;
-  medianPricePerM2: number | null;
-  averagePrice: number | null;
+  averagePricePerM2: number | null;
+  averageTransactionPrice: number | null;
   mutationCount: number | null;
 }
 

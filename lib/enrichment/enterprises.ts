@@ -5,7 +5,7 @@ import type {
   StaffSizeBandCount,
 } from "../types";
 
-const ENTERPRISE_SAMPLE_PAGES = 4;
+const ENTERPRISE_SAMPLE_PAGES = 10;
 const ENTERPRISE_PER_PAGE = 25;
 
 const NAF_SECTION_LABELS: Record<string, string> = {
@@ -163,7 +163,7 @@ export async function fetchEnterpriseSnapshot(
     millesime: "2024-2025",
     note:
       "Unités légales ayant au moins un établissement actif sur la commune. " +
-      "ESS, RGE et tranches d'effectif calculés sur un échantillon des premiers résultats.",
+      "ESS, RGE et tranches d'effectif calculés sur les ~250 premiers résultats de l'API.",
   };
 }
 

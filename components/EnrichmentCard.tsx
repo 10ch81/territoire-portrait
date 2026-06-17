@@ -101,6 +101,48 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
 
         <div>
           <h3 className="text-base font-semibold text-slate-900">
+            Structure par âge — Recensement 2021
+          </h3>
+          {territory.enrichment?.sociodemographics?.available ? (
+            <dl className="mt-3 space-y-3">
+              {territory.enrichment.sociodemographics.ageBands.map((band) => (
+                <DataRow
+                  key={band.label}
+                  label={band.label}
+                  value={formatPopulation(band.population)}
+                />
+              ))}
+              {territory.enrichment.sociodemographics.unemploymentRate !== null ? (
+                <DataRow
+                  label="Taux de chômage (15-64 ans)"
+                  value={formatRate(territory.enrichment.sociodemographics.unemploymentRate)}
+                />
+              ) : null}
+              {territory.enrichment.sociodemographics.medianDisposableIncome !==
+              null ? (
+                <DataRow
+                  label="Revenu médian disponible (FILOSOFI)"
+                  value={formatCurrency(
+                    territory.enrichment.sociodemographics.medianDisposableIncome,
+                  )}
+                />
+              ) : null}
+              <p className="text-xs text-slate-500">
+                {territory.enrichment.sociodemographics.note}
+              </p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={
+                territory.enrichment?.sociodemographics?.note ??
+                "Données socio-démographiques non disponibles."
+              }
+            />
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
             Économie — SIRENE
           </h3>
           {enterprises ? (
@@ -204,7 +246,8 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
                     <ul className="space-y-1 text-sm text-slate-700">
                       {equipments.byType.map((type) => (
                         <li key={type.code}>
-                          {type.code} —{" "}
+                          {type.label}
+                          {type.label !== type.code ? ` (${type.code})` : ""} —{" "}
                           {new Intl.NumberFormat("fr-FR").format(type.count)}
                         </li>
                       ))}
@@ -219,6 +262,48 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
               message={
                 equipments?.note ??
                 "Données BPE non disponibles. Exécutez « npm run ingest:bpe »."
+              }
+            />
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Transports — BPE 2024
+          </h3>
+          {equipments?.transport.available ? (
+            <dl className="mt-3 space-y-3">
+              <DataRow
+                label="Équipements recensés"
+                value={new Intl.NumberFormat("fr-FR").format(
+                  equipments.transport.totalEquipments,
+                )}
+              />
+              {equipments.transport.byType.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Types de dessertes
+                  </dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {equipments.transport.byType.map((type) => (
+                        <li key={type.code}>
+                          {type.label}
+                          {type.label !== type.code ? ` (${type.code})` : ""} —{" "}
+                          {new Intl.NumberFormat("fr-FR").format(type.count)}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
+              <p className="text-xs text-slate-500">{equipments.transport.note}</p>
+            </dl>
+          ) : (
+            <SectionUnavailable
+              message={
+                equipments?.transport.note ??
+                "Données de transport non disponibles."
               }
             />
           )}
@@ -413,12 +498,12 @@ export function EnrichmentCard({ territory }: EnrichmentCardProps) {
           {property?.available ? (
             <dl className="mt-3 space-y-3">
               <DataRow
-                label="Prix médian au m²"
-                value={formatCurrency(property.medianPricePerM2)}
+                label="Prix moyen au m²"
+                value={formatCurrency(property.averagePricePerM2)}
               />
               <DataRow
                 label="Prix moyen des mutations"
-                value={formatCurrency(property.averagePrice)}
+                value={formatCurrency(property.averageTransactionPrice)}
               />
               <DataRow
                 label="Nombre de mutations"

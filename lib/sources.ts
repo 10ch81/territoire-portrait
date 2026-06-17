@@ -26,6 +26,9 @@ export const SOURCE_IDS = {
   INSEE_BPE: "insee-bpe",
   INSEE_POPULATION: "insee-population",
   INSEE_POPULATION_HISTORY: "insee-population-history",
+  INSEE_RP_POPULATION: "insee-rp-population",
+  INSEE_RP_EMPLOYMENT: "insee-rp-employment",
+  INSEE_FILOSOFI: "insee-filosofi",
   GEORISQUES: "georisques",
   RPLS: "rpls",
   IRVE: "irve",
@@ -84,6 +87,36 @@ export function createPopulationHistorySource(accessedAt: string): DataSource {
     name: "INSEE — Populations historiques",
     url: POPULATION_HISTORY_URL,
     description: "Séries historiques de population municipale par commune.",
+    accessedAt,
+  };
+}
+
+export function createRpPopulationSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_RP_POPULATION,
+    name: "INSEE — Recensement 2021 (structure par âge)",
+    url: "https://www.insee.fr/fr/statistiques/8201904",
+    description: "Structure par tranches d'âge de la population communale (RP 2021).",
+    accessedAt,
+  };
+}
+
+export function createRpEmploymentSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_RP_EMPLOYMENT,
+    name: "INSEE — Recensement 2021 (emploi)",
+    url: "https://www.insee.fr/fr/statistiques/8202916",
+    description: "Population active et chômage au recensement 2021.",
+    accessedAt,
+  };
+}
+
+export function createFilosofiSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_FILOSOFI,
+    name: "INSEE — FILOSOFI (revenus)",
+    url: "https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation",
+    description: "Revenu médian disponible par unité de consommation (FILOSOFI).",
     accessedAt,
   };
 }

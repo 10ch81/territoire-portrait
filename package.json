@@ -16,6 +16,7 @@
     "ingest:rei": "tsx scripts/ingest-rei.ts",
     "ingest:geography": "tsx scripts/ingest-geography.ts",
     "ingest:property": "tsx scripts/ingest-property.ts",
+    "ingest:social": "tsx scripts/ingest-social.ts",
     "ingest:all": "tsx scripts/ingest-all.ts"
   },
   "dependencies": {

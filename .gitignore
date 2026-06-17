@@ -43,7 +43,8 @@ yarn-error.log*
 !/data/cache/irve-by-commune.json
 !/data/cache/fiscal-by-commune.json
 !/data/cache/geography-by-commune.json
-!/data/cache/property-by-commune.json
+!/data/cache/bpe-type-labels.json
+!/data/cache/social-by-commune.json
 
 # vercel
 .vercel

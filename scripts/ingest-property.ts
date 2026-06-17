@@ -26,8 +26,17 @@ async function aggregateProperty(): Promise<PropertyCommuneCache> {
       continue;
     }
 
-    const [inseeCode, yearRaw, mutationCountRaw, , , , averagePriceRaw, medianPriceRaw] =
-      parseCsvLine(line);
+    const [
+      inseeCode,
+      yearRaw,
+      mutationCountRaw,
+      ,
+      ,
+      ,
+      ,
+      averageTransactionPriceRaw,
+      averagePricePerM2Raw,
+    ] = parseCsvLine(line);
 
     const year = Number.parseInt(yearRaw, 10);
     if (year !== 2024) {
@@ -36,8 +45,8 @@ async function aggregateProperty(): Promise<PropertyCommuneCache> {
 
     cache[inseeCode] = {
       year,
-      medianPricePerM2: parseFrenchDecimal(medianPriceRaw),
-      averagePrice: parseFrenchDecimal(averagePriceRaw),
+      averagePricePerM2: parseFrenchDecimal(averagePricePerM2Raw),
+      averageTransactionPrice: parseFrenchDecimal(averageTransactionPriceRaw),
       mutationCount: Number.parseInt(mutationCountRaw, 10) || null,
     };
   }

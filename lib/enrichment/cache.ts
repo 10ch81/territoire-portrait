@@ -7,7 +7,11 @@ export function cachePath(filename: string): string {
   return resolve(CACHE_DIR, filename);
 }
 
-const cacheStore = new Map<string, unknown | null>();
+const cacheStore = new Map<string, unknown | null | undefined>();
+
+export function isJsonCachePresent(filename: string): boolean {
+  return existsSync(cachePath(filename));
+}
 
 export function loadJsonCache<T>(filename: string): T | null {
   if (cacheStore.has(filename)) {

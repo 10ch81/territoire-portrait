@@ -47,6 +47,15 @@ function buildUserPrompt(territory: TerritoryProfile): string {
     evolutionDemographique: territory.enrichment?.populationHistory?.available
       ? territory.enrichment.populationHistory.history
       : null,
+    structureParAge: territory.enrichment?.sociodemographics?.available
+      ? {
+          tranches: territory.enrichment.sociodemographics.ageBands,
+          tauxChomage1564: territory.enrichment.sociodemographics.unemploymentRate,
+          revenuMedianDisponible:
+            territory.enrichment.sociodemographics.medianDisposableIncome,
+          note: territory.enrichment.sociodemographics.note,
+        }
+      : null,
     entreprises: territory.enrichment?.enterprises
       ? {
           unitesLegalesAvecEtablissement:
@@ -65,6 +74,7 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           total: territory.enrichment.equipments.totalEquipments,
           parDomaine: territory.enrichment.equipments.byDomain,
           parType: territory.enrichment.equipments.byType,
+          transports: territory.enrichment.equipments.transport,
           note: territory.enrichment.equipments.note,
         }
       : null,
@@ -111,8 +121,8 @@ function buildUserPrompt(territory: TerritoryProfile): string {
     immobilier: territory.enrichment?.property?.available
       ? {
           annee: territory.enrichment.property.year,
-          prixM2: territory.enrichment.property.medianPricePerM2,
-          prixMoyen: territory.enrichment.property.averagePrice,
+          prixM2Moyen: territory.enrichment.property.averagePricePerM2,
+          prixMoyenMutation: territory.enrichment.property.averageTransactionPrice,
           mutations: territory.enrichment.property.mutationCount,
           note: territory.enrichment.property.note,
         }

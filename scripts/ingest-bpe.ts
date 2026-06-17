@@ -11,7 +11,9 @@ const CACHE_DIR = resolve(process.cwd(), "data/cache");
 const ZIP_PATH = resolve(CACHE_DIR, "bpe-2024.zip");
 const EXTRACT_DIR = resolve(CACHE_DIR, "bpe-2024-extract");
 const DATA_CSV_PATH = resolve(EXTRACT_DIR, "DS_BPE_2024_data.csv");
+const METADATA_CSV_PATH = resolve(EXTRACT_DIR, "DS_BPE_2024_metadata.csv");
 const OUTPUT_PATH = resolve(CACHE_DIR, "bpe-by-commune.json");
+const LABELS_OUTPUT_PATH = resolve(CACHE_DIR, "bpe-type-labels.json");
 
 const BPE_DOMAINS = new Set(["A", "B", "C", "D", "E", "F", "G"]);
 
@@ -113,6 +115,34 @@ async function aggregateCommuneData(): Promise<BpeCommuneCache> {
   return cache;
 }
 
+async function exportBpeTypeLabels(): Promise<Record<string, string>> {
+  if (!existsSync(METADATA_CSV_PATH)) {
+    throw new Error(`Métadonnées BPE introuvables : ${METADATA_CSV_PATH}`);
+  }
+
+  const labels: Record<string, string> = {};
+  const stream = createInterface({
+    input: createReadStream(METADATA_CSV_PATH, { encoding: "utf-8" }),
+    crlfDelay: Infinity,
+  });
+
+  let lineNumber = 0;
+
+  for await (const line of stream) {
+    lineNumber += 1;
+    if (lineNumber === 1 || !line.trim()) {
+      continue;
+    }
+
+    const [variable, , code, label] = parseCsvLine(line);
+    if (variable === "FACILITY_TYPE" && code && label) {
+      labels[code] = label;
+    }
+  }
+
+  return labels;
+}
+
 async function main(): Promise<void> {
   if (!existsSync(ZIP_PATH)) {
     await downloadBpeArchive();
@@ -120,10 +150,14 @@ async function main(): Promise<void> {
 
   await extractArchive();
   const cache = await aggregateCommuneData();
+  const labels = await exportBpeTypeLabels();
 
   writeFileSync(OUTPUT_PATH, JSON.stringify(cache));
+  writeFileSync(LABELS_OUTPUT_PATH, JSON.stringify(labels));
   console.log(`\n✅ Cache BPE généré : ${OUTPUT_PATH}`);
   console.log(`   Communes indexées : ${Object.keys(cache).length}`);
+  console.log(`✅ Libellés BPE générés : ${LABELS_OUTPUT_PATH}`);
+  console.log(`   Types indexés : ${Object.keys(labels).length}`);
 }
 
 main().catch((error: unknown) => {
