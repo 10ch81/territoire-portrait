@@ -1,168 +1,84 @@
 import { createEnterpriseSource } from "../sources";
-import type {
-  ActivitySectionCount,
-  EnterpriseSnapshot,
-  StaffSizeBandCount,
-} from "../types";
+import type { EnterpriseSnapshot } from "../types";
 
-const ENTERPRISE_SAMPLE_PAGES = 10;
-const ENTERPRISE_PER_PAGE = 25;
-
-const NAF_SECTION_LABELS: Record<string, string> = {
-  A: "Agriculture, sylviculture et pêche",
-  B: "Industries extractives",
-  C: "Industrie manufacturière",
-  D: "Énergie",
-  E: "Eau, déchets, dépollution",
-  F: "Construction",
-  G: "Commerce et réparation",
-  H: "Transports et entreposage",
-  I: "Hébergement et restauration",
-  J: "Information et communication",
-  K: "Activités financières et d'assurance",
-  L: "Activités immobilières",
-  M: "Activités scientifiques et techniques",
-  N: "Services administratifs et de soutien",
-  O: "Administration publique",
-  P: "Enseignement",
-  Q: "Santé humaine et action sociale",
-  R: "Arts, spectacles et activités récréatives",
-  S: "Autres activités de services",
-  T: "Activités des ménages",
-  U: "Activités extra-territoriales",
-};
-
-const STAFF_SIZE_LABELS: Record<string, string> = {
-  NN: "Non renseigné",
-  "00": "0 salarié",
-  "01": "1 à 2 salariés",
-  "02": "3 à 5 salariés",
-  "03": "6 à 9 salariés",
-  "11": "10 à 19 salariés",
-  "12": "20 à 49 salariés",
-  "21": "50 à 99 salariés",
-  "22": "100 à 199 salariés",
-  "31": "200 à 249 salariés",
-  "32": "250 à 499 salariés",
-  "41": "500 à 999 salariés",
-  "42": "1 000 à 1 999 salariés",
-  "51": "2 000 à 4 999 salariés",
-  "52": "5 000 à 9 999 salariés",
-  "53": "10 000 salariés ou plus",
-};
+const ENTERPRISE_API_BASE = "https://recherche-entreprises.api.gouv.fr/search";
+const ENTERPRISE_API_MAX_PAGES = 400;
+const ENTERPRISE_API_MAX_RESULTS = 10_000;
 
 interface EnterpriseSearchResponse {
   total_results?: number;
-  results?: Array<{
-    section_activite_principale?: string;
-    est_ess?: boolean;
-    tranche_effectif_salarie?: string;
-    complements?: {
-      est_rge?: boolean;
-    };
-  }>;
+  total_pages?: number;
 }
 
-async function fetchEnterprisePage(
+interface EnterpriseTotalResult {
+  total: number | null;
+  isCapped: boolean;
+}
+
+async function fetchEnterpriseTotal(
   inseeCode: string,
-  page: number,
-): Promise<EnterpriseSearchResponse | null> {
+  filters: Record<string, string> = {},
+): Promise<EnterpriseTotalResult | null> {
   const params = new URLSearchParams({
     code_commune: inseeCode,
     etat_administratif: "A",
-    page: String(page),
-    per_page: String(ENTERPRISE_PER_PAGE),
+    page: "1",
+    per_page: "1",
+    ...filters,
   });
 
-  const response = await fetch(
-    `https://recherche-entreprises.api.gouv.fr/search?${params.toString()}`,
-    {
-      headers: { Accept: "application/json" },
-      next: { revalidate: 86400 },
-    },
-  );
+  const response = await fetch(`${ENTERPRISE_API_BASE}?${params.toString()}`, {
+    headers: { Accept: "application/json" },
+    next: { revalidate: 86400 },
+  });
 
   if (!response.ok) {
     console.error("Erreur API entreprises:", response.status);
     return null;
   }
 
-  return (await response.json()) as EnterpriseSearchResponse;
+  const data = (await response.json()) as EnterpriseSearchResponse;
+  const total = data.total_results ?? null;
+  const totalPages = data.total_pages ?? 0;
+  const isCapped =
+    total !== null &&
+    total >= ENTERPRISE_API_MAX_RESULTS &&
+    totalPages >= ENTERPRISE_API_MAX_PAGES;
+
+  return { total, isCapped };
 }
 
 export async function fetchEnterpriseSnapshot(
   inseeCode: string,
 ): Promise<EnterpriseSnapshot | null> {
-  const pages = await Promise.all(
-    Array.from({ length: ENTERPRISE_SAMPLE_PAGES }, (_, index) =>
-      fetchEnterprisePage(inseeCode, index + 1),
-    ),
-  );
+  const [base, ess, rge] = await Promise.all([
+    fetchEnterpriseTotal(inseeCode),
+    fetchEnterpriseTotal(inseeCode, { est_ess: "true" }),
+    fetchEnterpriseTotal(inseeCode, { est_rge: "true" }),
+  ]);
 
-  const firstPage = pages[0];
-  if (!firstPage) {
+  if (!base) {
     return null;
   }
 
-  const sectionCounts = new Map<string, number>();
-  const staffCounts = new Map<string, number>();
-  let sampleSize = 0;
-  let essCount = 0;
-  let rgeCount = 0;
+  const noteParts = [
+    "Unités légales ayant au moins un établissement actif sur la commune.",
+    "Comptages ESS et RGE issus de l'API (filtres dédiés).",
+  ];
 
-  for (const page of pages) {
-    for (const result of page?.results ?? []) {
-      sampleSize += 1;
-
-      const section = result.section_activite_principale;
-      if (section) {
-        sectionCounts.set(section, (sectionCounts.get(section) ?? 0) + 1);
-      }
-
-      if (result.est_ess) {
-        essCount += 1;
-      }
-
-      if (result.complements?.est_rge) {
-        rgeCount += 1;
-      }
-
-      const staffBand = result.tranche_effectif_salarie;
-      if (staffBand) {
-        staffCounts.set(staffBand, (staffCounts.get(staffBand) ?? 0) + 1);
-      }
-    }
+  if (base.isCapped) {
+    noteParts.push(
+      `Le total général est plafonné à ${ENTERPRISE_API_MAX_RESULTS.toLocaleString("fr-FR")} par l'API : la commune peut en compter davantage.`,
+    );
   }
 
-  const topActivitySections: ActivitySectionCount[] = [...sectionCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([code, count]) => ({
-      code,
-      label: NAF_SECTION_LABELS[code] ?? code,
-      count,
-    }));
-
-  const staffSizeBands: StaffSizeBandCount[] = [...staffCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([code, count]) => ({
-      code,
-      label: STAFF_SIZE_LABELS[code] ?? code,
-      count,
-    }));
-
   return {
-    legalUnitsWithEstablishment: firstPage.total_results ?? null,
-    sampleSize,
-    topActivitySections,
-    essCount: sampleSize > 0 ? essCount : null,
-    rgeCount: sampleSize > 0 ? rgeCount : null,
-    staffSizeBands,
+    legalUnitsWithEstablishment: base.total,
+    legalUnitsIsCapped: base.isCapped,
+    essCount: ess?.total ?? null,
+    rgeCount: rge?.total ?? null,
     millesime: "2024-2025",
-    note:
-      "Unités légales ayant au moins un établissement actif sur la commune. " +
-      "ESS, RGE et tranches d'effectif calculés sur les ~250 premiers résultats de l'API.",
+    note: noteParts.join(" "),
   };
 }
 

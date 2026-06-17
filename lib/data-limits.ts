@@ -74,7 +74,7 @@ function appendEmploymentLimits(
 
   pushUnique(
     limits,
-    "Emplois salariés au lieu de travail, taux d'activité et répartition sectorielle de l'emploi (hors échantillon SIRENE) non disponibles.",
+    "Emplois salariés au lieu de travail, taux d'activité et répartition sectorielle de l'emploi (hors SIRENE) non disponibles.",
   );
 }
 
@@ -90,12 +90,14 @@ function appendEnterpriseLimits(
   }
 
   const totalLabel = isPresent(enterprises.legalUnitsWithEstablishment)
-    ? `${enterprises.legalUnitsWithEstablishment} unités légales recensées`
+    ? enterprises.legalUnitsIsCapped
+      ? `≥ ${enterprises.legalUnitsWithEstablishment} unités légales recensées (plafond API)`
+      : `${enterprises.legalUnitsWithEstablishment} unités légales recensées`
     : "total communal inconnu";
 
   pushUnique(
     limits,
-    `Données économiques SIRENE basées sur un échantillon de ${enterprises.sampleSize} unités légales (${totalLabel}) : ne pas extrapoler la structure sectorielle ni les effectifs.`,
+    `Données économiques SIRENE limitées aux comptages d'unités légales, ESS et RGE (${totalLabel}) : pas de répartition sectorielle ni de tranches d'effectif fiables.`,
   );
 }
 

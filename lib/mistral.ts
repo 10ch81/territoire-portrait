@@ -11,8 +11,7 @@ Règles impératives :
 - Base ton analyse uniquement sur les données territoriales fournies.
 - Les limites des sources sont calculées côté serveur : concentre-toi sur summary, strengths, watchPoints et opportunities.
 - Ne déclare JAMAIS qu'une donnée est absente si elle est présente dans le JSON (ex. tauxChomage1564 non null, equipements.total > 0, mutationsMaisons/mutationsAppartements renseignés).
-- Les champs marqués « échantillon » (SIRENE) décrivent un sous-ensemble d'entreprises, pas la commune entière : ne pas en déduire la structure économique réelle ni la part d'emploi.
-- Les comptages dans un échantillon (ex. tranches d'effectif) ne sont pas des proportions communales.
+- Les comptages ESS et RGE (SIRENE) proviennent de filtres API dédiés ; ne pas extrapoler la structure sectorielle ni les effectifs salariés.
 - Les données RPLS (loués / vacants) décrivent le parc locatif social, pas le marché immobilier général.
 - La BPE dénombre des équipements (y compris enseignement et services publics de proximité) : ne pas écrire qu'il n'y a pas d'écoles ou de mairie si des comptages sont fournis.
 - Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
@@ -77,13 +76,9 @@ function buildUserPrompt(territory: TerritoryProfile): string {
       ? {
           unitesLegalesAvecEtablissement:
             territory.enrichment.enterprises.legalUnitsWithEstablishment,
-          tailleEchantillon: territory.enrichment.enterprises.sampleSize,
-          secteursDominantsEchantillon:
-            territory.enrichment.enterprises.topActivitySections,
-          essEchantillon: territory.enrichment.enterprises.essCount,
-          rgeEchantillon: territory.enrichment.enterprises.rgeCount,
-          tranchesEffectifEchantillon:
-            territory.enrichment.enterprises.staffSizeBands,
+          totalPlafonneApi: territory.enrichment.enterprises.legalUnitsIsCapped,
+          ess: territory.enrichment.enterprises.essCount,
+          rge: territory.enrichment.enterprises.rgeCount,
           note: territory.enrichment.enterprises.note,
         }
       : null,

@@ -7,6 +7,11 @@ interface EconomySectionProps {
   territory: TerritoryProfile;
 }
 
+function formatEnterpriseCount(value: number, isCapped: boolean): string {
+  const formatted = new Intl.NumberFormat("fr-FR").format(value);
+  return isCapped ? `≥ ${formatted}` : formatted;
+}
+
 export function EconomySection({ territory }: EconomySectionProps) {
   const enterprises = territory.enrichment?.enterprises;
 
@@ -27,53 +32,30 @@ export function EconomySection({ territory }: EconomySectionProps) {
             label="Entreprises (≥ 1 établissement actif)"
             value={
               enterprises.legalUnitsWithEstablishment !== null
-                ? new Intl.NumberFormat("fr-FR").format(
+                ? formatEnterpriseCount(
                     enterprises.legalUnitsWithEstablishment,
+                    enterprises.legalUnitsIsCapped,
                   )
                 : "Donnée non disponible"
             }
           />
           {enterprises.essCount !== null ? (
-            <DataRow
-              label="ESS (échantillon)"
-              value={String(enterprises.essCount)}
-            />
-          ) : null}
-          {enterprises.rgeCount !== null ? (
-            <DataRow
-              label="RGE (échantillon)"
-              value={String(enterprises.rgeCount)}
-            />
-          ) : null}
-          {enterprises.staffSizeBands.length > 0 ? (
-            <div>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
               <dt className="text-sm font-medium text-slate-500">
-                Tranches d&apos;effectif (échantillon)
+                <AcronymTooltip term="ESS" />
               </dt>
-              <dd className="mt-2">
-                <ul className="space-y-1 text-sm text-slate-700">
-                  {enterprises.staffSizeBands.map((band) => (
-                    <li key={band.code}>
-                      {band.label} — {band.count}
-                    </li>
-                  ))}
-                </ul>
+              <dd className="text-sm text-slate-900 sm:text-right">
+                {new Intl.NumberFormat("fr-FR").format(enterprises.essCount)}
               </dd>
             </div>
           ) : null}
-          {enterprises.topActivitySections.length > 0 ? (
-            <div>
+          {enterprises.rgeCount !== null ? (
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
               <dt className="text-sm font-medium text-slate-500">
-                Secteurs dominants (échantillon)
+                <AcronymTooltip term="RGE" />
               </dt>
-              <dd className="mt-2">
-                <ul className="space-y-1 text-sm text-slate-700">
-                  {enterprises.topActivitySections.map((section) => (
-                    <li key={section.code}>
-                      {section.label} ({section.code}) — {section.count}
-                    </li>
-                  ))}
-                </ul>
+              <dd className="text-sm text-slate-900 sm:text-right">
+                {new Intl.NumberFormat("fr-FR").format(enterprises.rgeCount)}
               </dd>
             </div>
           ) : null}

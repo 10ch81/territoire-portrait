@@ -57,11 +57,9 @@ export interface PopulationYearCount {
 
 export interface EnterpriseSnapshot {
   legalUnitsWithEstablishment: number | null;
-  sampleSize: number;
-  topActivitySections: ActivitySectionCount[];
+  legalUnitsIsCapped: boolean;
   essCount: number | null;
   rgeCount: number | null;
-  staffSizeBands: StaffSizeBandCount[];
   millesime: string;
   note: string;
 }
