@@ -68,6 +68,22 @@ export function isMistralConfigured(): boolean {
   return Boolean(process.env.MISTRAL_API_KEY?.trim());
 }
 
+function getMissingApiKeyMessage(): string {
+  if (process.env.VERCEL) {
+    return (
+      "L'analyse IA n'est pas configurée sur ce déploiement Vercel. " +
+      "Vérifiez que MISTRAL_API_KEY est définie pour l'environnement Production " +
+      "(ou Preview), puis redéployez le projet."
+    );
+  }
+
+  return (
+    "L'analyse IA n'est pas configurée en local. " +
+    "Ajoutez MISTRAL_API_KEY dans .env.local, ou exécutez « npx vercel env pull .env.local » " +
+    "après avoir ajouté la clé à l'environnement Development sur Vercel."
+  );
+}
+
 export async function analyzeTerritory(
   territory: TerritoryProfile,
 ): Promise<AnalysisResult> {
@@ -77,8 +93,7 @@ export async function analyzeTerritory(
     return {
       analysis: null,
       configured: false,
-      error:
-        "L'analyse IA n'est pas configurée. Ajoutez MISTRAL_API_KEY dans .env.local.",
+      error: getMissingApiKeyMessage(),
     };
   }
 
