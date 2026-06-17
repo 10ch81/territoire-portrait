@@ -31,7 +31,10 @@ export function summarizeFindings(findings: QualityFinding[]): QualitySummary {
   const failed =
     critical > 0 ||
     findings.some(
-      (f) => f.class !== undefined && CI_FAIL_CLASSES.includes(f.class),
+      (finding) =>
+        finding.severity === "critical" &&
+        finding.class !== undefined &&
+        CI_FAIL_CLASSES.includes(finding.class),
     );
 
   return { ok, warning, critical, failed };

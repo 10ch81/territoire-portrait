@@ -18,7 +18,8 @@
     "ingest:property": "tsx scripts/ingest-property.ts",
     "ingest:social": "tsx scripts/ingest-social.ts",
     "ingest:all": "tsx scripts/ingest-all.ts",
-    "validate:internal": "tsx scripts/validate-internal.ts"
+    "validate:internal": "tsx scripts/validate-internal.ts",
+    "verify:reference": "tsx scripts/verify-reference.ts"
   },
   "dependencies": {
     "next": "16.2.9",
