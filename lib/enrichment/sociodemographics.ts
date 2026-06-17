@@ -1,5 +1,5 @@
 import { createFilosofiSource, createRpEmploymentSource, createRpPopulationSource } from "../sources";
-import { loadJsonCache } from "./cache";
+import { isJsonCachePresent, loadJsonCache } from "./cache";
 import type {
   AgeBandCount,
   SociodemographicsCommuneCache,
@@ -21,18 +21,23 @@ const AGE_BAND_LABELS: Record<string, string> = {
 export function loadSociodemographicsSnapshot(
   inseeCode: string,
 ): SociodemographicsSnapshot {
+  const cachePresent = isJsonCachePresent(SOCIAL_CACHE_FILE);
   const cache = loadJsonCache<SociodemographicsCommuneCache>(SOCIAL_CACHE_FILE);
   const entry = cache?.[inseeCode];
 
   if (!entry) {
+    const note =
+      !cachePresent || cache === null
+        ? "Cache socio-démographique absent. Exécutez « npm run ingest:social » pour activer structure par âge, chômage et revenus."
+        : `Commune ${inseeCode} absente du cache socio-démographique.`;
+
     return {
       year: 2021,
       ageBands: [],
       unemploymentRate: null,
       medianDisposableIncome: null,
       available: false,
-      note:
-        "Cache socio-démographique absent. Exécutez « npm run ingest:social » pour activer structure par âge, chômage et revenus.",
+      note,
     };
   }
 

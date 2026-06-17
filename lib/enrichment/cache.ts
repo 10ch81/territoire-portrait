@@ -9,6 +9,10 @@ export function cachePath(filename: string): string {
 
 const cacheStore = new Map<string, unknown | null | undefined>();
 
+function stripUtf8Bom(text: string): string {
+  return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+}
+
 export function isJsonCachePresent(filename: string): boolean {
   return existsSync(cachePath(filename));
 }
@@ -26,7 +30,9 @@ export function loadJsonCache<T>(filename: string): T | null {
   }
 
   try {
-    const parsed = JSON.parse(readFileSync(path, "utf-8")) as T;
+    const parsed = JSON.parse(
+      stripUtf8Bom(readFileSync(path, "utf-8")),
+    ) as T;
     cacheStore.set(filename, parsed);
     return parsed;
   } catch (error) {
