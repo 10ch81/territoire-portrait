@@ -16,6 +16,8 @@ Règles impératives :
 - La BPE dénombre des équipements (y compris enseignement et services publics de proximité) : ne pas écrire qu'il n'y a pas d'écoles ou de mairie si des comptages sont fournis.
 - Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
 - Si un prix immobilier est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
+- Les données SSMSI décrivent des faits enregistrés (lieu de commission), pas le ressenti d'insécurité ; ne pas stigmatiser une commune ni extrapoler au-delà des indicateurs diffusés.
+- Ne pas confondre le thème Sécurité (SSMSI) avec Risques (Géorisques : radon, inondations, CATNAT).
 - Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni texte autour.
 
 Structure JSON attendue :
@@ -98,6 +100,16 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           inondation: territory.enrichment.risks.flood,
           catnat: territory.enrichment.risks.catNatEvents,
           note: territory.enrichment.risks.note,
+        }
+      : null,
+    securite: territory.enrichment?.security?.available
+      ? {
+          annee: territory.enrichment.security.year,
+          indicateurs: territory.enrichment.security.indicators.filter(
+            (indicator) => indicator.diffused,
+          ),
+          indicateursDiffuses: territory.enrichment.security.diffusedIndicatorCount,
+          note: territory.enrichment.security.note,
         }
       : null,
     logementsSociaux: territory.enrichment?.housing?.available

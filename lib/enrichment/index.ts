@@ -13,6 +13,7 @@ import { loadIrveSnapshot, createIrveSource } from "./mobility";
 import { loadLocalTaxSnapshot, createReiSource } from "./fiscal";
 import { loadGeographySnapshot, createAavSource } from "./geography";
 import { loadPropertyMarketSnapshot, createDvfSource } from "./property";
+import { loadSecuritySnapshot, createSsmsiSource } from "./security";
 import { computeDerivedIndicators } from "./derived";
 import {
   loadSociodemographicsSnapshot,
@@ -47,6 +48,9 @@ function collectEnrichmentSources(
   }
   if (enrichment.risks?.available) {
     sources.push(createGeorisquesSource(accessedAt));
+  }
+  if (enrichment.security?.available) {
+    sources.push(createSsmsiSource(accessedAt));
   }
   if (enrichment.housing?.available) {
     sources.push(createRplsSource(accessedAt));
@@ -89,6 +93,7 @@ export async function enrichTerritory(
   const mobility = loadIrveSnapshot(territory.inseeCode);
   const fiscal = loadLocalTaxSnapshot(territory.inseeCode);
   const property = loadPropertyMarketSnapshot(territory.inseeCode);
+  const security = loadSecuritySnapshot(territory);
 
   const enrichment: TerritoryEnrichment = {
     populationHistory,
@@ -96,6 +101,7 @@ export async function enrichTerritory(
     enterprises,
     equipments,
     risks,
+    security,
     housing,
     mobility,
     fiscal,

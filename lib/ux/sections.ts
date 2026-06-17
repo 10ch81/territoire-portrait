@@ -31,6 +31,11 @@ export const ENRICHMENT_SECTIONS: SectionDef[] = [
     isAvailable: (t) => t.enrichment?.risks?.available === true,
   },
   {
+    id: "securite",
+    label: "Sécurité",
+    isAvailable: (t) => t.enrichment?.security?.available === true,
+  },
+  {
     id: "logement",
     label: "Logement",
     isAvailable: (t) => t.enrichment?.housing?.available === true,

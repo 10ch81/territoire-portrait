@@ -12,6 +12,7 @@ export const ACRONYMS: Record<string, string> = {
   INSEE: "Institut national de la statistique et des études économiques",
   AZI: "Atlas des zones inondables",
   CATNAT: "Catastrophes naturelles — régime d'indemnisation",
+  SSMSI: "Service statistique ministériel de la sécurité intérieure — délinquance enregistrée",
   FILOSOFI: "Fichier localisé social et fiscal — revenus INSEE",
 };
 

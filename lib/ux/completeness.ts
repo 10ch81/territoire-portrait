@@ -36,6 +36,10 @@ const ENRICHMENT_CHECKS: Array<{
     isAvailable: (t) => t.enrichment?.risks?.available === true,
   },
   {
+    id: "security",
+    isAvailable: (t) => t.enrichment?.security?.available === true,
+  },
+  {
     id: "housing",
     isAvailable: (t) => t.enrichment?.housing?.available === true,
   },

@@ -214,12 +214,30 @@ export interface DerivedIndicatorsSnapshot {
   note: string;
 }
 
+export interface SecurityIndicatorSnapshot {
+  id: string;
+  label: string;
+  count: number | null;
+  ratePer1000: number | null;
+  departmentRatePer1000: number | null;
+  diffused: boolean;
+}
+
+export interface SecuritySnapshot {
+  year: number;
+  indicators: SecurityIndicatorSnapshot[];
+  diffusedIndicatorCount: number;
+  available: boolean;
+  note: string;
+}
+
 export interface TerritoryEnrichment {
   populationHistory: PopulationHistorySnapshot | null;
   sociodemographics: SociodemographicsSnapshot | null;
   enterprises: EnterpriseSnapshot | null;
   equipments: EquipmentSnapshot | null;
   risks: RisksSnapshot | null;
+  security: SecuritySnapshot | null;
   housing: SocialHousingSnapshot | null;
   mobility: IrveSnapshot | null;
   fiscal: LocalTaxSnapshot | null;
@@ -369,3 +387,24 @@ export interface PropertyCommuneCacheEntry {
 }
 
 export type PropertyCommuneCache = Record<string, PropertyCommuneCacheEntry>;
+
+export interface SecurityIndicatorCacheEntry {
+  count: number | null;
+  ratePer1000: number | null;
+  diffused: boolean;
+}
+
+export interface SecurityCommuneCacheEntry {
+  year: number;
+  departmentCode: string;
+  indicators: Record<string, SecurityIndicatorCacheEntry>;
+}
+
+export type SecurityCommuneCache = Record<string, SecurityCommuneCacheEntry>;
+
+export interface SecurityDepartmentCacheEntry {
+  year: number;
+  indicators: Record<string, SecurityIndicatorCacheEntry>;
+}
+
+export type SecurityDepartmentCache = Record<string, SecurityDepartmentCacheEntry>;

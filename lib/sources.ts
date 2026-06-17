@@ -19,6 +19,8 @@ const AAV_URL =
   "https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/";
 const DVF_URL =
   "https://www.data.gouv.fr/datasets/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/";
+const SSMSI_URL =
+  "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales";
 
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
@@ -35,6 +37,7 @@ export const SOURCE_IDS = {
   REI: "rei",
   AAV: "aav2020",
   DVF: "dvf",
+  SSMSI: "ssmsi",
 } as const;
 
 export function createGeoApiSource(accessedAt: string): DataSource {
@@ -178,6 +181,17 @@ export function createDvfSource(accessedAt: string): DataSource {
     name: "DVF — Indicateurs immobiliers",
     url: DVF_URL,
     description: "Prix et volumes de mutations immobilières agrégés par commune.",
+    accessedAt,
+  };
+}
+
+export function createSsmsiSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.SSMSI,
+    name: "SSMSI — Délinquance enregistrée",
+    url: SSMSI_URL,
+    description:
+      "Principaux indicateurs de crimes et délits enregistrés par la police et la gendarmerie (lieu de commission).",
     accessedAt,
   };
 }

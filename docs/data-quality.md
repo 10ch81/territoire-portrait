@@ -154,6 +154,7 @@ data/quality/
 npm run validate:internal   # cohérence interne du cache
 npm run verify:reference    # golden communes vs APIs live
 npm run quality:all         # validate + verify (sans ingest)
+npm run quality:sample        # validate + verify sur Rennes (35238)
 ```
 
 ## Phases d'implémentation

@@ -16,11 +16,13 @@
     "ingest:rei": "tsx scripts/ingest-rei.ts",
     "ingest:geography": "tsx scripts/ingest-geography.ts",
     "ingest:property": "tsx scripts/ingest-property.ts",
+    "ingest:security": "tsx scripts/ingest-security.ts",
     "ingest:social": "tsx scripts/ingest-social.ts",
     "ingest:all": "tsx scripts/ingest-all.ts",
     "validate:internal": "tsx scripts/validate-internal.ts",
     "verify:reference": "tsx scripts/verify-reference.ts",
-    "quality:all": "tsx scripts/quality-all.ts"
+    "quality:all": "tsx scripts/quality-all.ts",
+    "quality:sample": "tsx scripts/quality-sample.ts"
   },
   "dependencies": {
     "next": "16.2.9",

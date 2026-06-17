@@ -256,6 +256,20 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
     enrichment.risks?.note,
   );
 
+  if (enrichment.security?.available) {
+    pushUnique(
+      limits,
+      "Sécurité (SSMSI) : faits enregistrés par la police/gendarmerie (lieu de commission) ; couverture communale partielle et pas de ressenti d'insécurité.",
+    );
+  } else {
+    appendUnavailable(
+      limits,
+      enrichment.security?.available,
+      "Données de sécurité (SSMSI) non disponibles pour cette commune.",
+      enrichment.security?.note,
+    );
+  }
+
   appendUnavailable(
     limits,
     enrichment.mobility?.available,

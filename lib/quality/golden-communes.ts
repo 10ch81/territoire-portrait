@@ -26,3 +26,6 @@ export const GOLDEN_COMMUNES: GoldenCommune[] = [
     motif: "commune rurale",
   },
 ];
+
+/** Commune de référence pour les tests rapides (`npm run quality:sample`). */
+export const SAMPLE_QUALITY_COMMUNE: GoldenCommune = GOLDEN_COMMUNES[0];

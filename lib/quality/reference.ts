@@ -114,7 +114,10 @@ function pushExactMatchFinding(
   });
 }
 
-async function verifyCommune(inseeCode: string, name: string): Promise<QualityFinding[]> {
+export async function verifyReferenceCommune(
+  inseeCode: string,
+  name: string,
+): Promise<QualityFinding[]> {
   const findings: QualityFinding[] = [];
   const territory = await getEnrichedTerritoryByInsee(inseeCode);
 
@@ -329,7 +332,10 @@ export async function verifyGoldenCommunes(): Promise<QualityFinding[]> {
 
   for (const commune of GOLDEN_COMMUNES) {
     console.log(`  Vérification ${commune.name} (${commune.inseeCode})…`);
-    const communeFindings = await verifyCommune(commune.inseeCode, commune.name);
+    const communeFindings = await verifyReferenceCommune(
+      commune.inseeCode,
+      commune.name,
+    );
     findings.push(...communeFindings);
     await new Promise((resolve) => setTimeout(resolve, 1500));
   }

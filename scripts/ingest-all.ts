@@ -13,6 +13,7 @@ const steps = [
   { name: "REI (fiscalité locale)", script: "scripts/ingest-rei.ts" },
   { name: "AAV (aires d'attraction)", script: "scripts/ingest-geography.ts" },
   { name: "DVF (prix immobiliers)", script: "scripts/ingest-property.ts" },
+  { name: "SSMSI (sécurité / délinquance)", script: "scripts/ingest-security.ts" },
 ];
 
 for (const step of steps) {

@@ -138,6 +138,8 @@ Pas de scraping web — sources limitées à la liste blanche `lib/sources.ts`.
 
 Guide complet : [docs/data-quality.md](./docs/data-quality.md).
 
+Test rapide (Rennes) : `npm run quality:sample`.
+
 ## MCP data.gouv.fr
 
 Le MCP data.gouv.fr sert d'abord à **découvrir et explorer** les jeux de données pertinents dans Cursor, avant de les intégrer au code.

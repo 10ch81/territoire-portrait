@@ -55,6 +55,7 @@ npm run ingest:all       # toutes les ingestions
 npm run validate:internal   # cohérence interne cache
 npm run verify:reference    # golden communes vs APIs live
 npm run quality:all         # validate + verify
+npm run quality:sample      # validate + verify sur Rennes (35238)
 ```
 
 ## Déploiement
