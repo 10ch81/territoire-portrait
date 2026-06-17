@@ -91,6 +91,7 @@ docs/mcp-datagouv.md              # Guide MCP data.gouv.fr
 | REI (cache) | Taux de fiscalité locale |
 | AAV 2020 (cache) | Aire d'attraction des villes |
 | DVF (cache) | Prix immobilier au m² |
+| RP + FILOSOFI (cache) | Structure par âge, chômage, revenus |
 
 ### Ingestion des caches locaux
 
@@ -102,10 +103,19 @@ npm run ingest:housing    # logements sociaux (RPLS)
 npm run ingest:irve       # bornes de recharge (~150 Mo)
 npm run ingest:rei        # fiscalité locale (~17 Mo)
 npm run ingest:geography  # aires d'attraction 2020
-npm run ingest:property   # indicateurs DVF
+npm run ingest:property   # indicateurs DVF (série 2014-2024)
+npm run ingest:social     # structure par âge, chômage, revenus
 ```
 
-Les caches agrégés sont stockés dans `data/cache/*-by-commune.json` (versionnés pour Vercel).
+Les caches agrégés sont stockés dans `data/cache/*-by-commune.json` (versionnés pour Vercel, dont `property-by-commune.json` et `social-by-commune.json`).
+
+### Rafraîchissement automatique (CI)
+
+Un workflow GitHub Actions (`.github/workflows/refresh-cache.yml`) relance `npm run ingest:all` **le 1er de chaque mois**, commit les JSON modifiés et déclenche un redéploiement Vercel.
+
+- **Manuel** : GitHub → Actions → *Refresh data cache* → *Run workflow*
+- **Maintenance des scripts** : Cursor (exploration MCP, mise à jour des millésimes INSEE)
+- **Exécution planifiée** : GitHub Actions (reproductible, logs CI)
 
 ## MCP data.gouv.fr
 

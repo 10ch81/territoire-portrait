@@ -1,10 +1,10 @@
 import { createReadStream, createWriteStream, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
-import { spawnSync } from "node:child_process";
 import { pipeline } from "node:stream/promises";
 import { resolve } from "node:path";
 import { Readable } from "node:stream";
 import { BPE_MMELODI_FILE_URL } from "../lib/sources";
+import { extractZip } from "./ingest-utils";
 import type { BpeCommuneCache, BpeCommuneCacheEntry } from "../lib/types";
 
 const CACHE_DIR = resolve(process.cwd(), "data/cache");
@@ -33,29 +33,6 @@ async function downloadBpeArchive(): Promise<void> {
   const fileStream = createWriteStream(ZIP_PATH);
   await pipeline(Readable.fromWeb(response.body as never), fileStream);
   console.log(`Archive enregistrée : ${ZIP_PATH}`);
-}
-
-async function extractArchive(): Promise<void> {
-  if (existsSync(DATA_CSV_PATH)) {
-    return;
-  }
-
-  console.log("Extraction de l'archive ZIP…");
-  mkdirSync(EXTRACT_DIR, { recursive: true });
-
-  const result = spawnSync(
-    "powershell",
-    [
-      "-NoProfile",
-      "-Command",
-      `Expand-Archive -Path '${ZIP_PATH.replace(/'/g, "''")}' -DestinationPath '${EXTRACT_DIR.replace(/'/g, "''")}' -Force`,
-    ],
-    { stdio: "inherit" },
-  );
-
-  if (result.status !== 0) {
-    throw new Error("Extraction ZIP échouée.");
-  }
 }
 
 async function aggregateCommuneData(): Promise<BpeCommuneCache> {
@@ -148,7 +125,9 @@ async function main(): Promise<void> {
     await downloadBpeArchive();
   }
 
-  await extractArchive();
+  if (!existsSync(DATA_CSV_PATH)) {
+    extractZip(ZIP_PATH, EXTRACT_DIR);
+  }
   const cache = await aggregateCommuneData();
   const labels = await exportBpeTypeLabels();
 
