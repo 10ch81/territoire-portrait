@@ -20,9 +20,12 @@ Construire un système réutilisable pour produire des portraits territoriaux de
 | `lib/enrichment/`        | SIRENE (API live) + BPE (cache INSEE)             |
 | `lib/mistral.ts`         | Client Mistral centralisé (serveur uniquement)    |
 | `lib/sources.ts`         | Métadonnées des sources                           |
-| `scripts/`               | Ingestion et outils CLI futurs                    |
-| `data/cache/`            | Cache local (non versionné)                       |
+| `lib/quality/`           | Règles et vérification qualité données (planifié) |
+| `scripts/`               | Ingestion, validation et outils CLI               |
+| `data/cache/`            | Snapshots agrégés par commune (versionnés pour Vercel) |
+| `data/quality/`          | Rapports de validation CI (`latest.json`)         |
 | `docs/mcp-datagouv.md`   | Guide MCP data.gouv.fr                            |
+| `docs/data-quality.md`   | Boucle qualité des données                        |
 | `.cursor/rules/`         | Règles persistantes Cursor                        |
 
 ## Workflow de développement
@@ -32,6 +35,7 @@ Construire un système réutilisable pour produire des portraits territoriaux de
 3. Implémenter l'ingestion dans `scripts/` puis brancher `lib/territory.ts`.
 4. Enrichir la fiche et le prompt Mistral avec les nouvelles données.
 5. Vérifier : `npm run typecheck`, `npm run lint`, `npm run build`.
+6. Qualité données : `npm run validate:internal` et `npm run verify:reference` (voir `docs/data-quality.md`).
 
 ## APIs MVP
 
@@ -48,6 +52,9 @@ npm run typecheck        # vérification TypeScript
 npm run analyze:sample   # test Mistral avec Nantes (44109)
 npm run ingest:bpe       # ingestion BPE INSEE → data/cache/
 npm run ingest:all       # toutes les ingestions
+npm run validate:internal   # cohérence interne cache (planifié)
+npm run verify:reference    # golden communes vs APIs live (planifié)
+npm run quality:all         # validate + verify (planifié)
 ```
 
 ## Déploiement
@@ -61,9 +68,21 @@ Feuille de route et statut d'implémentation : **`docs/ux-roadmap.md`**.
 
 Principes : KPI hero → synthèse IA → sections thématiques ; chargement progressif ; sources traçables ; pas d'invention de données.
 
+## Qualité des données
+
+Boucle automatique documentée dans **`docs/data-quality.md`** :
+
+1. Cohérence interne (calculs, unités, indicateurs dérivés).
+2. Golden communes (Rennes 35238, Nantes 44109, …) vs APIs officielles live.
+3. Classification des écarts (millésime vs bug parser).
+4. Pipeline CI post-ingest (`refresh-cache.yml`).
+5. Agent Cursor sur échecs de code (`PARSER_BUG`, `JOIN_KEY_ERROR`).
+
+Pas de scraping web — liste blanche `lib/sources.ts` uniquement.
+
 ## Prochaines étapes suggérées
 
-- Ingestion CSV/JSON depuis data.gouv.fr (population détaillée, équipements, SIRENE).
-- Cache local dans `data/cache/`.
-- Automatisation Cursor (ingestion planifiée, génération de rapports batch).
+- Implémenter `lib/quality/` et scripts `validate-internal` / `verify-reference` (P0–P2).
+- Ingestion CSV/JSON depuis data.gouv.fr (nouvelles thématiques).
+- Automation Cursor sur échecs CI qualité données.
 - Comparaison de communes (`/compare`) — phase 2 UX.

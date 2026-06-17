@@ -9,6 +9,8 @@ alwaysApply: false
 - Ne jamais inventer de données — afficher « Donnée non disponible ».
 - Documenter chaque source dans `lib/sources.ts` avec URL et description.
 - MVP : API Géo (geo.api.gouv.fr) pour la résolution commune.
-- Enrichissement futur via MCP data.gouv.fr puis scripts d'ingestion.
+- Enrichissement via scripts d'ingestion + APIs live (SIRENE, Géorisques).
 - Conserver la traçabilité : `accessedAt` sur les sources consultées.
 - Structurer le code pour ajouter facilement de nouvelles sources.
+- Qualité : liste blanche officielle uniquement — pas de scraping web (voir `docs/data-quality.md`).
+- Nouvelle source : ajouter à `lib/sources.ts` et aux golden communes si critique.

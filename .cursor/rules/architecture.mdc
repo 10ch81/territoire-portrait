@@ -9,7 +9,9 @@ alwaysApply: true
 - Logique métier dans `lib/` — pas dans les composants UI.
 - Routes API dans `app/api/` pour la résolution commune et l'analyse Mistral.
 - Composants présentationnels dans `components/`.
-- Scripts CLI et ingestion dans `scripts/`.
-- Cache local dans `data/cache/` (non versionné).
+- Scripts CLI, ingestion et validation dans `scripts/`.
+- Cache agrégé dans `data/cache/` (versionné pour Vercel).
+- Rapports qualité dans `data/quality/`.
 - Types centralisés dans `lib/types.ts`.
+- Validation qualité dans `lib/quality/` (règles, référence, classification).
 - Enrichissement data.gouv.fr : d'abord MCP (exploration), puis scripts (ingestion).

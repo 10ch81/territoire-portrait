@@ -55,15 +55,28 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] Accueil orienté **cas d'usage** (élus, prospecteurs, risques)
 - [ ] Comparaison de communes (phase 2 — page `/compare` à venir)
 
+## Sprint 5 — Qualité des données (planifié)
+
+- [ ] `lib/quality/rules.ts` — cohérence interne (densité, dérivés, bornes)
+- [ ] `scripts/validate-internal.ts` — validation du cache agrégé
+- [ ] `scripts/verify-reference.ts` — golden communes vs APIs live
+- [ ] Classification des écarts (`MILLESIME_DIFF`, `PARSER_BUG`, …)
+- [ ] Extension CI `refresh-cache.yml` (validate + verify avant commit)
+- [ ] Rapport `data/quality/latest.json`
+- [ ] Automation Cursor sur échecs de code
+
+Référence : [docs/data-quality.md](./data-quality.md).
+
 ---
 
 ## Principes directeurs
 
 1. **Ne jamais inventer de données** — conserver « Donnée non disponible »
 2. **Sources traçables** — lien contextuel par section + liste globale
-3. **Analyse IA prudente** — synthèse après les faits, limites explicites
-4. **Progressive disclosure** — KPIs → synthèse → détail par onglet/ancre
-5. **Pas de sur-ingénierie** — SVG natif pour les graphiques, pas de carte interactive lourde
+3. **Qualité vérifiable** — boucle validate / verify documentée (`docs/data-quality.md`)
+4. **Analyse IA prudente** — synthèse après les faits, limites explicites
+5. **Progressive disclosure** — KPIs → synthèse → détail par onglet/ancre
+6. **Pas de sur-ingénierie** — SVG natif pour les graphiques, pas de carte interactive lourde
 
 ## À éviter (hors scope actuel)
 
@@ -78,6 +91,7 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 | -------- | ----- |
 | `lib/ux/kpis.ts` | Extraction KPI hero |
 | `lib/ux/completeness.ts` | Score complétude des sources |
+| `lib/quality/` | Validation qualité (planifié — voir `docs/data-quality.md`) |
 | `lib/ux/sections.ts` | Définition des ancres de navigation |
 | `lib/ux/acronyms.ts` | Glossaire acronymes |
 | `components/KpiHero.tsx` | Bandeau indicateurs |

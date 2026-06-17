@@ -1,0 +1,5 @@
+# Rapport qualité — généré par CI
+
+Ce dossier contiendra les rapports de validation (`latest.json`) produits par `validate:internal` et `verify:reference`.
+
+Voir [docs/data-quality.md](../docs/data-quality.md).

@@ -65,7 +65,21 @@ Quels jeux de données sont exploitables automatiquement via CSV, JSON ou API ?
 | `scripts/analyze-sample.ts`    | **Actif**     | Test Mistral sur Nantes (44109)          |
 | `scripts/ingest-bpe.ts`        | **Actif**     | Ingestion BPE INSEE → cache communal     |
 | `scripts/ingest-all.ts`        | **Actif**     | Lance toutes les ingestions              |
+| `scripts/validate-internal.ts` | **Planifié**  | Cohérence interne du cache communal      |
+| `scripts/verify-reference.ts`  | **Planifié**  | Golden communes vs APIs live             |
 | `scripts/explore-datagouv.ts`  | Placeholder   | Future exploration programmatique        |
+
+## Qualité des données
+
+Voir [docs/data-quality.md](./data-quality.md) pour la boucle complète :
+
+1. Cohérence interne (`validate:internal`) sur le cache agrégé.
+2. Vérification référence (`verify:reference`) sur golden communes (Rennes 35238, Nantes 44109, …).
+3. Classification des écarts (millésime vs bug parser).
+4. Extension du workflow CI `refresh-cache.yml`.
+5. Agent Cursor sur échecs `PARSER_BUG` / `JOIN_KEY_ERROR`.
+
+Pas de scraping web — liste blanche `lib/sources.ts` uniquement.
 
 ## Bonnes pratiques
 

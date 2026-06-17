@@ -70,11 +70,15 @@ lib/
   territory.ts                  # API Géo + normalisation
   mistral.ts                    # Client Mistral
   sources.ts                    # Métadonnées sources
+  enrichment/                   # Enrichissement par thème (cache + live)
+  quality/                      # Validation qualité (planifié)
   types.ts                      # Types TypeScript
 components/                       # UI (SearchForm, TerritoryCard, …)
-scripts/                          # Ingestion future + analyze-sample
-data/cache/                       # Cache local (.gitkeep)
+scripts/                          # Ingestion + validation qualité
+data/cache/                       # Snapshots agrégés par commune
+data/quality/                     # Rapports CI (latest.json)
 docs/mcp-datagouv.md              # Guide MCP data.gouv.fr
+docs/data-quality.md              # Boucle qualité des données
 ```
 
 ## Sources de données
@@ -113,9 +117,26 @@ Les caches agrégés sont stockés dans `data/cache/*-by-commune.json` (versionn
 
 Un workflow GitHub Actions (`.github/workflows/refresh-cache.yml`) relance `npm run ingest:all` **le 1er de chaque mois**, commit les JSON modifiés et déclenche un redéploiement Vercel.
 
+**Évolution planifiée** : après ingest, exécuter `validate:internal` et `verify:reference` avant commit (voir [docs/data-quality.md](./docs/data-quality.md)).
+
 - **Manuel** : GitHub → Actions → *Refresh data cache* → *Run workflow*
 - **Maintenance des scripts** : Cursor (exploration MCP, mise à jour des millésimes INSEE)
 - **Exécution planifiée** : GitHub Actions (reproductible, logs CI)
+
+### Qualité des données
+
+Boucle automatique en cours de mise en place pour détecter erreurs de parsers, jointures, unités et cache obsolète :
+
+| Couche | Commande (planifiée) | Rôle |
+| ------ | -------------------- | ---- |
+| Cohérence interne | `npm run validate:internal` | Densité, indicateurs dérivés, bornes |
+| Référence live | `npm run verify:reference` | Rennes, Nantes, … vs APIs officielles |
+| Pipeline CI | extension `refresh-cache.yml` | Ingest → validate → verify → commit |
+| Investigation | automation Cursor | PR sur bugs parser / jointure |
+
+Pas de scraping web — sources limitées à la liste blanche `lib/sources.ts`.
+
+Guide complet : [docs/data-quality.md](./docs/data-quality.md).
 
 ## MCP data.gouv.fr
 
