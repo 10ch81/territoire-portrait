@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "analyze:sample": "tsx scripts/analyze-sample.ts"
+    "analyze:sample": "tsx scripts/analyze-sample.ts",
+    "ingest:bpe": "tsx scripts/ingest-bpe.ts",
+    "ingest:all": "tsx scripts/ingest-all.ts"
   },
   "dependencies": {
     "next": "16.2.9",

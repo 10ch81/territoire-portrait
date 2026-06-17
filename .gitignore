@@ -37,6 +37,7 @@ yarn-error.log*
 # local data cache
 /data/cache/*
 !/data/cache/.gitkeep
+!/data/cache/bpe-by-commune.json
 
 # vercel
 .vercel

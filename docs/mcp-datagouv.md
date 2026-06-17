@@ -63,8 +63,9 @@ Quels jeux de données sont exploitables automatiquement via CSV, JSON ou API ?
 | Script                         | Statut        | Description                              |
 | ------------------------------ | ------------- | ---------------------------------------- |
 | `scripts/analyze-sample.ts`    | **Actif**     | Test Mistral sur Nantes (44109)          |
+| `scripts/ingest-bpe.ts`        | **Actif**     | Ingestion BPE INSEE → cache communal     |
+| `scripts/ingest-all.ts`        | **Actif**     | Lance toutes les ingestions              |
 | `scripts/explore-datagouv.ts`  | Placeholder   | Future exploration programmatique        |
-| `scripts/ingest-sample.ts`     | Placeholder   | Future ingestion CSV/JSON → cache        |
 
 ## Bonnes pratiques
 

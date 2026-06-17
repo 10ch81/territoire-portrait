@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { analyzeTerritory } from "../lib/mistral";
-import { getTerritoryByInsee } from "../lib/territory";
+import { getEnrichedTerritoryByInsee } from "../lib/enrichment";
 
 function loadEnvLocal(): void {
   const envPath = resolve(process.cwd(), ".env.local");
@@ -38,7 +38,7 @@ async function main(): Promise<void> {
   const sampleInsee = "44109";
   console.log(`\n🔍 Chargement de la commune INSEE ${sampleInsee} (Nantes)…\n`);
 
-  const territory = await getTerritoryByInsee(sampleInsee);
+  const territory = await getEnrichedTerritoryByInsee(sampleInsee);
 
   if (!territory) {
     console.error("Commune introuvable.");

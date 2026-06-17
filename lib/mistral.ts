@@ -39,10 +39,30 @@ function buildUserPrompt(territory: TerritoryProfile): string {
     codesPostaux: territory.postalCodes,
     departement: territory.department,
     region: territory.region,
+    epci: territory.epci,
     population: territory.population,
+    densiteHabKm2: territory.densityPerKm2,
     coordonnees: territory.coordinates,
     surfaceKm2: territory.surfaceKm2,
-    sources: territory.sources.map((s) => s.name),
+    entreprises: territory.enrichment?.enterprises
+      ? {
+          unitesLegalesAvecEtablissement:
+            territory.enrichment.enterprises.legalUnitsWithEstablishment,
+          secteursDominants:
+            territory.enrichment.enterprises.topActivitySections,
+          essEchantillon: territory.enrichment.enterprises.essCount,
+          note: territory.enrichment.enterprises.note,
+        }
+      : null,
+    equipements: territory.enrichment?.equipments?.available
+      ? {
+          annee: territory.enrichment.equipments.year,
+          total: territory.enrichment.equipments.totalEquipments,
+          parDomaine: territory.enrichment.equipments.byDomain,
+          note: territory.enrichment.equipments.note,
+        }
+      : null,
+    sources: territory.sources.map((source) => source.name),
   };
 
   return `Analyse ce territoire à partir des données suivantes (ne rien inventer) :

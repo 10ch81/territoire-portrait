@@ -16,9 +16,49 @@ export interface TerritoryRegion {
   name: string;
 }
 
+export interface TerritoryEpci {
+  code: string;
+  name: string;
+}
+
 export interface TerritoryCoordinates {
   latitude: number;
   longitude: number;
+}
+
+export interface ActivitySectionCount {
+  code: string;
+  label: string;
+  count: number;
+}
+
+export interface EquipmentDomainCount {
+  code: string;
+  label: string;
+  count: number;
+}
+
+export interface EnterpriseSnapshot {
+  legalUnitsWithEstablishment: number | null;
+  sampleSize: number;
+  topActivitySections: ActivitySectionCount[];
+  essCount: number | null;
+  millesime: string;
+  note: string;
+}
+
+export interface EquipmentSnapshot {
+  year: number;
+  totalEquipments: number;
+  byDomain: EquipmentDomainCount[];
+  available: boolean;
+  note: string;
+}
+
+export interface TerritoryEnrichment {
+  enterprises: EnterpriseSnapshot | null;
+  equipments: EquipmentSnapshot | null;
+  sources: DataSource[];
 }
 
 export interface TerritoryProfile {
@@ -27,10 +67,13 @@ export interface TerritoryProfile {
   postalCodes: string[];
   department: TerritoryDepartment | null;
   region: TerritoryRegion | null;
+  epci: TerritoryEpci | null;
   population: number | null;
+  densityPerKm2: number | null;
   coordinates: TerritoryCoordinates | null;
   surfaceKm2: number | null;
   sources: DataSource[];
+  enrichment: TerritoryEnrichment | null;
 }
 
 export interface TerritoryAnalysis {
@@ -70,6 +113,18 @@ export interface GeoApiCommune {
     code: string;
     nom: string;
   };
+  epci?: {
+    code: string;
+    nom: string;
+  };
   codeDepartement?: string;
   codeRegion?: string;
 }
+
+export interface BpeCommuneCacheEntry {
+  year: number;
+  total: number;
+  byDomain: Record<string, number>;
+}
+
+export type BpeCommuneCache = Record<string, BpeCommuneCacheEntry>;

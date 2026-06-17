@@ -17,6 +17,7 @@ Construire un système réutilisable pour produire des portraits territoriaux de
 | ------------------------ | ------------------------------------------------- |
 | `app/`                   | Interface Next.js (App Router)                    |
 | `lib/territory.ts`       | Résolution commune + normalisation                |
+| `lib/enrichment/`        | SIRENE (API live) + BPE (cache INSEE)             |
 | `lib/mistral.ts`         | Client Mistral centralisé (serveur uniquement)    |
 | `lib/sources.ts`         | Métadonnées des sources                           |
 | `scripts/`               | Ingestion et outils CLI futurs                    |
@@ -45,6 +46,8 @@ npm run build            # build production
 npm run lint             # ESLint
 npm run typecheck        # vérification TypeScript
 npm run analyze:sample   # test Mistral avec Nantes (44109)
+npm run ingest:bpe       # ingestion BPE INSEE → data/cache/
+npm run ingest:all       # toutes les ingestions
 ```
 
 ## Déploiement

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
+import { enrichTerritory, getEnrichedTerritoryByInsee } from "@/lib/enrichment";
 import { analyzeTerritory } from "@/lib/mistral";
-import { getTerritoryByInsee } from "@/lib/territory";
 import type { TerritoryProfile } from "@/lib/types";
 
 interface AnalyzeRequestBody {
@@ -15,7 +15,9 @@ export async function POST(request: Request) {
     let territory = body.territory ?? null;
 
     if (!territory && body.codeInsee) {
-      territory = await getTerritoryByInsee(body.codeInsee);
+      territory = await getEnrichedTerritoryByInsee(body.codeInsee);
+    } else if (territory) {
+      territory = await enrichTerritory(territory);
     }
 
     if (!territory) {

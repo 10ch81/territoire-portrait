@@ -79,11 +79,20 @@ docs/mcp-datagouv.md              # Guide MCP data.gouv.fr
 
 ## Sources de données (MVP)
 
-| Source        | Usage                                      |
-| ------------- | ------------------------------------------ |
-| API Géo       | Communes, population, coordonnées, découpage |
+| Source | Usage |
+| ------ | ----- |
+| API Géo | Communes, population, EPCI, coordonnées |
+| API Recherche Entreprises | SIRENE — entreprises avec établissement sur la commune |
+| INSEE BPE 2024 (cache local) | Équipements et services par domaine |
 
-Les sources data.gouv.fr plus riches (INSEE, SIRENE, équipements) seront intégrées via **MCP** (exploration) puis **scripts d'ingestion**.
+### Ingestion des données BPE
+
+```bash
+npm run ingest:bpe    # télécharge et agrège la BPE INSEE (~13 Mo)
+npm run ingest:all    # toutes les ingestions
+```
+
+Le cache est stocké dans `data/cache/bpe-by-commune.json` (versionné pour Vercel).
 
 ## MCP data.gouv.fr
 

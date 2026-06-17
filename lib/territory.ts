@@ -1,4 +1,8 @@
-import { createGeoApiSource } from "./sources";
+import {
+  createGeoApiSource,
+  createPopulationSource,
+  mergeSources,
+} from "./sources";
 import type {
   CommuneSearchResult,
   GeoApiCommune,
@@ -16,6 +20,7 @@ const COMMUNE_FIELDS = [
   "centre",
   "departement",
   "region",
+  "epci",
   "codeDepartement",
   "codeRegion",
 ].join(",");
@@ -59,6 +64,17 @@ async function fetchGeoApi<T>(path: string): Promise<T | null> {
 function mapGeoCommuneToProfile(commune: GeoApiCommune): TerritoryProfile {
   const accessedAt = new Date().toISOString();
   const [longitude, latitude] = commune.centre?.coordinates ?? [null, null];
+  const surfaceKm2 = commune.surface ? commune.surface / 100 : null;
+  const population = commune.population ?? null;
+  const densityPerKm2 =
+    population !== null && surfaceKm2 !== null && surfaceKm2 > 0
+      ? population / surfaceKm2
+      : null;
+
+  const baseSources = [createGeoApiSource(accessedAt)];
+  if (population !== null) {
+    baseSources.push(createPopulationSource(accessedAt));
+  }
 
   return {
     name: commune.nom,
@@ -74,13 +90,18 @@ function mapGeoCommuneToProfile(commune: GeoApiCommune): TerritoryProfile {
       : commune.codeRegion
         ? { code: commune.codeRegion, name: "Donnée non disponible" }
         : null,
-    population: commune.population ?? null,
+    epci: commune.epci
+      ? { code: commune.epci.code, name: commune.epci.nom }
+      : null,
+    population,
+    densityPerKm2,
     coordinates:
       latitude !== null && longitude !== null
         ? { latitude, longitude }
         : null,
-    surfaceKm2: commune.surface ? commune.surface / 100 : null,
-    sources: [createGeoApiSource(accessedAt)],
+    surfaceKm2,
+    sources: mergeSources(baseSources),
+    enrichment: null,
   };
 }
 

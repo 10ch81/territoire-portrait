@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AiAnalysis } from "@/components/AiAnalysis";
+import { EnrichmentCard } from "@/components/EnrichmentCard";
 import { SourcesList } from "@/components/SourcesList";
 import { TerritoryCard } from "@/components/TerritoryCard";
+import { getEnrichedTerritoryByInsee } from "@/lib/enrichment";
 import { analyzeTerritory } from "@/lib/mistral";
-import { getTerritoryByInsee } from "@/lib/territory";
 
 interface CommunePageProps {
   params: Promise<{ codeInsee: string }>;
@@ -12,7 +13,7 @@ interface CommunePageProps {
 
 export default async function CommunePage({ params }: CommunePageProps) {
   const { codeInsee } = await params;
-  const territory = await getTerritoryByInsee(codeInsee);
+  const territory = await getEnrichedTerritoryByInsee(codeInsee);
 
   if (!territory) {
     notFound();
@@ -38,6 +39,7 @@ export default async function CommunePage({ params }: CommunePageProps) {
       </header>
 
       <TerritoryCard territory={territory} />
+      <EnrichmentCard territory={territory} />
       <AiAnalysis result={analysisResult} />
       <SourcesList sources={territory.sources} />
     </main>
