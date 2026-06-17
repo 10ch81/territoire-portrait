@@ -9,7 +9,7 @@ export function UseCaseCards() {
       <h2 className="text-base font-semibold text-slate-900">
         Par cas d&apos;usage
       </h2>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {USE_CASE_EXAMPLES.map((useCase) => (
           <Link
             key={useCase.id}

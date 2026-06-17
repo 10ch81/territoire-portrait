@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   EXAMPLE_COMMUNES,
   loadRecentCommunes,
@@ -9,7 +9,11 @@ import {
 } from "@/lib/ux/recent-communes";
 
 export function SearchSuggestions() {
-  const [recent] = useState<RecentCommune[]>(() => loadRecentCommunes());
+  const [recent, setRecent] = useState<RecentCommune[]>([]);
+
+  useEffect(() => {
+    setRecent(loadRecentCommunes());
+  }, []);
 
   if (recent.length === 0) {
     return (

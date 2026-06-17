@@ -73,4 +73,11 @@ export const USE_CASE_EXAMPLES = [
     inseeCode: "35238",
     anchor: "risques",
   },
+  {
+    id: "security",
+    title: "Sécurité publique",
+    description: "Délinquance enregistrée (SSMSI), taux pour 1 000 hab.",
+    inseeCode: "44109",
+    anchor: "securite",
+  },
 ] as const;
