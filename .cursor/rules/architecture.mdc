@@ -1,0 +1,15 @@
+---
+description: Architecture du projet Portrait IA de territoire
+alwaysApply: true
+---
+
+# Architecture
+
+- Next.js App Router, TypeScript strict, Tailwind CSS.
+- Logique métier dans `lib/` — pas dans les composants UI.
+- Routes API dans `app/api/` pour la résolution commune et l'analyse Mistral.
+- Composants présentationnels dans `components/`.
+- Scripts CLI et ingestion dans `scripts/`.
+- Cache local dans `data/cache/` (non versionné).
+- Types centralisés dans `lib/types.ts`.
+- Enrichissement data.gouv.fr : d'abord MCP (exploration), puis scripts (ingestion).

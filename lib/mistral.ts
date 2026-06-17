@@ -1,0 +1,139 @@
+import type { AnalysisResult, TerritoryAnalysis, TerritoryProfile } from "./types";
+
+const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
+
+const SYSTEM_PROMPT = `Tu es un analyste territorial spécialisé dans les communes françaises.
+
+Règles impératives :
+- Tu ne dois JAMAIS inventer de chiffres, statistiques ou faits non fournis dans les données.
+- Tu dois distinguer clairement les faits (présents dans les données), les hypothèses et les limites.
+- Si une information manque, indique-le explicitement dans dataLimits.
+- Base ton analyse uniquement sur les données territoriales fournies.
+- Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni texte autour.
+
+Structure JSON attendue :
+{
+  "summary": "résumé court du territoire en 2-3 phrases",
+  "strengths": ["point fort 1", "point fort 2"],
+  "watchPoints": ["point d'attention 1"],
+  "opportunities": ["opportunité possible 1"],
+  "dataLimits": ["limite des données 1"]
+}`;
+
+function getMistralConfig(): { apiKey: string; model: string } | null {
+  const apiKey = process.env.MISTRAL_API_KEY?.trim();
+  if (!apiKey) {
+    return null;
+  }
+
+  return {
+    apiKey,
+    model: process.env.MISTRAL_MODEL?.trim() || "mistral-large-latest",
+  };
+}
+
+function buildUserPrompt(territory: TerritoryProfile): string {
+  const facts = {
+    nom: territory.name,
+    codeInsee: territory.inseeCode,
+    codesPostaux: territory.postalCodes,
+    departement: territory.department,
+    region: territory.region,
+    population: territory.population,
+    coordonnees: territory.coordinates,
+    surfaceKm2: territory.surfaceKm2,
+    sources: territory.sources.map((s) => s.name),
+  };
+
+  return `Analyse ce territoire à partir des données suivantes (ne rien inventer) :
+
+${JSON.stringify(facts, null, 2)}`;
+}
+
+function parseAnalysisContent(content: string): TerritoryAnalysis {
+  const parsed = JSON.parse(content) as Partial<TerritoryAnalysis>;
+
+  return {
+    summary: parsed.summary ?? "Analyse non disponible.",
+    strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
+    watchPoints: Array.isArray(parsed.watchPoints) ? parsed.watchPoints : [],
+    opportunities: Array.isArray(parsed.opportunities)
+      ? parsed.opportunities
+      : [],
+    dataLimits: Array.isArray(parsed.dataLimits) ? parsed.dataLimits : [],
+  };
+}
+
+export function isMistralConfigured(): boolean {
+  return Boolean(process.env.MISTRAL_API_KEY?.trim());
+}
+
+export async function analyzeTerritory(
+  territory: TerritoryProfile,
+): Promise<AnalysisResult> {
+  const config = getMistralConfig();
+
+  if (!config) {
+    return {
+      analysis: null,
+      configured: false,
+      error:
+        "L'analyse IA n'est pas configurée. Ajoutez MISTRAL_API_KEY dans .env.local.",
+    };
+  }
+
+  try {
+    const response = await fetch(MISTRAL_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: buildUserPrompt(territory) },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.3,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error("Erreur Mistral:", response.status, errorBody);
+      return {
+        analysis: null,
+        configured: true,
+        error: `L'analyse IA a échoué (statut ${response.status}). Vérifiez la clé API et le modèle.`,
+      };
+    }
+
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+
+    const content = data.choices?.[0]?.message?.content;
+
+    if (!content) {
+      return {
+        analysis: null,
+        configured: true,
+        error: "Réponse Mistral vide ou inattendue.",
+      };
+    }
+
+    return {
+      analysis: parseAnalysisContent(content),
+      configured: true,
+    };
+  } catch (error) {
+    console.error("Erreur lors de l'appel Mistral:", error);
+    return {
+      analysis: null,
+      configured: true,
+      error: "Erreur réseau lors de l'appel à l'API Mistral.",
+    };
+  }
+}

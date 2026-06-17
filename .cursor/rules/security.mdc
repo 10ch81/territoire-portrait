@@ -1,0 +1,13 @@
+---
+description: Règles de sécurité — clés API et secrets
+alwaysApply: true
+---
+
+# Sécurité
+
+- Ne jamais exposer `MISTRAL_API_KEY` ou tout secret côté client.
+- Lire les clés uniquement via `process.env` côté serveur.
+- Ne jamais committer `.env.local` — seul `.env.example` est versionné.
+- Les messages d'erreur doivent être explicites sans révéler de secrets.
+- Valider les entrées utilisateur avant les appels API externes.
+- Pas de `NEXT_PUBLIC_` pour les clés Mistral.

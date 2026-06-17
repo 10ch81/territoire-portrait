@@ -1,0 +1,14 @@
+---
+description: Données publiques et sources territoriales
+globs: lib/territory.ts,lib/sources.ts,scripts/**
+alwaysApply: false
+---
+
+# Données publiques
+
+- Ne jamais inventer de données — afficher « Donnée non disponible ».
+- Documenter chaque source dans `lib/sources.ts` avec URL et description.
+- MVP : API Géo (geo.api.gouv.fr) pour la résolution commune.
+- Enrichissement futur via MCP data.gouv.fr puis scripts d'ingestion.
+- Conserver la traçabilité : `accessedAt` sur les sources consultées.
+- Structurer le code pour ajouter facilement de nouvelles sources.

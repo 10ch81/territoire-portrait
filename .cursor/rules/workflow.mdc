@@ -1,0 +1,13 @@
+---
+description: Workflow de développement du projet
+alwaysApply: true
+---
+
+# Workflow
+
+1. Explorer les datasets via MCP data.gouv.fr (voir `docs/mcp-datagouv.md`).
+2. Implémenter dans `lib/` et `scripts/` — changements focalisés.
+3. Vérifier : `npm run typecheck`, `npm run lint`, `npm run build`.
+4. Tester la recherche commune et la page `/commune/[codeInsee]`.
+5. Tester Mistral : `npm run analyze:sample` (avec `.env.local`).
+6. Documenter les nouvelles sources dans README et `lib/sources.ts`.

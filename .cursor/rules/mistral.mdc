@@ -1,0 +1,14 @@
+---
+description: Règles d'intégration Mistral
+globs: lib/mistral.ts,app/api/analyze/**,scripts/analyze-sample.ts
+alwaysApply: false
+---
+
+# Mistral
+
+- Appels uniquement côté serveur via `lib/mistral.ts`.
+- Prompt système : analyste territorial, pas d'invention de chiffres, JSON structuré.
+- Format de réponse attendu : `summary`, `strengths`, `watchPoints`, `opportunities`, `dataLimits`.
+- Modèle configurable via `MISTRAL_MODEL` (défaut : `mistral-large-latest`).
+- Sans clé API : retourner un résultat gracieux, ne pas faire planter l'application.
+- Température basse (≈ 0.3) pour des analyses factuelles.
