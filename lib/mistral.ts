@@ -65,7 +65,9 @@ Population :
 
 Économie :
 - Privilégier inseeSideUnitesLegales et inseeSideEtablissements (SIDE INSEE) pour décrire le tissu économique local.
+- Préférer « tissu économique local » à « tissu entrepreneurial local » lorsque l'analyse repose surtout sur SIDE/SIRENE.
 - SIRENE (unitesLegalesAvecEtablissement) est un répertoire administratif complémentaire : ne JAMAIS en faire la preuve d'un « dynamisme entrepreneurial » ou d'une « vitalité économique marquée ».
+- Ne pas suggérer un dynamisme entrepreneurial sans données de créations, d'évolution ou d'emploi.
 - Ne pas qualifier automatiquement une commune de dynamique sur la seule base du stock SIRENE.
 - Si avertissementDivergenceSireneSide est renseigné, le mentionner prudemment.
 - Les comptages ESS et RGE (SIRENE) proviennent de filtres API dédiés ; ne pas extrapoler la structure sectorielle ni les effectifs salariés.
@@ -89,10 +91,16 @@ Sécurité SSMSI :
 
 Immobilier DVF :
 - Prix agrégés sur les mutations enregistrées ; pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus.
-- Interdire sans méthode robuste : « dynamique immobilière soutenue », « marché stable », « résilience des volumes », « accessibilité immobilière ».
+- Interdire sans méthode robuste : « dynamique immobilière soutenue », « marché stable », « prix moyens stables », « résilience des volumes », « accessibilité immobilière », « marché actif », « volume actif ».
 - Méthode robuste = série temporelle interprétée, nettoyage des mutations, comparaison multi-échelle, distribution ou volumes normalisés.
-- Sinon, préférer : « marché immobilier actif sur l'année disponible », « volume de mutations recensé », « prix moyens DVF indicatifs à interpréter prudemment ».
+- Le DVF agrégé ne permet pas seul de conclure sur la stabilité, l'accessibilité ou la dynamique du marché.
+- Préférer : « X mutations recensées en [année] », « prix moyen DVF indicatif de X €/m² », « données DVF agrégées à interpréter avec prudence ».
 - Si un prix est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
+
+Mobilité et infrastructures :
+- Ne pas intituler « Accessibilité aux infrastructures » si le contenu mélange IRVE, taxis-VTC et tourisme.
+- Préférer : « Premiers équipements de mobilité recensés » ou « Équipements de mobilité et capacité touristique à approfondir ».
+- Les IRVE ou taxis-VTC recensés ne prouvent pas une accessibilité territoriale forte.
 
 Risques et CATNAT :
 - Distinguer les événements CATNAT par type ; ne pas regrouper sous un seul libellé (ex. ne pas écrire « 5 inondations » si les types diffèrent).

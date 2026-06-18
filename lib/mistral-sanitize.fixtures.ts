@@ -413,7 +413,9 @@ export function fragileAnalysisForFixture(fixtureId: string): {
       "Chef-lieu de l'EPCI, fonction centrale économique et administrative dans une aire urbaine de catégorie 11.",
     strengths: [
       "Les données ESS sont incluses dans le total SIDE, confirmant une complémentarité entre SIDE et ESS/RGE.",
-      "Dynamique immobilière soutenue et marché stable avec résilience des volumes.",
+      "Dynamique immobilière soutenue et prix moyens stables avec résilience des volumes.",
+      "Tissu entrepreneurial local dynamique selon le stock SIDE.",
+      "Accessibilité aux infrastructures renforcée par l'IRVE et les taxis-VTC.",
       "515 équipements, dont commerces (3).",
       "Faible dépendance aux transports en commun selon les parts modales.",
     ],

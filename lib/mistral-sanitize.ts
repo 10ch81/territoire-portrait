@@ -183,6 +183,34 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
     replacement:
       "équipements de transport recensés dans la BPE ; offre réelle de transport collectif non analysée",
   },
+  {
+    id: "entrepreneurial-fabric",
+    pattern: /tissu entrepreneurial local/gi,
+    replacement: "tissu économique local",
+  },
+  {
+    id: "entrepreneurial-dynamism-generic",
+    pattern: /dynamisme entrepreneurial/gi,
+    replacement:
+      "tissu économique local, à confirmer par des données de créations, d'évolution ou d'emploi",
+  },
+  {
+    id: "infrastructure-accessibility-title",
+    pattern: /accessibilité aux infrastructures/gi,
+    replacement: "premiers équipements de mobilité recensés",
+  },
+  {
+    id: "strong-territorial-accessibility",
+    pattern: /accessibilité territoriale (?:forte|marquée|élevée)/gi,
+    replacement:
+      "équipements de mobilité recensés, sans preuve d'accessibilité territoriale globale",
+  },
+  {
+    id: "real-estate-agencies-major-lever",
+    pattern: /agences immobilières[^.]{0,40}levier/gi,
+    replacement:
+      "acteurs du logement, les propriétaires, les collectivités et les dispositifs de réhabilitation",
+  },
 ];
 
 const CONTEXTUAL_REPLACEMENTS: ReplacementRule[] = [
@@ -282,13 +310,37 @@ const CONTEXTUAL_REPLACEMENTS: ReplacementRule[] = [
   {
     id: "property-sustained-dynamics",
     pattern: /dynamique immobilière soutenue/gi,
-    replacement: "marché immobilier actif sur l'année disponible",
+    replacement: "données DVF agrégées à interpréter avec prudence",
     when: (context) => !context.hasRobustPropertyAnalysis,
   },
   {
     id: "property-stable-market",
     pattern: /marché stable/gi,
-    replacement: "prix moyens DVF indicatifs à interpréter prudemment",
+    replacement: "données DVF agrégées à interpréter avec prudence",
+    when: (context) => !context.hasRobustPropertyAnalysis,
+  },
+  {
+    id: "property-stable-prices",
+    pattern: /prix moyens stables/gi,
+    replacement: "données DVF agrégées à interpréter avec prudence",
+    when: (context) => !context.hasRobustPropertyAnalysis,
+  },
+  {
+    id: "property-active-market",
+    pattern: /marché immobilier actif/gi,
+    replacement: "mutations recensées sur l'année disponible",
+    when: (context) => !context.hasRobustPropertyAnalysis,
+  },
+  {
+    id: "property-active-market-short",
+    pattern: /\bmarché actif\b/gi,
+    replacement: "mutations recensées sur l'année disponible",
+    when: (context) => !context.hasRobustPropertyAnalysis,
+  },
+  {
+    id: "property-active-volume",
+    pattern: /volume actif/gi,
+    replacement: "volume de mutations recensé",
     when: (context) => !context.hasRobustPropertyAnalysis,
   },
   {
@@ -619,6 +671,10 @@ export function containsForbiddenPhrases(text: string): string[] {
     "acteurs mobilisables",
     "agences immobilières locales",
     "filière ess structurée",
+    "prix moyens stables",
+    "tissu entrepreneurial local",
+    "accessibilité aux infrastructures",
+    "marché immobilier actif",
   ];
 
   const lower = text.toLowerCase();

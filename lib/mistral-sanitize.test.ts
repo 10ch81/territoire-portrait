@@ -45,6 +45,10 @@ describe("sanitizeTerritorialAnalysis", () => {
       assert.equal(text.toLowerCase().includes("moyenne nationale"), false);
       assert.equal(text.toLowerCase().includes("dynamique immobilière soutenue"), false);
       assert.equal(text.toLowerCase().includes("résilience des volumes"), false);
+      assert.equal(text.toLowerCase().includes("prix moyens stables"), false);
+      assert.equal(text.toLowerCase().includes("marché immobilier actif"), false);
+      assert.equal(text.toLowerCase().includes("tissu entrepreneurial local"), false);
+      assert.equal(text.toLowerCase().includes("accessibilité aux infrastructures"), false);
       assert.equal(text.toLowerCase().includes("faible dépendance aux transports en commun"), false);
       assert.equal(text.toLowerCase().includes("complémentarité entre side"), false);
       assert.equal(text.toLowerCase().includes("fonction centrale économique et administrative"), false);
@@ -129,7 +133,53 @@ describe("sanitizeTerritorialAnalysis", () => {
     const text = collectText(analysis);
     assert.equal(text.toLowerCase().includes("dynamique immobilière soutenue"), false);
     assert.equal(text.toLowerCase().includes("résilience des volumes"), false);
-    assert.match(text, /marché immobilier actif|prix moyens DVF indicatifs|volume de mutations recensé/i);
+    assert.equal(text.toLowerCase().includes("prix moyens stables"), false);
+    assert.match(text, /mutations recensées|données DVF agrégées|volume de mutations recensé/i);
+  });
+
+  it("remplace prix moyens stables sans analyse temporelle robuste", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Prix moyens stables sur le marché local.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "saint-girons")!.facts,
+    );
+
+    assert.equal(analysis.summary.toLowerCase().includes("prix moyens stables"), false);
+    assert.match(analysis.summary, /données DVF agrégées à interpréter avec prudence/i);
+  });
+
+  it("préfère tissu économique local au tissu entrepreneurial", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: ["Tissu entrepreneurial local diversifié selon SIDE."],
+        watchPoints: [],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "sirene-side-divergence")!.facts,
+    );
+
+    assert.equal(analysis.strengths[0].toLowerCase().includes("tissu entrepreneurial"), false);
+    assert.match(analysis.strengths[0], /tissu économique local/i);
+  });
+
+  it("évite l'intitulé accessibilité aux infrastructures", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Accessibilité aux infrastructures via IRVE et taxis-VTC.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.equal(analysis.summary.toLowerCase().includes("accessibilité aux infrastructures"), false);
+    assert.match(analysis.summary, /premiers équipements de mobilité recensés/i);
   });
 
   it("remplace la faible dépendance aux transports en commun", () => {
