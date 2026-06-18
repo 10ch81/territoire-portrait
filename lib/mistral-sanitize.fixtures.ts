@@ -325,6 +325,18 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
     libelles: [],
     note: "",
   },
+  risques: {
+    radon: null,
+    inondation: { zones: ["Zone A"], count: 1 },
+    catnat: [
+      { label: "Inondation et/ou Coulées de boue", startDate: "2018-06-01" },
+      { label: "Inondation et/ou Coulées de boue", startDate: "2020-10-12" },
+      { label: "Inondation et/ou Coulées de boue", startDate: "2022-03-05" },
+      { label: "Inondation et/ou Coulées de boue", startDate: "2024-01-18" },
+      { label: "Neige / Avalanche / Grand Froid", startDate: "2021-02-09" },
+    ],
+    note: "",
+  },
 });
 
 export const COMMUNE_FIXTURES = [
@@ -352,19 +364,22 @@ export function fragileAnalysisForFixture(fixtureId: string): {
 } {
   const common = {
     summary:
-      "Chef-lieu de l'EPCI, la commune affiche une vitalité économique marquée et une dynamique entrepreneuriale marquée.",
+      "Chef-lieu de l'EPCI, fonction centrale économique et administrative dans une aire urbaine de catégorie 11.",
     strengths: [
-      "Les données ESS sont incluses dans le total SIDE, confirmant un tissu engagé.",
-      "L'accessibilité immobilière reste favorable selon les moyennes disponibles.",
+      "Les données ESS sont incluses dans le total SIDE, confirmant une complémentarité entre SIDE et ESS/RGE.",
+      "Dynamique immobilière soutenue et marché stable avec résilience des volumes.",
+      "Faible dépendance aux transports en commun selon les parts modales.",
     ],
     watchPoints: [
       "Tendance à la hausse des faits de sécurité et insécurité croissante.",
       "Offre de transport limitée malgré une part modale voiture élevée.",
       "Tensions sociales possibles dans certains quartiers.",
+      "Taux de chômage supérieur aux indicateurs départementaux.",
     ],
     opportunities: [
       "Potentiel touristique sous-exploité compte tenu des capacités d'hébergement.",
       "Pression fiscale faible propice à l'attractivité.",
+      "L'accessibilité immobilière reste favorable selon les moyennes disponibles.",
     ],
   };
 
@@ -383,14 +398,16 @@ export function fragileAnalysisForFixture(fixtureId: string): {
   if (fixtureId === "saint-girons") {
     return {
       summary:
-        "Saint-Girons, chef-lieu de l'EPCI, combine commune-centre et mobilité dominée par la voiture.",
+        "Saint-Girons, chef-lieu de l'EPCI, pôle d'une aire urbaine avec fonction centrale économique et administrative.",
       strengths: [
-        "Présence d'un tissu économique local avec des RGE incluses dans le stock SIDE.",
+        "Complémentarité entre SIDE et ESS/RGE avec des RGE incluses dans le stock SIDE.",
+        "Dynamique immobilière soutenue sur 42 mutations.",
       ],
       watchPoints: [
         "Tendance à la hausse des indicateurs SSMSI sur l'année disponible.",
         "78 % des actifs travaillant hors de la commune selon les parts modales.",
-        "Pression fiscale forte au regard de la moyenne nationale.",
+        "5 inondations CATNAT recensées sur la commune.",
+        "Faible dépendance aux transports en commun malgré 4 % de part modale TC.",
       ],
       opportunities: [
         "Potentiel touristique sous-exploité dans le Couserans.",

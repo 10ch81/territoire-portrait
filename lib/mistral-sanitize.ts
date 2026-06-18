@@ -26,7 +26,9 @@ export interface SanitizationResult {
 interface FactsContext {
   hasNationalBenchmark: boolean;
   hasRegionalBenchmark: boolean;
-  hasDepartmentBenchmark: boolean;
+  hasDepartmentPropertyBenchmark: boolean;
+  hasDepartmentSecurityBenchmark: boolean;
+  hasAnyDepartmentBenchmark: boolean;
   hasEpciBenchmark: boolean;
   hasTourismFrequency: boolean;
   hasCommuteOutboundFlows: boolean;
@@ -35,6 +37,11 @@ interface FactsContext {
   hasMultiYearProperty: boolean;
   hasMultiYearPopulation: boolean;
   hasOnlyAggregatedDvf: boolean;
+  hasRobustPropertyAnalysis: boolean;
+  hasAdministrativeFunction: boolean;
+  usesAavData: boolean;
+  hasMixedCatNatTypes: boolean;
+  aavCategoryLabel: string | null;
 }
 
 interface ReplacementRule {
@@ -87,11 +94,36 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
     replacement: "taux communal à interpréter avec prudence",
   },
   {
+    id: "economy-side-ess-complementarity",
+    pattern:
+      /complémentarité entre (?:le )?SIDE et (?:les )?(?:ESS(?:\/RGE)?|RGE)(?:\s+avec\s+des\s+(?:ESS|RGE)\s+incluses?\s+dans\s+le\s+(?:stock\s+)?SIDE)?/gi,
+    replacement:
+      "SIDE décrit le tissu économique local ; en complément, les bases administratives ESS/RGE permettent d'identifier des acteurs ou thématiques spécifiques",
+  },
+  {
     id: "side-sirene-inclusion",
     pattern:
       /((?:données |comptages )?(?:ESS|RGE)[^.]{0,80}?(?:inclus(?:es)?|intégré(?:es)?|comptabilisé(?:es)?)[^.]{0,80}?(?:SIDE|total (?:SIDE|INSEE)))/gi,
     replacement:
       "en complément, les bases administratives identifient des structures ESS ou RGE distinctes du périmètre SIDE",
+  },
+  {
+    id: "low-public-transit-dependency",
+    pattern: /faible dépendance aux transports en commun/gi,
+    replacement:
+      "usage marginal des transports collectifs dans les déplacements domicile-travail",
+  },
+  {
+    id: "department-indicators-comparison",
+    pattern:
+      /(?:supérieur|inférieur)(?:e|es)?\s+aux?\s+indicateurs\s+départementaux/gi,
+    replacement: "à décrire sans comparaison départementale homogène fournie",
+  },
+  {
+    id: "unemployment-department-comparison",
+    pattern:
+      /(?:chômage|taux de chômage)[^.]{0,50}(?:supérieur|inférieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+départementale/gi,
+    replacement: "taux de chômage élevé au recensement",
   },
 ];
 
@@ -157,7 +189,7 @@ const CONTEXTUAL_REPLACEMENTS: ReplacementRule[] = [
     id: "department-average",
     pattern: /moyenne départementale/gi,
     replacement: "comparaison départementale non fournie dans les données",
-    when: (context) => !context.hasDepartmentBenchmark,
+    when: (context) => !context.hasAnyDepartmentBenchmark,
   },
   {
     id: "epci-average",
@@ -189,16 +221,105 @@ const CONTEXTUAL_REPLACEMENTS: ReplacementRule[] = [
     replacement: "données immobilières insuffisantes pour une conclusion d'accessibilité",
     when: (context) => !context.hasOnlyAggregatedDvf,
   },
+  {
+    id: "property-sustained-dynamics",
+    pattern: /dynamique immobilière soutenue/gi,
+    replacement: "marché immobilier actif sur l'année disponible",
+    when: (context) => !context.hasRobustPropertyAnalysis,
+  },
+  {
+    id: "property-stable-market",
+    pattern: /marché stable/gi,
+    replacement: "prix moyens DVF indicatifs à interpréter prudemment",
+    when: (context) => !context.hasRobustPropertyAnalysis,
+  },
+  {
+    id: "property-volume-resilience",
+    pattern: /résilience des volumes/gi,
+    replacement: "volume de mutations recensé",
+    when: (context) => !context.hasRobustPropertyAnalysis,
+  },
+  {
+    id: "below-department-average",
+    pattern:
+      /(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+départementale/gi,
+    replacement: "à décrire sans comparaison départementale homogène",
+    when: (context) => !context.hasAnyDepartmentBenchmark,
+  },
+  {
+    id: "below-regional-average",
+    pattern:
+      /(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+régionale/gi,
+    replacement: "à décrire sans comparaison régionale homogène",
+    when: (context) => !context.hasRegionalBenchmark,
+  },
+  {
+    id: "central-admin-function-without-data",
+    pattern: /fonction (?:centrale )?administrative/gi,
+    replacement: "centralité territoriale",
+    when: (context) => !context.hasAdministrativeFunction,
+  },
+  {
+    id: "central-admin-economic-function",
+    pattern: /fonction centrale économique et administrative/gi,
+    replacement: "fonction de centralité territoriale et économique",
+    when: (context) => !context.hasAdministrativeFunction,
+  },
+  {
+    id: "urban-area-vocabulary",
+    pattern: /\baire urbaine\b/gi,
+    replacement: "aire d'attraction des villes",
+    when: (context) => context.usesAavData,
+  },
+  {
+    id: "technical-aav-category-code",
+    pattern: /catégorie\s+\d+/gi,
+    replacement: "catégorie AAV",
+    when: (context) => context.usesAavData,
+  },
 ];
+
+function countCatNatTypes(
+  events: Array<{ label: string; startDate: string | null }>,
+): { floodLike: number; other: number } {
+  let floodLike = 0;
+  let other = 0;
+
+  for (const event of events) {
+    const label = event.label.toLowerCase();
+    if (
+      label.includes("inond") ||
+      label.includes("coulée") ||
+      label.includes("coulee") ||
+      label.includes("crue")
+    ) {
+      floodLike += 1;
+      continue;
+    }
+    other += 1;
+  }
+
+  return { floodLike, other };
+}
 
 function buildFactsContext(facts: TerritorialFacts): FactsContext {
   const propertyYears = facts.immobilier?.serieHistorique?.length ?? 0;
   const populationYears = facts.evolutionDemographique?.length ?? 0;
+  const catNatEvents = facts.risques?.catnat ?? [];
+  const catNatTypes = countCatNatTypes(catNatEvents);
+  const hasDepartmentPropertyBenchmark = facts.immobilier?.prixM2MoyenDepartement != null;
+  const hasDepartmentSecurityBenchmark =
+    facts.securite?.indicateurs.some(
+      (indicator) => indicator.departmentRatePer1000 != null,
+    ) ?? false;
 
   return {
     hasNationalBenchmark: false,
     hasRegionalBenchmark: false,
-    hasDepartmentBenchmark: facts.immobilier?.prixM2MoyenDepartement != null,
+    hasDepartmentPropertyBenchmark,
+    hasDepartmentSecurityBenchmark,
+    hasAnyDepartmentBenchmark:
+      hasDepartmentPropertyBenchmark || hasDepartmentSecurityBenchmark,
     hasEpciBenchmark:
       facts.geographie.comparatifEpci?.epciAveragePopulation != null ||
       facts.geographie.comparatifEpci?.epciAverageDensity != null,
@@ -209,7 +330,60 @@ function buildFactsContext(facts: TerritorialFacts): FactsContext {
     hasMultiYearProperty: propertyYears >= 2,
     hasMultiYearPopulation: populationYears >= 2,
     hasOnlyAggregatedDvf: facts.immobilier != null,
+    hasRobustPropertyAnalysis: false,
+    hasAdministrativeFunction: false,
+    usesAavData: facts.geographie.aireAttraction != null,
+    hasMixedCatNatTypes: catNatTypes.floodLike > 0 && catNatTypes.other > 0,
+    aavCategoryLabel: facts.geographie.aireAttraction?.categoryLabel ?? null,
   };
+}
+
+function sanitizeCatNatInflation(
+  text: string,
+  context: FactsContext,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  if (!context.hasMixedCatNatTypes) {
+    return text;
+  }
+
+  return text.replace(/\b(\d+)\s+inondations?\b/gi, (match) => {
+    const replacement =
+      "plusieurs reconnaissances CATNAT, dont des épisodes d'inondations/coulées de boue";
+    warnings.push({
+      field,
+      index,
+      original: match,
+      sanitized: replacement,
+      rule: "catnat-mixed-types",
+    });
+    return replacement;
+  });
+}
+
+function sanitizeAavCategoryLabel(
+  text: string,
+  context: FactsContext,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  if (!context.aavCategoryLabel) {
+    return text;
+  }
+
+  return text.replace(/catégorie AAV/gi, (match) => {
+    warnings.push({
+      field,
+      index,
+      original: match,
+      sanitized: context.aavCategoryLabel!,
+      rule: "aav-readable-category",
+    });
+    return context.aavCategoryLabel!;
+  });
 }
 
 function applyReplacementRules(
@@ -266,6 +440,9 @@ function sanitizeText(
     field,
     index,
   );
+
+  sanitized = sanitizeCatNatInflation(sanitized, context, warnings, field, index);
+  sanitized = sanitizeAavCategoryLabel(sanitized, context, warnings, field, index);
 
   return sanitized.trim();
 }
@@ -342,6 +519,12 @@ export function containsForbiddenPhrases(text: string): string[] {
     "accessibilité immobilière",
     "moyenne nationale",
     "actifs travaillant hors de la commune",
+    "dynamique immobilière soutenue",
+    "résilience des volumes",
+    "faible dépendance aux transports en commun",
+    "complémentarité entre SIDE",
+    "aire urbaine",
+    "fonction centrale économique et administrative",
   ];
 
   const lower = text.toLowerCase();

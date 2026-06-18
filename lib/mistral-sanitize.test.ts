@@ -43,6 +43,15 @@ describe("sanitizeTerritorialAnalysis", () => {
       assert.equal(text.toLowerCase().includes("offre de transport limitée"), false);
       assert.equal(text.toLowerCase().includes("accessibilité immobilière"), false);
       assert.equal(text.toLowerCase().includes("moyenne nationale"), false);
+      assert.equal(text.toLowerCase().includes("dynamique immobilière soutenue"), false);
+      assert.equal(text.toLowerCase().includes("résilience des volumes"), false);
+      assert.equal(text.toLowerCase().includes("faible dépendance aux transports en commun"), false);
+      assert.equal(text.toLowerCase().includes("complémentarité entre side"), false);
+      assert.equal(text.toLowerCase().includes("fonction centrale économique et administrative"), false);
+      if (fixture.facts.geographie.aireAttraction) {
+        assert.equal(text.toLowerCase().includes("aire urbaine"), false);
+      }
+      assert.equal(text.toLowerCase().includes("supérieur aux indicateurs départementaux"), false);
       if (fixture.facts.mobilite?.domicileTravail) {
         assert.equal(
           text.toLowerCase().includes("actifs travaillant hors de la commune"),
@@ -101,6 +110,88 @@ describe("sanitizeTerritorialAnalysis", () => {
     assert.match(analysis.summary, /constat ponctuel/i);
   });
 
+  it("adoucit les formulations DVF sans analyse robuste", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Marché stable avec dynamique immobilière soutenue.",
+        strengths: ["Résilience des volumes de mutations."],
+        watchPoints: [],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "touristic")!.facts,
+    );
+
+    const text = collectText(analysis);
+    assert.equal(text.toLowerCase().includes("dynamique immobilière soutenue"), false);
+    assert.equal(text.toLowerCase().includes("résilience des volumes"), false);
+    assert.match(text, /marché immobilier actif|prix moyens DVF indicatifs|volume de mutations recensé/i);
+  });
+
+  it("remplace la faible dépendance aux transports en commun", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: ["Faible dépendance aux transports en commun."],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.match(
+      analysis.watchPoints[0],
+      /usage marginal des transports collectifs dans les déplacements domicile-travail/i,
+    );
+  });
+
+  it("bloque la comparaison départementale sans benchmark sécurité", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: ["Taux supérieur aux indicateurs départementaux."],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "rural")!.facts,
+    );
+
+    assert.equal(
+      analysis.watchPoints[0].toLowerCase().includes("supérieur aux indicateurs départementaux"),
+      false,
+    );
+  });
+
+  it("corrige le vocabulaire AAV et les codes techniques", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Pôle d'une aire urbaine de catégorie 4.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.equal(analysis.summary.toLowerCase().includes("aire urbaine"), false);
+    assert.match(analysis.summary, /aire d'attraction des villes/i);
+    assert.match(analysis.summary, /Commune-centre d'aire d'attraction/i);
+  });
+
+  it("distingue les types CATNAT mixtes", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: ["5 inondations CATNAT recensées."],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.equal(analysis.watchPoints[0].toLowerCase().includes("5 inondations"), false);
+    assert.match(analysis.watchPoints[0], /reconnaissances CATNAT/i);
+  });
+
   it("adoucit la confusion SIDE/SIRENE/ESS/RGE", () => {
     const { analysis } = sanitizeTerritorialAnalysis(
       {
@@ -146,7 +237,11 @@ describe("sanitizeTerritorialAnalysis", () => {
     assert.equal(text.toLowerCase().includes("chef-lieu de l'epci"), false);
     assert.equal(text.toLowerCase().includes("potentiel touristique sous-exploité"), false);
     assert.equal(text.toLowerCase().includes("actifs travaillant hors de la commune"), false);
-    assert.match(text, /commune-centre/i);
+    assert.equal(text.toLowerCase().includes("dynamique immobilière soutenue"), false);
+    assert.equal(text.toLowerCase().includes("faible dépendance aux transports en commun"), false);
+    assert.equal(text.toLowerCase().includes("aire urbaine"), false);
+    assert.equal(text.toLowerCase().includes("5 inondations"), false);
+    assert.match(text, /commune-centre|aire d'attraction/i);
   });
 });
 

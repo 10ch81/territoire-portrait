@@ -32,12 +32,23 @@ Institutions :
 Mobilité :
 - Ne jamais déduire les actifs travaillant hors commune à partir des parts modales.
 - Le complément de la part voiture n'est pas une part d'actifs sortants.
-- Distinguer usage domicile-travail, équipements BPE et offre réelle de transport.
+- Distinguer systématiquement usage domicile-travail RP, équipements BPE et offre réelle de transport.
 - Ne pas qualifier l'offre réelle de transport si GTFS, horaires, arrêts ou lignes ne sont pas fournis.
+- Interdire « faible dépendance aux transports en commun » : une faible part modale TC signifie un usage marginal des transports collectifs dans les déplacements domicile-travail, pas une faible dépendance.
 
 Mélange de périmètres :
 - Ne pas écrire que des données ESS ou RGE sont « incluses » dans un total SIDE si elles viennent de SIRENE ou d'un autre périmètre.
-- Utiliser : « en complément, les bases administratives identifient... »
+- Éviter « complémentarité entre SIDE et ESS/RGE » si le lien n'est pas démontré.
+- Formulation recommandée : « SIDE décrit le tissu économique local ; en complément, les bases administratives ESS/RGE permettent d'identifier des acteurs ou thématiques spécifiques. »
+- Ne pas déduire de filière économique ou de dynamique collaborative sans données sectorielles, effectifs ou projets.
+
+Centralité institutionnelle :
+- Remplacer « fonction centrale économique et administrative » par « fonction de centralité territoriale et économique », sauf si les fonctions administratives sont explicitement fournies.
+- Ne jamais déduire une fonction administrative uniquement du rang EPCI ou de l'AAV.
+
+Comparaisons territoriales :
+- Ne jamais écrire « supérieur aux indicateurs départementaux », « inférieur à la moyenne régionale » ou équivalent si la valeur de comparaison n'est pas explicitement présente dans le JSON.
+- Si la comparaison n'est pas disponible, rester descriptif : « taux de chômage élevé au recensement », « revenu médian modeste », « vacance résidentielle marquée ».
 
 Fiscalité :
 - Ne pas interpréter un taux communal REI comme pression fiscale globale.
@@ -54,6 +65,7 @@ Population :
 - Ne pas qualifier automatiquement une commune de dynamique sur la seule base du stock SIRENE.
 - Si avertissementDivergenceSireneSide est renseigné, le mentionner prudemment.
 - Les comptages ESS et RGE (SIRENE) proviennent de filtres API dédiés ; ne pas extrapoler la structure sectorielle ni les effectifs salariés.
+- SIDE, SIRENE, ESS et RGE peuvent être cités ensemble, mais leurs périmètres doivent rester distincts.
 
 Équipements BPE :
 - total = nombre d'équipements recensés ; parDomaine = décomposition par catégorie ; parType = principaux types (liste partielle, non exhaustive).
@@ -67,8 +79,18 @@ Sécurité SSMSI :
 
 Immobilier DVF :
 - Prix agrégés sur les mutations enregistrées ; pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus.
-- Éviter les conclusions fortes sur l'accessibilité immobilière sans comparaison multi-échelle ou distribution.
+- Interdire sans méthode robuste : « dynamique immobilière soutenue », « marché stable », « résilience des volumes », « accessibilité immobilière ».
+- Méthode robuste = série temporelle interprétée, nettoyage des mutations, comparaison multi-échelle, distribution ou volumes normalisés.
+- Sinon, préférer : « marché immobilier actif sur l'année disponible », « volume de mutations recensé », « prix moyens DVF indicatifs à interpréter prudemment ».
 - Si un prix est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
+
+Risques et CATNAT :
+- Distinguer les événements CATNAT par type ; ne pas regrouper sous un seul libellé (ex. ne pas écrire « 5 inondations » si les types diffèrent).
+- Formulation recommandée : « plusieurs reconnaissances CATNAT, dont des épisodes d'inondations/coulées de boue ».
+
+AAV :
+- Utiliser « aire d'attraction des villes » ou « pôle de l'aire d'attraction », pas « aire urbaine » (vocabulaire AAV 2020).
+- Ne pas afficher de codes techniques comme « catégorie 11 » ; préférer le libellé lisible fourni (categoryLabel).
 
 Tourisme :
 - Sans données de fréquentation, ne pas écrire « potentiel touristique sous-exploité ».
