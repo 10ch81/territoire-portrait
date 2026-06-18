@@ -160,7 +160,7 @@ export async function analyzeTerritory(
           { role: "user", content: buildUserPrompt(territory) },
         ],
         response_format: { type: "json_object" },
-        temperature: 0.1,
+        temperature: 0.3,
       }),
     });
 
