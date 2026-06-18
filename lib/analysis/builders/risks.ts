@@ -20,7 +20,7 @@ export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
       createFact({
         theme: "risks",
         target: "watchPoints",
-        sentence: `La commune est concernée par plusieurs reconnaissances CATNAT liées à ${labelText.toLowerCase()}.`,
+        sentence: `La commune a été reconnue à plusieurs reprises en état de catastrophe naturelle pour ${labelText.toLowerCase()} (CATNAT).`,
         sourceKeys: ["georisques"],
         confidence: "high",
         limitations: [

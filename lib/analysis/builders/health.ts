@@ -13,7 +13,7 @@ export function buildHealthFacts(territory: TerritoryProfile): AnalysisFact[] {
     createFact({
       theme: "health",
       target: "strengths",
-      sentence: `FINESS recense ${formatCount(health.totalEstablishments)} établissements sanitaires et médico-sociaux ouverts sur la commune en ${health.year}.`,
+      sentence: `${formatCount(health.totalEstablishments)} établissements de santé et d'accompagnement social recensés sur la commune en ${health.year} (FINESS).`,
       sourceKeys: ["finess"],
       year: health.year,
       confidence: "medium",
@@ -42,7 +42,7 @@ export function buildHealthFacts(territory: TerritoryProfile): AnalysisFact[] {
       createFact({
         theme: "health",
         target: "summary",
-        sentence: `Principales catégories FINESS recensées : ${list}.`,
+        sentence: `Principales catégories recensées : ${list} (FINESS).`,
         sourceKeys: ["finess"],
         year: health.year,
         confidence: "medium",

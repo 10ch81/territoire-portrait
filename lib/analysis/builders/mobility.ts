@@ -19,7 +19,7 @@ export function buildMobilityFacts(territory: TerritoryProfile): AnalysisFact[] 
         year: commute.year,
         confidence: "high",
         limitations: [
-          "Parts modales domicile-travail RP ; ne décrit pas l'offre réelle de transport collectif.",
+          "Parts modales domicile-travail (recensement) ; ne décrit pas l'offre réelle de transport collectif.",
         ],
         numericBindings: [
           binding(
@@ -46,7 +46,7 @@ export function buildMobilityFacts(territory: TerritoryProfile): AnalysisFact[] 
         year: commute.year,
         confidence: "high",
         limitations: [
-          "Usage modale domicile-travail ; ne mesure pas l'offre GTFS, lignes ou horaires.",
+          "Parts des déplacements domicile-travail (recensement) ; ne mesure pas l'offre GTFS, lignes ou horaires.",
         ],
         numericBindings: [
           binding(
@@ -73,7 +73,7 @@ export function buildEnergyFacts(territory: TerritoryProfile): AnalysisFact[] {
     createFact({
       theme: "energy",
       target: "summary",
-      sentence: `La commune compte ${irve.chargingPoints.toLocaleString("fr-FR")} points de charge IRVE recensés (${irve.stations} station(s)).`,
+      sentence: `La commune compte ${irve.chargingPoints.toLocaleString("fr-FR")} points de recharge pour véhicules électriques (${irve.stations} station(s), IRVE).`,
       sourceKeys: ["irve"],
       year: irve.year,
       confidence: "high",

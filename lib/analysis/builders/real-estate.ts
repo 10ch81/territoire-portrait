@@ -4,7 +4,7 @@ import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
 const DVF_LIMITATIONS = [
-  "Moyennes agrégées sur les mutations enregistrées.",
+  "Moyennes agrégées sur les ventes immobilières enregistrées.",
   "Pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus.",
 ];
 
@@ -17,7 +17,7 @@ export function buildRealEstateFacts(territory: TerritoryProfile): AnalysisFact[
   const parts: string[] = [];
 
   if (property.mutationCount !== null && property.mutationCount > 0) {
-    parts.push(`${formatCount(property.mutationCount)} mutations en ${property.year}`);
+    parts.push(`${formatCount(property.mutationCount)} ventes immobilières enregistrées en ${property.year}`);
   }
 
   if (property.averagePricePerM2 !== null) {
@@ -30,7 +30,7 @@ export function buildRealEstateFacts(territory: TerritoryProfile): AnalysisFact[
     createFact({
       theme: "real_estate",
       target: "summary",
-      sentence: `DVF recense ${parts.join(" et ")}.`,
+      sentence: `${parts.join(" et ")} (DVF).`,
       sourceKeys: ["dvf"],
       year: property.year,
       confidence: "high",
@@ -38,8 +38,8 @@ export function buildRealEstateFacts(territory: TerritoryProfile): AnalysisFact[
       numericBindings: [
         ...(property.mutationCount !== null
           ? [
-              binding(property.mutationCount, "mutations DVF", "real_estate", [
-                "mutations",
+              binding(property.mutationCount, "ventes immobilières DVF", "real_estate", [
+                "ventes immobilières",
                 "DVF",
                 "transactions",
               ]),

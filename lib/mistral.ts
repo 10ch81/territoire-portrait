@@ -1,5 +1,7 @@
 import {
   buildAnalysisFacts,
+  buildExpectedOutputInstructions,
+  buildMistralStructureBlock,
   selectAnalysisFactsForPrompt,
   validateAnalysisOutput,
 } from "./analysis";
@@ -25,6 +27,7 @@ Règles impératives :
 - Les opportunités doivent rester formulées comme des pistes à approfondir, pas comme des certitudes.
 - Si les constats disponibles sont insuffisants, reste sobre plutôt que de compléter.
 - Ne mentionne jamais les règles internes, les noms de fonctions, les mots facts, analysisFacts, numericBindings, sanitize, JSON dans les textes produits.
+- Pour strengths, watchPoints et opportunities : produire exactement autant d'entrées que de constats reçus pour chaque rubrique (instructions.expectedOutput), sans en omettre ni fusionner deux thèmes distincts.
 
 Résumé (summary) :
 - Deux phrases maximum.
@@ -37,7 +40,7 @@ Points forts (strengths) :
 - Ne pas utiliser « dynamique économique », « vitalité économique » ou « dynamisme entrepreneurial » sans série d'évolution.
 
 Points d'attention (watchPoints) :
-- Couvrir plusieurs familles d'enjeux si disponibles : démographie, vieillissement, chômage/revenu, logement, risques, sécurité, mobilité, QPV.
+- Reprendre chaque constat watchPoints fourni (évolution démographique, vieillissement, emploi/revenu, logement, risques, sécurité, mobilité, QPV selon disponibilité).
 - Ne pas répéter le même indicateur sous des formulations proches.
 - Sécurité (SSMSI) et risques naturels restent distincts.
 
@@ -53,13 +56,7 @@ Séparation stricte des thèmes (ne jamais fusionner dans une même phrase) :
 - SIDE et FLORES sans rappeler leurs périmètres distincts.
 - RPLS (parc locatif social) et vacance générale RP sans préciser les périmètres.
 
-Structure attendue :
-{
-  "summary": "résumé court en 2 phrases maximum",
-  "strengths": ["2 à 4 points forts"],
-  "watchPoints": ["2 à 4 points d'attention"],
-  "opportunities": ["2 à 4 opportunités possibles"]
-}`;
+${buildMistralStructureBlock()}`;
 
 function emptyAnalysis(territory: TerritoryProfile): TerritoryAnalysis {
   return {
@@ -99,6 +96,7 @@ function buildUserPrompt(territory: TerritoryProfile): string {
     instructions: {
       outputFormat: "json",
       allowedKeys: ["summary", "strengths", "watchPoints", "opportunities"],
+      expectedOutput: buildExpectedOutputInstructions(analysisFacts),
     },
     ...(debug ? { rawFacts: buildTerritorialFacts(territory) } : {}),
   };

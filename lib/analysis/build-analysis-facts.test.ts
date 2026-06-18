@@ -26,7 +26,7 @@ describe("buildAnalysisFacts", () => {
 
     assert.ok(side);
     assert.ok(ess);
-    assert.match(side!.sentence, /658.*unités légales/);
+    assert.match(side!.sentence, /658.*entreprises/);
     assert.match(side!.sentence, /749.*établissements/);
     assert.match(side!.sentence, /SIDE/);
     assert.match(ess!.sentence, /289.*ESS/);
@@ -44,14 +44,14 @@ describe("buildAnalysisFacts", () => {
     assert.doesNotMatch(flores!.sentence, /unités légales/);
   });
 
-  it("Saint-Girons — BPE occurrences totales", () => {
+  it("Saint-Girons — BPE équipements totaux", () => {
     const facts = buildAnalysisFacts(saintGironsProfile);
     const bpe = facts.find(
       (f) => f.theme === "equipments" && f.sentence.includes("515"),
     );
 
     assert.ok(bpe);
-    assert.match(bpe!.sentence, /515.*occurrences/);
+    assert.match(bpe!.sentence, /515.*équipements/);
     assert.match(bpe!.sentence, /BPE/);
   });
 
@@ -64,15 +64,15 @@ describe("buildAnalysisFacts", () => {
     assert.doesNotMatch(rpls!.sentence, /absence de logements sociaux/i);
   });
 
-  it("Saint-Girons — vacance résidentielle", () => {
+  it("Saint-Girons — logements vacants", () => {
     const facts = buildAnalysisFacts(saintGironsProfile);
     const housing = facts.find(
-      (f) => f.theme === "housing" && f.sentence.includes("vacance"),
+      (f) => f.theme === "housing" && f.sentence.includes("vacants"),
     );
 
     assert.ok(housing);
     assert.match(housing!.sentence, /18,8\s*%/);
-    assert.match(housing!.sentence, /vacance/i);
+    assert.match(housing!.sentence, /vacants/i);
   });
 
   it("Saint-Girons — SSMSI et risques séparés", () => {
@@ -132,7 +132,7 @@ describe("buildAnalysisFacts", () => {
     const dvf = facts.find((f) => f.theme === "real_estate");
 
     assert.ok(dvf);
-    assert.match(dvf!.sentence, /114.*mutations/);
+    assert.match(dvf!.sentence, /114.*ventes immobilières/);
     assert.match(dvf!.sentence, /1\s429.*€\/m²/);
     assert.doesNotMatch(dvf!.sentence, /marché actif|prix stables/i);
   });
@@ -142,7 +142,7 @@ describe("buildAnalysisFacts", () => {
     const security = facts.find((f) => f.theme === "security");
 
     assert.ok(security);
-    assert.match(security!.sentence, /supérieurs aux références départementales/);
+    assert.match(security!.sentence, /dépassent les références départementales/);
   });
 
   it("SSMSI — pas de mention supérieur si taux communal inférieur", () => {
@@ -172,7 +172,7 @@ describe("buildAnalysisFacts", () => {
     const security = facts.find((f) => f.theme === "security");
 
     assert.ok(security);
-    assert.doesNotMatch(security!.sentence, /supérieurs aux références départementales/);
+    assert.doesNotMatch(security!.sentence, /supérieurs aux références départementales|dépassent les références départementales/);
     assert.match(security!.sentence, /interpréter avec prudence/i);
   });
 

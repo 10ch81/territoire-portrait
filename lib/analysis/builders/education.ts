@@ -14,7 +14,7 @@ export function buildEducationFacts(territory: TerritoryProfile): AnalysisFact[]
       createFact({
         theme: "education",
         target: "strengths",
-        sentence: `L'Annuaire Éducation recense ${formatCount(education.totalOpen)} établissements scolaires ouverts en ${education.year}.`,
+        sentence: `${formatCount(education.totalOpen)} établissements scolaires ouverts recensés en ${education.year} (Annuaire Éducation).`,
         sourceKeys: ["education-annuaire"],
         year: education.year,
         confidence: "medium",
@@ -40,7 +40,7 @@ export function buildEducationFacts(territory: TerritoryProfile): AnalysisFact[]
       createFact({
         theme: "education",
         target: "summary",
-        sentence: `Répartition par secteur (Annuaire Éducation) : ${list}.`,
+        sentence: `Répartition par secteur : ${list} (Annuaire Éducation).`,
         sourceKeys: ["education-annuaire"],
         year: education.year,
         confidence: "medium",
@@ -55,7 +55,7 @@ export function buildEducationFacts(territory: TerritoryProfile): AnalysisFact[]
       createFact({
         theme: "education",
         target: "summary",
-        sentence: `Types d'établissements (Annuaire Éducation) : ${list}.`,
+        sentence: `Types d'établissements : ${list} (Annuaire Éducation).`,
         sourceKeys: ["education-annuaire"],
         year: education.year,
         confidence: "medium",

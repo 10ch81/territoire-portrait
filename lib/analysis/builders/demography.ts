@@ -26,33 +26,51 @@ export function buildDemographyFacts(territory: TerritoryProfile): AnalysisFact[
 
   const isDecline = growthPercent < 0;
   const formatted = formatSignedPercent(growthPercent);
+  const evolutionSentence = isDecline
+    ? `La population recule de ${formatted} entre ${fromYear} et ${toYear}.`
+    : `La population progresse de ${formatted} entre ${fromYear} et ${toYear}.`;
+
+  const evolutionBindings = [
+    binding(growthPercent, "évolution démographique", "demography", [
+      "recul",
+      "baisse",
+      "croissance",
+      "évolution",
+      "population",
+      "entre",
+      "depuis",
+    ]),
+  ];
+
+  const evolutionMeta = {
+    sourceKeys: ["insee-population"],
+    year: toYear,
+    confidence: "high" as const,
+    limitations: [
+      "Évolution calculée sur la série des populations officielles disponibles.",
+    ],
+    numericBindings: evolutionBindings,
+  };
 
   facts.push(
     createFact({
       theme: "demography",
       target: isDecline ? "watchPoints" : "summary",
-      sentence: isDecline
-        ? `La population recule de ${formatted} entre ${fromYear} et ${toYear}.`
-        : `La population progresse de ${formatted} entre ${fromYear} et ${toYear}.`,
-      sourceKeys: ["insee-population"],
-      year: toYear,
-      confidence: "high",
-      limitations: [
-        "Évolution calculée sur la série des populations légales disponibles.",
-      ],
-      numericBindings: [
-        binding(growthPercent, "évolution démographique", "demography", [
-          "recul",
-          "baisse",
-          "croissance",
-          "évolution",
-          "population",
-          "entre",
-          "depuis",
-        ]),
-      ],
+      sentence: evolutionSentence,
+      ...evolutionMeta,
     }),
   );
+
+  if (isDecline) {
+    facts.push(
+      createFact({
+        theme: "demography",
+        target: "summary",
+        sentence: evolutionSentence,
+        ...evolutionMeta,
+      }),
+    );
+  }
 
   return facts;
 }

@@ -16,7 +16,7 @@ export function buildEconomyFacts(territory: TerritoryProfile): AnalysisFact[] {
   const et = enterprises.inseeEstablishments;
 
   const parts: string[] = [];
-  if (ul !== null) parts.push(`${formatCount(ul)} unités légales`);
+  if (ul !== null) parts.push(`${formatCount(ul)} entreprises recensées`);
   if (et !== null) parts.push(`${formatCount(et)} établissements actifs`);
 
   if (parts.length === 0) return facts;
@@ -25,20 +25,20 @@ export function buildEconomyFacts(territory: TerritoryProfile): AnalysisFact[] {
     createFact({
       theme: "economy",
       target: "strengths",
-      sentence: `Le tissu économique local est décrit par ${parts.join(" et ")} selon SIDE INSEE${year ? ` ${year}` : ""}.`,
+      sentence: `L'activité économique locale compte ${parts.join(" et ")}${year ? ` en ${year}` : ""} (SIDE INSEE).`,
       sourceKeys: ["insee-side"],
       year: year ?? undefined,
       confidence: "high",
       limitations: [
-        "SIDE décrit les stocks d'unités légales et d'établissements ; distinct de FLORES (emploi salarié) et de SIRENE.",
+        "SIDE décrit les entreprises et établissements recensés ; distinct de FLORES (emploi salarié) et de SIRENE.",
       ],
       numericBindings: [
         ...(ul !== null
           ? [
-              binding(ul, "unités légales SIDE", "economy", [
-                "unités légales",
+              binding(ul, "entreprises SIDE", "economy", [
+                "entreprises",
                 "SIDE",
-                "tissu économique",
+                "activité économique",
               ]),
             ]
           : []),
@@ -47,7 +47,7 @@ export function buildEconomyFacts(territory: TerritoryProfile): AnalysisFact[] {
               binding(et, "établissements SIDE", "economy", [
                 "établissements",
                 "SIDE",
-                "tissu économique",
+                "activité économique",
               ]),
             ]
           : []),
@@ -93,7 +93,7 @@ export function buildEssRgeFacts(territory: TerritoryProfile): AnalysisFact[] {
     createFact({
       theme: "ess_rge",
       target: "strengths",
-      sentence: `En complément, les bases administratives identifient ${parts.join(" et ")}.`,
+      sentence: `Le répertoire administratif identifie ${parts.join(" et ")} (SIRENE).`,
       sourceKeys: ["sirene"],
       confidence: "medium",
       limitations: [

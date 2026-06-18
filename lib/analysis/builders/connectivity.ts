@@ -14,7 +14,7 @@ export function buildConnectivityFacts(territory: TerritoryProfile): AnalysisFac
       createFact({
         theme: "connectivity",
         target: "strengths",
-        sentence: `ARCEP (${connectivity.vintage}) estime à ${formatPercent(connectivity.fiberEligibleSharePercent)} la part de locaux raccordables à la fibre.`,
+        sentence: `Environ ${formatPercent(connectivity.fiberEligibleSharePercent)} des logements peuvent être connectés à la fibre (${connectivity.vintage}, ARCEP).`,
         sourceKeys: ["arcep-fibre"],
         year: connectivity.vintage,
         confidence: "high",
@@ -26,7 +26,7 @@ export function buildConnectivityFacts(territory: TerritoryProfile): AnalysisFac
             connectivity.fiberEligibleSharePercent,
             "part locaux raccordables fibre",
             "connectivity",
-            ["fibre", "raccordables", "ARCEP", "connectivité", "internet"],
+            ["fibre", "connectés", "ARCEP", "connectivité", "internet"],
           ),
         ],
       }),
@@ -38,7 +38,7 @@ export function buildConnectivityFacts(territory: TerritoryProfile): AnalysisFac
       createFact({
         theme: "connectivity",
         target: "summary",
-        sentence: `Technologies recensées par ARCEP : ${connectivity.technologies.join(", ")}.`,
+        sentence: `Technologies internet fixe recensées : ${connectivity.technologies.join(", ")} (ARCEP).`,
         sourceKeys: ["arcep-fibre"],
         year: connectivity.vintage,
         confidence: "high",

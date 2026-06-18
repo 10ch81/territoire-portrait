@@ -13,7 +13,7 @@ export function buildIdentityFacts(territory: TerritoryProfile): AnalysisFact[] 
       createFact({
         theme: "identity",
         target: "summary",
-        sentence: `La population légale de référence est de ${formatCount(territory.population)} habitants en ${populationMeta.vintage}.`,
+        sentence: `La population officielle compte ${formatCount(territory.population)} habitants en ${populationMeta.vintage} (INSEE).`,
         sourceKeys: ["geo.api.gouv.fr", "insee-population"],
         year: populationMeta.vintage,
         confidence: "high",
@@ -23,9 +23,9 @@ export function buildIdentityFacts(territory: TerritoryProfile): AnalysisFact[] 
         numericBindings: [
           binding(
             territory.population,
-            "population légale",
+            "population officielle",
             "identity",
-            ["population", "habitants", "population légale"],
+            ["population", "habitants", "population officielle"],
           ),
         ],
       }),

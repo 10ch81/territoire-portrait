@@ -13,19 +13,19 @@ export function buildEquipmentFacts(territory: TerritoryProfile): AnalysisFact[]
     createFact({
       theme: "equipments",
       target: "strengths",
-      sentence: `La commune compte ${formatCount(equipments.totalEquipments)} occurrences d'équipements recensées dans la BPE ${equipments.year}.`,
+      sentence: `La commune compte ${formatCount(equipments.totalEquipments)} équipements recensés (BPE ${equipments.year}).`,
       sourceKeys: ["insee-bpe"],
       year: equipments.year,
       confidence: "high",
       limitations: [
-        "Total BPE = occurrences recensées ; distinct des nombres de types par domaine.",
+        "Total BPE = équipements recensés ; distinct des nombres de types par domaine.",
       ],
       numericBindings: [
         binding(
           equipments.totalEquipments,
-          "occurrences BPE",
+          "équipements BPE",
           "equipments",
-          ["équipements", "BPE", "occurrences", "recensées"],
+          ["équipements", "BPE", "recensés"],
         ),
       ],
     }),
@@ -42,7 +42,7 @@ export function buildEquipmentFacts(territory: TerritoryProfile): AnalysisFact[]
         sourceKeys: ["insee-bpe"],
         year: equipments.year,
         confidence: "high",
-        limitations: ["Résumé qualitatif BPE ; les domaines comptent des types, pas des occurrences."],
+        limitations: ["Résumé qualitatif BPE ; les domaines comptent des types, pas des équipements totaux."],
       }),
     );
   }
@@ -53,11 +53,11 @@ export function buildEquipmentFacts(territory: TerritoryProfile): AnalysisFact[]
       createFact({
         theme: "equipments",
         target: "summary",
-        sentence: `Domaines d'équipements présents dans la BPE : ${domainLabels.join(", ")} (nombre de types par domaine, ne recompose pas le total).`,
+        sentence: `Domaines d'équipements présents : ${domainLabels.join(", ")} (nombre de types par domaine, ne recompose pas le total, BPE ${equipments.year}).`,
         sourceKeys: ["insee-bpe"],
         year: equipments.year,
         confidence: "high",
-        limitations: ["Métrique domaine = nombre de types ; ne pas confondre avec le total d'occurrences."],
+        limitations: ["Métrique domaine = nombre de types ; ne pas confondre avec le total d'équipements."],
       }),
     );
   }
@@ -68,11 +68,11 @@ export function buildEquipmentFacts(territory: TerritoryProfile): AnalysisFact[]
       createFact({
         theme: "equipments",
         target: "summary",
-        sentence: `La densité d'équipements s'élève à ${density.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} occurrences pour 1 000 habitants (BPE ${equipments.year}).`,
+        sentence: `La commune compte ${density.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} équipements pour 1 000 habitants (BPE ${equipments.year}).`,
         sourceKeys: ["insee-bpe"],
         year: equipments.year,
         confidence: "high",
-        limitations: ["Ratio occurrences BPE / population légale ; ne mesure pas la qualité ni l'accessibilité."],
+        limitations: ["Ratio équipements BPE / population officielle ; ne mesure pas la qualité ni l'accessibilité."],
         numericBindings: [
           binding(density, "équipements par 1000 hab.", "equipments", [
             "équipements",
@@ -94,11 +94,11 @@ export function buildEquipmentFacts(territory: TerritoryProfile): AnalysisFact[]
       createFact({
         theme: "equipments",
         target: "summary",
-        sentence: `Principaux types d'équipements BPE (liste partielle) : ${list}.`,
+        sentence: `Principaux types d'équipements (liste partielle) : ${list} (BPE ${equipments.year}).`,
         sourceKeys: ["insee-bpe"],
         year: equipments.year,
         confidence: "medium",
-        limitations: ["Liste partielle de types BPE ; distinct du total d'occurrences."],
+        limitations: ["Liste partielle de types BPE ; distinct du total d'équipements."],
       }),
     );
   }
@@ -109,7 +109,7 @@ export function buildEquipmentFacts(territory: TerritoryProfile): AnalysisFact[]
       createFact({
         theme: "equipments",
         target: "summary",
-        sentence: `La BPE recense ${formatCount(transport.totalEquipments)} occurrence(s) d'équipements de transport sur la commune (ne décrit pas l'offre horaire réelle).`,
+        sentence: `${formatCount(transport.totalEquipments)} équipement(s) de transport recensé(s) sur la commune ; cela ne décrit pas l'offre horaire réelle (BPE ${equipments.year}).`,
         sourceKeys: ["insee-bpe"],
         year: equipments.year,
         confidence: "medium",

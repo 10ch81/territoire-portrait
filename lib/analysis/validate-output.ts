@@ -12,6 +12,12 @@ import {
 } from "../demographic-indicators";
 import { containsForbiddenPhrases, containsInternalLeakage } from "../mistral-sanitize";
 import type { TerritoryAnalysis } from "../types";
+import { ensureOutputCoverage } from "./ensure-output-coverage";
+import { ANALYSIS_OUTPUT_LIMITS } from "./prompt-limits";
+import {
+  hasUnsourcedClaimIssue,
+  stripUnsourcedClaims,
+} from "./unsourced-claims";
 import type {
   AnalysisFact,
   AnalysisFactTheme,
@@ -24,13 +30,13 @@ const THEME_CONTEXT_KEYWORDS: Partial<
   demography: isDemographicEvolutionContext,
   ageing: isAgeShareContext,
   employment: (text) => /\b(?:chômage|taux de chômage)\b/i.test(text),
-  housing: (text) => /\b(?:vacance|résidentielle)\b/i.test(text),
-  connectivity: (text) => /\b(?:fibre|ARCEP|raccordables|internet)\b/i.test(text),
+  housing: (text) => /\b(?:logements vacants|vacance|logements)\b/i.test(text),
+  connectivity: (text) => /\b(?:fibre|ARCEP|connectés|internet)\b/i.test(text),
   mobility: (text) => /\b(?:voiture|domicile-travail|transports en commun)\b/i.test(text),
-  health: (text) => /\b(?:FINESS|sanitaires|médico-social)\b/i.test(text),
+  health: (text) => /\b(?:FINESS|santé|sanitaires|accompagnement social)\b/i.test(text),
   education: (text) => /\b(?:scolaires|Annuaire Éducation|scolarisation)\b/i.test(text),
-  employment_sectors: (text) => /\b(?:FLORES|postes salariés|secteurs A17)\b/i.test(text),
-  economy: (text) => /\b(?:SIDE|unités légales|établissements actifs)\b/i.test(text),
+  employment_sectors: (text) => /\b(?:FLORES|postes salariés|secteurs d'activité)\b/i.test(text),
+  economy: (text) => /\b(?:SIDE|entreprises|établissements actifs)\b/i.test(text),
 };
 
 const CROSS_THEME_PATTERNS: Array<{ pattern: RegExp; rule: string }> = [
@@ -43,7 +49,7 @@ const CROSS_THEME_PATTERNS: Array<{ pattern: RegExp; rule: string }> = [
     rule: "risks-security-mix",
   },
   {
-    pattern: /\b(?:unités légales|SIDE)\b.*\b(?:postes salariés|FLORES)\b(?![\s\S]{0,40}distinct)/i,
+    pattern: /\b(?:entreprises recensées|SIDE)\b.*\b(?:postes salariés|FLORES)\b(?![\s\S]{0,40}distinct)/i,
     rule: "side-flores-mix",
   },
   {
@@ -283,6 +289,7 @@ function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string
   }
 
   if (!validatePercentContext(text, analysisFacts)) return "numeric-context";
+  if (hasUnsourcedClaimIssue(text, analysisFacts)) return "unsourced-claim";
 
   return null;
 }
@@ -325,10 +332,11 @@ function sanitizeField(
   field: "summary" | "strengths" | "watchPoints" | "opportunities",
   analysisFacts: AnalysisFact[],
 ): string {
-  const issue = hasValidationIssue(text, analysisFacts);
-  if (!issue) return text.trim();
+  const stripped = stripUnsourcedClaims(text, analysisFacts);
+  const issue = hasValidationIssue(stripped, analysisFacts);
+  if (!issue) return stripped.trim();
 
-  const replacement = findReplacementFact(text, field, analysisFacts);
+  const replacement = findReplacementFact(stripped, field, analysisFacts);
   return replacement?.sentence ?? "";
 }
 
@@ -371,9 +379,13 @@ function sanitizeList(
   }
 
   if (hasListValidationIssue(result, field, analysisFacts)) {
+    const max =
+      field === "opportunities"
+        ? ANALYSIS_OUTPUT_LIMITS.opportunities.max
+        : ANALYSIS_OUTPUT_LIMITS[field].max;
     const fallback = analysisFacts
       .filter((f) => f.target === field)
-      .slice(0, field === "opportunities" ? 3 : 4)
+      .slice(0, max)
       .map((f) => f.sentence);
     return fallback.filter((sentence, index, list) => list.indexOf(sentence) === index);
   }
@@ -387,31 +399,46 @@ export function validateAnalysisOutput(
 ): Omit<TerritoryAnalysis, "dataLimits"> {
   const summaryRaw =
     typeof analysis.summary === "string" ? analysis.summary : "Analyse non disponible.";
-  const summary = sanitizeField(summaryRaw, "summary", analysisFacts) || "Analyse non disponible.";
+  const summarySanitized =
+    sanitizeField(summaryRaw, "summary", analysisFacts) || "Analyse non disponible.";
+
+  const covered = ensureOutputCoverage(
+    {
+      summary: summarySanitized,
+      strengths: sanitizeList(
+        Array.isArray(analysis.strengths)
+          ? analysis.strengths.filter((i): i is string => typeof i === "string")
+          : [],
+        "strengths",
+        analysisFacts,
+      ),
+      watchPoints: sanitizeList(
+        Array.isArray(analysis.watchPoints)
+          ? analysis.watchPoints.filter((i): i is string => typeof i === "string")
+          : [],
+        "watchPoints",
+        analysisFacts,
+      ),
+      opportunities: sanitizeList(
+        Array.isArray(analysis.opportunities)
+          ? analysis.opportunities.filter((i): i is string => typeof i === "string")
+          : [],
+        "opportunities",
+        analysisFacts,
+      ),
+    },
+    analysisFacts,
+  );
 
   return {
-    summary,
-    strengths: sanitizeList(
-      Array.isArray(analysis.strengths)
-        ? analysis.strengths.filter((i): i is string => typeof i === "string")
-        : [],
-      "strengths",
-      analysisFacts,
-    ),
-    watchPoints: sanitizeList(
-      Array.isArray(analysis.watchPoints)
-        ? analysis.watchPoints.filter((i): i is string => typeof i === "string")
-        : [],
-      "watchPoints",
-      analysisFacts,
-    ),
-    opportunities: sanitizeList(
-      Array.isArray(analysis.opportunities)
-        ? analysis.opportunities.filter((i): i is string => typeof i === "string")
-        : [],
-      "opportunities",
-      analysisFacts,
-    ),
+    summary: sanitizeField(covered.summary, "summary", analysisFacts) || covered.summary,
+    strengths: covered.strengths.map((item) => sanitizeField(item, "strengths", analysisFacts)).filter(Boolean),
+    watchPoints: covered.watchPoints
+      .map((item) => sanitizeField(item, "watchPoints", analysisFacts))
+      .filter(Boolean),
+    opportunities: covered.opportunities
+      .map((item) => sanitizeField(item, "opportunities", analysisFacts))
+      .filter(Boolean),
   };
 }
 

@@ -13,7 +13,7 @@ export function buildTourismFacts(territory: TerritoryProfile): AnalysisFact[] {
     createFact({
       theme: "tourism",
       target: "strengths",
-      sentence: `La commune dispose de ${formatCount(tourism.accommodationPlaces)} places d'hébergement touristique recensées en ${tourism.year}, sans données de fréquentation.`,
+      sentence: `${formatCount(tourism.accommodationPlaces)} places d'hébergement touristique recensées en ${tourism.year}, sans données de fréquentation.`,
       sourceKeys: ["tourism-capacity"],
       year: tourism.year,
       confidence: "medium",

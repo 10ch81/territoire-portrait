@@ -12,7 +12,7 @@ export function buildPublicServicesFacts(territory: TerritoryProfile): AnalysisF
     createFact({
       theme: "public_services",
       target: "strengths",
-      sentence: `France Services recense ${services.franceServicesCount} structure(s) sur la commune.`,
+      sentence: `${services.franceServicesCount} structure(s) France Services recensée(s) sur la commune.`,
       sourceKeys: ["france-services"],
       year: services.year,
       confidence: "high",
@@ -37,7 +37,7 @@ export function buildPolicyCityFacts(territory: TerritoryProfile): AnalysisFact[
       createFact({
         theme: "policy_city",
         target: "watchPoints",
-        sentence: `La commune comprend ${qpvLabel} de la politique de la ville (QPV), signalant des enjeux localisés.`,
+        sentence: `La commune comprend ${qpvLabel} de la politique de la ville, signalant des enjeux localisés (QPV).`,
         sourceKeys: ["qpv"],
         year: urbanPolicy.year,
         confidence: "high",
@@ -61,7 +61,7 @@ export function buildFinancesFacts(territory: TerritoryProfile): AnalysisFact[] 
       createFact({
         theme: "finances",
         target: "summary",
-        sentence: `Le taux de taxe foncière bâti communal s'élève à ${fiscal.propertyTaxBuiltRate.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} % (REI ${fiscal.year}).`,
+        sentence: `Le taux communal de taxe foncière sur les bâtiments s'élève à ${fiscal.propertyTaxBuiltRate.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} % (REI ${fiscal.year}).`,
         sourceKeys: ["rei"],
         year: fiscal.year,
         confidence: "high",
@@ -85,7 +85,7 @@ export function buildFinancesFacts(territory: TerritoryProfile): AnalysisFact[] 
       createFact({
         theme: "finances",
         target: "watchPoints",
-        sentence: `L'encours de dette du budget principal s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
+        sentence: `La dette communale s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
         sourceKeys: ["ofgl"],
         year: accounts.year,
         confidence: "medium",
@@ -97,9 +97,9 @@ export function buildFinancesFacts(territory: TerritoryProfile): AnalysisFact[] 
   if (accounts?.available) {
     const revenueSentence =
       accounts.operatingRevenuePerCapitaEur !== null
-        ? `Les recettes de fonctionnement du budget principal s'élèvent à ${Math.round(accounts.operatingRevenuePerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`
+        ? `Les recettes annuelles de la commune s'élèvent à ${Math.round(accounts.operatingRevenuePerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`
         : accounts.operatingRevenueEur !== null
-          ? `Les recettes de fonctionnement du budget principal s'élèvent à ${Math.round(accounts.operatingRevenueEur).toLocaleString("fr-FR")} € (OFGL ${accounts.year}).`
+          ? `Les recettes annuelles de la commune s'élèvent à ${Math.round(accounts.operatingRevenueEur).toLocaleString("fr-FR")} € (OFGL ${accounts.year}).`
           : null;
 
     if (revenueSentence) {

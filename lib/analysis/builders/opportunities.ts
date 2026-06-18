@@ -120,7 +120,7 @@ export function buildOpportunityFacts(territory: TerritoryProfile): AnalysisFact
         theme: "education",
         target: "opportunities",
         sentence:
-          "S'appuyer sur l'offre éducative et sanitaire recensée pour renforcer l'attractivité et la centralité de services.",
+          "S'appuyer sur l'offre éducative et sanitaire recensée pour renforcer l'attractivité et les services de proximité.",
         sourceKeys: ["education-annuaire", "finess"],
         confidence: "medium",
         limitations: [
@@ -146,7 +146,7 @@ export function buildOpportunityFacts(territory: TerritoryProfile): AnalysisFact
         sourceKeys: ["insee-commute", "irve"],
         confidence: "medium",
         limitations: [
-          "Usage modale RP ; ne décrit pas l'offre réelle de transport collectif.",
+          "Parts des déplacements domicile-travail (recensement) ; ne décrit pas l'offre réelle de transport collectif.",
         ],
       }),
     );
@@ -156,12 +156,12 @@ export function buildOpportunityFacts(territory: TerritoryProfile): AnalysisFact
         theme: "mobility",
         target: "opportunities",
         sentence:
-          "Renforcer les alternatives à la voiture pour les déplacements du quotidien (modes actifs, mutualisation, intermodalité).",
+          "Renforcer les alternatives à la voiture pour les déplacements du quotidien (modes actifs, mutualisation, combinaison de plusieurs modes de transport).",
         sourceKeys: ["insee-commute"],
         year: commute?.year,
         confidence: "medium",
         limitations: [
-          "Usage modale domicile-travail RP ; ne conclut pas à une offre de transport limitée sans données d'offre.",
+          "Parts des déplacements domicile-travail (recensement) ; ne conclut pas à une offre de transport limitée sans données d'offre.",
         ],
       }),
     );

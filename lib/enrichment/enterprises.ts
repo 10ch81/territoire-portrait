@@ -77,8 +77,8 @@ function computeSireneSideDivergence(
   const sideLabel = new Intl.NumberFormat("fr-FR").format(sideUnits);
 
   return (
-    `Écart notable entre SIRENE API (${sireneLabel} unités légales) et SIDE INSEE (${sideLabel}) : ` +
-    "périmètres et méthodes distincts. Privilégier SIDE pour l'analyse économique ; SIRENE sert de répertoire administratif complémentaire."
+    `Écart notable entre le répertoire SIRENE (${sireneLabel} entreprises) et SIDE INSEE (${sideLabel}) : ` +
+    "périmètres et méthodes distincts. Privilégier SIDE pour décrire l'activité économique ; SIRENE sert de répertoire administratif complémentaire."
   );
 }
 

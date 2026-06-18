@@ -15,7 +15,7 @@ export function buildIncomeFacts(territory: TerritoryProfile): AnalysisFact[] {
     createFact({
       theme: "income",
       target: "summary",
-      sentence: `Le revenu médian disponible par unité de consommation s'élève à ${formatEuro(sociodemographics.medianDisposableIncome)} au recensement ${sociodemographics.year}.`,
+      sentence: `Le revenu médian des ménages s'élève à ${formatEuro(sociodemographics.medianDisposableIncome)} au recensement ${sociodemographics.year} (FILOSOFI).`,
       sourceKeys: ["insee-filosofi"],
       year: sociodemographics.year,
       confidence: "high",

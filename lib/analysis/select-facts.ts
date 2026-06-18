@@ -4,6 +4,10 @@ import {
   dedupeSelectedFacts,
   indicatorKeys,
 } from "./dedupe-facts";
+import {
+  TARGET_LIMITS,
+  watchPointRetentionRank,
+} from "./prompt-limits";
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
 import {
   isActionableOpportunity,
@@ -18,17 +22,15 @@ import {
 } from "./watch-point-coverage";
 
 export {
+  ANALYSIS_OUTPUT_LIMITS,
+  TARGET_LIMITS,
+  buildExpectedOutputInstructions,
+} from "./prompt-limits";
+export {
   countRobustWatchPointFamilies,
   missingWatchPointFamilies,
   WATCH_POINT_FAMILIES,
 } from "./watch-point-coverage";
-
-const TARGET_LIMITS: Record<AnalysisFactTarget, { min: number; max: number }> = {
-  summary: { min: 2, max: 4 },
-  strengths: { min: 3, max: 5 },
-  watchPoints: { min: 3, max: 5 },
-  opportunities: { min: 2, max: 5 },
-};
 
 const SUMMARY_THEMES: AnalysisFactTheme[] = ["identity", "centrality", "demography"];
 
@@ -215,6 +217,8 @@ function ensureMandatoryWatchThemes(
   context: ScoreContext,
   themes: AnalysisFactTheme[],
 ): void {
+  const limit = TARGET_LIMITS.watchPoints;
+
   for (const theme of themes) {
     if (selected.some((f) => f.target === "watchPoints" && f.theme === theme)) {
       continue;
@@ -233,6 +237,116 @@ function ensureMandatoryWatchThemes(
 
     if (canAddToTarget(watchCandidate, selected, "watchPoints")) {
       selected.push(watchCandidate);
+      continue;
+    }
+
+    const watchPoints = selected.filter((f) => f.target === "watchPoints");
+    if (watchPoints.length < limit.max) continue;
+
+    const lowestPriorityIndex = watchPoints.reduce((worst, fact, index, list) => {
+      const rank = watchPointRetentionRank(fact.theme);
+      const worstRank = watchPointRetentionRank(list[worst].theme);
+      return rank > worstRank ? index : worst;
+    }, 0);
+
+    const mandatoryRank = watchPointRetentionRank(theme);
+    if (mandatoryRank >= watchPointRetentionRank(watchPoints[lowestPriorityIndex].theme)) {
+      continue;
+    }
+
+    selected.splice(selected.indexOf(watchPoints[lowestPriorityIndex]), 1);
+    if (canAddToTarget(watchCandidate, selected, "watchPoints")) {
+      selected.push(watchCandidate);
+    }
+  }
+}
+
+function reconcileSummaryDemographyWatchSlot(
+  facts: AnalysisFact[],
+  selected: AnalysisFact[],
+  _context: ScoreContext,
+): void {
+  const hasSummaryDemography = selected.some(
+    (fact) => fact.theme === "demography" && fact.target === "summary",
+  );
+  if (!hasSummaryDemography) return;
+
+  for (let index = selected.length - 1; index >= 0; index -= 1) {
+    const fact = selected[index]!;
+    if (fact.target === "watchPoints" && fact.theme === "demography") {
+      selected.splice(index, 1);
+    }
+  }
+
+  if (selected.some((fact) => fact.theme === "employment" && fact.target === "watchPoints")) {
+    return;
+  }
+
+  const employment =
+    facts.find((fact) => fact.theme === "employment" && fact.target === "watchPoints") ??
+    facts.find((fact) => fact.theme === "employment");
+  if (!employment) return;
+
+  const watchEmployment: AnalysisFact =
+    employment.target === "watchPoints"
+      ? employment
+      : { ...employment, target: "watchPoints" };
+
+  const limit = TARGET_LIMITS.watchPoints;
+  const watchCount = selected.filter((fact) => fact.target === "watchPoints").length;
+
+  if (watchCount < limit.max && canAddToTarget(watchEmployment, selected, "watchPoints")) {
+    selected.push(watchEmployment);
+    return;
+  }
+
+  const displaceableThemes: AnalysisFactTheme[] = [
+    "social_housing",
+    "policy_city",
+    "mobility",
+    "income",
+  ];
+  const watchPoints = selected.filter((fact) => fact.target === "watchPoints");
+  const replaceFact =
+    watchPoints.find((fact) => displaceableThemes.includes(fact.theme)) ??
+    watchPoints.reduce((lowest, fact) =>
+      watchPointRetentionRank(fact.theme) > watchPointRetentionRank(lowest.theme)
+        ? fact
+        : lowest,
+    );
+
+  selected.splice(selected.indexOf(replaceFact), 1);
+  if (canAddToTarget(watchEmployment, selected, "watchPoints")) {
+    selected.push(watchEmployment);
+  }
+}
+
+function trimTargetToLimit(
+  selected: AnalysisFact[],
+  target: AnalysisFactTarget,
+  context: ScoreContext,
+): void {
+  const limit = TARGET_LIMITS[target];
+  const targetFacts = selected.filter((f) => f.target === target);
+
+  if (targetFacts.length <= limit.max) return;
+
+  const ranked = targetFacts
+    .map((fact) => ({
+      fact,
+      rank:
+        target === "watchPoints"
+          ? watchPointRetentionRank(fact.theme)
+          : -scoreAnalysisFact(fact, context),
+    }))
+    .sort((a, b) => a.rank - b.rank || scoreAnalysisFact(b.fact, context) - scoreAnalysisFact(a.fact, context));
+
+  const keepIds = new Set(ranked.slice(0, limit.max).map(({ fact }) => fact.id));
+
+  for (let index = selected.length - 1; index >= 0; index -= 1) {
+    const fact = selected[index];
+    if (fact.target === target && !keepIds.has(fact.id)) {
+      selected.splice(index, 1);
     }
   }
 }
@@ -352,6 +466,12 @@ export function selectAnalysisFactsForPrompt(
 
   ensureWatchPointsMinimum(facts, selected, context);
   ensureMandatoryWatchThemes(facts, selected, context, ["security", "risks"]);
+  reconcileSummaryDemographyWatchSlot(facts, selected, context);
+
+  trimTargetToLimit(selected, "watchPoints", context);
+  trimTargetToLimit(selected, "strengths", context);
+  trimTargetToLimit(selected, "opportunities", context);
+  trimTargetToLimit(selected, "summary", context);
 
   return dedupeSelectedFacts(selected, context);
 }

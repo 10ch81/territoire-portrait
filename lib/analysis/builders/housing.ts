@@ -14,19 +14,19 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
       createFact({
         theme: "housing",
         target: "summary",
-        sentence: `Le parc total de logements recensé au recensement ${housing.year} s'élève à ${housing.totalDwellings.toLocaleString("fr-FR")} logements.`,
+        sentence: `L'ensemble des logements recensé au recensement ${housing.year} s'élève à ${housing.totalDwellings.toLocaleString("fr-FR")} logements (INSEE).`,
         sourceKeys: ["insee-rp-logement"],
         year: housing.year,
         confidence: "high",
         limitations: [
-          "Parc global RP ; distinct du parc locatif social RPLS.",
+          "Parc global INSEE ; distinct du parc locatif social (RPLS).",
         ],
         numericBindings: [
           binding(
             housing.totalDwellings,
-            "parc total logements RP",
-            "housing",
-            ["logements", "parc", "RP", "recensement"],
+          "ensemble des logements INSEE",
+          "housing",
+          ["logements", "ensemble", "INSEE", "recensement"],
           ),
         ],
       }),
@@ -43,17 +43,17 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
     createFact({
       theme: "housing",
       target: isHigh ? "watchPoints" : "summary",
-      sentence: `La vacance résidentielle atteint ${formatPercent(housing.rpVacancyRatePercent)} du parc global en ${housing.year}.`,
+      sentence: `Les logements vacants représentent ${formatPercent(housing.rpVacancyRatePercent)} de l'ensemble des logements en ${housing.year} (INSEE).`,
       sourceKeys: ["insee-rp-logement"],
       year: housing.year,
       confidence: "high",
-      limitations: ["Vacance du parc global RP ; distinct du parc locatif social RPLS."],
+      limitations: ["Logements vacants du parc global INSEE ; distinct du parc locatif social (RPLS)."],
       numericBindings: [
         binding(
           housing.rpVacancyRatePercent,
-          "taux vacance résidentielle",
+          "part logements vacants",
           "housing",
-          ["vacance", "résidentielle", "parc global", "logements vacants"],
+          ["logements vacants", "vacance", "ensemble des logements", "logements"],
         ),
       ],
     }),
@@ -73,7 +73,7 @@ export function buildSocialHousingFacts(territory: TerritoryProfile): AnalysisFa
       createFact({
         theme: "social_housing",
         target: "watchPoints",
-        sentence: `Aucun logement locatif social n'est recensé dans RPLS ${housing.year}.`,
+        sentence: `Aucun logement locatif social recensé en ${housing.year} (RPLS).`,
         sourceKeys: ["rpls"],
         year: housing.year,
         confidence: "high",
@@ -88,7 +88,7 @@ export function buildSocialHousingFacts(territory: TerritoryProfile): AnalysisFa
       createFact({
         theme: "social_housing",
         target: "summary",
-        sentence: `RPLS ${housing.year} recense ${housing.totalUnits.toLocaleString("fr-FR")} logements locatifs sociaux sur la commune.`,
+        sentence: `${housing.totalUnits.toLocaleString("fr-FR")} logements locatifs sociaux recensés sur la commune en ${housing.year} (RPLS).`,
         sourceKeys: ["rpls"],
         year: housing.year,
         confidence: "high",

@@ -9,17 +9,28 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
 
   if (!flores?.available) return facts;
 
+  const population = territory.population;
+  const postsPer100Residents =
+    population !== null && population > 0
+      ? Math.round((flores.totalSalariedPosts / population) * 100)
+      : null;
+
+  const mainStrengthSentence =
+    postsPer100Residents !== null
+      ? `${formatCount(flores.totalSalariedPosts)} postes salariés et ${formatCount(flores.totalEstablishments)} établissements recensés en ${flores.year}, soit environ ${formatCount(postsPer100Residents)} postes pour 100 habitants (FLORES).`
+      : `${formatCount(flores.totalSalariedPosts)} postes salariés et ${formatCount(flores.totalEstablishments)} établissements recensés en ${flores.year} (FLORES).`;
+
   facts.push(
     createFact({
       theme: "employment_sectors",
       target: "strengths",
-      sentence: `Les données FLORES documentent une fonction d'emploi local : ${formatCount(flores.totalSalariedPosts)} postes salariés fin d'année et ${formatCount(flores.totalEstablishments)} établissements en ${flores.year}.`,
+      sentence: mainStrengthSentence,
       sourceKeys: ["insee-flores"],
       year: flores.year,
       confidence: "high",
       limitations: [
         "FLORES complète SIDE en décrivant les postes salariés et établissements par secteur.",
-        "Périmètre distinct de SIDE (stocks UL/ET) ; pas d'analyse d'évolution temporelle.",
+        "Périmètre distinct de SIDE ; pas d'analyse d'évolution temporelle.",
       ],
       numericBindings: [
         binding(
@@ -34,6 +45,15 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
           "employment_sectors",
           ["postes salariés", "FLORES", "emploi salarié"],
         ),
+        ...(postsPer100Residents !== null
+          ? [
+              binding(postsPer100Residents, "postes pour 100 habitants FLORES", "employment_sectors", [
+                "postes",
+                "100 habitants",
+                "FLORES",
+              ]),
+            ]
+          : []),
       ],
     }),
   );
@@ -52,11 +72,11 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
       createFact({
         theme: "employment_sectors",
         target: "summary",
-        sentence: `Les principaux secteurs A17 recensés sont : ${sectorList}.`,
+        sentence: `Les principaux secteurs d'activité recensés sont : ${sectorList} (FLORES).`,
         sourceKeys: ["insee-flores"],
         year: flores.year,
         confidence: "high",
-        limitations: ["Répartition sectorielle FLORES A17 ; pas de comparaison temporelle."],
+        limitations: ["Répartition sectorielle FLORES ; pas de comparaison temporelle."],
       }),
     );
 
@@ -69,7 +89,7 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
         createFact({
           theme: "employment_sectors",
           target: "summary",
-          sentence: `Les postes salariés se concentrent notamment dans le secteur ${topSector.label} (${weightPercent.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} % des postes selon FLORES).`,
+          sentence: `Les postes salariés se concentrent notamment dans le secteur ${topSector.label} (${weightPercent.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} % des postes, FLORES).`,
           sourceKeys: ["insee-flores"],
           year: flores.year,
           confidence: "high",
@@ -87,21 +107,25 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
     }
   }
 
-  if (
-    territory.population !== null &&
-    territory.population > 0 &&
-    flores.totalSalariedPosts / territory.population >= 0.15
-  ) {
+  if (postsPer100Residents !== null && postsPer100Residents >= 15) {
     facts.push(
       createFact({
         theme: "employment_sectors",
         target: "strengths",
-        sentence: `FLORES recense ${formatCount(flores.totalSalariedPosts)} postes salariés fin d'année, suggérant une fonction d'emploi local significative au regard de la population.`,
+        sentence: `La commune accueille davantage d'emplois salariés que ne le laisserait supposer sa seule population résidente (${formatCount(flores.totalSalariedPosts)} postes, FLORES).`,
         sourceKeys: ["insee-flores"],
         year: flores.year,
         confidence: "medium",
         limitations: [
-          "Ratio postes/population indicatif ; ne décrit pas un dynamisme entrepreneurial.",
+          "Comparaison postes salariés FLORES / population résidente ; ne décrit pas un dynamisme entrepreneurial.",
+        ],
+        numericBindings: [
+          binding(
+            flores.totalSalariedPosts,
+            "postes salariés FLORES",
+            "employment_sectors",
+            ["postes salariés", "FLORES", "emploi salarié"],
+          ),
         ],
       }),
     );

@@ -124,7 +124,7 @@ describe("validateAnalysisOutput", () => {
   it("rejette fusion SIDE + FLORES", () => {
     assert.ok(
       hasCriticalValidationIssue(
-        "658 unités légales SIDE et 4 200 postes salariés FLORES dans le même tissu.",
+        "658 entreprises SIDE et 4 200 postes salariés FLORES dans le même tissu.",
         analysisFacts,
       ),
     );
@@ -243,9 +243,9 @@ describe("validateAnalysisOutput", () => {
     const result = validateAnalysisOutput(
       {
         summary:
-          "La population légale s'élève à 6 008 habitants en 2022. La population recule de -5,7 % entre 2010 et 2022.",
+          "La population officielle compte 6 008 habitants en 2022 (INSEE). La population recule de -5,7 % entre 2010 et 2022.",
         strengths: [
-          "Le tissu économique local est décrit par 658 unités légales et 749 établissements actifs selon SIDE INSEE 2022.",
+          "L'activité économique locale compte 658 entreprises et 749 établissements actifs en 2022 (SIDE INSEE).",
         ],
         watchPoints: [
           "Les 60 ans et plus représentent 38,1 % de la population en 2021.",

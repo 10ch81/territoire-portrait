@@ -28,8 +28,8 @@ export function buildSecurityFacts(territory: TerritoryProfile): AnalysisFact[] 
       theme: "security",
       target: "watchPoints",
       sentence: hasHigherThanDepartment
-        ? `Les données SSMSI ${security.year} signalent certains indicateurs de sécurité enregistrée supérieurs aux références départementales fournies, à interpréter avec prudence.`
-        : `Les données SSMSI ${security.year} recensent des faits enregistrés par police/gendarmerie, à interpréter avec prudence.`,
+        ? `Certains indicateurs de sécurité enregistrée dépassent les références départementales disponibles, à interpréter avec prudence (SSMSI ${security.year}).`
+        : `Des faits de délinquance enregistrés par la police et la gendarmerie sont recensés, à interpréter avec prudence (SSMSI ${security.year}).`,
       sourceKeys: ["ssmsi"],
       year: security.year,
       confidence: "medium",

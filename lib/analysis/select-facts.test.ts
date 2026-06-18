@@ -6,6 +6,7 @@ import {
   hasDuplicateIndicatorInTarget,
   indicatorKeys,
 } from "./dedupe-facts";
+import { ANALYSIS_OUTPUT_LIMITS } from "./prompt-limits";
 import { saintGironsProfile } from "./fixtures";
 import { selectAnalysisFactsForPrompt } from "./select-facts";
 
@@ -61,7 +62,17 @@ describe("selectAnalysisFactsForPrompt", () => {
     );
 
     assert.ok(watchThemes.size >= 3);
-    assert.ok(watchThemes.has("housing") || watchThemes.has("social_housing"));
+    assert.ok(watchThemes.has("employment") || watchThemes.has("housing"));
+    assert.ok(watchThemes.has("ageing"));
+  });
+
+  it("respecte la limite max de watchPoints", () => {
+    const all = buildAnalysisFacts(saintGironsProfile);
+    const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
+    const watchPoints = selected.filter((f) => f.target === "watchPoints");
+
+    assert.ok(watchPoints.length >= ANALYSIS_OUTPUT_LIMITS.watchPoints.min);
+    assert.ok(watchPoints.length <= ANALYSIS_OUTPUT_LIMITS.watchPoints.max);
   });
 
   it("priorise centralité et services dans les strengths", () => {
@@ -78,7 +89,7 @@ describe("selectAnalysisFactsForPrompt", () => {
     );
   });
 
-  it("produit au moins 3 watchPoints si 4 familles d'enjeux robustes", () => {
+  it("produit au moins 3 watchPoints si plusieurs familles d'enjeux robustes", () => {
     const all = buildAnalysisFacts(saintGironsProfile);
     const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
     const watchPoints = selected.filter((f) => f.target === "watchPoints");

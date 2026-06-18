@@ -14,7 +14,7 @@ export function buildCentralityFacts(territory: TerritoryProfile): AnalysisFact[
       createFact({
         theme: "centrality",
         target: "summary",
-        sentence: `${territory.name} est une commune-centre de son EPCI (${territory.epci.name}), au premier rang par population au sein de l'intercommunalité.`,
+        sentence: `${territory.name} est la principale commune de ${territory.epci.name}, au premier rang par population au sein de l'intercommunalité (INSEE).`,
         sourceKeys: ["insee-geography"],
         confidence: "high",
         evidence: [`Rang population EPCI : 1/${geography?.epciComparison?.communeCount ?? "?"}`],
@@ -25,7 +25,7 @@ export function buildCentralityFacts(territory: TerritoryProfile): AnalysisFact[
       createFact({
         theme: "centrality",
         target: "summary",
-        sentence: `${territory.name} est classée ${geography.attractionArea.categoryLabel.toLowerCase()} au sein de l'aire d'attraction ${geography.attractionArea.label}.`,
+        sentence: `${territory.name} est la principale commune de la zone d'influence ${geography.attractionArea.label} (INSEE).`,
         sourceKeys: ["insee-geography"],
         confidence: "high",
       }),
@@ -35,7 +35,7 @@ export function buildCentralityFacts(territory: TerritoryProfile): AnalysisFact[
       createFact({
         theme: "centrality",
         target: "strengths",
-        sentence: `${territory.name} occupe le ${epciRank}${epciRank === 1 ? "er" : "e"} rang par population au sein de ${territory.epci.name}.`,
+        sentence: `${territory.name} occupe le ${epciRank}${epciRank === 1 ? "er" : "e"} rang par population au sein de ${territory.epci.name} (INSEE).`,
         sourceKeys: ["insee-geography"],
         confidence: "medium",
         numericBindings: [
