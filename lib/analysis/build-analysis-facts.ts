@@ -26,6 +26,7 @@ import {
   buildPolicyCityFacts,
   buildPublicServicesFacts,
 } from "./builders/misc";
+import { buildOpportunityFacts } from "./builders/opportunities";
 
 type FactBuilder = (territory: TerritoryProfile) => AnalysisFact[];
 
@@ -54,6 +55,7 @@ const BUILDERS: FactBuilder[] = [
   buildPublicServicesFacts,
   buildPolicyCityFacts,
   buildFinancesFacts,
+  buildOpportunityFacts,
 ];
 
 export function buildAnalysisFacts(territory: TerritoryProfile): AnalysisFact[] {

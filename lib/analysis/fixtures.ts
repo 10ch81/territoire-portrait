@@ -68,7 +68,7 @@ export const saintGironsProfile: TerritoryProfile = {
       populationGrowthToYear: 2022,
       irvePointsPer1000Residents: null,
       socialHousingVacancyRatePercent: null,
-      equipmentsPer1000Residents: null,
+      equipmentsPer1000Residents: 85.7,
       available: true,
       note: "",
     },
@@ -104,7 +104,10 @@ export const saintGironsProfile: TerritoryProfile = {
         { code: "B", label: "Commerces", count: 8 },
         { code: "D", label: "Santé et action sociale", count: 6 },
       ],
-      byType: [],
+      byType: [
+        { code: "A101", label: "Bureau de poste", count: 1 },
+        { code: "B201", label: "Supérette", count: 3 },
+      ],
       transport: {
         totalEquipments: 4,
         byType: [{ code: "E101", label: "Taxis-VTC", count: 4 }],
@@ -271,3 +274,267 @@ export const ruralProfileMinimal: TerritoryProfile = {
   sources: [],
   enrichment: null,
 };
+
+export type PanelPreset =
+  | "ruralSparse"
+  | "urbanDense"
+  | "periurban"
+  | "tourist"
+  | "coastalOrMountain"
+  | "withQpv"
+  | "withoutQpv"
+  | "lowSsmsi"
+  | "lowDvf"
+  | "sideSireneDivergence"
+  | "fullEnrichment";
+
+function baseProfile(
+  name: string,
+  inseeCode: string,
+  population: number,
+  density: number,
+  enrichment: Partial<TerritoryEnrichment>,
+): TerritoryProfile {
+  return {
+    name,
+    inseeCode,
+    postalCodes: ["00000"],
+    department: { code: "99", name: "Département test" },
+    region: { code: "99", name: "Région test" },
+    epci: { code: "200000000", name: "EPCI test" },
+    population,
+    densityPerKm2: density,
+    coordinates: null,
+    surfaceKm2: population / Math.max(density, 1),
+    sources: [],
+    enrichment: baseEnrichment(enrichment),
+  };
+}
+
+export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
+  switch (preset) {
+    case "ruralSparse":
+      return baseProfile("Commune rurale peu équipée", "99001", 450, 18, {
+        equipments: {
+          year: 2024,
+          totalEquipments: 12,
+          byDomain: [{ code: "B", label: "Commerces", count: 2 }],
+          byType: [{ code: "B201", label: "Supérette", count: 1 }],
+          transport: { totalEquipments: 0, byType: [], available: false, note: "" },
+          available: true,
+          note: "",
+          domainBreakdownLabel: "Types",
+          topTypesLabel: "Top",
+          qualitativeSummary: "Peu d'équipements recensés.",
+          domainCountsAreTypeCounts: true,
+        },
+        derived: {
+          populationGrowthPercent: -8.2,
+          populationGrowthFromYear: 2010,
+          populationGrowthToYear: 2022,
+          irvePointsPer1000Residents: null,
+          socialHousingVacancyRatePercent: null,
+          equipmentsPer1000Residents: 26.7,
+          available: true,
+          note: "",
+        },
+        populationHistory: {
+          latestYear: 2022,
+          latestPopulation: 450,
+          history: [
+            { year: 2010, population: 490 },
+            { year: 2022, population: 450 },
+          ],
+          available: true,
+          note: "",
+        },
+      });
+    case "urbanDense":
+      return baseProfile("Commune urbaine dense", "99002", 85_000, 4_200, {
+        sociodemographics: {
+          year: 2021,
+          ageBands: [{ label: "60-74 ans", population: 12_000, sharePercent: 14.1 }],
+          unemploymentRate: 12.5,
+          medianDisposableIncome: 16_800,
+          available: true,
+          note: "",
+        },
+        urbanPolicy: {
+          year: 2024,
+          hasQpv: true,
+          qpvCount: 2,
+          qpvLabels: ["QPV Nord", "QPV Centre"],
+          available: true,
+          note: "",
+        },
+        security: {
+          year: 2024,
+          indicators: [
+            {
+              id: "vols",
+              label: "Vols",
+              count: 800,
+              ratePer1000: 9.4,
+              departmentRatePer1000: 6.1,
+              diffused: true,
+            },
+          ],
+          diffusedIndicatorCount: 1,
+          available: true,
+          note: "",
+        },
+        property: {
+          year: 2024,
+          averagePricePerM2: 3_500,
+          averageTransactionPrice: 280_000,
+          mutationCount: 420,
+          houseMutations: 200,
+          apartmentMutations: 220,
+          houseSharePercent: null,
+          apartmentSharePercent: null,
+          priceHistory: [],
+          departmentCode: "99",
+          departmentAveragePricePerM2: 3_200,
+          available: true,
+          note: "",
+        },
+        housing: {
+          year: 2021,
+          totalUnits: 5_000,
+          occupiedUnits: 4_800,
+          vacantUnits: 200,
+          totalDwellings: 42_000,
+          rpVacantDwellings: 3_200,
+          rpVacancyRatePercent: 7.6,
+          socialHousingSharePercent: 18,
+          vacancyRatePercent: null,
+          available: true,
+          note: "",
+        },
+      });
+    case "periurban":
+      return baseProfile("Commune périurbaine", "99003", 12_000, 450, {
+        mobility: {
+          irve: { year: 2024, chargingPoints: 8, stations: 3, available: true, note: "" },
+          commute: {
+            year: 2021,
+            employedCount: 5_500,
+            carSharePercent: 82.4,
+            publicTransportSharePercent: 4.2,
+            available: true,
+            note: "",
+          },
+          connectivity: {
+            vintage: "2025_T4",
+            fiberEligibleSharePercent: 55.0,
+            totalPremises: 5_000,
+            fiberEligiblePremises: 2_750,
+            technologies: ["Fibre", "Cuivre"],
+            available: true,
+            note: "",
+          },
+        },
+      });
+    case "tourist":
+      return baseProfile("Commune touristique", "99004", 3_500, 120, {
+        tourism: {
+          year: 2025,
+          accommodationPlaces: 1_200,
+          available: true,
+          note: "",
+        },
+      });
+    case "coastalOrMountain":
+      return baseProfile("Commune littorale ou montagne", "99005", 2_100, 95, {
+        risks: {
+          radon: { potentialClass: "3", label: "Catégorie 3" },
+          flood: { zones: ["Zone A", "Zone B"], count: 2 },
+          catNatEvents: [
+            { label: "Inondation et/ou Coulées de boue", startDate: "2019-01-01" },
+            { label: "Sécheresse", startDate: "2022-07-01" },
+          ],
+          available: true,
+          note: "",
+        },
+      });
+    case "withQpv":
+      return baseProfile("Commune avec QPV", "99006", 18_000, 2_800, {
+        urbanPolicy: {
+          year: 2024,
+          hasQpv: true,
+          qpvCount: 1,
+          qpvLabels: ["QPV Test"],
+          available: true,
+          note: "",
+        },
+      });
+    case "withoutQpv":
+      return baseProfile("Commune sans QPV", "99007", 18_000, 2_800, {
+        urbanPolicy: {
+          year: 2024,
+          hasQpv: false,
+          qpvCount: 0,
+          qpvLabels: [],
+          available: true,
+          note: "",
+        },
+      });
+    case "lowSsmsi":
+      return baseProfile("Commune faible SSMSI", "99008", 5_000, 200, {
+        security: {
+          year: 2024,
+          indicators: [
+            {
+              id: "vols",
+              label: "Vols",
+              count: 5,
+              ratePer1000: 1.0,
+              departmentRatePer1000: 4.5,
+              diffused: true,
+            },
+          ],
+          diffusedIndicatorCount: 1,
+          available: true,
+          note: "",
+        },
+      });
+    case "lowDvf":
+      return baseProfile("Commune peu de mutations DVF", "99009", 900, 35, {
+        property: {
+          year: 2024,
+          averagePricePerM2: 950,
+          averageTransactionPrice: 120_000,
+          mutationCount: 3,
+          houseMutations: 2,
+          apartmentMutations: 1,
+          houseSharePercent: null,
+          apartmentSharePercent: null,
+          priceHistory: [],
+          departmentCode: "99",
+          departmentAveragePricePerM2: 1_100,
+          available: true,
+          note: "",
+        },
+      });
+    case "sideSireneDivergence":
+      return baseProfile("Commune divergence SIDE/SIRENE", "99010", 7_000, 180, {
+        enterprises: {
+          legalUnitsWithEstablishment: 500,
+          legalUnitsIsCapped: false,
+          essCount: 40,
+          rgeCount: 5,
+          inseeLegalUnits: 480,
+          inseeEstablishments: 520,
+          inseeSideYear: 2022,
+          millesime: "2022",
+          divergenceWarning:
+            "Écart entre SIDE (480 UL) et SIRENE live (512 UL) : millésimes ou périmètres distincts.",
+          note: "",
+        },
+      });
+    case "fullEnrichment":
+      return saintGironsProfile;
+    default:
+      return ruralProfileMinimal;
+  }
+}

@@ -13,6 +13,11 @@ export {
   selectAnalysisFactsForPrompt,
 } from "./select-facts";
 export {
+  isActionableOpportunity,
+  isStudyOnlyFact,
+  scoreAnalysisFact,
+} from "./score-facts";
+export {
   hasCriticalValidationIssue,
   validateAnalysisOutput,
 } from "./validate-output";

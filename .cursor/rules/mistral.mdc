@@ -7,10 +7,11 @@ alwaysApply: false
 # Mistral
 
 - Appels uniquement côté serveur via `lib/mistral.ts`.
-- Prompt système : analyste territorial, pas d'invention de chiffres, JSON structuré.
-- Post-traitement : `sanitizeTerritorialAnalysis` dans `lib/mistral-sanitize.ts` (formulations interdites, comparaisons non homogènes, BPE, SSMSI, mobilité, ESS/RGE).
-- Facts partagés : `buildTerritorialFacts` dans `lib/mistral-facts.ts` ; sémantique BPE dans `lib/bpe-semantics.ts`.
-- Format de réponse attendu : `summary`, `strengths`, `watchPoints`, `opportunities`, `dataLimits`.
+- Pipeline : `buildAnalysisFacts` → `selectAnalysisFactsForPrompt` → prompt JSON → `validateAnalysisOutput` (sur les faits sélectionnés) → `mergeSanitizedAnalysis`.
+- Le modèle reçoit uniquement des `analysisFacts` prévalidés, pas les `facts` bruts (sauf `ANALYSIS_DEBUG_RAW_FACTS=true`).
+- Prompt système : rédacteur territorial, pas d'invention de chiffres, JSON structuré (`summary`, `strengths`, `watchPoints`, `opportunities`).
+- Post-traitement : `validateAnalysisOutput` dans `lib/analysis/validate-output.ts` + formulations interdites via `containsForbiddenPhrases` dans `lib/mistral-sanitize.ts`.
+- Legacy (debug uniquement) : `buildTerritorialFacts` / `sanitizeTerritorialAnalysis` dans `lib/mistral-facts.ts` et `lib/mistral-sanitize.ts`.
 - Modèle configurable via `MISTRAL_MODEL` (défaut : `mistral-large-latest`).
 - Sans clé API : retourner un résultat gracieux, ne pas faire planter l'application.
-- Température basse (≈ 0.3) pour des analyses factuelles.
+- Température basse (≈ 0.1) pour des analyses factuelles.

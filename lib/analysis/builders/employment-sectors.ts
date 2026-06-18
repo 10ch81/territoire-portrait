@@ -40,10 +40,11 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
 
   const topSectors = flores.sectors
     .filter((s) => s.salariedPosts > 0)
-    .slice(0, 5);
+    .sort((a, b) => b.salariedPosts - a.salariedPosts);
 
   if (topSectors.length > 0) {
     const sectorList = topSectors
+      .slice(0, 5)
       .map((s) => `${s.label} (${formatCount(s.salariedPosts)} postes)`)
       .join(", ");
 
@@ -56,6 +57,52 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
         year: flores.year,
         confidence: "high",
         limitations: ["Répartition sectorielle FLORES A17 ; pas de comparaison temporelle."],
+      }),
+    );
+
+    const topSector = topSectors[0];
+    if (flores.totalSalariedPosts > 0) {
+      const weightPercent =
+        Math.round((topSector.salariedPosts / flores.totalSalariedPosts) * 1000) / 10;
+
+      facts.push(
+        createFact({
+          theme: "employment_sectors",
+          target: "summary",
+          sentence: `Le secteur ${topSector.label} concentre ${weightPercent.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} % des postes salariés FLORES.`,
+          sourceKeys: ["insee-flores"],
+          year: flores.year,
+          confidence: "high",
+          limitations: ["Poids sectoriel FLORES sur une seule année ; pas d'évolution temporelle."],
+          numericBindings: [
+            binding(weightPercent, "poids 1er secteur FLORES", "employment_sectors", [
+              "secteur",
+              "postes salariés",
+              "FLORES",
+              "%",
+            ]),
+          ],
+        }),
+      );
+    }
+  }
+
+  if (
+    territory.population !== null &&
+    territory.population > 0 &&
+    flores.totalSalariedPosts / territory.population >= 0.15
+  ) {
+    facts.push(
+      createFact({
+        theme: "employment_sectors",
+        target: "strengths",
+        sentence: `FLORES recense ${formatCount(flores.totalSalariedPosts)} postes salariés fin d'année, suggérant une fonction d'emploi local significative au regard de la population.`,
+        sourceKeys: ["insee-flores"],
+        year: flores.year,
+        confidence: "medium",
+        limitations: [
+          "Ratio postes/population indicatif ; ne décrit pas un dynamisme entrepreneurial.",
+        ],
       }),
     );
   }

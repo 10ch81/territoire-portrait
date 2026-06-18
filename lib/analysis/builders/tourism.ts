@@ -12,7 +12,7 @@ export function buildTourismFacts(territory: TerritoryProfile): AnalysisFact[] {
   facts.push(
     createFact({
       theme: "tourism",
-      target: "opportunities",
+      target: "strengths",
       sentence: `La commune dispose de ${formatCount(tourism.accommodationPlaces)} places d'hébergement touristique recensées en ${tourism.year}, sans données de fréquentation.`,
       sourceKeys: ["tourism-capacity"],
       year: tourism.year,
@@ -28,18 +28,6 @@ export function buildTourismFacts(territory: TerritoryProfile): AnalysisFact[] {
           ["hébergement", "tourisme", "places", "touristique"],
         ),
       ],
-    }),
-  );
-
-  facts.push(
-    createFact({
-      theme: "tourism",
-      target: "opportunities",
-      sentence: "Potentiel touristique à approfondir, faute de données de fréquentation.",
-      sourceKeys: ["tourism-capacity"],
-      year: tourism.year,
-      confidence: "medium",
-      limitations: ["Formulation prudente ; pas de conclusion sur un sous-exploitation."],
     }),
   );
 

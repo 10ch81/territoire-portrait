@@ -72,7 +72,7 @@ export function buildEnergyFacts(territory: TerritoryProfile): AnalysisFact[] {
   facts.push(
     createFact({
       theme: "energy",
-      target: "opportunities",
+      target: "summary",
       sentence: `La commune compte ${irve.chargingPoints.toLocaleString("fr-FR")} points de charge IRVE recensés (${irve.stations} station(s)).`,
       sourceKeys: ["irve"],
       year: irve.year,

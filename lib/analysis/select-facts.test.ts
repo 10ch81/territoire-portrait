@@ -7,7 +7,7 @@ import { selectAnalysisFactsForPrompt } from "./select-facts";
 describe("selectAnalysisFactsForPrompt", () => {
   it("limite le volume et conserve sécurité + risques séparés", () => {
     const all = buildAnalysisFacts(saintGironsProfile);
-    const selected = selectAnalysisFactsForPrompt(all);
+    const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
 
     assert.ok(selected.length <= 20);
     assert.ok(selected.length >= 4);
@@ -20,7 +20,7 @@ describe("selectAnalysisFactsForPrompt", () => {
 
   it("évite les doublons de thème identique", () => {
     const all = buildAnalysisFacts(saintGironsProfile);
-    const selected = selectAnalysisFactsForPrompt(all);
+    const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
     const signatures = selected.map((f) => `${f.theme}:${f.sentence.slice(0, 40)}`);
     assert.equal(signatures.length, new Set(signatures).size);
   });

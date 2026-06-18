@@ -66,7 +66,9 @@ describe("buildAnalysisFacts", () => {
 
   it("Saint-Girons — vacance résidentielle", () => {
     const facts = buildAnalysisFacts(saintGironsProfile);
-    const housing = facts.find((f) => f.theme === "housing");
+    const housing = facts.find(
+      (f) => f.theme === "housing" && f.sentence.includes("vacance"),
+    );
 
     assert.ok(housing);
     assert.match(housing!.sentence, /18,8\s*%/);
@@ -118,9 +120,11 @@ describe("buildAnalysisFacts", () => {
     const tourism = facts.filter((f) => f.theme === "tourism");
 
     assert.ok(tourism.length >= 1);
-    const allText = tourism.map((f) => f.sentence).join(" ");
-    assert.match(allText, /75.*hébergement|approfondir/i);
+    const descriptive = tourism.filter((f) => f.target !== "opportunities");
+    const allText = descriptive.map((f) => f.sentence).join(" ");
+    assert.match(allText, /75.*hébergement/i);
     assert.doesNotMatch(allText, /sous-exploité/i);
+    assert.doesNotMatch(allText, /approfondir, faute de/i);
   });
 
   it("Saint-Girons — DVF indicatif", () => {

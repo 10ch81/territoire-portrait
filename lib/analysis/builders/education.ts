@@ -48,5 +48,21 @@ export function buildEducationFacts(territory: TerritoryProfile): AnalysisFact[]
     );
   }
 
+  const levels = education.byLevel.filter((l) => l.count > 0);
+  if (levels.length > 0 && education.totalOpen > 0) {
+    const list = levels.map((l) => `${l.label} (${formatCount(l.count)})`).join(", ");
+    facts.push(
+      createFact({
+        theme: "education",
+        target: "summary",
+        sentence: `Types d'établissements (Annuaire Éducation) : ${list}.`,
+        sourceKeys: ["education-annuaire"],
+        year: education.year,
+        confidence: "medium",
+        limitations: ["Types d'établissements ; ne pas extrapoler sur les effectifs ou la qualité."],
+      }),
+    );
+  }
+
   return facts;
 }

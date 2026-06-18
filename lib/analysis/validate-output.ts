@@ -169,6 +169,9 @@ function validatePercentContext(text: string, analysisFacts: AnalysisFact[]): bo
   return true;
 }
 
+const OPPORTUNITY_STUDY_PATTERN =
+  /^(?:faire|mener|conduire)\s+(?:une\s+)?(?:analyse|étude)/i;
+
 function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string | null {
   if (!text.trim()) return "empty";
 
@@ -225,6 +228,9 @@ function sanitizeList(
   const seen = new Set<string>();
 
   for (const item of items) {
+    if (field === "opportunities" && OPPORTUNITY_STUDY_PATTERN.test(item.trim())) {
+      continue;
+    }
     const sanitized = sanitizeField(item, field, analysisFacts);
     if (!sanitized) continue;
     if (seen.has(sanitized.toLowerCase())) continue;

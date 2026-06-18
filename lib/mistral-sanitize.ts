@@ -1268,11 +1268,15 @@ export function sanitizeTerritorialAnalysis(
 export function containsForbiddenPhrases(text: string): string[] {
   const probes = [
     "chef-lieu de l'EPCI",
+    "dynamique entrepreneuriale",
     "dynamique entrepreneuriale marquée",
+    "tissu économique dynamique",
+    "vitalité économique",
     "vitalité économique marquée",
     "potentiel touristique sous-exploité",
     "tensions sociales",
     "insécurité croissante",
+    "tendance à la hausse",
     "pression fiscale faible",
     "pression fiscale forte",
     "offre de transport limitée",
@@ -1291,6 +1295,7 @@ export function containsForbiddenPhrases(text: string): string[] {
     "acteurs mobilisables",
     "agences immobilières locales",
     "filière ess structurée",
+    "prix stables",
     "prix moyens stables",
     "tissu entrepreneurial local",
     "accessibilité aux infrastructures",

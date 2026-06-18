@@ -55,6 +55,22 @@ export function buildEconomyFacts(territory: TerritoryProfile): AnalysisFact[] {
     }),
   );
 
+  if (enterprises.divergenceWarning) {
+    facts.push(
+      createFact({
+        theme: "economy",
+        target: "summary",
+        sentence: enterprises.divergenceWarning,
+        sourceKeys: ["insee-side", "sirene"],
+        year: year ?? undefined,
+        confidence: "low",
+        limitations: [
+          "Écart méthodologique SIDE/SIRENE ; ne pas fusionner les périmètres dans une même conclusion.",
+        ],
+      }),
+    );
+  }
+
   return facts;
 }
 
@@ -76,7 +92,7 @@ export function buildEssRgeFacts(territory: TerritoryProfile): AnalysisFact[] {
   facts.push(
     createFact({
       theme: "ess_rge",
-      target: "opportunities",
+      target: "strengths",
       sentence: `En complément, les bases administratives identifient ${parts.join(" et ")}.`,
       sourceKeys: ["sirene"],
       confidence: "medium",

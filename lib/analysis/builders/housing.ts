@@ -7,7 +7,33 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
   const facts: AnalysisFact[] = [];
   const housing = territory.enrichment?.housing;
 
-  if (!housing?.available || housing.rpVacancyRatePercent === null) {
+  if (!housing?.available) return facts;
+
+  if (housing.totalDwellings !== null && housing.totalDwellings > 0) {
+    facts.push(
+      createFact({
+        theme: "housing",
+        target: "summary",
+        sentence: `Le parc total de logements recensé au recensement ${housing.year} s'élève à ${housing.totalDwellings.toLocaleString("fr-FR")} logements.`,
+        sourceKeys: ["insee-rp-logement"],
+        year: housing.year,
+        confidence: "high",
+        limitations: [
+          "Parc global RP ; distinct du parc locatif social RPLS.",
+        ],
+        numericBindings: [
+          binding(
+            housing.totalDwellings,
+            "parc total logements RP",
+            "housing",
+            ["logements", "parc", "RP", "recensement"],
+          ),
+        ],
+      }),
+    );
+  }
+
+  if (housing.rpVacancyRatePercent === null) {
     return facts;
   }
 

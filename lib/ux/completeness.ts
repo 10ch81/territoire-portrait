@@ -82,6 +82,18 @@ const ENRICHMENT_CHECKS: Array<{
     isAvailable: (t) => t.enrichment?.property?.available === true,
   },
   {
+    id: "education",
+    isAvailable: (t) => t.enrichment?.education?.available === true,
+  },
+  {
+    id: "health",
+    isAvailable: (t) => t.enrichment?.health?.available === true,
+  },
+  {
+    id: "employment-sectors",
+    isAvailable: (t) => t.enrichment?.employmentSectors?.available === true,
+  },
+  {
     id: "mistral",
     isAvailable: () => false,
   },
@@ -99,6 +111,6 @@ export function computeCompleteness(
     available,
     total,
     percent,
-    label: `${available}/${total} sources disponibles (${percent} %)`,
+    label: `${available}/${total} familles de données disponibles (${percent} %)`,
   };
 }

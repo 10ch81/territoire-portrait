@@ -17,7 +17,7 @@ export function CompletenessIndicator({
   return (
     <div
       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${tone}`}
-      title="Nombre de blocs de données enrichies disponibles pour cette commune"
+      title="Nombre de familles thématiques de données enrichies disponibles pour cette commune (distinct du détail des sources listées)"
     >
       <span
         className="inline-block h-2 w-2 rounded-full bg-current opacity-60"

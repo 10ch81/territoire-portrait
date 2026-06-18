@@ -57,8 +57,7 @@ function getMistralConfig(): { apiKey: string; model: string } | null {
 }
 
 function buildUserPrompt(territory: TerritoryProfile): string {
-  const allFacts = buildAnalysisFacts(territory);
-  const analysisFacts = selectAnalysisFactsForPrompt(allFacts);
+  const analysisFacts = getSelectedAnalysisFacts(territory);
   const debug = process.env.ANALYSIS_DEBUG_RAW_FACTS === "true";
 
   const payload = {
@@ -80,6 +79,11 @@ function buildUserPrompt(territory: TerritoryProfile): string {
   return JSON.stringify(payload, null, 2);
 }
 
+function getSelectedAnalysisFacts(territory: TerritoryProfile) {
+  const allFacts = buildAnalysisFacts(territory);
+  return selectAnalysisFactsForPrompt(allFacts, territory);
+}
+
 function parseAnalysisContent(
   content: string,
   territory: TerritoryProfile,
@@ -97,10 +101,10 @@ function parseAnalysisContent(
     };
   }
 
-  const analysisFacts = buildAnalysisFacts(territory);
+  const selectedFacts = getSelectedAnalysisFacts(territory);
   const validated = validateAnalysisOutput(
     parsed as Parameters<typeof validateAnalysisOutput>[0],
-    analysisFacts,
+    selectedFacts,
   );
 
   return {
