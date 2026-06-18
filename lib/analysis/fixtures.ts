@@ -299,6 +299,7 @@ export type PanelPreset =
   | "lowMunicipalDebt"
   | "highMunicipalDebt"
   | "compositeIncomeFragility"
+  | "twoNegativeEnjeux"
   | "sireneCapped"
   | "fullEnrichment";
 
@@ -902,6 +903,64 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           catNatEvents: [
             { label: "Inondation et/ou Coulées de boue", startDate: "2019-03-15" },
           ],
+          available: true,
+          note: "",
+        },
+      });
+    case "twoNegativeEnjeux":
+      return baseProfile("Commune deux enjeux défavorables", "99024", 8_000, 180, {
+        sociodemographics: {
+          year: 2021,
+          ageBands: [],
+          unemploymentRate: 11.5,
+          medianDisposableIncome: 20_500,
+          available: true,
+          note: "",
+        },
+        housing: {
+          year: 2021,
+          totalUnits: 120,
+          occupiedUnits: 115,
+          vacantUnits: 5,
+          totalDwellings: 3_800,
+          rpVacantDwellings: 95,
+          rpVacancyRatePercent: 2.5,
+          socialHousingSharePercent: 10,
+          vacancyRatePercent: null,
+          available: true,
+          note: "",
+        },
+        security: {
+          year: 2024,
+          indicators: [
+            {
+              id: "vols",
+              label: "Vols",
+              count: 8,
+              ratePer1000: 1.0,
+              departmentRatePer1000: 5.5,
+              diffused: true,
+            },
+          ],
+          diffusedIndicatorCount: 1,
+          available: true,
+          note: "",
+        },
+        risks: {
+          radon: null,
+          flood: { zones: ["Zone A"], count: 1 },
+          catNatEvents: [
+            { label: "Inondation et/ou Coulées de boue", startDate: "2020-06-01" },
+          ],
+          available: true,
+          note: "",
+        },
+        publicAccounts: {
+          year: 2023,
+          operatingRevenueEur: null,
+          operatingRevenuePerCapitaEur: null,
+          debtOutstandingEur: 4_000_000,
+          debtPerCapitaEur: 500,
           available: true,
           note: "",
         },

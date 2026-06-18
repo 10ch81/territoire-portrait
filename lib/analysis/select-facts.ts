@@ -16,9 +16,11 @@ import {
   type ScoreContext,
 } from "./score-facts";
 import {
+  countQualifiedWatchPointCandidates,
   isEligibleEmploymentWatchPoint,
-  isEligibleSocioEconomicWatchPoint,
-} from "./socio-economic-watch-points";
+  isFactEligibleForWatchPoint,
+  qualifiedWatchPointCandidates,
+} from "./qualify-facts";
 
 import {
   countRobustWatchPointFamilies,
@@ -172,7 +174,7 @@ function canAddToTarget(
   if (
     target === "watchPoints" &&
     context?.territory &&
-    !isEligibleSocioEconomicWatchPoint(candidate, context.territory)
+    !isFactEligibleForWatchPoint(candidate, { territory: context.territory })
   ) {
     return false;
   }
@@ -232,6 +234,7 @@ function ensureMandatoryWatchThemes(
   themes: AnalysisFactTheme[],
 ): void {
   const limit = TARGET_LIMITS.watchPoints;
+  const analysisContext = { territory: context.territory };
 
   for (const theme of themes) {
     if (selected.some((f) => f.target === "watchPoints" && f.theme === theme)) {
@@ -243,6 +246,7 @@ function ensureMandatoryWatchThemes(
       .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context))[0];
 
     if (!candidate) continue;
+    if (!isFactEligibleForWatchPoint(candidate, analysisContext)) continue;
 
     const watchCandidate: AnalysisFact = {
       ...candidate,
@@ -372,9 +376,14 @@ function ensureWatchPointsMinimum(
   context: ScoreContext,
 ): void {
   const limit = TARGET_LIMITS.watchPoints;
-  const robustFamilies = countRobustWatchPointFamilies(facts);
-  const minimum =
-    robustFamilies >= 4 ? Math.min(limit.max, Math.max(3, limit.min)) : limit.min;
+  const analysisContext = { territory: context.territory };
+  const qualifiedAvailable = countQualifiedWatchPointCandidates(facts, analysisContext);
+
+  if (qualifiedAvailable === 0) {
+    return;
+  }
+
+  const minimum = Math.min(limit.max, qualifiedAvailable);
 
   let watchCount = selected.filter((f) => f.target === "watchPoints").length;
 
@@ -382,7 +391,10 @@ function ensureWatchPointsMinimum(
     if (watchCount >= limit.max || watchCount >= minimum) break;
 
     const pick = pickBestFromThemes(
-      facts.filter((f) => f.target === "watchPoints" || family.includes(f.theme)),
+      qualifiedWatchPointCandidates(
+        facts.filter((f) => f.target === "watchPoints" || family.includes(f.theme)),
+        analysisContext,
+      ),
       family,
       context,
       selected,
@@ -400,7 +412,7 @@ function ensureWatchPointsMinimum(
   }
 
   while (watchCount < minimum && watchCount < limit.max) {
-    const candidates = facts
+    const candidates = qualifiedWatchPointCandidates(facts, analysisContext)
       .filter((f) => f.target === "watchPoints")
       .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 

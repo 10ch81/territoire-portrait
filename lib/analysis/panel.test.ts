@@ -85,11 +85,10 @@ describe("panel multi-profils", () => {
     assert.doesNotMatch(qpv!.sentence, /toute la commune/i);
   });
 
-  it("lowSsmsi — pas de comparaison département si taux inférieur", () => {
+  it("lowSsmsi — pas de constat sécurité si taux inférieur au département", () => {
     const facts = buildAnalysisFacts(createPanelProfile("lowSsmsi"));
     const security = facts.find((f) => f.theme === "security");
-    assert.ok(security);
-    assert.doesNotMatch(security!.sentence, /supérieurs aux références départementales/i);
+    assert.equal(security, undefined);
   });
 
   it("sideSireneDivergence — constat d'écart méthodologique", () => {

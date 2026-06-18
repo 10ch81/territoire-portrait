@@ -35,14 +35,11 @@ export function buildMobilityFacts(territory: TerritoryProfile): AnalysisFact[] 
   }
 
   if (commute.publicTransportSharePercent !== null) {
-    const isMarginal = commute.publicTransportSharePercent < 5;
     facts.push(
       createFact({
         theme: "mobility",
-        target: isMarginal ? "watchPoints" : "summary",
-        sentence: isMarginal
-          ? `La part des transports en commun dans les déplacements domicile-travail est marginale, à ${formatPercent(commute.publicTransportSharePercent)} en ${commute.year}.`
-          : `Les transports en commun représentent ${formatPercent(commute.publicTransportSharePercent)} des déplacements domicile-travail en ${commute.year}.`,
+        target: "summary",
+        sentence: `Les transports en commun représentent ${formatPercent(commute.publicTransportSharePercent)} des déplacements domicile-travail en ${commute.year}.`,
         sourceKeys: ["insee-commute"],
         year: commute.year,
         confidence: "high",

@@ -32,6 +32,20 @@ export type AnalysisFactTarget =
 
 export type AnalysisFactConfidence = "high" | "medium" | "low";
 
+export type FactPolarity = "positive" | "neutral" | "negative" | "unknown";
+export type FactIntensity = "low" | "medium" | "high";
+
+export type TerritoryAnalysisContext = {
+  territory: import("../types").TerritoryProfile;
+};
+
+export type QualifiedAnalysisFact = AnalysisFact & {
+  polarity: FactPolarity;
+  intensity: FactIntensity;
+  eligibleTargets: AnalysisFactTarget[];
+  qualificationReason?: string;
+};
+
 export type NumericBinding = {
   value: number | string;
   label: string;

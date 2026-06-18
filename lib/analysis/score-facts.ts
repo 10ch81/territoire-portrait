@@ -1,11 +1,12 @@
 import type { TerritoryProfile } from "../types";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 import {
-  isDescriptiveIncomeWatchPointSentence,
   qualifiesAsDebtWatchPoint,
   qualifiesAsIncomeWatchPoint,
   qualifiesAsUnemploymentWatchPoint,
-} from "./socio-economic-watch-points";
+  qualifiesAsVacancyWatchPoint,
+  isDescriptiveIncomeWatchPointSentence,
+} from "./qualify-facts";
 
 const CONFIDENCE_SCORE = { high: 30, medium: 15, low: 0 } as const;
 
@@ -49,7 +50,10 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
   const connectivity = territory.enrichment?.mobility?.connectivity;
 
   if (fact.theme === "housing" && housing?.rpVacancyRatePercent != null) {
-    if (housing.rpVacancyRatePercent >= 10) return 12;
+    if (qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent)) {
+      return 12;
+    }
+    return -20;
   }
 
   if (fact.theme === "employment" && sociodemographics?.unemploymentRate != null) {
@@ -73,6 +77,27 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
       return -20;
     }
     return 10;
+  }
+
+  if (fact.theme === "security") {
+    const security = territory.enrichment?.security;
+    const unfavorable = security?.indicators.some(
+      (indicator) =>
+        indicator.diffused &&
+        indicator.departmentRatePer1000 !== null &&
+        indicator.ratePer1000 !== null &&
+        indicator.ratePer1000 > indicator.departmentRatePer1000,
+    );
+    if (unfavorable) return 10;
+    return -20;
+  }
+
+  if (fact.theme === "social_housing" && /Aucun logement locatif social/i.test(fact.sentence)) {
+    return -20;
+  }
+
+  if (fact.theme === "mobility" && /marginale/i.test(fact.sentence)) {
+    return -20;
   }
 
   if (fact.theme === "connectivity" && connectivity?.fiberEligibleSharePercent != null) {

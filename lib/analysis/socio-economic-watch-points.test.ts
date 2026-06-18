@@ -44,7 +44,7 @@ describe("socio-economic watch points", () => {
 
   it("ne code aucune commune ni code INSEE dans le module de seuils", () => {
     const source = readFileSync(
-      join(moduleDir, "socio-economic-watch-points.ts"),
+      join(moduleDir, "qualify-facts.ts"),
       "utf8",
     );
     assert.doesNotMatch(source, /\b0\d{4}\b/);

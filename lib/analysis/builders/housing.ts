@@ -1,5 +1,6 @@
 import type { TerritoryProfile } from "../../types";
 import { formatPercent } from "../format";
+import { qualifiesAsVacancyWatchPoint } from "../qualify-facts";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -37,7 +38,7 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
     return facts;
   }
 
-  const isHigh = housing.rpVacancyRatePercent >= 10;
+  const isHigh = qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent);
 
   facts.push(
     createFact({
@@ -72,7 +73,7 @@ export function buildSocialHousingFacts(territory: TerritoryProfile): AnalysisFa
     facts.push(
       createFact({
         theme: "social_housing",
-        target: "watchPoints",
+        target: "summary",
         sentence: `Aucun logement locatif social recensé en ${housing.year} (RPLS).`,
         sourceKeys: ["rpls"],
         year: housing.year,

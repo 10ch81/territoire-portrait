@@ -71,7 +71,7 @@ describe("selectAnalysisFactsForPrompt", () => {
     const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
     const watchPoints = selected.filter((f) => f.target === "watchPoints");
 
-    assert.ok(watchPoints.length >= ANALYSIS_OUTPUT_LIMITS.watchPoints.min);
+    assert.ok(watchPoints.length >= 1);
     assert.ok(watchPoints.length <= ANALYSIS_OUTPUT_LIMITS.watchPoints.max);
   });
 
@@ -89,7 +89,7 @@ describe("selectAnalysisFactsForPrompt", () => {
     );
   });
 
-  it("produit au moins 3 watchPoints si plusieurs familles d'enjeux robustes", () => {
+  it("produit des watchPoints défavorables qualifiés sans remplissage neutre", () => {
     const all = buildAnalysisFacts(saintGironsProfile);
     const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
     const watchPoints = selected.filter((f) => f.target === "watchPoints");
@@ -97,6 +97,7 @@ describe("selectAnalysisFactsForPrompt", () => {
     assert.ok(watchPoints.length >= 3);
     assert.ok(watchPoints.some((f) => f.theme === "security"));
     assert.ok(watchPoints.some((f) => f.theme === "risks"));
+    assert.ok(!watchPoints.some((f) => f.theme === "social_housing"));
   });
 
   it("sépare tourisme et France Services dans les strengths", () => {

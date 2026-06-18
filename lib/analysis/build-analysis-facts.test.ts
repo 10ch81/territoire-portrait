@@ -171,9 +171,7 @@ describe("buildAnalysisFacts", () => {
     const facts = buildAnalysisFacts(belowDeptProfile);
     const security = facts.find((f) => f.theme === "security");
 
-    assert.ok(security);
-    assert.doesNotMatch(security!.sentence, /supérieurs aux références départementales|dépassent les références départementales/);
-    assert.match(security!.sentence, /interpréter avec prudence/i);
+    assert.equal(security, undefined, "pas de constat sécurité si taux sous référence départementale");
   });
 
   it("commune sans enrichissement — aucun constat thématique", () => {

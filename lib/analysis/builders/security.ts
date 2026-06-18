@@ -23,13 +23,15 @@ export function buildSecurityFacts(territory: TerritoryProfile): AnalysisFact[] 
       i.ratePer1000 > i.departmentRatePer1000,
   );
 
+  if (!hasHigherThanDepartment) {
+    return facts;
+  }
+
   facts.push(
     createFact({
       theme: "security",
       target: "watchPoints",
-      sentence: hasHigherThanDepartment
-        ? `Certains indicateurs de sécurité enregistrée dépassent les références départementales disponibles, à interpréter avec prudence (SSMSI ${security.year}).`
-        : `Des faits de délinquance enregistrés par la police et la gendarmerie sont recensés, à interpréter avec prudence (SSMSI ${security.year}).`,
+      sentence: `Certains indicateurs de sécurité enregistrée dépassent les références départementales disponibles, à interpréter avec prudence (SSMSI ${security.year}).`,
       sourceKeys: ["ssmsi"],
       year: security.year,
       confidence: "medium",

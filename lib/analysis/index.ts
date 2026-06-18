@@ -38,6 +38,20 @@ export {
   scoreAnalysisFact,
 } from "./score-facts";
 export {
+  buildIncomeWatchPointSentence,
+  isEligibleForWatchPoint,
+  isFactEligibleForWatchPoint,
+  qualifyAnalysisFact,
+  qualifyAnalysisFacts,
+  qualifiedWatchPointCandidates,
+} from "./qualify-facts";
+export type {
+  FactIntensity,
+  FactPolarity,
+  QualifiedAnalysisFact,
+  TerritoryAnalysisContext,
+} from "./types";
+export {
   hasCriticalValidationIssue,
   validateAnalysisOutput,
 } from "./validate-output";
