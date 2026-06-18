@@ -1,5 +1,6 @@
 import { createEnterpriseSource } from "../sources";
-import type { EnterpriseSnapshot } from "../types";
+import { loadJsonCache } from "./cache";
+import type { EnterpriseSideCommuneCache, EnterpriseSnapshot } from "../types";
 
 const ENTERPRISE_API_BASE = "https://recherche-entreprises.api.gouv.fr/search";
 const ENTERPRISE_API_MAX_PAGES = 400;
@@ -48,6 +49,27 @@ async function fetchEnterpriseTotal(
   return { total, isCapped };
 }
 
+const ENTERPRISE_SIDE_CACHE_FILE = "enterprise-side-by-commune.json";
+
+function loadInseeSideCounts(inseeCode: string): {
+  legalUnits: number | null;
+  establishments: number | null;
+  year: number | null;
+} {
+  const cache = loadJsonCache<EnterpriseSideCommuneCache>(ENTERPRISE_SIDE_CACHE_FILE);
+  const entry = cache?.[inseeCode];
+
+  if (!entry) {
+    return { legalUnits: null, establishments: null, year: null };
+  }
+
+  return {
+    legalUnits: entry.legalUnits,
+    establishments: entry.establishments,
+    year: entry.year,
+  };
+}
+
 export async function fetchEnterpriseSnapshot(
   inseeCode: string,
 ): Promise<EnterpriseSnapshot | null> {
@@ -57,27 +79,38 @@ export async function fetchEnterpriseSnapshot(
     fetchEnterpriseTotal(inseeCode, { est_rge: "true" }),
   ]);
 
-  if (!base) {
+  const side = loadInseeSideCounts(inseeCode);
+
+  if (!base && side.legalUnits === null) {
     return null;
   }
 
   const noteParts = [
-    "Unités légales ayant au moins un établissement actif sur la commune.",
+    "Unités légales ayant au moins un établissement actif sur la commune (API SIRENE).",
     "Comptages ESS et RGE issus de l'API (filtres dédiés).",
   ];
 
-  if (base.isCapped) {
+  if (side.legalUnits !== null) {
     noteParts.push(
-      `Le total général est plafonné à ${ENTERPRISE_API_MAX_RESULTS.toLocaleString("fr-FR")} par l'API : la commune peut en compter davantage.`,
+      `Stocks INSEE SIDE (${side.year}) : unités légales et étabissements actifs sur la commune.`,
+    );
+  }
+
+  if (base?.isCapped) {
+    noteParts.push(
+      `Le total SIRENE est plafonné à ${ENTERPRISE_API_MAX_RESULTS.toLocaleString("fr-FR")} par l'API : la commune peut en compter davantage.`,
     );
   }
 
   return {
-    legalUnitsWithEstablishment: base.total,
-    legalUnitsIsCapped: base.isCapped,
+    legalUnitsWithEstablishment: base?.total ?? null,
+    legalUnitsIsCapped: base?.isCapped ?? false,
     essCount: ess?.total ?? null,
     rgeCount: rge?.total ?? null,
-    millesime: "2024-2025",
+    inseeLegalUnits: side.legalUnits,
+    inseeEstablishments: side.establishments,
+    inseeSideYear: side.year,
+    millesime: side.year ? `${side.year} / 2024-2025` : "2024-2025",
     note: noteParts.join(" "),
   };
 }

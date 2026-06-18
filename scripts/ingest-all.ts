@@ -16,7 +16,9 @@ const steps = [
   { name: "SSMSI (sécurité / délinquance)", script: "scripts/ingest-security.ts" },
   { name: "Commute (RP domicile-travail)", script: "scripts/ingest-commute.ts" },
   { name: "QPV (politique de la ville)", script: "scripts/ingest-qpv.ts" },
-  { name: "GTFS (transport collectif)", script: "scripts/ingest-gtfs.ts" },
+  { name: "SIDE (stocks entreprises INSEE)", script: "scripts/ingest-enterprise-side.ts" },
+  { name: "France Services", script: "scripts/ingest-services.ts" },
+  { name: "Tourisme (capacités INSEE)", script: "scripts/ingest-tourism.ts" },
 ];
 
 for (const step of steps) {

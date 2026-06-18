@@ -59,6 +59,22 @@ export function EconomySection({ territory }: EconomySectionProps) {
               </dd>
             </div>
           ) : null}
+          {enterprises.inseeLegalUnits !== null ? (
+            <DataRow
+              label="Unités légales actives (INSEE SIDE)"
+              value={new Intl.NumberFormat("fr-FR").format(
+                enterprises.inseeLegalUnits,
+              )}
+            />
+          ) : null}
+          {enterprises.inseeEstablishments !== null ? (
+            <DataRow
+              label="Établissements actifs (INSEE SIDE)"
+              value={new Intl.NumberFormat("fr-FR").format(
+                enterprises.inseeEstablishments,
+              )}
+            />
+          ) : null}
           <p className="text-xs text-slate-500">{enterprises.note}</p>
         </dl>
       ) : (

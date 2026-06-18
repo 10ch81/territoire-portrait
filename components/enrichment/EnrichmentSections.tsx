@@ -9,6 +9,8 @@ import { MobilitySection } from "./MobilitySection";
 import { PropertySection } from "./PropertySection";
 import { RisksSection } from "./RisksSection";
 import { SecuritySection } from "./SecuritySection";
+import { ProximityServicesSection } from "./ProximityServicesSection";
+import { TourismSection } from "./TourismSection";
 import { UrbanPolicySection } from "./UrbanPolicySection";
 
 interface EnrichmentSectionsProps {
@@ -31,8 +33,14 @@ export function EnrichmentSections({ territory }: EnrichmentSectionsProps) {
       {enrichment?.urbanPolicy ? (
         <UrbanPolicySection territory={territory} />
       ) : null}
+      {enrichment?.proximityServices ? (
+        <ProximityServicesSection territory={territory} />
+      ) : null}
       {enrichment?.mobility ? <MobilitySection territory={territory} /> : null}
-      {enrichment?.fiscal ? <FiscalSection territory={territory} /> : null}
+      {enrichment?.fiscal || enrichment?.publicAccounts ? (
+        <FiscalSection territory={territory} />
+      ) : null}
+      {enrichment?.tourism ? <TourismSection territory={territory} /> : null}
       {enrichment?.geography ? (
         <GeographySection territory={territory} />
       ) : null}

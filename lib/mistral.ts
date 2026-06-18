@@ -13,7 +13,6 @@ Règles impératives :
 - Ne déclare JAMAIS qu'une donnée est absente si elle est présente dans le JSON (ex. tauxChomage1564 non null, equipements.total > 0, mutationsMaisons/mutationsAppartements renseignés).
 - Les comptages ESS et RGE (SIRENE) proviennent de filtres API dédiés ; ne pas extrapoler la structure sectorielle ni les effectifs salariés.
 - Les données RPLS (loués / vacants) décrivent le parc locatif social ; la vacance générale (RP logement) porte sur l'ensemble du parc.
-- Les arrêts GTFS recensent une offre de transport collectif ; ne pas conclure à l'absence de bus/car sans croiser BPE et GTFS.
 - Les QPV sont des sous-périmètres communaux ; ne pas généraliser à toute la commune.
 - La BPE dénombre des équipements (y compris enseignement et services publics de proximité) : ne pas écrire qu'il n'y a pas d'écoles ou de mairie si des comptages sont fournis.
 - Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
@@ -83,6 +82,10 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           totalPlafonneApi: territory.enrichment.enterprises.legalUnitsIsCapped,
           ess: territory.enrichment.enterprises.essCount,
           rge: territory.enrichment.enterprises.rgeCount,
+          inseeSideUnitesLegales: territory.enrichment.enterprises.inseeLegalUnits,
+          inseeSideEtablissements:
+            territory.enrichment.enterprises.inseeEstablishments,
+          inseeSideAnnee: territory.enrichment.enterprises.inseeSideYear,
           note: territory.enrichment.enterprises.note,
         }
       : null,
@@ -144,17 +147,7 @@ function buildUserPrompt(territory: TerritoryProfile): string {
                   territory.enrichment.mobility.commute.publicTransportSharePercent,
               }
             : null,
-          transportCollectif: territory.enrichment.mobility.publicTransport.available
-            ? {
-                arretsGtfs: territory.enrichment.mobility.publicTransport.stopCount,
-                fluxGtfs: territory.enrichment.mobility.publicTransport.feedCount,
-              }
-            : null,
-          note: [
-            territory.enrichment.mobility.irve.note,
-            territory.enrichment.mobility.commute.note,
-            territory.enrichment.mobility.publicTransport.note,
-          ]
+          note: [territory.enrichment.mobility.irve.note, territory.enrichment.mobility.commute.note]
             .filter(Boolean)
             .join(" "),
         }
@@ -173,6 +166,31 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           tauxTfb: territory.enrichment.fiscal.propertyTaxBuiltRate,
           tauxTfnb: territory.enrichment.fiscal.propertyTaxUnbuiltRate,
           note: territory.enrichment.fiscal.note,
+        }
+      : null,
+    comptesPublics: territory.enrichment?.publicAccounts?.available
+      ? {
+          annee: territory.enrichment.publicAccounts.year,
+          recettesFonctionnement: territory.enrichment.publicAccounts.operatingRevenueEur,
+          recettesParHabitant:
+            territory.enrichment.publicAccounts.operatingRevenuePerCapitaEur,
+          encoursDette: territory.enrichment.publicAccounts.debtOutstandingEur,
+          detteParHabitant: territory.enrichment.publicAccounts.debtPerCapitaEur,
+          note: territory.enrichment.publicAccounts.note,
+        }
+      : null,
+    servicesProximite: territory.enrichment?.proximityServices?.available
+      ? {
+          franceServices: territory.enrichment.proximityServices.franceServicesCount,
+          structures: territory.enrichment.proximityServices.structureLabels,
+          note: territory.enrichment.proximityServices.note,
+        }
+      : null,
+    tourisme: territory.enrichment?.tourism?.available
+      ? {
+          annee: territory.enrichment.tourism.year,
+          placesHebergement: territory.enrichment.tourism.accommodationPlaces,
+          note: territory.enrichment.tourism.note,
         }
       : null,
     geographie: {

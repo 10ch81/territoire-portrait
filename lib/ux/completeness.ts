@@ -50,9 +50,7 @@ const ENRICHMENT_CHECKS: Array<{
       return (
         mobility !== undefined &&
         mobility !== null &&
-        (mobility.irve.available ||
-          mobility.commute.available ||
-          mobility.publicTransport.available)
+        (mobility.irve.available || mobility.commute.available)
       );
     },
   },
@@ -62,7 +60,17 @@ const ENRICHMENT_CHECKS: Array<{
   },
   {
     id: "fiscal",
-    isAvailable: (t) => t.enrichment?.fiscal?.available === true,
+    isAvailable: (t) =>
+      t.enrichment?.fiscal?.available === true ||
+      t.enrichment?.publicAccounts?.available === true,
+  },
+  {
+    id: "proximity-services",
+    isAvailable: (t) => t.enrichment?.proximityServices?.available === true,
+  },
+  {
+    id: "tourism",
+    isAvailable: (t) => t.enrichment?.tourism?.available === true,
   },
   {
     id: "geography",

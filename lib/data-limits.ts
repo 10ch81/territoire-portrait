@@ -97,7 +97,9 @@ function appendEnterpriseLimits(
 
   pushUnique(
     limits,
-    `Données économiques SIRENE limitées aux comptages d'unités légales, ESS et RGE (${totalLabel}) : pas de répartition sectorielle ni de tranches d'effectif fiables.`,
+    enterprises.inseeLegalUnits !== null
+      ? `Données économiques : comptages SIRENE (API) complétés par SIDE INSEE (${enterprises.inseeSideYear}) ; pas de répartition sectorielle ni de tranches d'effectif fiables.`
+      : `Données économiques SIRENE limitées aux comptages d'unités légales, ESS et RGE (${totalLabel}) : pas de répartition sectorielle ni de tranches d'effectif fiables.`,
   );
 }
 
@@ -169,21 +171,38 @@ function appendFiscalLimits(
   enrichment: TerritoryEnrichment,
 ): void {
   const fiscal = enrichment.fiscal;
+  const publicAccounts = enrichment.publicAccounts;
+  const hasRei = fiscal?.available === true;
+  const hasOfgl = publicAccounts?.available === true;
 
-  if (!fiscal?.available) {
+  if (!hasRei && !hasOfgl) {
     appendUnavailable(
       limits,
-      fiscal?.available,
-      "Fiscalité locale (REI) non disponible.",
-      fiscal?.note,
+      hasRei || hasOfgl,
+      "Finances locales (REI / OFGL) non disponibles.",
+      fiscal?.note ?? publicAccounts?.note,
     );
     return;
   }
 
-  pushUnique(
-    limits,
-    "Fiscalité locale : taux d'imposition communaux (REI) uniquement, sans bases fiscales ni recettes communales.",
-  );
+  if (hasRei) {
+    pushUnique(
+      limits,
+      "Fiscalité locale : taux d'imposition communaux (REI) uniquement, sans bases fiscales.",
+    );
+  }
+
+  if (hasOfgl) {
+    pushUnique(
+      limits,
+      "Comptes publics OFGL : encours de dette et recettes de fonctionnement (budget principal) ; pas de dépenses détaillées ni d'années antérieures dans le portrait.",
+    );
+  } else if (hasRei) {
+    pushUnique(
+      limits,
+      "Recettes et dette communale (OFGL) non disponibles pour cette commune.",
+    );
+  }
 }
 
 /**
@@ -272,24 +291,15 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
 
   appendUnavailable(
     limits,
-    enrichment.mobility?.irve.available ||
-      enrichment.mobility?.commute.available ||
-      enrichment.mobility?.publicTransport.available,
-    "Données IRVE (bornes de recharge) non disponibles.",
+    enrichment.mobility?.irve.available || enrichment.mobility?.commute.available,
+    "Données de mobilité non disponibles.",
     enrichment.mobility?.irve.note,
   );
 
   if (enrichment.mobility?.commute.available) {
     pushUnique(
       limits,
-      "Mobilité domicile-travail (RP 2021) : mode principal déclaré, pas de fréquence ni d'offre horaire.",
-    );
-  }
-
-  if (enrichment.mobility?.publicTransport.available) {
-    pushUnique(
-      limits,
-      "Transport collectif GTFS : dénombrement d'arrêts recensés ; complète la BPE sans horaires ni fréquences.",
+      "Mobilité domicile-travail (RP 2021) : mode principal déclaré ; l'offre horaire de transport collectif n'est pas intégrée (BPE domaine E pour les équipements).",
     );
   }
 

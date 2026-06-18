@@ -23,7 +23,12 @@ const COMMUTE_URL =
   "https://www.insee.fr/fr/statistiques/fichier/8200836/TD_NAV2A_2021_csv.zip";
 const QPV_URL =
   "https://www.insee.fr/fr/statistiques/fichier/8186239/TAG_QPV2024_2025_csv.zip";
-const GTFS_API_URL = "https://transport.data.gouv.fr/api/datasets";
+const FRANCE_SERVICES_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services/";
+const OFGL_URL = "https://data.ofgl.fr/";
+const SIDE_URL = "https://www.insee.fr/fr/statistiques/2011101";
+const TOURISM_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/2021703/DS_TOUR_CAP_CSV_2025_geo25.zip";
 
 const SSMSI_URL =
   "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales";
@@ -42,9 +47,12 @@ export const SOURCE_IDS = {
   GEORISQUES: "georisques",
   RPLS: "rpls",
   IRVE: "irve",
-  GTFS: "gtfs-transport",
   QPV: "qpv-sig-ville",
   REI: "rei",
+  OFGL: "ofgl",
+  FRANCE_SERVICES: "france-services",
+  INSEE_SIDE: "insee-side",
+  INSEE_TOURISM: "insee-tourism",
   AAV: "aav2020",
   DVF: "dvf",
   SSMSI: "ssmsi",
@@ -227,17 +235,6 @@ export function createCommuteSource(accessedAt: string): DataSource {
   };
 }
 
-export function createGtfsSource(accessedAt: string): DataSource {
-  return {
-    id: SOURCE_IDS.GTFS,
-    name: "transport.data.gouv.fr — GTFS",
-    url: GTFS_API_URL,
-    description:
-      "Arrêts de transport collectif agrégés depuis les flux GTFS français (transport.data.gouv.fr).",
-    accessedAt,
-  };
-}
-
 export function createQpvSource(accessedAt: string): DataSource {
   return {
     id: SOURCE_IDS.QPV,
@@ -245,6 +242,48 @@ export function createQpvSource(accessedAt: string): DataSource {
     url: QPV_URL,
     description:
       "Quartiers prioritaires de la politique de la ville (table d'appartenance géographique 2025).",
+    accessedAt,
+  };
+}
+
+export function createOfglSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.OFGL,
+    name: "OFGL — Comptes des collectivités",
+    url: OFGL_URL,
+    description:
+      "Encours de dette et recettes de fonctionnement des communes (budget principal).",
+    accessedAt,
+  };
+}
+
+export function createFranceServicesSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.FRANCE_SERVICES,
+    name: "France Services — Structures labellisées",
+    url: FRANCE_SERVICES_DATASET_URL,
+    description: "Points d'accueil France Services labellisés par commune.",
+    accessedAt,
+  };
+}
+
+export function createInseeSideSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_SIDE,
+    name: "INSEE — SIDE (stocks d'entreprises)",
+    url: SIDE_URL,
+    description:
+      "Stocks d'unités légales et d'étabissements actifs par commune (SIDE).",
+    accessedAt,
+  };
+}
+
+export function createTourismSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_TOURISM,
+    name: "INSEE — Capacités touristiques",
+    url: TOURISM_URL,
+    description: "Places d'hébergement touristique par commune.",
     accessedAt,
   };
 }

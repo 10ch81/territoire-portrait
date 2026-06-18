@@ -78,8 +78,9 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | [INSEE — RP 2021 structure par âge](https://www.insee.fr/fr/statistiques/8201904) | Pyramide des âges | R | ✅ | `ingest-social.ts` → `sociodemographics.ts` | Millésime RP 2021 |
 | [INSEE — RP 2021 emploi / chômage](https://www.insee.fr/fr/statistiques/8202916) | Chômage 15-64 ans | R | ✅ | `ingest-social.ts` | Taux au recensement, pas au BIT |
 | [INSEE — FILOSOFI](https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation) | Revenu médian disponible | R | ✅ | `ingest-social.ts` | Millésime 2020 (revenus 2019) |
-| [INSEE — RP logement 2021](https://www.insee.fr/fr/statistiques/6682710) | Vacance, parc total, statut d'occupation | R | ❌ 📋 P1 | — | Distinct du RPLS (parc social) ; vacance générale absente |
-| [INSEE — RP mobilité domicile-travail](https://www.insee.fr/fr/statistiques/6682710) | Modes de transport des actifs | R | ❌ 📋 P1 | — | Complète GTFS (usage vs offre) |
+| [INSEE — RP logement 2021](https://www.insee.fr/fr/statistiques/8202349) | Vacance, parc total, statut d'occupation | R | ✅ | `ingest-housing.ts` | Vacance générale (P21_LOGVAC) + RPLS |
+| [SIG Ville / INSEE TAG QPV](https://www.insee.fr/fr/information/8186239) | QPV, politique de la ville | R | ✅ | `ingest-qpv.ts` | Table d'appartenance QPV 2025 |
+| [INSEE — RP mobilité domicile-travail](https://www.insee.fr/fr/statistiques/8200836) | Modes de transport des actifs | R | ✅ | `ingest-commute.ts` | Tableau NAV2A 2021 (usage déclaré) |
 | [INSEE — Dossier / comparateur territoires](https://www.insee.fr/fr/statistiques/2011101) | Référence croisée | R | ⚠️ | — | Pages web de référence ; données couvertes via Melodi/cache, pas de scrape |
 
 ### Géographie, centralité, institutions
@@ -95,7 +96,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | Source | Thème | Niv. | Statut | Module / script | Notes |
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [API Recherche Entreprises / SIRENE](https://recherche-entreprises.api.gouv.fr) | Unités légales, ESS, RGE | C | ⚠️ | `enterprises.ts` (live) | Filtre `etat_administratif=A` ; définitions ≠ INSEE démographie entreprises ; plafond 10 000 |
-| [INSEE — démographie d'entreprises](https://www.insee.fr/fr/statistiques/2011101) | ULE / établissements économiquement actifs | R | ❌ 📋 P2 | — | Aligner comptages SIRENE sur définitions INSEE |
+| [INSEE — démographie d'entreprises (SIDE)](https://www.insee.fr/fr/statistiques/2011101) | ULE / établissements économiquement actifs | R | ✅ | `ingest-enterprise-side.ts` → `enterprises.ts` | Stocks UL + ET ; complète SIRENE API |
 | [data.gouv — ESS](https://www.data.gouv.fr/datasets/liste-des-entreprises-de-less) | Économie sociale et solidaire | C | ⚠️ | `enterprises.ts` (filtre API) | Comptage via API, pas fichier bulk |
 | [data.gouv — RGE](https://www.data.gouv.fr/datasets/liste-des-entreprises-rge) | Transition écologique locale | C | ⚠️ | `enterprises.ts` (filtre API) | Idem |
 
@@ -104,9 +105,9 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | Source | Thème | Niv. | Statut | Module / script | Notes |
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [INSEE — BPE 2024](https://api.insee.fr/melodi/file/DS_BPE/DS_BPE_2024_CSV_FR) | Commerces, santé, écoles, services | R | ✅ | `ingest-bpe.ts` → `equipments.ts` | Dénombrement, pas accessibilité |
-| [Annuaire de l'Éducation](https://www.data.gouv.fr/datasets/annuaire-de-leducation) | Établissements scolaires ouverts | C | ❌ 📋 P2 | — | Liste nominative ; BPE domaine C partiellement substitue |
-| [France Services](https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services) | Accueil public de proximité | C | ❌ 📋 P2 | — | |
-| [DREES — APL santé](https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl) | Accessibilité aux soins | C | ❌ 📋 P2 | — | Quantité BPE ≠ accessibilité |
+| [Annuaire de l'Éducation](https://www.data.gouv.fr/datasets/annuaire-de-leducation) | Établissements scolaires ouverts | C | ❌ 📋 P2 | — | **Écarté** (~36 Mo+) ; BPE domaine C partiellement substitue |
+| [France Services](https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services) | Accueil public de proximité | C | ✅ | `ingest-services.ts` → `proximity-services.ts` | |
+| [DREES — APL santé](https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl) | Accessibilité aux soins | C | ❌ 📋 P2 | — | **Écarté** (xlsx, pas bulk communal) |
 | [CartoSanté / AtlaSanté](https://cartosante.atlasante.fr/) | Offre et accès PS | C | ❌ | — | Portail carto ; pas de bulk simple ; APL prioritaire |
 
 ### Mobilité et transition
@@ -114,7 +115,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | Source | Thème | Niv. | Statut | Module / script | Notes |
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [BPE — domaine E (transport)](https://api.insee.fr/melodi/file/DS_BPE/DS_BPE_2024_CSV_FR) | Arrêts, gares recensés | C | ⚠️ | `equipments.ts` (`transport`) | Ne décrit pas l'offre horaire |
-| [transport.data.gouv.fr — GTFS liO Occitanie](https://transport.data.gouv.fr/datasets/reseau-lio-occitanie) | Lignes, arrêts, fréquences TC | R | ❌ 📋 P1 | — | Modèle réplicable par région/exploitant |
+| [transport.data.gouv.fr — GTFS](https://transport.data.gouv.fr/) | Lignes, arrêts, fréquences TC | R | ❌ 📋 P3 | — | **Reporté** : ~100 flux uniques, géocodage massif ; RP domicile-travail + BPE domaine E |
 | [IRVE national](https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/) | Bornes de recharge VE | C | ✅ | `ingest-irve.ts` → `mobility.ts` | |
 
 ### Logement et immobilier
@@ -134,32 +135,33 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | [SSMSI](https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales) | Délinquance enregistrée | S | ✅ | `ingest-security.ts` → `security.ts` | Diffusion partielle ; pas de ressenti |
 | [Interstats](https://www.interieur.gouv.fr/Interstats) | Méthodologie sécurité | — | ⚠️ | — | Référence documentaire pour SSMSI |
 | [REI](https://www.data.gouv.fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-4/) | Taux fiscalité locale | C | ✅ | `ingest-rei.ts` → `fiscal.ts` | Taux uniquement, pas recettes |
-| [OFGL / data.ofgl.fr](https://data.ofgl.fr/) | Budget, dette, gestion publique | C | ❌ 📋 P2 | — | Plus riche que REI pour capacité financière |
+| [OFGL / data.ofgl.fr](https://data.ofgl.fr/) | Budget, dette, gestion publique | C | ⚠️ | `public-accounts.ts` (API live) | Dette + recettes ; pas d'export bulk (~22 M lignes) |
 
 ### Tourisme, artificialisation, transversal
 
 | Source | Thème | Niv. | Statut | Module / script | Notes |
 | ------ | ----- | ---- | ------ | --------------- | ----- |
-| [INSEE — capacités touristiques](https://www.insee.fr/fr/statistiques/2021703) | Hébergements touristiques | C | ❌ 📋 P3 | — | |
-| [DATAtourisme](https://www.data.gouv.fr/datasets/datatourisme-la-base-nationale-des-donnees-publiques-dinformation-touristique-en-open-data) | Offre touristique | C | ❌ 📋 P3 | — | |
-| [Portail artificialisation des sols](https://artificialisation.developpement-durable.gouv.fr/) | Consommation d'espaces, ZAN | C | ❌ 📋 P3 | — | |
+| [INSEE — capacités touristiques](https://www.insee.fr/fr/statistiques/2021703) | Hébergements touristiques | C | ✅ | `ingest-tourism.ts` → `tourism.ts` | Places d'hébergement agrégées |
+| [DATAtourisme](https://www.data.gouv.fr/datasets/datatourisme-la-base-nationale-des-donnees-publiques-dinformation-touristique-en-open-data) | Offre touristique | C | ❌ 📋 P3 | — | INSEE capacités suffit pour MVP |
+| [Portail artificialisation des sols](https://artificialisation.developpement-durable.gouv.fr/) | Consommation d'espaces, ZAN | C | ❌ 📋 P3 | — | **Écarté** (jeux lourds) |
 | [Observatoire des territoires](https://www.observatoire-des-territoires.gouv.fr/) | Indicateurs transversaux | C | ❌ 📋 P3 | — | Agrégateur ; utile pour comparaisons |
 
 ### Synthèse par thème (couverture actuelle)
 
 | Thème | Couverture | Lacune principale |
 | ----- | ---------- | ----------------- |
-| Démographie | ✅ Forte | RP logement (vacance générale) |
-| Emploi / revenus | ✅ Forte | Modes domicile-travail, emploi salarié au lieu de travail |
-| Économie | ⚠️ Partielle | Définitions SIRENE vs INSEE |
-| Équipements | ✅ Forte | Accessibilité santé (APL), Annuaire Éducation |
-| Mobilité | ⚠️ Faible | GTFS / offre TC réelle |
-| Logement | ⚠️ Partielle | Confusion possible RPLS vs vacance RP |
+| Démographie | ✅ Forte | — |
+| Emploi / revenus | ✅ Forte | Emploi salarié au lieu de travail |
+| Économie | ✅ Correcte | SIRENE + SIDE ; pas de répartition sectorielle |
+| Équipements | ✅ Forte | France Services ; APL et Annuaire Éducation écartés |
+| Mobilité | ⚠️ Partielle | RP domicile-travail + IRVE ; GTFS reporté |
+| Logement | ✅ Correcte | RPLS + vacance RP |
 | Immobilier | ✅ Correcte | Faibles volumes → prudence |
-| Risques | ✅ Correcte | PPRN réglementaire |
+| Risques | ✅ Correcte | PPRN réglementaire absent |
 | Sécurité | ⚠️ Prudent | Source sensible, petites communes |
-| Finances | ⚠️ Partielle | REI sans budgets OFGL |
-| Politique ville | ❌ Absente | SIG Ville / QPV |
+| Finances | ✅ Correcte | REI + OFGL (API live) |
+| Politique ville | ✅ | QPV intégré |
+| Tourisme | ✅ Correcte | Capacités INSEE ; DATAtourisme non intégré |
 | Institutions | ⚠️ Partielle | BANATIC syndicats |
 
 ---
@@ -172,28 +174,31 @@ Ordre recommandé pour les prochaines ingestions. Chaque item suit le workflow M
 
 | # | Source | Thème | Effort estimé | Justification |
 | - | ------ | ----- | ------------- | ------------- |
-| 1 | GTFS (liO + modèle national) | Mobilité | Moyen | Corrige l'angle mort BPE-transport |
-| 2 | SIG Ville / QPV | Politique ville | Faible | Indicateur structurant non couvert |
-| 3 | RP logement 2021 | Logement | Faible | Vacance générale, parc total (Melodi ou CSV INSEE) |
-| 4 | RP mobilité domicile-travail | Mobilité | Faible | Croisement usage / offre TC |
+| 1 | RP mobilité domicile-travail | Mobilité | ✅ Fait | NAV2A 2021 |
+| 2 | SIG Ville / QPV | Politique ville | ✅ Fait | Table INSEE TAG 2025 |
+| 3 | RP logement 2021 | Logement | ✅ Fait | Vacance générale dans `ingest-housing` |
+| 4 | GTFS national | Mobilité | **Reporté P3** | Trop lourd en CI ; option régionale ultérieure |
 
 ### P2 — Enrichissement et alignement
 
 | # | Source | Thème | Effort estimé | Justification |
 | - | ------ | ----- | ------------- | ------------- |
-| 5 | INSEE démographie d'entreprises | Économie | Moyen | Recalibrer SIRENE vs définitions officielles |
-| 6 | France Services + Annuaire Éducation | Services | Faible | Listes bulk, jointure code INSEE |
-| 7 | APL santé (DREES) | Santé | Moyen | Accessibilité vs dénombrement BPE |
-| 8 | BANATIC | Institutions | Faible | Syndicats, PNR, complément EPCI |
-| 9 | OFGL | Finances | Moyen | Budgets et dette communale |
-| 10 | PPRN (catalogues régionaux) | Risques | Élevé | GéoJSON hétérogène par région |
+| 5 | INSEE SIDE (démographie d'entreprises) | Économie | ✅ Fait | `ingest-enterprise-side.ts` |
+| 6 | France Services | Services | ✅ Fait | `ingest-services.ts` ; Annuaire Éducation **écarté** |
+| 7 | APL santé (DREES) | Santé | **Écarté** | Fichiers xlsx, pas bulk communal |
+| 8 | BANATIC | Institutions | **Reporté** | Pas de JSON public par commune |
+| 9 | OFGL | Finances | ✅ Fait (API live) | Pas d'export bulk (~22 M lignes) |
+| 10 | PPRN (catalogues régionaux) | Risques | **Reporté** | GéoJSON hétérogène |
 
 ### P3 — Thématiques complémentaires
 
 | # | Source | Thème | Justification |
 | - | ------ | ----- | ------------- |
-| 11 | DVF+ | Immobilier | Carto / typologie fine si besoin |
-| 12 | DATAtourisme + capacités INSEE | Tourisme | Communes touristiques |
+| 11 | DVF+ | Immobilier | **Reporté** | Agrégé DVF suffit |
+| 12 | Capacités touristiques INSEE | Tourisme | ✅ Fait | `ingest-tourism.ts` |
+| 13 | DATAtourisme | Tourisme | **Reporté** | INSEE suffit pour MVP |
+| 14 | Artificialisation des sols | Environnement | **Écarté** | Jeux lourds |
+| 15 | Observatoire des territoires | Transversal | **Reporté** | Agrégateur externe |
 | 13 | Artificialisation des sols | Environnement | ZAN, consommation d'espaces |
 | 14 | Observatoire des territoires | Transversal | Comparaisons pré-calculées |
 
@@ -217,7 +222,7 @@ Requêtes MCP orientées par les lacunes P1 :
 
 | Thème | Mots-clés / datasets | Priorité |
 | ----- | -------------------- | -------- |
-| Mobilité | GTFS, NeTEx, transport.data.gouv.fr, liO | P1 |
+| Mobilité | RP domicile-travail, IRVE, BPE transport | P3 (GTFS national reporté) |
 | Politique ville | SIG Ville, QPV, Cœur de ville | P1 |
 | Logement | RP logement 2021, vacance, statut occupation | P1 |
 | Santé | APL, accessibilité localisée DREES | P2 |

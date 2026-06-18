@@ -60,6 +60,9 @@ export interface EnterpriseSnapshot {
   legalUnitsIsCapped: boolean;
   essCount: number | null;
   rgeCount: number | null;
+  inseeLegalUnits: number | null;
+  inseeEstablishments: number | null;
+  inseeSideYear: number | null;
   millesime: string;
   note: string;
 }
@@ -150,14 +153,6 @@ export interface CommuteSnapshot {
   note: string;
 }
 
-export interface PublicTransportSnapshot {
-  year: number;
-  stopCount: number;
-  feedCount: number;
-  available: boolean;
-  note: string;
-}
-
 export interface IrveSnapshot {
   year: number;
   chargingPoints: number;
@@ -169,7 +164,6 @@ export interface IrveSnapshot {
 export interface MobilitySnapshot {
   irve: IrveSnapshot;
   commute: CommuteSnapshot;
-  publicTransport: PublicTransportSnapshot;
 }
 
 export interface QpvSnapshot {
@@ -186,6 +180,31 @@ export interface LocalTaxSnapshot {
   propertyTaxBuiltRate: number | null;
   propertyTaxUnbuiltRate: number | null;
   habitationTaxRate: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface PublicAccountsSnapshot {
+  year: number;
+  operatingRevenueEur: number | null;
+  operatingRevenuePerCapitaEur: number | null;
+  debtOutstandingEur: number | null;
+  debtPerCapitaEur: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface ProximityServicesSnapshot {
+  year: number;
+  franceServicesCount: number;
+  structureLabels: string[];
+  available: boolean;
+  note: string;
+}
+
+export interface TourismSnapshot {
+  year: number;
+  accommodationPlaces: number;
   available: boolean;
   note: string;
 }
@@ -276,6 +295,9 @@ export interface TerritoryEnrichment {
   mobility: MobilitySnapshot | null;
   urbanPolicy: QpvSnapshot | null;
   fiscal: LocalTaxSnapshot | null;
+  publicAccounts: PublicAccountsSnapshot | null;
+  proximityServices: ProximityServicesSnapshot | null;
+  tourism: TourismSnapshot | null;
   geography: GeographySnapshot | null;
   property: PropertyMarketSnapshot | null;
   derived: DerivedIndicatorsSnapshot | null;
@@ -397,14 +419,6 @@ export interface QpvCommuneCacheEntry {
 
 export type QpvCommuneCache = Record<string, QpvCommuneCacheEntry>;
 
-export interface PublicTransportCommuneCacheEntry {
-  year: number;
-  stopCount: number;
-  feedCount: number;
-}
-
-export type PublicTransportCommuneCache = Record<string, PublicTransportCommuneCacheEntry>;
-
 export type HousingCommuneCache = Record<string, HousingCommuneCacheEntry>;
 
 export interface IrveCommuneCacheEntry {
@@ -423,6 +437,35 @@ export interface FiscalCommuneCacheEntry {
 }
 
 export type FiscalCommuneCache = Record<string, FiscalCommuneCacheEntry>;
+
+export interface EnterpriseSideCommuneCacheEntry {
+  year: number;
+  legalUnits: number;
+  establishments: number;
+}
+
+export type EnterpriseSideCommuneCache = Record<
+  string,
+  EnterpriseSideCommuneCacheEntry
+>;
+
+export interface ProximityServicesCommuneCacheEntry {
+  year: number;
+  count: number;
+  labels: string[];
+}
+
+export type ProximityServicesCommuneCache = Record<
+  string,
+  ProximityServicesCommuneCacheEntry
+>;
+
+export interface TourismCommuneCacheEntry {
+  year: number;
+  accommodationPlaces: number;
+}
+
+export type TourismCommuneCache = Record<string, TourismCommuneCacheEntry>;
 
 export interface GeographyCommuneCacheEntry {
   aavCode: string;

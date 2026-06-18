@@ -13,7 +13,9 @@ export const ACRONYMS: Record<string, string> = {
   AZI: "Atlas des zones inondables",
   CATNAT: "Catastrophes naturelles — régime d'indemnisation",
   SSMSI: "Service statistique ministériel de la sécurité intérieure — délinquance enregistrée",
-  GTFS: "General Transit Feed Specification — arrêts de transport collectif open data",
+  FILOSOFI: "Fichier localisé social et fiscal — revenus INSEE",
+  OFGL: "Observatoire des finances et de la gestion publique locales",
+  SIDE: "Système d'information sur la démographie des entreprises (INSEE)",
   QPV: "Quartier prioritaire de la politique de la ville",
 };
 

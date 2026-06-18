@@ -12,10 +12,7 @@ interface MobilitySectionProps {
 export function MobilitySection({ territory }: MobilitySectionProps) {
   const mobility = territory.enrichment?.mobility;
   const derived = territory.enrichment?.derived;
-  const hasContent =
-    mobility?.irve.available ||
-    mobility?.commute.available ||
-    mobility?.publicTransport.available;
+  const hasContent = mobility?.irve.available || mobility?.commute.available;
 
   return (
     <DataSection
@@ -23,8 +20,7 @@ export function MobilitySection({ territory }: MobilitySectionProps) {
       title="Mobilité"
       subtitle={
         <>
-          <AcronymTooltip term="IRVE" /> · <AcronymTooltip term="GTFS" /> · RP
-          2021
+          <AcronymTooltip term="IRVE" /> · RP 2021
         </>
       }
       vintage={mobility?.commute.year ?? mobility?.irve.year}
@@ -49,23 +45,6 @@ export function MobilitySection({ territory }: MobilitySectionProps) {
               />
             </>
           ) : null}
-          {mobility?.publicTransport.available &&
-          mobility.publicTransport.stopCount > 0 ? (
-            <>
-              <DataRow
-                label="Arrêts GTFS recensés"
-                value={new Intl.NumberFormat("fr-FR").format(
-                  mobility.publicTransport.stopCount,
-                )}
-              />
-              <DataRow
-                label="Flux GTFS couvrant la commune"
-                value={new Intl.NumberFormat("fr-FR").format(
-                  mobility.publicTransport.feedCount,
-                )}
-              />
-            </>
-          ) : null}
           {mobility?.irve.available ? (
             <>
               <DataRow
@@ -87,13 +66,7 @@ export function MobilitySection({ territory }: MobilitySectionProps) {
             </>
           ) : null}
           <p className="text-xs text-slate-500">
-            {[
-              mobility?.commute.note,
-              mobility?.publicTransport.note,
-              mobility?.irve.note,
-            ]
-              .filter(Boolean)
-              .join(" ")}
+            {[mobility?.commute.note, mobility?.irve.note].filter(Boolean).join(" ")}
           </p>
         </dl>
       ) : (

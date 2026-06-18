@@ -48,9 +48,7 @@ export const ENRICHMENT_SECTIONS: SectionDef[] = [
       return (
         mobility !== undefined &&
         mobility !== null &&
-        (mobility.irve.available ||
-          mobility.commute.available ||
-          mobility.publicTransport.available)
+        (mobility.irve.available || mobility.commute.available)
       );
     },
   },
@@ -61,8 +59,20 @@ export const ENRICHMENT_SECTIONS: SectionDef[] = [
   },
   {
     id: "fiscalite",
-    label: "Fiscalité",
-    isAvailable: (t) => t.enrichment?.fiscal?.available === true,
+    label: "Finances locales",
+    isAvailable: (t) =>
+      t.enrichment?.fiscal?.available === true ||
+      t.enrichment?.publicAccounts?.available === true,
+  },
+  {
+    id: "services-proximite",
+    label: "Services proximité",
+    isAvailable: (t) => t.enrichment?.proximityServices?.available === true,
+  },
+  {
+    id: "tourisme",
+    label: "Tourisme",
+    isAvailable: (t) => t.enrichment?.tourism?.available === true,
   },
   {
     id: "geographie",

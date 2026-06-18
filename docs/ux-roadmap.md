@@ -73,26 +73,29 @@ Référence détaillée : [docs/mcp-datagouv.md](./mcp-datagouv.md) (matrice sou
 
 ### P1 — Socle diagnostic
 
-- [ ] GTFS transport collectif (transport.data.gouv.fr, modèle liO → national)
-- [ ] SIG Ville / QPV (politique de la ville)
-- [ ] RP logement 2021 (vacance générale, parc total)
-- [ ] RP mobilité domicile-travail (modes de transport des actifs)
+- [ ] GTFS transport collectif — **reporté** (ingestion nationale trop lourde ; RP domicile-travail + BPE domaine E)
+- [x] SIG Ville / QPV (politique de la ville)
+- [x] RP logement 2021 (vacance générale, parc total)
+- [x] RP mobilité domicile-travail (modes de transport des actifs)
 
 ### P2 — Enrichissement
 
-- [ ] Alignement SIRENE / INSEE démographie d'entreprises
-- [ ] France Services + Annuaire de l'Éducation
-- [ ] APL santé (DREES)
-- [ ] BANATIC (syndicats, structures intercommunales)
-- [ ] OFGL (budgets, dette)
-- [ ] PPRN régionaux (complément Géorisques)
+- [x] INSEE SIDE (démographie d'entreprises) + SIRENE API
+- [x] France Services
+- [ ] Annuaire de l'Éducation — **écarté** (~36 Mo+)
+- [ ] APL santé (DREES) — **écarté** (xlsx, pas bulk communal)
+- [ ] BANATIC — **reporté** (pas de JSON public par commune)
+- [x] OFGL (dette, recettes — API live, pas bulk)
+- [ ] PPRN régionaux — **reporté**
 
 ### P3 — Complémentaire
 
-- [ ] DVF+ (géolocalisation fine)
-- [ ] Tourisme (DATAtourisme, capacités INSEE)
-- [ ] Artificialisation des sols
-- [ ] Observatoire des territoires
+- [ ] DVF+ — **reporté**
+- [x] Capacités touristiques INSEE
+- [ ] DATAtourisme — **reporté** (INSEE suffit)
+- [ ] GTFS national — **reporté** (trop lourd)
+- [ ] Artificialisation des sols — **écarté**
+- [ ] Observatoire des territoires — **reporté**
 
 ---
 

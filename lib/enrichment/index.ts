@@ -1,4 +1,4 @@
-import { mergeSources, createRpHousingSource } from "../sources";
+import { mergeSources, createRpHousingSource, createInseeSideSource } from "../sources";
 import { getTerritoryByInsee } from "../territory";
 import type { DataSource, TerritoryEnrichment, TerritoryProfile } from "../types";
 import { fetchEnterpriseSnapshot, createEnterpriseSource } from "./enterprises";
@@ -12,12 +12,20 @@ import {
   loadMobilitySnapshot,
   isMobilityAvailable,
   createCommuteSource,
-  createGtfsSource,
   createIrveSource,
 } from "./mobility";
 import { loadQpvSnapshot, createQpvSource } from "./urban-policy";
 import { loadSocialHousingSnapshot, createRplsSource } from "./housing";
 import { loadLocalTaxSnapshot, createReiSource } from "./fiscal";
+import {
+  fetchPublicAccountsSnapshot,
+  createOfglSource,
+} from "./public-accounts";
+import {
+  loadProximityServicesSnapshot,
+  createFranceServicesSource,
+} from "./proximity-services";
+import { loadTourismSnapshot, createTourismSource } from "./tourism";
 import { loadGeographySnapshot, createAavSource } from "./geography";
 import { loadPropertyMarketSnapshot, createDvfSource } from "./property";
 import { loadSecuritySnapshot, createSsmsiSource } from "./security";
@@ -49,6 +57,9 @@ function collectEnrichmentSources(
   }
   if (enrichment.enterprises) {
     sources.push(createEnterpriseSource(accessedAt));
+    if (enrichment.enterprises.inseeLegalUnits !== null) {
+      sources.push(createInseeSideSource(accessedAt));
+    }
   }
   if (enrichment.equipments?.available) {
     sources.push(createBpeSource(accessedAt));
@@ -72,15 +83,21 @@ function collectEnrichmentSources(
     if (enrichment.mobility.commute.available) {
       sources.push(createCommuteSource(accessedAt));
     }
-    if (enrichment.mobility.publicTransport.available) {
-      sources.push(createGtfsSource(accessedAt));
-    }
   }
   if (enrichment.urbanPolicy?.available) {
     sources.push(createQpvSource(accessedAt));
   }
   if (enrichment.fiscal?.available) {
     sources.push(createReiSource(accessedAt));
+  }
+  if (enrichment.publicAccounts?.available) {
+    sources.push(createOfglSource(accessedAt));
+  }
+  if (enrichment.proximityServices?.available) {
+    sources.push(createFranceServicesSource(accessedAt));
+  }
+  if (enrichment.tourism?.available) {
+    sources.push(createTourismSource(accessedAt));
   }
   if (enrichment.geography?.attractionArea?.available) {
     sources.push(createAavSource(accessedAt));
@@ -101,10 +118,12 @@ export async function enrichTerritory(
     enterprises,
     risks,
     geography,
+    publicAccounts,
   ] = await Promise.all([
     fetchEnterpriseSnapshot(territory.inseeCode),
     fetchRisksSnapshot(territory.inseeCode),
     loadGeographySnapshot(territory),
+    fetchPublicAccountsSnapshot(territory.inseeCode),
   ]);
 
   const populationHistory = loadPopulationHistorySnapshot(territory.inseeCode);
@@ -114,6 +133,8 @@ export async function enrichTerritory(
   const mobility = loadMobilitySnapshot(territory.inseeCode);
   const urbanPolicy = loadQpvSnapshot(territory.inseeCode);
   const fiscal = loadLocalTaxSnapshot(territory.inseeCode);
+  const proximityServices = loadProximityServicesSnapshot(territory.inseeCode);
+  const tourism = loadTourismSnapshot(territory.inseeCode);
   const property = loadPropertyMarketSnapshot(territory.inseeCode);
   const security = loadSecuritySnapshot(territory);
 
@@ -128,6 +149,9 @@ export async function enrichTerritory(
     mobility,
     urbanPolicy,
     fiscal,
+    publicAccounts,
+    proximityServices,
+    tourism,
     geography,
     property,
     derived: null,
