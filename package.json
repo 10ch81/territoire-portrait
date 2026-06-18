@@ -29,7 +29,8 @@
     "quality:all": "tsx scripts/quality-all.ts",
     "quality:sample": "tsx scripts/quality-sample.ts",
     "test": "tsx --test lib/**/*.test.ts",
-    "test:mistral-sanitize": "tsx --test lib/mistral-sanitize.test.ts"
+    "test:mistral-sanitize": "tsx --test lib/mistral-sanitize.test.ts",
+    "test:bpe-semantics": "tsx --test lib/bpe-semantics.test.ts"
   },
   "dependencies": {
     "next": "16.2.9",

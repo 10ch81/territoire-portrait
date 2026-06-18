@@ -52,6 +52,11 @@ describe("sanitizeTerritorialAnalysis", () => {
         assert.equal(text.toLowerCase().includes("aire urbaine"), false);
       }
       assert.equal(text.toLowerCase().includes("supérieur aux indicateurs départementaux"), false);
+      assert.equal(text.toLowerCase().includes("enjeux sécuritaires"), false);
+      assert.equal(text.toLowerCase().includes("offre de transport collectif limitée"), false);
+      assert.equal(text.toLowerCase().includes("acteurs mobilisables"), false);
+      assert.equal(text.toLowerCase().includes("agences immobilières locales"), false);
+      assert.equal(text.toLowerCase().includes("équipements, dont commerces"), false);
       if (fixture.facts.mobilite?.domicileTravail) {
         assert.equal(
           text.toLowerCase().includes("actifs travaillant hors de la commune"),
@@ -190,6 +195,73 @@ describe("sanitizeTerritorialAnalysis", () => {
 
     assert.equal(analysis.watchPoints[0].toLowerCase().includes("5 inondations"), false);
     assert.match(analysis.watchPoints[0], /reconnaissances CATNAT/i);
+  });
+
+  it("corrige une formulation BPE incohérente", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: ["515 équipements, dont commerces (3)."],
+        watchPoints: [],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "saint-girons")!.facts,
+    );
+
+    assert.equal(analysis.strengths[0].toLowerCase().includes("dont commerces (3)"), false);
+    assert.match(analysis.strengths[0], /équipements recensés/i);
+  });
+
+  it("adoucit les formulations sécuritaires fortes", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: ["Enjeux sécuritaires et problèmes sécuritaires sur la commune."],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "partial-ssmsi")!.facts,
+    );
+
+    const text = analysis.watchPoints.join(" ");
+    assert.equal(text.toLowerCase().includes("enjeux sécuritaires"), false);
+    assert.equal(text.toLowerCase().includes("problèmes sécuritaires"), false);
+    assert.match(text, /indicateurs de sécurité|faits enregistrés par police/i);
+  });
+
+  it("n'affirme pas la mobilisation ESS/RGE sans précaution", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: ["Filière ESS structurée avec acteurs mobilisables."],
+        watchPoints: [],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "sirene-side-divergence")!.facts,
+    );
+
+    const text = collectText(analysis);
+    assert.equal(text.toLowerCase().includes("acteurs mobilisables"), false);
+    assert.equal(text.toLowerCase().includes("filière ess structurée"), false);
+    assert.match(text, /potentiellement mobilisables|analyse locale plus fine|bases administratives/i);
+  });
+
+  it("évite le levier agences immobilières", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: [],
+        opportunities: ["Développer l'offre en lien avec les agences immobilières locales."],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "touristic")!.facts,
+    );
+
+    assert.equal(
+      analysis.opportunities[0].toLowerCase().includes("agences immobilières locales"),
+      false,
+    );
+    assert.match(analysis.opportunities[0], /acteurs du logement/i);
   });
 
   it("adoucit la confusion SIDE/SIRENE/ESS/RGE", () => {

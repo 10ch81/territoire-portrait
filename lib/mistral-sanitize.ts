@@ -42,6 +42,8 @@ interface FactsContext {
   usesAavData: boolean;
   hasMixedCatNatTypes: boolean;
   aavCategoryLabel: string | null;
+  bpeQualitativeSummary: string | null;
+  bpeDomainCountsAreTypeCounts: boolean;
 }
 
 interface ReplacementRule {
@@ -124,6 +126,62 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
     pattern:
       /(?:chômage|taux de chômage)[^.]{0,50}(?:supérieur|inférieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+départementale/gi,
     replacement: "taux de chômage élevé au recensement",
+  },
+  {
+    id: "security-stakes",
+    pattern: /enjeux sécuritaires/gi,
+    replacement: "indicateurs de sécurité enregistrée à interpréter avec prudence",
+  },
+  {
+    id: "security-problems",
+    pattern: /problèmes sécuritaires/gi,
+    replacement: "faits enregistrés par police/gendarmerie",
+  },
+  {
+    id: "insecurity-wording",
+    pattern: /\b(?:climat d['’])?insécurité\b/gi,
+    replacement: "indicateurs de sécurité enregistrée à interpréter avec prudence",
+  },
+  {
+    id: "security-tensions",
+    pattern: /\btensions\b/gi,
+    replacement: "indicateurs à suivre",
+  },
+  {
+    id: "ess-mobilizable-actors",
+    pattern: /acteurs mobilisables/gi,
+    replacement:
+      "acteurs potentiellement mobilisables, sous réserve d'une analyse locale plus fine",
+  },
+  {
+    id: "ess-structured-sector",
+    pattern: /filière ESS structurée/gi,
+    replacement:
+      "structures ESS identifiées dans les bases administratives, à confirmer localement",
+  },
+  {
+    id: "real-estate-agencies-lever",
+    pattern: /agences immobilières locales/gi,
+    replacement:
+      "acteurs du logement, les propriétaires, les collectivités et les dispositifs de réhabilitation",
+  },
+  {
+    id: "real-estate-agencies-link",
+    pattern: /en lien avec les agences immobilières/gi,
+    replacement:
+      "en lien avec les acteurs du logement, les propriétaires, les collectivités et les dispositifs de réhabilitation",
+  },
+  {
+    id: "limited-public-transport-offer",
+    pattern: /offre de transport collectif limitée/gi,
+    replacement:
+      "offre réelle de transport collectif non analysée dans les données disponibles",
+  },
+  {
+    id: "limited-collective-transport",
+    pattern: /transport collectif limité/gi,
+    replacement:
+      "équipements de transport recensés dans la BPE ; offre réelle de transport collectif non analysée",
   },
 ];
 
@@ -335,7 +393,36 @@ function buildFactsContext(facts: TerritorialFacts): FactsContext {
     usesAavData: facts.geographie.aireAttraction != null,
     hasMixedCatNatTypes: catNatTypes.floodLike > 0 && catNatTypes.other > 0,
     aavCategoryLabel: facts.geographie.aireAttraction?.categoryLabel ?? null,
+    bpeQualitativeSummary: facts.equipements?.resumeQualitatif ?? null,
+    bpeDomainCountsAreTypeCounts:
+      facts.equipements?.semantiqueDomaines.recomposeLeTotal === false,
   };
+}
+
+function sanitizeBpeMisleadingBreakdown(
+  text: string,
+  context: FactsContext,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  const replacement =
+    context.bpeQualitativeSummary ??
+    "équipements recensés avec une diversité de services à interpréter prudemment";
+
+  return text.replace(
+    /\b\d+\s+équipements?\s*,?\s*dont\s+[^.;\n]+?\(\d+\)/gi,
+    (match) => {
+      warnings.push({
+        field,
+        index,
+        original: match,
+        sanitized: replacement,
+        rule: "bpe-domain-equipment-breakdown",
+      });
+      return replacement;
+    },
+  );
 }
 
 function sanitizeCatNatInflation(
@@ -442,6 +529,7 @@ function sanitizeText(
   );
 
   sanitized = sanitizeCatNatInflation(sanitized, context, warnings, field, index);
+  sanitized = sanitizeBpeMisleadingBreakdown(sanitized, context, warnings, field, index);
   sanitized = sanitizeAavCategoryLabel(sanitized, context, warnings, field, index);
 
   return sanitized.trim();
@@ -525,6 +613,12 @@ export function containsForbiddenPhrases(text: string): string[] {
     "complémentarité entre SIDE",
     "aire urbaine",
     "fonction centrale économique et administrative",
+    "enjeux sécuritaires",
+    "problèmes sécuritaires",
+    "offre de transport collectif limitée",
+    "acteurs mobilisables",
+    "agences immobilières locales",
+    "filière ess structurée",
   ];
 
   const lower = text.toLowerCase();

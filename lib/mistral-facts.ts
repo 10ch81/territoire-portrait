@@ -52,8 +52,13 @@ export interface TerritorialFacts {
   equipements: {
     annee: number;
     total: number;
-    parDomaine: Array<{ code: string; label: string; count: number }>;
-    parType: Array<{ code: string; label: string; count: number }>;
+    resumeQualitatif: string;
+    semantiqueDomaines: {
+      metrique: string;
+      recomposeLeTotal: boolean;
+      domainesPresents: string[];
+    };
+    principauxTypesPartiels: Array<{ code: string; label: string; count: number }>;
     transports: {
       totalEquipments: number;
       byType: Array<{ code: string; label: string; count: number }>;
@@ -209,8 +214,15 @@ export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialF
       ? {
           annee: territory.enrichment.equipments.year,
           total: territory.enrichment.equipments.totalEquipments,
-          parDomaine: territory.enrichment.equipments.byDomain,
-          parType: territory.enrichment.equipments.byType,
+          resumeQualitatif: territory.enrichment.equipments.qualitativeSummary,
+          semantiqueDomaines: {
+            metrique: "nombre de types par domaine (ne recompose pas le total)",
+            recomposeLeTotal: false,
+            domainesPresents: territory.enrichment.equipments.byDomain.map(
+              (domain) => domain.label,
+            ),
+          },
+          principauxTypesPartiels: territory.enrichment.equipments.byType,
           transports: territory.enrichment.equipments.transport,
           note: territory.enrichment.equipments.note,
         }

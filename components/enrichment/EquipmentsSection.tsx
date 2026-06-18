@@ -47,14 +47,15 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
               {equipments.byDomain.length > 0 ? (
                 <div>
                   <dt className="text-sm font-medium text-slate-500">
-                    Nombre d&apos;équipements par domaine
+                    {equipments.domainBreakdownLabel}
                   </dt>
                   <dd className="mt-2">
                     <ul className="space-y-1 text-sm text-slate-700">
                       {equipments.byDomain.map((domain) => (
                         <li key={domain.code}>
                           {domain.label} —{" "}
-                          {new Intl.NumberFormat("fr-FR").format(domain.count)}
+                          {new Intl.NumberFormat("fr-FR").format(domain.count)}{" "}
+                          <span className="text-slate-500">types</span>
                         </li>
                       ))}
                     </ul>
@@ -64,7 +65,7 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
               {equipments.byType.length > 0 ? (
                 <div>
                   <dt className="text-sm font-medium text-slate-500">
-                    Principaux types d&apos;équipements (top 8, non exhaustif)
+                    {equipments.topTypesLabel}
                   </dt>
                   <dd className="mt-2">
                     <ul className="space-y-1 text-sm text-slate-700">
@@ -96,7 +97,7 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
           {equipments?.transport.available ? (
             <dl className="mt-3 space-y-3">
               <DataRow
-                label="Équipements recensés"
+                label="Occurrences recensées (domaine transport)"
                 value={new Intl.NumberFormat("fr-FR").format(
                   equipments.transport.totalEquipments,
                 )}

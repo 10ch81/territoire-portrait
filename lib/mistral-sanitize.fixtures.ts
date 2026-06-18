@@ -1,4 +1,41 @@
 import type { TerritorialFacts } from "./mistral-facts";
+import {
+  BPE_EQUIPMENT_NOTE,
+  BPE_TRANSPORT_NOTE_LIMITED,
+  BPE_TRANSPORT_NOTE_WITH_TYPES,
+} from "./bpe-semantics";
+
+function buildEquipementsFacts(options: {
+  total: number;
+  domainesPresents: string[];
+  resumeQualitatif: string;
+  transportCount?: number;
+  transportTypes?: Array<{ code: string; label: string; count: number }>;
+}): NonNullable<TerritorialFacts["equipements"]> {
+  const transportTypes = options.transportTypes ?? [];
+
+  return {
+    annee: 2024,
+    total: options.total,
+    resumeQualitatif: options.resumeQualitatif,
+    semantiqueDomaines: {
+      metrique: "nombre de types par domaine (ne recompose pas le total)",
+      recomposeLeTotal: false,
+      domainesPresents: options.domainesPresents,
+    },
+    principauxTypesPartiels: [],
+    transports: {
+      totalEquipments: options.transportCount ?? 0,
+      byType: transportTypes,
+      available: true,
+      note:
+        transportTypes.length > 0
+          ? BPE_TRANSPORT_NOTE_WITH_TYPES
+          : BPE_TRANSPORT_NOTE_LIMITED,
+    },
+    note: BPE_EQUIPMENT_NOTE,
+  };
+}
 
 function baseFacts(overrides: Partial<TerritorialFacts> = {}): TerritorialFacts {
   return {
@@ -68,14 +105,19 @@ export const urbanDenseFacts: TerritorialFacts = baseFacts({
     avertissementDivergenceSireneSide: null,
     note: "",
   },
-  equipements: {
-    annee: 2024,
+  equipements: buildEquipementsFacts({
     total: 5000,
-    parDomaine: [],
-    parType: [],
-    transports: { totalEquipments: 200, byType: [], available: true, note: "" },
-    note: "",
-  },
+    domainesPresents: [
+      "Services pour les particuliers",
+      "Commerces",
+      "Santé et action sociale",
+      "Sports, loisirs et culture",
+    ],
+    resumeQualitatif:
+      "5000 équipements recensés, avec une diversité de services de proximité, commerces, santé et action sociale et équipements de loisirs.",
+    transportCount: 200,
+    transportTypes: [{ code: "E101", label: "Taxis-VTC", count: 120 }],
+  }),
   mobilite: {
     irve: { pointsDeCharge: 1200, stations: 400 },
     domicileTravail: {
@@ -260,14 +302,18 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
     avertissementDivergenceSireneSide: null,
     note: "",
   },
-  equipements: {
-    annee: 2024,
+  equipements: buildEquipementsFacts({
     total: 85,
-    parDomaine: [],
-    parType: [],
-    transports: { totalEquipments: 4, byType: [], available: true, note: "" },
-    note: "",
-  },
+    domainesPresents: [
+      "Services pour les particuliers",
+      "Commerces",
+      "Transports et déplacements",
+    ],
+    resumeQualitatif:
+      "85 équipements recensés, avec une diversité de services de proximité, commerces et transports.",
+    transportCount: 4,
+    transportTypes: [{ code: "E101", label: "Taxis-VTC", count: 4 }],
+  }),
   mobilite: {
     irve: { pointsDeCharge: 6, stations: 2 },
     domicileTravail: {
@@ -368,11 +414,14 @@ export function fragileAnalysisForFixture(fixtureId: string): {
     strengths: [
       "Les données ESS sont incluses dans le total SIDE, confirmant une complémentarité entre SIDE et ESS/RGE.",
       "Dynamique immobilière soutenue et marché stable avec résilience des volumes.",
+      "515 équipements, dont commerces (3).",
       "Faible dépendance aux transports en commun selon les parts modales.",
     ],
     watchPoints: [
       "Tendance à la hausse des faits de sécurité et insécurité croissante.",
+      "Enjeux sécuritaires marqués sur le territoire.",
       "Offre de transport limitée malgré une part modale voiture élevée.",
+      "Offre de transport collectif limitée.",
       "Tensions sociales possibles dans certains quartiers.",
       "Taux de chômage supérieur aux indicateurs départementaux.",
     ],
@@ -380,6 +429,8 @@ export function fragileAnalysisForFixture(fixtureId: string): {
       "Potentiel touristique sous-exploité compte tenu des capacités d'hébergement.",
       "Pression fiscale faible propice à l'attractivité.",
       "L'accessibilité immobilière reste favorable selon les moyennes disponibles.",
+      "Opportunité en lien avec les agences immobilières locales.",
+      "Acteurs ESS mobilisables pour accélérer la transition.",
     ],
   };
 

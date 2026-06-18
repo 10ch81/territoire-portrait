@@ -35,12 +35,16 @@ Mobilité :
 - Distinguer systématiquement usage domicile-travail RP, équipements BPE et offre réelle de transport.
 - Ne pas qualifier l'offre réelle de transport si GTFS, horaires, arrêts ou lignes ne sont pas fournis.
 - Interdire « faible dépendance aux transports en commun » : une faible part modale TC signifie un usage marginal des transports collectifs dans les déplacements domicile-travail, pas une faible dépendance.
+- Un taxi-VTC recensé en BPE est un équipement recensé, pas une analyse d'offre de transport collectif.
+- Formulation recommandée : « Équipements de transport recensés dans la BPE limités aux types listés ; l'offre réelle de transport collectif n'est pas analysée. »
 
 Mélange de périmètres :
 - Ne pas écrire que des données ESS ou RGE sont « incluses » dans un total SIDE si elles viennent de SIRENE ou d'un autre périmètre.
 - Éviter « complémentarité entre SIDE et ESS/RGE » si le lien n'est pas démontré.
 - Formulation recommandée : « SIDE décrit le tissu économique local ; en complément, les bases administratives ESS/RGE permettent d'identifier des acteurs ou thématiques spécifiques. »
 - Ne pas déduire de filière économique ou de dynamique collaborative sans données sectorielles, effectifs ou projets.
+- Ne pas présenter les structures ESS ou entreprises RGE comme directement mobilisables sans précaution.
+- Formulation recommandée ESS/RGE : « Les bases ESS et RGE permettent d'identifier des acteurs potentiellement mobilisables, sous réserve d'une analyse locale plus fine. »
 
 Centralité institutionnelle :
 - Remplacer « fonction centrale économique et administrative » par « fonction de centralité territoriale et économique », sauf si les fonctions administratives sont explicitement fournies.
@@ -68,14 +72,20 @@ Population :
 - SIDE, SIRENE, ESS et RGE peuvent être cités ensemble, mais leurs périmètres doivent rester distincts.
 
 Équipements BPE :
-- total = nombre d'équipements recensés ; parDomaine = décomposition par catégorie ; parType = principaux types (liste partielle, non exhaustive).
+- equipements.total = occurrences recensées ; semantiqueDomaines = nombre de types par domaine (ne recompose pas le total).
+- principauxTypesPartiels = top 8 partiel ; ne pas confondre avec le total ni avec les domaines.
+- Préférer resumeQualitatif plutôt que des citations chiffrées par domaine.
+- Ne jamais écrire « X équipements, dont commerces (Y) » si Y est un nombre de types et non d'occurrences.
+- Formulation recommandée : « X équipements recensés, avec une diversité de services de proximité, santé, commerces et équipements de loisirs. »
 - Ne pas conclure à l'absence d'écoles ou de mairie si des comptages sont fournis.
-- Ne pas interpréter un total domaine « santé » comme égal à la somme des types listés (liste partielle).
 
 Sécurité SSMSI :
 - Faits enregistrés par police/gendarmerie (lieu de commission) ; ne mesure pas le ressenti d'insécurité ni les faits non déclarés.
-- Ne pas formuler de liens causaux (« signale des tensions sociales », « reflète l'insécurité ressentie ») sans croisement explicite avec d'autres sources.
+- Interdire : « enjeux sécuritaires », « problèmes sécuritaires », « insécurité », « tensions » comme diagnostic global.
+- Préférer : « indicateurs de sécurité enregistrée à interpréter avec prudence », « faits enregistrés par police/gendarmerie », « indicateurs à suivre ».
+- Ne pas formuler de liens causaux sans croisement explicite avec d'autres sources.
 - Ne parler de tendance sécuritaire que si plusieurs années sont fournies (une seule année = pas de tendance).
+- Ne pas généraliser à un climat d'insécurité.
 
 Immobilier DVF :
 - Prix agrégés sur les mutations enregistrées ; pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus.
@@ -97,7 +107,11 @@ Tourisme :
 - Préférer « potentiel touristique à approfondir » lorsque seules capacités d'hébergement et équipements sont disponibles.
 
 Autres :
-- Les données RPLS (loués / vacants) décrivent le parc locatif social ; la vacance générale (RP logement) porte sur l'ensemble du parc.
+- Les données RPLS (loués / vacants) décrivent le parc locatif social des bailleurs sociaux ; 0 logement RPLS ne prouve pas l'absence de toute offre abordable.
+- La vacance générale (RP logement) porte sur l'ensemble du parc.
+- Ne pas utiliser le nombre d'agences immobilières comme levier direct de politique publique.
+- Préférer : « en lien avec les acteurs du logement, les propriétaires, les collectivités et les dispositifs de réhabilitation. »
+- DVF reste un agrégat indicatif.
 - Les QPV sont des sous-périmètres communaux ; ne pas généraliser à toute la commune.
 - Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
 - Ne pas confondre le thème Sécurité (SSMSI) avec Risques (Géorisques : radon, inondations, CATNAT).

@@ -84,6 +84,10 @@ export interface EquipmentSnapshot {
   transport: TransportSnapshot;
   available: boolean;
   note: string;
+  domainBreakdownLabel: string;
+  topTypesLabel: string;
+  qualitativeSummary: string;
+  domainCountsAreTypeCounts: boolean;
 }
 
 export interface AgeBandCount {

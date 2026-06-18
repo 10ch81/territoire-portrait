@@ -186,7 +186,7 @@ function appendEquipmentLimits(
   if (hasEducationEquipments(enrichment)) {
     pushUnique(
       limits,
-      "Équipements BPE : dénombrement des équipements par domaine ; principaux types listés (top 8, non exhaustif) — ne pas confondre total domaine et liste partielle des types.",
+      "Équipements BPE : le total correspond aux occurrences recensées ; les domaines indiquent le nombre de types par domaine (décomposition partielle). Les principaux types (top 8) sont une liste partielle, non exhaustive.",
     );
     return;
   }
