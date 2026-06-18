@@ -16,6 +16,11 @@ import {
   type ScoreContext,
 } from "./score-facts";
 import {
+  isEligibleEmploymentWatchPoint,
+  isEligibleSocioEconomicWatchPoint,
+} from "./socio-economic-watch-points";
+
+import {
   countRobustWatchPointFamilies,
   missingWatchPointFamilies,
   WATCH_POINT_FAMILIES,
@@ -120,6 +125,7 @@ function canAddToTarget(
   candidate: AnalysisFact,
   selected: AnalysisFact[],
   target: AnalysisFactTarget,
+  context?: ScoreContext,
 ): boolean {
   if (selected.some((f) => f.id === candidate.id)) return false;
 
@@ -163,6 +169,14 @@ function canAddToTarget(
     if (!isActionableOpportunity(candidate)) return false;
   }
 
+  if (
+    target === "watchPoints" &&
+    context?.territory &&
+    !isEligibleSocioEconomicWatchPoint(candidate, context.territory)
+  ) {
+    return false;
+  }
+
   return true;
 }
 
@@ -178,7 +192,7 @@ function pickBestFromThemes(
     .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
   for (const candidate of themed) {
-    if (canAddToTarget(candidate, selected, target)) {
+    if (canAddToTarget(candidate, selected, target, context)) {
       return candidate;
     }
   }
@@ -205,7 +219,7 @@ function fillTargetFromSlots(
 
   for (const candidate of candidates) {
     if (selected.filter((f) => f.target === target).length >= limit.max) break;
-    if (canAddToTarget(candidate, selected, target)) {
+    if (canAddToTarget(candidate, selected, target, context)) {
       selected.push(candidate);
     }
   }
@@ -235,7 +249,7 @@ function ensureMandatoryWatchThemes(
       target: "watchPoints",
     };
 
-    if (canAddToTarget(watchCandidate, selected, "watchPoints")) {
+    if (canAddToTarget(watchCandidate, selected, "watchPoints", context)) {
       selected.push(watchCandidate);
       continue;
     }
@@ -255,7 +269,7 @@ function ensureMandatoryWatchThemes(
     }
 
     selected.splice(selected.indexOf(watchPoints[lowestPriorityIndex]), 1);
-    if (canAddToTarget(watchCandidate, selected, "watchPoints")) {
+    if (canAddToTarget(watchCandidate, selected, "watchPoints", context)) {
       selected.push(watchCandidate);
     }
   }
@@ -264,7 +278,7 @@ function ensureMandatoryWatchThemes(
 function reconcileSummaryDemographyWatchSlot(
   facts: AnalysisFact[],
   selected: AnalysisFact[],
-  _context: ScoreContext,
+  context: ScoreContext,
 ): void {
   const hasSummaryDemography = selected.some(
     (fact) => fact.theme === "demography" && fact.target === "summary",
@@ -286,6 +300,7 @@ function reconcileSummaryDemographyWatchSlot(
     facts.find((fact) => fact.theme === "employment" && fact.target === "watchPoints") ??
     facts.find((fact) => fact.theme === "employment");
   if (!employment) return;
+  if (!isEligibleEmploymentWatchPoint(employment, context.territory)) return;
 
   const watchEmployment: AnalysisFact =
     employment.target === "watchPoints"
@@ -295,7 +310,7 @@ function reconcileSummaryDemographyWatchSlot(
   const limit = TARGET_LIMITS.watchPoints;
   const watchCount = selected.filter((fact) => fact.target === "watchPoints").length;
 
-  if (watchCount < limit.max && canAddToTarget(watchEmployment, selected, "watchPoints")) {
+  if (watchCount < limit.max && canAddToTarget(watchEmployment, selected, "watchPoints", context)) {
     selected.push(watchEmployment);
     return;
   }
@@ -316,7 +331,7 @@ function reconcileSummaryDemographyWatchSlot(
     );
 
   selected.splice(selected.indexOf(replaceFact), 1);
-  if (canAddToTarget(watchEmployment, selected, "watchPoints")) {
+  if (canAddToTarget(watchEmployment, selected, "watchPoints", context)) {
     selected.push(watchEmployment);
   }
 }
@@ -377,7 +392,7 @@ function ensureWatchPointsMinimum(
     if (pick) {
       const watchPick =
         pick.target === "watchPoints" ? pick : { ...pick, target: "watchPoints" as const };
-      if (canAddToTarget(watchPick, selected, "watchPoints")) {
+      if (canAddToTarget(watchPick, selected, "watchPoints", context)) {
         selected.push(watchPick);
         watchCount += 1;
       }
@@ -389,7 +404,7 @@ function ensureWatchPointsMinimum(
       .filter((f) => f.target === "watchPoints")
       .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
-    const next = candidates.find((c) => canAddToTarget(c, selected, "watchPoints"));
+    const next = candidates.find((c) => canAddToTarget(c, selected, "watchPoints", context));
     if (!next) break;
 
     selected.push(next);
@@ -458,7 +473,7 @@ export function selectAnalysisFactsForPrompt(
 
     if (candidate) {
       const summaryCandidate = { ...candidate, target: "summary" as const };
-      if (canAddToTarget(summaryCandidate, selected, "summary")) {
+      if (canAddToTarget(summaryCandidate, selected, "summary", context)) {
         selected.push(summaryCandidate);
       }
     }

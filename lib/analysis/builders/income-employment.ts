@@ -1,5 +1,10 @@
 import type { TerritoryProfile } from "../../types";
 import { formatEuro, formatPercent } from "../format";
+import {
+  buildIncomeWatchPointSentence,
+  qualifiesAsIncomeWatchPoint,
+  qualifiesAsUnemploymentWatchPoint,
+} from "../socio-economic-watch-points";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -30,6 +35,30 @@ export function buildIncomeFacts(territory: TerritoryProfile): AnalysisFact[] {
     }),
   );
 
+  if (qualifiesAsIncomeWatchPoint(territory)) {
+    facts.push(
+      createFact({
+        theme: "income",
+        target: "watchPoints",
+        sentence: buildIncomeWatchPointSentence(territory),
+        sourceKeys: ["insee-filosofi"],
+        year: sociodemographics.year,
+        confidence: "medium",
+        limitations: [
+          "Revenu FILOSOFI ; lecture prudente sans comparaison homogène systématique.",
+        ],
+        numericBindings: [
+          binding(
+            sociodemographics.medianDisposableIncome,
+            "revenu médian disponible",
+            "income",
+            ["revenu", "médian", "FILOSOFI", "fragilité", "repères"],
+          ),
+        ],
+      }),
+    );
+  }
+
   return facts;
 }
 
@@ -41,7 +70,7 @@ export function buildEmploymentFacts(territory: TerritoryProfile): AnalysisFact[
     return facts;
   }
 
-  const isHigh = sociodemographics.unemploymentRate >= 10;
+  const isHigh = qualifiesAsUnemploymentWatchPoint(sociodemographics.unemploymentRate);
 
   facts.push(
     createFact({

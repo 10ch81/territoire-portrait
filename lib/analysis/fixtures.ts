@@ -295,6 +295,10 @@ export type PanelPreset =
   | "withEducation"
   | "withArcep"
   | "demographicGrowth"
+  | "moderateEmployment"
+  | "lowMunicipalDebt"
+  | "highMunicipalDebt"
+  | "compositeIncomeFragility"
   | "sireneCapped"
   | "fullEnrichment";
 
@@ -702,6 +706,202 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           rpVacancyRatePercent: 3.7,
           socialHousingSharePercent: 12,
           vacancyRatePercent: null,
+          available: true,
+          note: "",
+        },
+      });
+    case "moderateEmployment":
+      return baseProfile("Commune emploi modéré", "99020", 10_000, 200, {
+        sociodemographics: {
+          year: 2021,
+          ageBands: [],
+          unemploymentRate: 8.2,
+          medianDisposableIncome: 19_500,
+          available: true,
+          note: "",
+        },
+        housing: {
+          year: 2021,
+          totalUnits: 800,
+          occupiedUnits: 750,
+          vacantUnits: 50,
+          totalDwellings: 4_200,
+          rpVacantDwellings: 525,
+          rpVacancyRatePercent: 12.5,
+          socialHousingSharePercent: 8,
+          vacancyRatePercent: null,
+          available: true,
+          note: "",
+        },
+        security: {
+          year: 2024,
+          indicators: [
+            {
+              id: "vols",
+              label: "Vols",
+              count: 120,
+              ratePer1000: 12.0,
+              departmentRatePer1000: 7.5,
+              diffused: true,
+            },
+          ],
+          diffusedIndicatorCount: 1,
+          available: true,
+          note: "",
+        },
+        risks: {
+          radon: null,
+          flood: { zones: ["Zone A"], count: 1 },
+          catNatEvents: [
+            { label: "Inondation et/ou Coulées de boue", startDate: "2019-03-15" },
+          ],
+          available: true,
+          note: "",
+        },
+      });
+    case "lowMunicipalDebt":
+      return baseProfile("Commune dette faible", "99021", 10_000, 200, {
+        sociodemographics: {
+          year: 2021,
+          ageBands: [],
+          unemploymentRate: 8.2,
+          medianDisposableIncome: 19_500,
+          available: true,
+          note: "",
+        },
+        publicAccounts: {
+          year: 2023,
+          operatingRevenueEur: null,
+          operatingRevenuePerCapitaEur: null,
+          debtOutstandingEur: 6_500_000,
+          debtPerCapitaEur: 650,
+          available: true,
+          note: "",
+        },
+        security: {
+          year: 2024,
+          indicators: [
+            {
+              id: "vols",
+              label: "Vols",
+              count: 120,
+              ratePer1000: 12.0,
+              departmentRatePer1000: 7.5,
+              diffused: true,
+            },
+          ],
+          diffusedIndicatorCount: 1,
+          available: true,
+          note: "",
+        },
+        risks: {
+          radon: null,
+          flood: { zones: ["Zone A"], count: 1 },
+          catNatEvents: [
+            { label: "Inondation et/ou Coulées de boue", startDate: "2019-03-15" },
+          ],
+          available: true,
+          note: "",
+        },
+      });
+    case "highMunicipalDebt":
+      return baseProfile("Commune dette élevée", "99022", 10_000, 200, {
+        sociodemographics: {
+          year: 2021,
+          ageBands: [],
+          unemploymentRate: 8.2,
+          medianDisposableIncome: 19_500,
+          available: true,
+          note: "",
+        },
+        publicAccounts: {
+          year: 2023,
+          operatingRevenueEur: null,
+          operatingRevenuePerCapitaEur: null,
+          debtOutstandingEur: 18_500_000,
+          debtPerCapitaEur: 1_850,
+          available: true,
+          note: "",
+        },
+        security: {
+          year: 2024,
+          indicators: [
+            {
+              id: "vols",
+              label: "Vols",
+              count: 120,
+              ratePer1000: 12.0,
+              departmentRatePer1000: 7.5,
+              diffused: true,
+            },
+          ],
+          diffusedIndicatorCount: 1,
+          available: true,
+          note: "",
+        },
+        risks: {
+          radon: null,
+          flood: { zones: ["Zone A"], count: 1 },
+          catNatEvents: [
+            { label: "Inondation et/ou Coulées de boue", startDate: "2019-03-15" },
+          ],
+          available: true,
+          note: "",
+        },
+      });
+    case "compositeIncomeFragility":
+      return baseProfile("Commune fragilité revenu composite", "99023", 12_000, 280, {
+        sociodemographics: {
+          year: 2021,
+          ageBands: [],
+          unemploymentRate: 11.2,
+          medianDisposableIncome: 18_500,
+          available: true,
+          note: "",
+        },
+        urbanPolicy: {
+          year: 2024,
+          hasQpv: true,
+          qpvCount: 1,
+          qpvLabels: ["QPV Centre"],
+          available: true,
+          note: "",
+        },
+        housing: {
+          year: 2021,
+          totalUnits: 900,
+          occupiedUnits: 850,
+          vacantUnits: 50,
+          totalDwellings: 5_000,
+          rpVacantDwellings: 600,
+          rpVacancyRatePercent: 12.0,
+          socialHousingSharePercent: 22,
+          vacancyRatePercent: null,
+          available: true,
+          note: "",
+        },
+        security: {
+          year: 2024,
+          indicators: [
+            {
+              id: "vols",
+              label: "Vols",
+              count: 140,
+              ratePer1000: 11.7,
+              departmentRatePer1000: 7.5,
+              diffused: true,
+            },
+          ],
+          diffusedIndicatorCount: 1,
+          available: true,
+          note: "",
+        },
+        risks: {
+          radon: null,
+          flood: { zones: ["Zone A"], count: 1 },
+          catNatEvents: [
+            { label: "Inondation et/ou Coulées de boue", startDate: "2019-03-15" },
+          ],
           available: true,
           note: "",
         },

@@ -1,5 +1,11 @@
 import type { TerritoryProfile } from "../types";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
+import {
+  isDescriptiveIncomeWatchPointSentence,
+  qualifiesAsDebtWatchPoint,
+  qualifiesAsIncomeWatchPoint,
+  qualifiesAsUnemploymentWatchPoint,
+} from "./socio-economic-watch-points";
 
 const CONFIDENCE_SCORE = { high: 30, medium: 15, low: 0 } as const;
 
@@ -47,7 +53,26 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
   }
 
   if (fact.theme === "employment" && sociodemographics?.unemploymentRate != null) {
-    if (sociodemographics.unemploymentRate >= 10) return 12;
+    if (qualifiesAsUnemploymentWatchPoint(sociodemographics.unemploymentRate)) {
+      return 12;
+    }
+  }
+
+  if (fact.theme === "finances" && /dette/i.test(fact.sentence)) {
+    if (qualifiesAsDebtWatchPoint(territory.enrichment?.publicAccounts?.debtPerCapitaEur)) {
+      return 8;
+    }
+    return -20;
+  }
+
+  if (fact.theme === "income") {
+    if (!qualifiesAsIncomeWatchPoint(territory)) {
+      return -20;
+    }
+    if (isDescriptiveIncomeWatchPointSentence(fact.sentence)) {
+      return -20;
+    }
+    return 10;
   }
 
   if (fact.theme === "connectivity" && connectivity?.fiberEligibleSharePercent != null) {

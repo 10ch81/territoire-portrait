@@ -1,5 +1,6 @@
 import type { TerritoryProfile } from "../../types";
 import { renderCountedLabel } from "../render-text";
+import { qualifiesAsDebtWatchPoint } from "../socio-economic-watch-points";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -86,15 +87,22 @@ export function buildFinancesFacts(territory: TerritoryProfile): AnalysisFact[] 
   }
 
   if (accounts?.available && accounts.debtPerCapitaEur !== null) {
+    const debtIsWatchPoint = qualifiesAsDebtWatchPoint(accounts.debtPerCapitaEur);
     facts.push(
       createFact({
         theme: "finances",
-        target: "watchPoints",
+        target: debtIsWatchPoint ? "watchPoints" : "summary",
         sentence: `La dette communale s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
         sourceKeys: ["ofgl"],
         year: accounts.year,
         confidence: "medium",
-        limitations: ["Comptes publics OFGL ; budget principal ; lecture descriptive."],
+        limitations: debtIsWatchPoint
+          ? [
+              "Comptes publics OFGL ; budget principal ; lecture descriptive sans jugement de gestion.",
+            ]
+          : [
+              "Comptes publics OFGL ; budget principal ; niveau non interprétable comme tension sans comparaison ou série.",
+            ],
       }),
     );
   }
