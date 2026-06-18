@@ -45,7 +45,20 @@ const ENRICHMENT_CHECKS: Array<{
   },
   {
     id: "mobility",
-    isAvailable: (t) => t.enrichment?.mobility?.available === true,
+    isAvailable: (t) => {
+      const mobility = t.enrichment?.mobility;
+      return (
+        mobility !== undefined &&
+        mobility !== null &&
+        (mobility.irve.available ||
+          mobility.commute.available ||
+          mobility.publicTransport.available)
+      );
+    },
+  },
+  {
+    id: "urban-policy",
+    isAvailable: (t) => t.enrichment?.urbanPolicy?.available === true,
   },
   {
     id: "fiscal",

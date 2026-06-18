@@ -133,8 +133,27 @@ export interface SocialHousingSnapshot {
   occupiedUnits: number | null;
   vacantUnits: number | null;
   totalDwellings: number | null;
+  rpVacantDwellings: number | null;
+  rpVacancyRatePercent: number | null;
   socialHousingSharePercent: number | null;
   vacancyRatePercent: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface CommuteSnapshot {
+  year: number;
+  employedCount: number | null;
+  carSharePercent: number | null;
+  publicTransportSharePercent: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface PublicTransportSnapshot {
+  year: number;
+  stopCount: number;
+  feedCount: number;
   available: boolean;
   note: string;
 }
@@ -143,6 +162,21 @@ export interface IrveSnapshot {
   year: number;
   chargingPoints: number;
   stations: number;
+  available: boolean;
+  note: string;
+}
+
+export interface MobilitySnapshot {
+  irve: IrveSnapshot;
+  commute: CommuteSnapshot;
+  publicTransport: PublicTransportSnapshot;
+}
+
+export interface QpvSnapshot {
+  year: number;
+  hasQpv: boolean;
+  qpvCount: number;
+  qpvLabels: string[];
   available: boolean;
   note: string;
 }
@@ -239,7 +273,8 @@ export interface TerritoryEnrichment {
   risks: RisksSnapshot | null;
   security: SecuritySnapshot | null;
   housing: SocialHousingSnapshot | null;
-  mobility: IrveSnapshot | null;
+  mobility: MobilitySnapshot | null;
+  urbanPolicy: QpvSnapshot | null;
   fiscal: LocalTaxSnapshot | null;
   geography: GeographySnapshot | null;
   property: PropertyMarketSnapshot | null;
@@ -342,7 +377,33 @@ export interface HousingCommuneCacheEntry {
   occupiedUnits: number;
   vacantUnits: number;
   totalDwellings: number | null;
+  rpVacantDwellings: number | null;
+  rpVacancyRatePercent: number | null;
 }
+
+export interface CommuteCommuneCacheEntry {
+  year: number;
+  employedCount: number;
+  carSharePercent: number | null;
+  publicTransportSharePercent: number | null;
+}
+
+export type CommuteCommuneCache = Record<string, CommuteCommuneCacheEntry>;
+
+export interface QpvCommuneCacheEntry {
+  year: number;
+  qpvLabels: string[];
+}
+
+export type QpvCommuneCache = Record<string, QpvCommuneCacheEntry>;
+
+export interface PublicTransportCommuneCacheEntry {
+  year: number;
+  stopCount: number;
+  feedCount: number;
+}
+
+export type PublicTransportCommuneCache = Record<string, PublicTransportCommuneCacheEntry>;
 
 export type HousingCommuneCache = Record<string, HousingCommuneCacheEntry>;
 

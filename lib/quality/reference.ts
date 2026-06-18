@@ -250,13 +250,13 @@ export async function verifyReferenceCommune(
   const irveCache = loadJsonCache<IrveCommuneCache>("irve-by-commune.json");
   const irveEntry = irveCache?.[inseeCode];
   const mobility = enrichment.mobility;
-  if (irveEntry && mobility?.available) {
+  if (irveEntry && mobility?.irve.available) {
     pushExactMatchFinding(findings, {
       ruleId: "irve-loader",
       field: "points IRVE",
       inseeCode,
       reference: irveEntry.chargingPoints,
-      actual: mobility.chargingPoints,
+      actual: mobility.irve.chargingPoints,
       referenceLabel: "cache IRVE",
       actualLabel: "loader mobilité",
     });

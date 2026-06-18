@@ -1,4 +1,4 @@
-import { mergeSources } from "../sources";
+import { mergeSources, createRpHousingSource } from "../sources";
 import { getTerritoryByInsee } from "../territory";
 import type { DataSource, TerritoryEnrichment, TerritoryProfile } from "../types";
 import { fetchEnterpriseSnapshot, createEnterpriseSource } from "./enterprises";
@@ -8,8 +8,15 @@ import {
   createPopulationHistorySource,
 } from "./population";
 import { fetchRisksSnapshot, createGeorisquesSource } from "./risks";
+import {
+  loadMobilitySnapshot,
+  isMobilityAvailable,
+  createCommuteSource,
+  createGtfsSource,
+  createIrveSource,
+} from "./mobility";
+import { loadQpvSnapshot, createQpvSource } from "./urban-policy";
 import { loadSocialHousingSnapshot, createRplsSource } from "./housing";
-import { loadIrveSnapshot, createIrveSource } from "./mobility";
 import { loadLocalTaxSnapshot, createReiSource } from "./fiscal";
 import { loadGeographySnapshot, createAavSource } from "./geography";
 import { loadPropertyMarketSnapshot, createDvfSource } from "./property";
@@ -54,9 +61,23 @@ function collectEnrichmentSources(
   }
   if (enrichment.housing?.available) {
     sources.push(createRplsSource(accessedAt));
+    if (enrichment.housing.rpVacancyRatePercent !== null) {
+      sources.push(createRpHousingSource(accessedAt));
+    }
   }
-  if (enrichment.mobility?.available) {
-    sources.push(createIrveSource(accessedAt));
+  if (enrichment.mobility && isMobilityAvailable(enrichment.mobility)) {
+    if (enrichment.mobility.irve.available) {
+      sources.push(createIrveSource(accessedAt));
+    }
+    if (enrichment.mobility.commute.available) {
+      sources.push(createCommuteSource(accessedAt));
+    }
+    if (enrichment.mobility.publicTransport.available) {
+      sources.push(createGtfsSource(accessedAt));
+    }
+  }
+  if (enrichment.urbanPolicy?.available) {
+    sources.push(createQpvSource(accessedAt));
   }
   if (enrichment.fiscal?.available) {
     sources.push(createReiSource(accessedAt));
@@ -90,7 +111,8 @@ export async function enrichTerritory(
   const sociodemographics = loadSociodemographicsSnapshot(territory.inseeCode);
   const equipments = loadEquipmentSnapshot(territory.inseeCode);
   const housing = loadSocialHousingSnapshot(territory.inseeCode);
-  const mobility = loadIrveSnapshot(territory.inseeCode);
+  const mobility = loadMobilitySnapshot(territory.inseeCode);
+  const urbanPolicy = loadQpvSnapshot(territory.inseeCode);
   const fiscal = loadLocalTaxSnapshot(territory.inseeCode);
   const property = loadPropertyMarketSnapshot(territory.inseeCode);
   const security = loadSecuritySnapshot(territory);
@@ -104,6 +126,7 @@ export async function enrichTerritory(
     security,
     housing,
     mobility,
+    urbanPolicy,
     fiscal,
     geography,
     property,

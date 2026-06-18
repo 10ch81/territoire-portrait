@@ -1,4 +1,4 @@
-import { createRplsSource } from "../sources";
+import { createRplsSource, createRpHousingSource } from "../sources";
 import { loadJsonCache } from "./cache";
 import type { HousingCommuneCache, SocialHousingSnapshot } from "../types";
 
@@ -21,6 +21,8 @@ export function loadSocialHousingSnapshot(
       occupiedUnits: null,
       vacantUnits: null,
       totalDwellings: null,
+      rpVacantDwellings: null,
+      rpVacancyRatePercent: null,
       socialHousingSharePercent: null,
       vacancyRatePercent: null,
       available: false,
@@ -45,12 +47,14 @@ export function loadSocialHousingSnapshot(
     occupiedUnits: entry.occupiedUnits,
     vacantUnits: entry.vacantUnits,
     totalDwellings: entry.totalDwellings ?? null,
+    rpVacantDwellings: entry.rpVacantDwellings ?? null,
+    rpVacancyRatePercent: entry.rpVacancyRatePercent ?? null,
     socialHousingSharePercent,
     vacancyRatePercent,
     available: true,
     note:
-      "Parc locatif social (RPLS) agrégé par commune, avec part du parc global (RP logement 2021).",
+      "Parc locatif social (RPLS) et vacance générale du parc (RP logement 2021) — périmètres distincts.",
   };
 }
 
-export { createRplsSource };
+export { createRplsSource, createRpHousingSource };

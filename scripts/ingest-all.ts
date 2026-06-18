@@ -14,6 +14,9 @@ const steps = [
   { name: "AAV (aires d'attraction)", script: "scripts/ingest-geography.ts" },
   { name: "DVF (prix immobiliers)", script: "scripts/ingest-property.ts" },
   { name: "SSMSI (sécurité / délinquance)", script: "scripts/ingest-security.ts" },
+  { name: "Commute (RP domicile-travail)", script: "scripts/ingest-commute.ts" },
+  { name: "QPV (politique de la ville)", script: "scripts/ingest-qpv.ts" },
+  { name: "GTFS (transport collectif)", script: "scripts/ingest-gtfs.ts" },
 ];
 
 for (const step of steps) {

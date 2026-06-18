@@ -12,7 +12,9 @@ Règles impératives :
 - Les limites des sources sont calculées côté serveur : concentre-toi sur summary, strengths, watchPoints et opportunities.
 - Ne déclare JAMAIS qu'une donnée est absente si elle est présente dans le JSON (ex. tauxChomage1564 non null, equipements.total > 0, mutationsMaisons/mutationsAppartements renseignés).
 - Les comptages ESS et RGE (SIRENE) proviennent de filtres API dédiés ; ne pas extrapoler la structure sectorielle ni les effectifs salariés.
-- Les données RPLS (loués / vacants) décrivent le parc locatif social, pas le marché immobilier général.
+- Les données RPLS (loués / vacants) décrivent le parc locatif social ; la vacance générale (RP logement) porte sur l'ensemble du parc.
+- Les arrêts GTFS recensent une offre de transport collectif ; ne pas conclure à l'absence de bus/car sans croiser BPE et GTFS.
+- Les QPV sont des sous-périmètres communaux ; ne pas généraliser à toute la commune.
 - La BPE dénombre des équipements (y compris enseignement et services publics de proximité) : ne pas écrire qu'il n'y a pas d'écoles ou de mairie si des comptages sont fournis.
 - Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
 - Si un prix immobilier est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
@@ -117,18 +119,52 @@ function buildUserPrompt(territory: TerritoryProfile): string {
           annee: territory.enrichment.housing.year,
           parcTotal: territory.enrichment.housing.totalUnits,
           loues: territory.enrichment.housing.occupiedUnits,
-          vacants: territory.enrichment.housing.vacantUnits,
+          vacantsRpls: territory.enrichment.housing.vacantUnits,
           parcLogementsGlobal: territory.enrichment.housing.totalDwellings,
+          vacantsRp: territory.enrichment.housing.rpVacantDwellings,
+          tauxVacanceRp: territory.enrichment.housing.rpVacancyRatePercent,
           partDuParcGlobal: territory.enrichment.housing.socialHousingSharePercent,
-          tauxVacance: territory.enrichment.housing.vacancyRatePercent,
+          tauxVacanceRpls: territory.enrichment.housing.vacancyRatePercent,
           note: territory.enrichment.housing.note,
         }
       : null,
-    irve: territory.enrichment?.mobility?.available
+    mobilite: territory.enrichment?.mobility
       ? {
-          pointsDeCharge: territory.enrichment.mobility.chargingPoints,
-          stations: territory.enrichment.mobility.stations,
-          note: territory.enrichment.mobility.note,
+          irve: territory.enrichment.mobility.irve.available
+            ? {
+                pointsDeCharge: territory.enrichment.mobility.irve.chargingPoints,
+                stations: territory.enrichment.mobility.irve.stations,
+              }
+            : null,
+          domicileTravail: territory.enrichment.mobility.commute.available
+            ? {
+                actifsOccupes: territory.enrichment.mobility.commute.employedCount,
+                partVoiture: territory.enrichment.mobility.commute.carSharePercent,
+                partTransportsCommun:
+                  territory.enrichment.mobility.commute.publicTransportSharePercent,
+              }
+            : null,
+          transportCollectif: territory.enrichment.mobility.publicTransport.available
+            ? {
+                arretsGtfs: territory.enrichment.mobility.publicTransport.stopCount,
+                fluxGtfs: territory.enrichment.mobility.publicTransport.feedCount,
+              }
+            : null,
+          note: [
+            territory.enrichment.mobility.irve.note,
+            territory.enrichment.mobility.commute.note,
+            territory.enrichment.mobility.publicTransport.note,
+          ]
+            .filter(Boolean)
+            .join(" "),
+        }
+      : null,
+    politiqueVille: territory.enrichment?.urbanPolicy?.available
+      ? {
+          qpv: territory.enrichment.urbanPolicy.hasQpv,
+          nombreQpv: territory.enrichment.urbanPolicy.qpvCount,
+          libelles: territory.enrichment.urbanPolicy.qpvLabels,
+          note: territory.enrichment.urbanPolicy.note,
         }
       : null,
     fiscalite: territory.enrichment?.fiscal?.available

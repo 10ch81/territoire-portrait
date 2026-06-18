@@ -9,6 +9,7 @@ import { MobilitySection } from "./MobilitySection";
 import { PropertySection } from "./PropertySection";
 import { RisksSection } from "./RisksSection";
 import { SecuritySection } from "./SecuritySection";
+import { UrbanPolicySection } from "./UrbanPolicySection";
 
 interface EnrichmentSectionsProps {
   territory: TerritoryProfile;
@@ -27,6 +28,9 @@ export function EnrichmentSections({ territory }: EnrichmentSectionsProps) {
       {enrichment?.risks ? <RisksSection territory={territory} /> : null}
       {enrichment?.security ? <SecuritySection territory={territory} /> : null}
       {enrichment?.housing ? <HousingSection territory={territory} /> : null}
+      {enrichment?.urbanPolicy ? (
+        <UrbanPolicySection territory={territory} />
+      ) : null}
       {enrichment?.mobility ? <MobilitySection territory={territory} /> : null}
       {enrichment?.fiscal ? <FiscalSection territory={territory} /> : null}
       {enrichment?.geography ? (

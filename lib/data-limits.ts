@@ -234,7 +234,7 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
   if (enrichment.housing?.available) {
     pushUnique(
       limits,
-      "Données RPLS limitées au parc locatif social ; pas de couverture du marché immobilier privé (location ou accession).",
+      "Données RPLS limitées au parc locatif social ; la vacance générale (RP logement) couvre l'ensemble du parc.",
     );
   } else {
     appendUnavailable(
@@ -272,10 +272,40 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
 
   appendUnavailable(
     limits,
-    enrichment.mobility?.available,
+    enrichment.mobility?.irve.available ||
+      enrichment.mobility?.commute.available ||
+      enrichment.mobility?.publicTransport.available,
     "Données IRVE (bornes de recharge) non disponibles.",
-    enrichment.mobility?.note,
+    enrichment.mobility?.irve.note,
   );
+
+  if (enrichment.mobility?.commute.available) {
+    pushUnique(
+      limits,
+      "Mobilité domicile-travail (RP 2021) : mode principal déclaré, pas de fréquence ni d'offre horaire.",
+    );
+  }
+
+  if (enrichment.mobility?.publicTransport.available) {
+    pushUnique(
+      limits,
+      "Transport collectif GTFS : dénombrement d'arrêts recensés ; complète la BPE sans horaires ni fréquences.",
+    );
+  }
+
+  if (enrichment.urbanPolicy?.available && enrichment.urbanPolicy.hasQpv) {
+    pushUnique(
+      limits,
+      "QPV : périmètres quartiers prioritaires 2024 ; ne pas confondre avec la totalité de la commune.",
+    );
+  } else {
+    appendUnavailable(
+      limits,
+      enrichment.urbanPolicy?.available,
+      "Données QPV non disponibles.",
+      enrichment.urbanPolicy?.note,
+    );
+  }
 
   if (!enrichment.geography?.attractionArea?.available) {
     appendUnavailable(

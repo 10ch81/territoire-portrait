@@ -13,7 +13,8 @@ export const ACRONYMS: Record<string, string> = {
   AZI: "Atlas des zones inondables",
   CATNAT: "Catastrophes naturelles — régime d'indemnisation",
   SSMSI: "Service statistique ministériel de la sécurité intérieure — délinquance enregistrée",
-  FILOSOFI: "Fichier localisé social et fiscal — revenus INSEE",
+  GTFS: "General Transit Feed Specification — arrêts de transport collectif open data",
+  QPV: "Quartier prioritaire de la politique de la ville",
 };
 
 export function getAcronymDefinition(term: string): string | undefined {

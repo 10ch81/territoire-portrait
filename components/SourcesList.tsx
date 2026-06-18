@@ -1,5 +1,5 @@
 import type { DataSource } from "@/lib/types";
-import { PLANNED_SOURCES } from "@/lib/sources";
+import { SourceRoadmap } from "@/components/SourceRoadmap";
 
 interface SourcesListProps {
   sources: DataSource[];
@@ -42,29 +42,7 @@ export function SourcesList({ sources, showPlanned = true }: SourcesListProps) {
         ))}
       </ul>
 
-      {showPlanned ? (
-        <div className="mt-6">
-          <h3 className="text-sm font-semibold text-slate-700">
-            Sources prévues (MCP data.gouv.fr)
-          </h3>
-          <ul className="mt-2 space-y-2">
-            {PLANNED_SOURCES.map((source) => (
-              <li key={source.id} className="text-sm text-slate-500">
-                <a
-                  href={source.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  {source.name}
-                </a>
-                {" — "}
-                {source.description}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      {showPlanned ? <SourceRoadmap /> : null}
     </section>
   );
 }

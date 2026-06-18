@@ -43,7 +43,21 @@ export const ENRICHMENT_SECTIONS: SectionDef[] = [
   {
     id: "mobilite",
     label: "Mobilité",
-    isAvailable: (t) => t.enrichment?.mobility?.available === true,
+    isAvailable: (t) => {
+      const mobility = t.enrichment?.mobility;
+      return (
+        mobility !== undefined &&
+        mobility !== null &&
+        (mobility.irve.available ||
+          mobility.commute.available ||
+          mobility.publicTransport.available)
+      );
+    },
+  },
+  {
+    id: "politique-ville",
+    label: "Politique ville",
+    isAvailable: (t) => t.enrichment?.urbanPolicy?.available === true,
   },
   {
     id: "fiscalite",

@@ -19,6 +19,12 @@ const AAV_URL =
   "https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/";
 const DVF_URL =
   "https://www.data.gouv.fr/datasets/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/";
+const COMMUTE_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/8200836/TD_NAV2A_2021_csv.zip";
+const QPV_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/8186239/TAG_QPV2024_2025_csv.zip";
+const GTFS_API_URL = "https://transport.data.gouv.fr/api/datasets";
+
 const SSMSI_URL =
   "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales";
 
@@ -30,10 +36,14 @@ export const SOURCE_IDS = {
   INSEE_POPULATION_HISTORY: "insee-population-history",
   INSEE_RP_POPULATION: "insee-rp-population",
   INSEE_RP_EMPLOYMENT: "insee-rp-employment",
+  INSEE_RP_HOUSING: "insee-rp-housing",
+  INSEE_RP_COMMUTE: "insee-rp-commute",
   INSEE_FILOSOFI: "insee-filosofi",
   GEORISQUES: "georisques",
   RPLS: "rpls",
   IRVE: "irve",
+  GTFS: "gtfs-transport",
+  QPV: "qpv-sig-ville",
   REI: "rei",
   AAV: "aav2020",
   DVF: "dvf",
@@ -196,17 +206,50 @@ export function createSsmsiSource(accessedAt: string): DataSource {
   };
 }
 
-export const BPE_MMELODI_FILE_URL = BPE_FILE_URL;
+export function createRpHousingSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_RP_HOUSING,
+    name: "INSEE — RP 2021 logement",
+    url: "https://www.insee.fr/fr/statistiques/8202349",
+    description: "Parc de logements et vacance générale au recensement 2021.",
+    accessedAt,
+  };
+}
 
-export const PLANNED_SOURCES: DataSource[] = [
-  {
-    id: "ban-adresses",
-    name: "Base Adresse Nationale",
-    url: "https://adresse.data.gouv.fr/",
-    description: "Géolocalisation et adresses (exploration MCP data.gouv.fr).",
-    accessedAt: "",
-  },
-];
+export function createCommuteSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_RP_COMMUTE,
+    name: "INSEE — RP 2021 mobilité domicile-travail",
+    url: COMMUTE_URL,
+    description:
+      "Modes de transport principal des actifs occupés de 15 ans ou plus (recensement 2021).",
+    accessedAt,
+  };
+}
+
+export function createGtfsSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.GTFS,
+    name: "transport.data.gouv.fr — GTFS",
+    url: GTFS_API_URL,
+    description:
+      "Arrêts de transport collectif agrégés depuis les flux GTFS français (transport.data.gouv.fr).",
+    accessedAt,
+  };
+}
+
+export function createQpvSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.QPV,
+    name: "INSEE / SIG Ville — QPV 2024",
+    url: QPV_URL,
+    description:
+      "Quartiers prioritaires de la politique de la ville (table d'appartenance géographique 2025).",
+    accessedAt,
+  };
+}
+
+export const BPE_MMELODI_FILE_URL = BPE_FILE_URL;
 
 export function formatSourceLabel(source: DataSource): string {
   return `${source.name} — ${source.url}`;

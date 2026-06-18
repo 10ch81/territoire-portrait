@@ -86,6 +86,8 @@ async function aggregateRpls(): Promise<HousingCommuneCache> {
       occupiedUnits: Number.parseInt(loueRaw, 10) || 0,
       vacantUnits: Number.parseInt(vacantRaw, 10) || 0,
       totalDwellings: null,
+      rpVacantDwellings: null,
+      rpVacancyRatePercent: null,
     };
   }
 
@@ -108,6 +110,7 @@ async function enrichWithTotalDwellings(
 
   let headerIndex: Map<string, number> | null = null;
   const dwellingsColumn = "P21_LOG";
+  const vacantColumn = "P21_LOGVAC";
 
   for await (const line of stream) {
     if (!line.trim()) {
@@ -129,13 +132,36 @@ async function enrichWithTotalDwellings(
     const totalDwellings = parseFrenchDecimal(
       cells[headerIndex.get(dwellingsColumn) ?? -1] ?? "",
     );
+    const vacantDwellings = parseFrenchDecimal(
+      cells[headerIndex.get(vacantColumn) ?? -1] ?? "",
+    );
     if (totalDwellings === null) {
       continue;
     }
 
+    const roundedTotal = Math.round(totalDwellings);
+    const roundedVacant =
+      vacantDwellings !== null ? Math.round(vacantDwellings) : null;
+    const vacancyRatePercent =
+      roundedVacant !== null && roundedTotal > 0
+        ? Math.round((roundedVacant / roundedTotal) * 1000) / 10
+        : null;
+
     const entry = cache[inseeCode];
     if (entry) {
-      entry.totalDwellings = Math.round(totalDwellings);
+      entry.totalDwellings = roundedTotal;
+      entry.rpVacantDwellings = roundedVacant;
+      entry.rpVacancyRatePercent = vacancyRatePercent;
+    } else {
+      cache[inseeCode] = {
+        year: 2021,
+        totalUnits: 0,
+        occupiedUnits: 0,
+        vacantUnits: 0,
+        totalDwellings: roundedTotal,
+        rpVacantDwellings: roundedVacant,
+        rpVacancyRatePercent: vacancyRatePercent,
+      };
     }
   }
 }

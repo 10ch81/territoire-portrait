@@ -67,6 +67,33 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 
 Référence : [docs/data-quality.md](./data-quality.md).
 
+## Sprint 6 — Enrichissement sources (données)
+
+Référence détaillée : [docs/mcp-datagouv.md](./mcp-datagouv.md) (matrice sources × thèmes, niveaux R/C/S, roadmap P1–P3).
+
+### P1 — Socle diagnostic
+
+- [ ] GTFS transport collectif (transport.data.gouv.fr, modèle liO → national)
+- [ ] SIG Ville / QPV (politique de la ville)
+- [ ] RP logement 2021 (vacance générale, parc total)
+- [ ] RP mobilité domicile-travail (modes de transport des actifs)
+
+### P2 — Enrichissement
+
+- [ ] Alignement SIRENE / INSEE démographie d'entreprises
+- [ ] France Services + Annuaire de l'Éducation
+- [ ] APL santé (DREES)
+- [ ] BANATIC (syndicats, structures intercommunales)
+- [ ] OFGL (budgets, dette)
+- [ ] PPRN régionaux (complément Géorisques)
+
+### P3 — Complémentaire
+
+- [ ] DVF+ (géolocalisation fine)
+- [ ] Tourisme (DATAtourisme, capacités INSEE)
+- [ ] Artificialisation des sols
+- [ ] Observatoire des territoires
+
 ---
 
 ## Principes directeurs

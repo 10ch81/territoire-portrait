@@ -16,10 +16,10 @@ export function HousingSection({ territory }: HousingSectionProps) {
   return (
     <DataSection
       id="logement"
-      title="Logements sociaux"
+      title="Logement"
       subtitle={
         <>
-          <AcronymTooltip term="RPLS" />
+          <AcronymTooltip term="RPLS" /> · RP 2021
         </>
       }
       vintage={housing?.year}
@@ -48,6 +48,18 @@ export function HousingSection({ territory }: HousingSectionProps) {
             <DataRow
               label="Part du parc global"
               value={formatPercent(housing.socialHousingSharePercent)}
+            />
+          ) : null}
+          {housing.rpVacantDwellings !== null ? (
+            <DataRow
+              label="Logements vacants (RP 2021)"
+              value={formatPopulation(housing.rpVacantDwellings)}
+            />
+          ) : null}
+          {housing.rpVacancyRatePercent !== null ? (
+            <DataRow
+              label="Taux de vacance générale (RP 2021)"
+              value={formatPercent(housing.rpVacancyRatePercent)}
             />
           ) : null}
           {housing.vacancyRatePercent !== null ? (

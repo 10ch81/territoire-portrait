@@ -24,7 +24,7 @@ Construire un système réutilisable pour produire des portraits territoriaux de
 | `scripts/`               | Ingestion, validation et outils CLI               |
 | `data/cache/`            | Snapshots agrégés par commune (versionnés pour Vercel) |
 | `data/quality/`          | Rapports de validation CI (`latest.json`)         |
-| `docs/mcp-datagouv.md`   | Guide MCP data.gouv.fr                            |
+| `docs/mcp-datagouv.md`   | Guide MCP, matrice sources, roadmap P1–P3         |
 | `docs/data-quality.md`   | Boucle qualité des données                        |
 | `.cursor/rules/`         | Règles persistantes Cursor                        |
 

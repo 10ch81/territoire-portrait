@@ -36,9 +36,9 @@ export function computeDerivedIndicators(
   }
 
   const irvePointsPer1000Residents =
-    population && population > 0 && enrichment.mobility?.available
+    population && population > 0 && enrichment.mobility?.irve.available
       ? roundOneDecimal(
-          (enrichment.mobility.chargingPoints / population) * 1000,
+          (enrichment.mobility.irve.chargingPoints / population) * 1000,
         )
       : null;
 
