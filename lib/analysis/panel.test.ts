@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { computeDataLimits } from "../data-limits";
 import { buildAnalysisFacts } from "./build-analysis-facts";
 import {
   createPanelProfile,
@@ -131,6 +132,9 @@ describe("panel multi-profils", () => {
       assert.equal(hasDuplicateIndicatorInTarget(selected, target), false);
     }
 
+    const watchPoints = selected.filter((f) => f.target === "watchPoints");
+    assert.ok(watchPoints.length >= 3);
+
     const opps = selected.filter((f) => f.target === "opportunities");
     for (const opp of opps) {
       assert.equal(isStudyOnlyFact(opp), false);
@@ -187,5 +191,28 @@ describe("panel — opportunités vacance", () => {
     );
     assert.ok(rehab);
     assertNoForbiddenPhrases(rehab!.sentence);
+  });
+
+  it("fullEnrichment — limites FLORES cohérentes avec postes salariés", () => {
+    const profile = createPanelProfile("fullEnrichment");
+    const limits = computeDataLimits(profile);
+    const limitsText = limits.join(" ");
+
+    assert.match(limitsText, /FLORES/i);
+    assert.doesNotMatch(
+      limitsText,
+      /Emplois salariés au lieu de travail et taux d'activité \(hors SIRENE\) non disponibles/,
+    );
+    assert.match(limitsText, /Taux d'activité non disponible.*FLORES/i);
+  });
+
+  it("tourist — opportunité sans filière touristique", () => {
+    const facts = buildAnalysisFacts(createPanelProfile("tourist"));
+    const tourismOpp = facts.find(
+      (f) => f.target === "opportunities" && f.theme === "tourism",
+    );
+    if (tourismOpp) {
+      assert.doesNotMatch(tourismOpp.sentence, /filière touristique/i);
+    }
   });
 });

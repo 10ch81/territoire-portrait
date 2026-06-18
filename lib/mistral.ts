@@ -44,6 +44,14 @@ Points d'attention (watchPoints) :
 Opportunités (opportunities) :
 - Formuler des pistes d'action prudentes, pas des constats ni des demandes d'étude.
 - Ne pas transformer un risque en opportunité sans prudence méthodologique.
+- Ne pas parler de « filière touristique » sans données d'acteurs, flux ou emplois touristiques.
+
+Séparation stricte des thèmes (ne jamais fusionner dans une même phrase) :
+- SSMSI (sécurité enregistrée) et Géorisques/CATNAT (risques naturels).
+- France Services et capacité d'hébergement touristique.
+- ARCEP (fibre) et mobilité physique (voiture, transports, IRVE).
+- SIDE et FLORES sans rappeler leurs périmètres distincts.
+- RPLS (parc locatif social) et vacance générale RP sans préciser les périmètres.
 
 Structure attendue :
 {

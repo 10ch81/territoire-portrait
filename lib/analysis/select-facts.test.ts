@@ -77,4 +77,38 @@ describe("selectAnalysisFactsForPrompt", () => {
         strengthThemes.includes("health"),
     );
   });
+
+  it("produit au moins 3 watchPoints si 4 familles d'enjeux robustes", () => {
+    const all = buildAnalysisFacts(saintGironsProfile);
+    const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
+    const watchPoints = selected.filter((f) => f.target === "watchPoints");
+
+    assert.ok(watchPoints.length >= 3);
+    assert.ok(watchPoints.some((f) => f.theme === "security"));
+    assert.ok(watchPoints.some((f) => f.theme === "risks"));
+  });
+
+  it("sépare tourisme et France Services dans les strengths", () => {
+    const profile = {
+      ...saintGironsProfile,
+      enrichment: {
+        ...saintGironsProfile.enrichment!,
+        proximityServices: {
+          year: 2024,
+          franceServicesCount: 1,
+          structureLabels: ["Structure test"],
+          available: true,
+          note: "",
+        },
+      },
+    };
+    const selected = selectAnalysisFactsForPrompt(buildAnalysisFacts(profile), profile);
+    const strengths = selected.filter((f) => f.target === "strengths");
+    const hasTourism = strengths.some((f) => f.theme === "tourism");
+    const hasFranceServices = strengths.some((f) => f.theme === "public_services");
+
+    if (hasTourism && hasFranceServices) {
+      assert.fail("Tourisme et France Services ne doivent pas coexister dans les strengths");
+    }
+  });
 });

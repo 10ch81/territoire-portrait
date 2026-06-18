@@ -98,12 +98,12 @@ export function buildOpportunityFacts(territory: TerritoryProfile): AnalysisFact
         theme: "tourism",
         target: "opportunities",
         sentence:
-          "Approfondir le développement de la filière touristique locale, en croisant capacité d'hébergement et offre de services.",
+          "Approfondir le potentiel touristique local en croisant capacité d'hébergement, équipements, fréquentation et offre de services.",
         sourceKeys: ["tourism-capacity"],
         year: tourism.year,
         confidence: "medium",
         limitations: [
-          "Sans données de fréquentation ; ne pas conclure à une sous-exploitation.",
+          "Sans données de fréquentation, d'acteurs ou d'emplois touristiques ; ne pas parler de filière structurée.",
         ],
       }),
     );

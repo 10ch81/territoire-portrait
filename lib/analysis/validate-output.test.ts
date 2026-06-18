@@ -186,6 +186,59 @@ describe("validateAnalysisOutput", () => {
     assert.doesNotMatch(result.watchPoints.join(" "), /25,0\s*%/);
   });
 
+  it("rejette fusion SSMSI et risques naturels", () => {
+    const result = validateAnalysisOutput(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: [
+          "La commune est exposée à des risques naturels et enregistre des indicateurs de sécurité élevés selon SSMSI.",
+        ],
+        opportunities: [],
+      },
+      analysisFacts,
+    );
+
+    assert.doesNotMatch(
+      result.watchPoints.join(" "),
+      /risques naturels.*sécurité|sécurité.*risques naturels/i,
+    );
+  });
+
+  it("rejette fusion tourisme et France Services", () => {
+    const result = validateAnalysisOutput(
+      {
+        summary: "",
+        strengths: [
+          "La commune dispose de 75 places d'hébergement touristique et d'une structure France Services.",
+        ],
+        watchPoints: [],
+        opportunities: [],
+      },
+      analysisFacts,
+    );
+
+    const strengthsText = result.strengths.join(" ");
+    assert.ok(
+      !/France Services/i.test(strengthsText) ||
+        !/hébergement touristique/i.test(strengthsText),
+    );
+  });
+
+  it("rejette filière touristique sans données dédiées", () => {
+    const result = validateAnalysisOutput(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: [],
+        opportunities: ["Développer la filière touristique locale."],
+      },
+      analysisFacts,
+    );
+
+    assert.doesNotMatch(result.opportunities.join(" "), /filière touristique/i);
+  });
+
   it("conserve une sortie valide structurée", () => {
     const result = validateAnalysisOutput(
       {

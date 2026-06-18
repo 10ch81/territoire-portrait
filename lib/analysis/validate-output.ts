@@ -74,6 +74,34 @@ const CROSS_THEME_PATTERNS: Array<{ pattern: RegExp; rule: string }> = [
     pattern: /\bfracture numérique\b/i,
     rule: "connectivity-fracture",
   },
+  {
+    pattern:
+      /\b(?:risques naturels|CATNAT|inondation|Géorisques)\b.*\b(?:SSMSI|sécurité enregistrée|indicateurs de sécurité)\b/i,
+    rule: "risks-security-mix-alt",
+  },
+  {
+    pattern:
+      /\b(?:SSMSI|sécurité enregistrée|indicateurs de sécurité)\b.*\b(?:risques naturels|CATNAT|inondation|Géorisques)\b/i,
+    rule: "security-risks-mix-alt",
+  },
+  {
+    pattern:
+      /\b(?:hébergement touristique|capacité.*touristique|tourisme)\b.*\bFrance Services\b/i,
+    rule: "tourism-public-services-mix",
+  },
+  {
+    pattern:
+      /\bFrance Services\b.*\b(?:hébergement touristique|capacité.*touristique|tourisme)\b/i,
+    rule: "public-services-tourism-mix",
+  },
+  {
+    pattern: /\bfilière touristique\b/i,
+    rule: "tourism-filiere-overstatement",
+  },
+  {
+    pattern: /\bdéveloppement de la filière\b/i,
+    rule: "tourism-filiere-development",
+  },
 ];
 
 function extractPercentTokens(text: string): number[] {
@@ -173,7 +201,7 @@ const OPPORTUNITY_STUDY_PATTERN =
   /^(?:faire|mener|conduire)\s+(?:une\s+)?(?:analyse|étude)|analyse plus poussée/i;
 
 const FORBIDDEN_OPPORTUNITY_PATTERN =
-  /(?:potentiel|dynamique).*(?:sous-exploité|à exploiter)|(?:sécurité|SSMSI).*(?:opportunité|levier)/i;
+  /(?:potentiel|dynamique).*(?:sous-exploité|à exploiter)|(?:sécurité|SSMSI).*(?:opportunité|levier)|filière touristique|développement de la filière/i;
 
 function extractNumericTokens(text: string): number[] {
   const percents = extractPercentTokens(text);

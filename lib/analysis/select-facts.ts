@@ -11,6 +11,17 @@ import {
   scoreAnalysisFact,
   type ScoreContext,
 } from "./score-facts";
+import {
+  countRobustWatchPointFamilies,
+  missingWatchPointFamilies,
+  WATCH_POINT_FAMILIES,
+} from "./watch-point-coverage";
+
+export {
+  countRobustWatchPointFamilies,
+  missingWatchPointFamilies,
+  WATCH_POINT_FAMILIES,
+} from "./watch-point-coverage";
 
 const TARGET_LIMITS: Record<AnalysisFactTarget, { min: number; max: number }> = {
   summary: { min: 2, max: 4 },
@@ -34,16 +45,16 @@ const STRENGTH_SLOTS: AnalysisFactTheme[][] = [
   ["mobility", "energy"],
 ];
 
-const WATCH_POINT_SLOTS: AnalysisFactTheme[][] = [
-  ["demography"],
-  ["ageing"],
-  ["employment", "income"],
-  ["housing", "social_housing"],
-  ["risks"],
-  ["security"],
-  ["mobility"],
-  ["policy_city"],
-  ["finances"],
+const WATCH_POINT_SLOTS: AnalysisFactTheme[][] = WATCH_POINT_FAMILIES;
+
+const STRENGTH_THEME_CONFLICTS: Array<[AnalysisFactTheme, AnalysisFactTheme]> = [
+  ["tourism", "public_services"],
+  ["security", "risks"],
+  ["economy", "employment_sectors"],
+  ["equipments", "education"],
+  ["equipments", "health"],
+  ["mobility", "connectivity"],
+  ["energy", "connectivity"],
 ];
 
 const OPPORTUNITY_SLOTS: AnalysisFactTheme[][] = [
@@ -71,16 +82,26 @@ const SUMMARY_EXCLUDED_THEMES: AnalysisFactTheme[] = [
   "finances",
 ];
 
-function themesConflict(a: AnalysisFact, b: AnalysisFact): boolean {
-  const pairs: Array<[AnalysisFactTheme, AnalysisFactTheme]> = [
-    ["security", "risks"],
-    ["economy", "employment_sectors"],
-    ["equipments", "education"],
-    ["equipments", "health"],
-    ["mobility", "connectivity"],
-    ["energy", "connectivity"],
-    ["housing", "social_housing"],
-  ];
+function themesConflict(
+  a: AnalysisFact,
+  b: AnalysisFact,
+  target?: AnalysisFactTarget,
+): boolean {
+  if (target === "watchPoints") {
+    return false;
+  }
+
+  const pairs =
+    target === "strengths"
+      ? STRENGTH_THEME_CONFLICTS
+      : ([
+          ["security", "risks"],
+          ["economy", "employment_sectors"],
+          ["equipments", "education"],
+          ["equipments", "health"],
+          ["mobility", "connectivity"],
+          ["energy", "connectivity"],
+        ] as Array<[AnalysisFactTheme, AnalysisFactTheme]>);
 
   return pairs.some(
     ([t1, t2]) =>
@@ -110,7 +131,7 @@ function canAddToTarget(
     return false;
   }
 
-  if (sameTarget.some((existing) => themesConflict(existing, candidate))) {
+  if (sameTarget.some((existing) => themesConflict(existing, candidate, target))) {
     return false;
   }
 
@@ -188,23 +209,77 @@ function fillTargetFromSlots(
   }
 }
 
-function ensureMandatoryThemes(
+function ensureMandatoryWatchThemes(
   facts: AnalysisFact[],
   selected: AnalysisFact[],
   context: ScoreContext,
   themes: AnalysisFactTheme[],
 ): void {
   for (const theme of themes) {
-    if (selected.some((f) => f.theme === theme)) continue;
+    if (selected.some((f) => f.target === "watchPoints" && f.theme === theme)) {
+      continue;
+    }
 
     const candidate = facts
       .filter((f) => f.theme === theme)
       .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context))[0];
 
     if (!candidate) continue;
-    if (selected.some((f) => f.id === candidate.id)) continue;
 
-    selected.push(candidate);
+    const watchCandidate: AnalysisFact = {
+      ...candidate,
+      target: "watchPoints",
+    };
+
+    if (canAddToTarget(watchCandidate, selected, "watchPoints")) {
+      selected.push(watchCandidate);
+    }
+  }
+}
+
+function ensureWatchPointsMinimum(
+  facts: AnalysisFact[],
+  selected: AnalysisFact[],
+  context: ScoreContext,
+): void {
+  const limit = TARGET_LIMITS.watchPoints;
+  const robustFamilies = countRobustWatchPointFamilies(facts);
+  const minimum =
+    robustFamilies >= 4 ? Math.min(limit.max, Math.max(3, limit.min)) : limit.min;
+
+  let watchCount = selected.filter((f) => f.target === "watchPoints").length;
+
+  for (const family of missingWatchPointFamilies(facts, selected)) {
+    if (watchCount >= limit.max || watchCount >= minimum) break;
+
+    const pick = pickBestFromThemes(
+      facts.filter((f) => f.target === "watchPoints" || family.includes(f.theme)),
+      family,
+      context,
+      selected,
+      "watchPoints",
+    );
+
+    if (pick) {
+      const watchPick =
+        pick.target === "watchPoints" ? pick : { ...pick, target: "watchPoints" as const };
+      if (canAddToTarget(watchPick, selected, "watchPoints")) {
+        selected.push(watchPick);
+        watchCount += 1;
+      }
+    }
+  }
+
+  while (watchCount < minimum && watchCount < limit.max) {
+    const candidates = facts
+      .filter((f) => f.target === "watchPoints")
+      .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
+
+    const next = candidates.find((c) => canAddToTarget(c, selected, "watchPoints"));
+    if (!next) break;
+
+    selected.push(next);
+    watchCount += 1;
   }
 }
 
@@ -275,7 +350,8 @@ export function selectAnalysisFactsForPrompt(
     }
   }
 
-  ensureMandatoryThemes(facts, selected, context, ["security", "risks"]);
+  ensureWatchPointsMinimum(facts, selected, context);
+  ensureMandatoryWatchThemes(facts, selected, context, ["security", "risks"]);
 
   return dedupeSelectedFacts(selected, context);
 }

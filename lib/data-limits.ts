@@ -73,10 +73,17 @@ function appendEmploymentLimits(
     );
   }
 
-  pushUnique(
-    limits,
-    "Emplois salariés au lieu de travail et taux d'activité (hors SIRENE) non disponibles.",
-  );
+  if (enrichment.employmentSectors?.available) {
+    pushUnique(
+      limits,
+      "Taux d'activité non disponible ; les postes salariés sont décrits via FLORES, avec un périmètre distinct des emplois au sens du recensement.",
+    );
+  } else {
+    pushUnique(
+      limits,
+      "Emplois salariés au lieu de travail et taux d'activité (hors SIRENE) non disponibles.",
+    );
+  }
 
   if (!enrichment.employmentSectors?.available) {
     pushUnique(

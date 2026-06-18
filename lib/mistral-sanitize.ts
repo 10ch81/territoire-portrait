@@ -1306,6 +1306,8 @@ export function containsForbiddenPhrases(text: string): string[] {
     "dynamique démographique en déclin",
     "leviers potentiels pour des dynamiques collaboratives",
     "absence de logements sociaux",
+    "filière touristique",
+    "développement de la filière",
     ...INTERNAL_LEAK_MARKERS,
   ];
 
