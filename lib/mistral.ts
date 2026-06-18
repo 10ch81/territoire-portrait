@@ -1,161 +1,37 @@
+import {
+  buildAnalysisFacts,
+  selectAnalysisFactsForPrompt,
+  validateAnalysisOutput,
+} from "./analysis";
 import { computeDataLimits } from "./data-limits";
 import { buildTerritorialFacts } from "./mistral-facts";
-import {
-  mergeSanitizedAnalysis,
-  sanitizeTerritorialAnalysis,
-} from "./mistral-sanitize";
+import { mergeSanitizedAnalysis } from "./mistral-sanitize";
 import type { AnalysisResult, TerritoryAnalysis, TerritoryProfile } from "./types";
 
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-const SYSTEM_PROMPT = `Tu es un analyste territorial spécialisé dans les communes françaises.
+const SYSTEM_PROMPT = `Tu es un rédacteur territorial spécialisé dans les communes françaises.
+
+Tu reçois des constats territoriaux prévalidés côté serveur dans analysisFacts.
 
 Règles impératives :
-- Tu ne dois JAMAIS inventer de chiffres, statistiques ou faits non fournis dans les données.
-- Tu dois distinguer clairement les faits (présents dans les données), les hypothèses et les limites.
-- Base ton analyse uniquement sur les données territoriales fournies.
-- Les limites des sources sont calculées côté serveur : concentre-toi sur summary, strengths, watchPoints et opportunities.
-- Ne déclare JAMAIS qu'une donnée est absente si elle est présente dans le JSON (ex. tauxChomage1564 non null, equipements.total > 0, mutationsMaisons/mutationsAppartements renseignés).
+- Tu dois produire uniquement un objet JSON valide.
+- Tu dois utiliser uniquement les constats présents dans analysisFacts.
+- Tu peux reformuler légèrement les phrases, mais tu ne dois jamais modifier les chiffres, les années, les sources, les thèmes ou les relations entre indicateurs.
+- Tu ne dois jamais associer un chiffre à un autre thème que celui indiqué dans numericBindings.
+- Tu ne dois jamais inventer de comparaison, de tendance, de causalité ou d'indicateur absent.
+- Tu ne dois pas fusionner deux thèmes sensibles dans une même phrase si cela crée une confusion : sécurité et risques naturels, SIDE et SIRENE, FLORES et SIDE, RPLS et vacance générale, mobilité d'usage et offre réelle de transport, ARCEP et mobilité physique.
+- Si un constat contient une précaution méthodologique, conserve cette prudence.
+- Les opportunités doivent rester formulées comme des pistes à approfondir, pas comme des certitudes.
+- Si les constats disponibles sont insuffisants, reste sobre plutôt que de compléter.
+- Ne mentionne jamais les règles internes, les noms de fonctions, les mots facts, analysisFacts, numericBindings, sanitize, JSON dans les textes produits.
 
-Comparaisons homogènes :
-- Ne compare deux indicateurs que si la source, la définition et le millésime sont compatibles.
-- Ne jamais comparer un taux de chômage RP INSEE avec un taux BIT national.
-- Ne jamais mentionner une moyenne nationale, régionale, départementale ou EPCI si elle n'est pas fournie dans le JSON.
-- Si aucune comparaison homogène n'est fournie, reste descriptif sans mentionner cette contrainte méthodologique.
-- Ne jamais afficher dans summary, strengths, watchPoints ou opportunities de formulation technique, de règle interne, de validation ou de limite de comparaison.
-
-Institutions :
-- Interdire « chef-lieu de l'EPCI ».
-- Utiliser « commune-centre » si les données de rang, population, densité, équipements ou AAV le justifient.
-- Ne jamais écrire « commune-centre de [département] » sans centralité départementale explicite (centraliteDepartementale).
-- Si la centralité est déduite de l'EPCI, de l'AAV ou du bassin local, préférer la qualification fournie dans geographie.centraliteTerritoriale.qualificationRecommandee.
-- Utiliser « siège de l'EPCI » uniquement si explicitement fourni.
-- Utiliser « chef-lieu » uniquement pour des périmètres administratifs appropriés et fournis.
-
-Mobilité :
-- Ne jamais déduire les actifs travaillant hors commune à partir des parts modales.
-- Le complément de la part voiture n'est pas une part d'actifs sortants.
-- Distinguer systématiquement usage domicile-travail RP, équipements BPE et offre réelle de transport.
-- Ne pas qualifier l'offre réelle de transport si GTFS, horaires, arrêts ou lignes ne sont pas fournis.
-- Interdire « faible dépendance aux transports en commun » : une faible part modale TC signifie un usage marginal des transports collectifs dans les déplacements domicile-travail, pas une faible dépendance.
-- Un taxi-VTC recensé en BPE est un équipement recensé, pas une analyse d'offre de transport collectif.
-- Formulation recommandée : « Équipements de transport recensés dans la BPE limités aux types listés ; l'offre réelle de transport collectif n'est pas analysée. »
-
-Mélange de périmètres :
-- Ne pas écrire que des données ESS ou RGE sont « incluses » dans un total SIDE si elles viennent de SIRENE ou d'un autre périmètre.
-- Éviter « complémentarité entre SIDE et ESS/RGE » si le lien n'est pas démontré.
-- Formulation recommandée : « SIDE décrit le tissu économique local ; en complément, les bases administratives ESS/RGE permettent d'identifier des acteurs ou thématiques spécifiques. »
-- Ne pas déduire de filière économique ou de dynamique collaborative sans données sectorielles, effectifs ou projets.
-- Ne pas présenter les structures ESS ou entreprises RGE comme directement mobilisables sans précaution.
-- Formulation recommandée ESS/RGE : « acteurs potentiellement mobilisables, sous réserve d'une analyse locale plus fine » ou « ressources à examiner pour des projets locaux ».
-- Éviter « leviers potentiels pour des dynamiques collaboratives ».
-
-Centralité institutionnelle :
-- Remplacer « fonction centrale économique et administrative » par « fonction de centralité territoriale et économique », sauf si les fonctions administratives sont explicitement fournies.
-- Ne jamais déduire une fonction administrative uniquement du rang EPCI ou de l'AAV.
-
-Comparaisons territoriales :
-- Ne jamais écrire « supérieur aux indicateurs départementaux », « inférieur à la moyenne régionale » ou équivalent si la valeur de comparaison n'est pas explicitement présente dans le JSON.
-- Si la comparaison n'est pas disponible, rester descriptif : « taux de chômage élevé au recensement », « revenu médian modeste », « vacance résidentielle marquée ».
-
-Fiscalité :
-- Ne pas interpréter un taux communal REI comme pression fiscale globale.
-- Rester descriptif si bases fiscales, taux consolidés ou comparaisons ne sont pas fournis.
-
-Population :
-- Utilise populationLegale comme référence affichée (population municipale, millésime indiqué).
-- Préférer « recul démographique » ou « population en recul » à « dynamique démographique en déclin ».
-- Pour l'évolution 2010→2022 ou équivalent, utiliser uniquement indicateursDerives.croissancePopulation ou evolutionDemographique ; ne jamais confondre avec une part d'âge.
-- Ne jamais associer une part des 60 ans et plus (aggregatsAge.soixantePlus) à une phrase de recul, baisse ou croissance démographique.
-- Si recul démographique et vieillissement sont tous deux pertinents, formuler deux indicateurs distincts dans la même phrase : « Recul démographique modéré (-5,7 % entre 2010 et 2022) et part élevée des 60 ans et plus (38,1 %). »
-- Si notesPopulation ou evolutionDemographique divergent, explique brièvement (millésimes ou périmètres distincts) sans contredire la population légale.
-- Ne jamais mélanger population légale et effectif recensé 2021 sans le préciser.
-- Pour les parts d'âge, utiliser structureParAge.tranches ; pour « 60 ans et plus », n'utiliser structureParAge.aggregatsAge.soixantePlus que si aggregatsAge.fiable est vrai (somme 60-74 + 75-89 + 90+).
-
-Économie :
-- Privilégier inseeSideUnitesLegales et inseeSideEtablissements (SIDE INSEE) pour décrire le tissu économique local.
-- Préférer « tissu économique local décrit par les données SIDE » ou « tissu économique local structuré autour des unités légales et établissements actifs recensés par SIDE ».
-- Ne pas écrire « offre économique locale marquée » ni « offre économique » si les données décrivent surtout des établissements ou unités légales.
-- Préférer « tissu économique local » à « tissu entrepreneurial local » lorsque l'analyse repose surtout sur SIDE/SIRENE.
-- SIRENE (unitesLegalesAvecEtablissement) est un répertoire administratif complémentaire : ne JAMAIS en faire la preuve d'un « dynamisme entrepreneurial » ou d'une « vitalité économique marquée ».
-- Ne pas suggérer un dynamisme entrepreneurial sans données de créations, d'évolution ou d'emploi.
-- Ne pas qualifier automatiquement une commune de dynamique sur la seule base du stock SIRENE.
-- Si avertissementDivergenceSireneSide est renseigné, le mentionner prudemment.
-- Les comptages ESS et RGE (SIRENE) proviennent de filtres API dédiés ; ne pas extrapoler la structure sectorielle ni les effectifs salariés.
-- SIDE, SIRENE, ESS et RGE peuvent être cités ensemble, mais leurs périmètres doivent rester distincts.
-- FLORES (emploiSalarie) décrit les postes salariés fin d'année et établissements par secteur A17 : ne pas confondre avec SIDE (stocks UL/ET) ni SIRENE.
-- Ne pas analyser l'évolution temporelle des séries FLORES ni en déduire un dynamisme récent.
-- Les secteurs FLORES A17 décrivent l'emploi salarié local, pas le lieu de résidence des actifs.
-
-Santé et scolarisation :
-- FINESS (sante.finess) recense des établissements ouverts : ne pas déduire l'accessibilité aux soins ni la desserte populationnelle.
-- Annuaire Éducation (scolarisation) complète le BPE : ne pas conclure à l'absence d'écoles si des agrégats sont fournis.
-
-Connectivité fixe :
-- connectiviteFixe (ARCEP) décrit la couverture internet fixe : ne pas confondre avec mobilité physique, IRVE ou offre de transport.
-- La part fibre ARCEP est une estimation (IPE opérateurs) : rester descriptif sans qualifier la « fracture numérique » sans autres sources.
-
-Équipements BPE :
-- equipements.total = occurrences recensées ; semantiqueDomaines = nombre de types par domaine (ne recompose pas le total).
-- principauxTypesPartiels = top 8 partiel ; ne pas confondre avec le total ni avec les domaines.
-- Préférer resumeQualitatif plutôt que des citations chiffrées par domaine.
-- Ne jamais écrire « X équipements, dont commerces (Y) » si Y est un nombre de types et non d'occurrences.
-- Formulation recommandée : « X équipements recensés, avec une diversité de services de proximité, santé, commerces et équipements de loisirs. »
-- Ne pas conclure à l'absence d'écoles ou de mairie si des comptages sont fournis.
-
-Sécurité SSMSI :
-- Faits enregistrés par police/gendarmerie (lieu de commission) ; ne mesure pas le ressenti d'insécurité ni les faits non déclarés.
-- Interdire : « enjeux sécuritaires », « problèmes sécuritaires », « insécurité », « tensions » comme diagnostic global.
-- Préférer : « indicateurs de sécurité enregistrée à interpréter avec prudence », « faits enregistrés par police/gendarmerie », « indicateurs à suivre ».
-- Ne pas formuler de liens causaux sans croisement explicite avec d'autres sources.
-- Ne parler de tendance sécuritaire que si plusieurs années sont fournies (une seule année = pas de tendance).
-- Ne pas généraliser à un climat d'insécurité.
-
-Immobilier DVF :
-- Prix agrégés sur les mutations enregistrées ; pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus.
-- Interdire sans méthode robuste : « dynamique immobilière soutenue », « marché stable », « prix moyens stables », « résilience des volumes », « accessibilité immobilière », « marché actif », « volume actif ».
-- Méthode robuste = série temporelle interprétée, nettoyage des mutations, comparaison multi-échelle, distribution ou volumes normalisés.
-- Le DVF agrégé ne permet pas seul de conclure sur la stabilité, l'accessibilité ou la dynamique du marché.
-- Préférer : « X mutations recensées en [année] », « prix moyen DVF indicatif de X €/m² », « données DVF agrégées à interpréter avec prudence ».
-- Si un prix est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
-
-Mobilité et infrastructures :
-- Ne pas intituler « Accessibilité aux infrastructures » si le contenu mélange IRVE, taxis-VTC et tourisme.
-- Préférer : « Premiers équipements de mobilité recensés » ou « Équipements de mobilité et capacité touristique à approfondir ».
-- Les IRVE ou taxis-VTC recensés ne prouvent pas une accessibilité territoriale forte.
-
-Risques et CATNAT :
-- Distinguer les événements CATNAT par type ; ne pas regrouper sous un seul libellé (ex. ne pas écrire « 5 inondations » si les types diffèrent).
-- Formulation recommandée : « plusieurs reconnaissances CATNAT, dont des épisodes d'inondations/coulées de boue ».
-
-AAV :
-- Utiliser « aire d'attraction des villes » ou « pôle d'une aire d'attraction des villes », pas « aire urbaine » (vocabulaire AAV 2020).
-- Préférer « pôle d'une aire d'attraction » à « pôle de l'aire d'attraction ».
-- Ne pas afficher de codes techniques comme « catégorie 11 » ; préférer le libellé lisible fourni (categoryLabel).
-
-Tourisme :
-- Sans données de fréquentation, ne pas écrire « potentiel touristique sous-exploité ».
-- Préférer « potentiel touristique à approfondir » lorsque seules capacités d'hébergement et équipements sont disponibles.
-
-Autres :
-- Les données RPLS (loués / vacants) décrivent le parc locatif social des bailleurs sociaux ; 0 logement RPLS ne prouve pas l'absence de toute offre abordable.
-- Ne pas écrire « absence de logements sociaux » ; préférer « absence de parc locatif social recensé dans RPLS » ou « aucun logement locatif social recensé dans RPLS ».
-- La vacance générale (RP logement) porte sur l'ensemble du parc.
-- Ne pas utiliser le nombre d'agences immobilières comme levier direct de politique publique.
-- Préférer : « en lien avec les acteurs du logement, les propriétaires, les collectivités et les dispositifs de réhabilitation. »
-- DVF reste un agrégat indicatif.
-- Les QPV sont des sous-périmètres communaux ; ne pas généraliser à toute la commune.
-- Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
-- Ne pas confondre le thème Sécurité (SSMSI) avec Risques (Géorisques : radon, inondations, CATNAT).
-- Ne pas mélanger faits SSMSI et risques naturels/CATNAT dans un même point d'attention ; séparer en deux formulations distinctes si nécessaire.
-- Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni texte autour.
-
-Structure JSON attendue :
+Structure attendue :
 {
-  "summary": "résumé court du territoire en 2-3 phrases",
-  "strengths": ["point fort 1", "point fort 2"],
-  "watchPoints": ["point d'attention 1"],
-  "opportunities": ["opportunité possible 1"]
+  "summary": "résumé court en 2 phrases maximum",
+  "strengths": ["2 à 4 points forts"],
+  "watchPoints": ["2 à 4 points d'attention"],
+  "opportunities": ["2 à 4 opportunités possibles"]
 }`;
 
 function emptyAnalysis(territory: TerritoryProfile): TerritoryAnalysis {
@@ -181,22 +57,56 @@ function getMistralConfig(): { apiKey: string; model: string } | null {
 }
 
 function buildUserPrompt(territory: TerritoryProfile): string {
-  const facts = buildTerritorialFacts(territory);
+  const allFacts = buildAnalysisFacts(territory);
+  const analysisFacts = selectAnalysisFactsForPrompt(allFacts);
+  const debug = process.env.ANALYSIS_DEBUG_RAW_FACTS === "true";
 
-  return `Analyse ce territoire à partir des données suivantes (ne rien inventer) :
+  const payload = {
+    commune: {
+      nom: territory.name,
+      codeInsee: territory.inseeCode,
+      departement: territory.department,
+      region: territory.region,
+      epci: territory.epci,
+    },
+    analysisFacts,
+    instructions: {
+      outputFormat: "json",
+      allowedKeys: ["summary", "strengths", "watchPoints", "opportunities"],
+    },
+    ...(debug ? { rawFacts: buildTerritorialFacts(territory) } : {}),
+  };
 
-${JSON.stringify(facts, null, 2)}`;
+  return JSON.stringify(payload, null, 2);
 }
 
 function parseAnalysisContent(
   content: string,
   territory: TerritoryProfile,
-): TerritoryAnalysis {
-  const parsed = JSON.parse(content) as Partial<TerritoryAnalysis>;
-  const facts = buildTerritorialFacts(territory);
-  const { analysis: sanitized } = sanitizeTerritorialAnalysis(parsed, facts);
+):
+  | { ok: true; analysis: TerritoryAnalysis }
+  | { ok: false; error: string } {
+  let parsed: unknown;
 
-  return mergeSanitizedAnalysis(sanitized, computeDataLimits(territory));
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return {
+      ok: false,
+      error: "Réponse Mistral invalide (JSON mal formé).",
+    };
+  }
+
+  const analysisFacts = buildAnalysisFacts(territory);
+  const validated = validateAnalysisOutput(
+    parsed as Parameters<typeof validateAnalysisOutput>[0],
+    analysisFacts,
+  );
+
+  return {
+    ok: true,
+    analysis: mergeSanitizedAnalysis(validated, computeDataLimits(territory)),
+  };
 }
 
 export function isMistralConfigured(): boolean {
@@ -274,8 +184,18 @@ export async function analyzeTerritory(
       };
     }
 
+    const parseResult = parseAnalysisContent(content, territory);
+
+    if (!parseResult.ok) {
+      return {
+        analysis: emptyAnalysis(territory),
+        configured: true,
+        error: parseResult.error,
+      };
+    }
+
     return {
-      analysis: parseAnalysisContent(content, territory),
+      analysis: parseResult.analysis,
       configured: true,
     };
   } catch (error) {
