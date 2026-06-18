@@ -8,6 +8,8 @@ alwaysApply: false
 
 - Appels uniquement côté serveur via `lib/mistral.ts`.
 - Prompt système : analyste territorial, pas d'invention de chiffres, JSON structuré.
+- Post-traitement : `sanitizeTerritorialAnalysis` dans `lib/mistral-sanitize.ts` (formulations interdites, comparaisons non homogènes).
+- Facts partagés : `buildTerritorialFacts` dans `lib/mistral-facts.ts`.
 - Format de réponse attendu : `summary`, `strengths`, `watchPoints`, `opportunities`, `dataLimits`.
 - Modèle configurable via `MISTRAL_MODEL` (défaut : `mistral-large-latest`).
 - Sans clé API : retourner un résultat gracieux, ne pas faire planter l'application.

@@ -1,5 +1,9 @@
 import { computeDataLimits } from "./data-limits";
-import { getPopulationDisplayMeta } from "./ux/population";
+import { buildTerritorialFacts } from "./mistral-facts";
+import {
+  mergeSanitizedAnalysis,
+  sanitizeTerritorialAnalysis,
+} from "./mistral-sanitize";
 import type { AnalysisResult, TerritoryAnalysis, TerritoryProfile } from "./types";
 
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
@@ -12,6 +16,32 @@ Règles impératives :
 - Base ton analyse uniquement sur les données territoriales fournies.
 - Les limites des sources sont calculées côté serveur : concentre-toi sur summary, strengths, watchPoints et opportunities.
 - Ne déclare JAMAIS qu'une donnée est absente si elle est présente dans le JSON (ex. tauxChomage1564 non null, equipements.total > 0, mutationsMaisons/mutationsAppartements renseignés).
+
+Comparaisons homogènes :
+- Ne compare deux indicateurs que si la source, la définition et le millésime sont compatibles.
+- Ne jamais comparer un taux de chômage RP INSEE avec un taux BIT national.
+- Ne jamais mentionner une moyenne nationale, régionale, départementale ou EPCI si elle n'est pas fournie dans le JSON.
+- Si aucune comparaison homogène n'est fournie, reste descriptif.
+
+Institutions :
+- Interdire « chef-lieu de l'EPCI ».
+- Utiliser « commune-centre » si les données de rang, population, densité, équipements ou AAV le justifient.
+- Utiliser « siège de l'EPCI » uniquement si explicitement fourni.
+- Utiliser « chef-lieu » uniquement pour des périmètres administratifs appropriés et fournis.
+
+Mobilité :
+- Ne jamais déduire les actifs travaillant hors commune à partir des parts modales.
+- Le complément de la part voiture n'est pas une part d'actifs sortants.
+- Distinguer usage domicile-travail, équipements BPE et offre réelle de transport.
+- Ne pas qualifier l'offre réelle de transport si GTFS, horaires, arrêts ou lignes ne sont pas fournis.
+
+Mélange de périmètres :
+- Ne pas écrire que des données ESS ou RGE sont « incluses » dans un total SIDE si elles viennent de SIRENE ou d'un autre périmètre.
+- Utiliser : « en complément, les bases administratives identifient... »
+
+Fiscalité :
+- Ne pas interpréter un taux communal REI comme pression fiscale globale.
+- Rester descriptif si bases fiscales, taux consolidés ou comparaisons ne sont pas fournis.
 
 Population :
 - Utilise populationLegale comme référence affichée (population municipale, millésime indiqué).
@@ -82,185 +112,7 @@ function getMistralConfig(): { apiKey: string; model: string } | null {
 }
 
 function buildUserPrompt(territory: TerritoryProfile): string {
-  const populationMeta = getPopulationDisplayMeta(territory);
-  const facts = {
-    nom: territory.name,
-    codeInsee: territory.inseeCode,
-    codesPostaux: territory.postalCodes,
-    departement: territory.department,
-    region: territory.region,
-    epci: territory.epci,
-    populationLegale: territory.population,
-    populationMillesime: populationMeta.vintage,
-    definitionPopulation: populationMeta.definition,
-    notesPopulation: populationMeta.consistencyNotes,
-    densiteHabKm2: territory.densityPerKm2,
-    coordonnees: territory.coordinates,
-    surfaceKm2: territory.surfaceKm2,
-    evolutionDemographique: territory.enrichment?.populationHistory?.available
-      ? territory.enrichment.populationHistory.history
-      : null,
-    structureParAge: territory.enrichment?.sociodemographics?.available
-      ? {
-          tranches: territory.enrichment.sociodemographics.ageBands,
-          tauxChomage1564: territory.enrichment.sociodemographics.unemploymentRate,
-          revenuMedianDisponible:
-            territory.enrichment.sociodemographics.medianDisposableIncome,
-          note: territory.enrichment.sociodemographics.note,
-        }
-      : null,
-    entreprises: territory.enrichment?.enterprises
-      ? {
-          referenceStatistique: {
-            source: "INSEE SIDE",
-            annee: territory.enrichment.enterprises.inseeSideYear,
-            unitesLegales: territory.enrichment.enterprises.inseeLegalUnits,
-            etablissements: territory.enrichment.enterprises.inseeEstablishments,
-          },
-          complementAdministratif: {
-            source: "API SIRENE",
-            unitesLegalesAvecEtablissement:
-              territory.enrichment.enterprises.legalUnitsWithEstablishment,
-            totalPlafonneApi: territory.enrichment.enterprises.legalUnitsIsCapped,
-            ess: territory.enrichment.enterprises.essCount,
-            rge: territory.enrichment.enterprises.rgeCount,
-          },
-          avertissementDivergenceSireneSide:
-            territory.enrichment.enterprises.divergenceWarning,
-          note: territory.enrichment.enterprises.note,
-        }
-      : null,
-    equipements: territory.enrichment?.equipments?.available
-      ? {
-          annee: territory.enrichment.equipments.year,
-          total: territory.enrichment.equipments.totalEquipments,
-          parDomaine: territory.enrichment.equipments.byDomain,
-          parType: territory.enrichment.equipments.byType,
-          transports: territory.enrichment.equipments.transport,
-          note: territory.enrichment.equipments.note,
-        }
-      : null,
-    risques: territory.enrichment?.risks?.available
-      ? {
-          radon: territory.enrichment.risks.radon,
-          inondation: territory.enrichment.risks.flood,
-          catnat: territory.enrichment.risks.catNatEvents,
-          note: territory.enrichment.risks.note,
-        }
-      : null,
-    securite: territory.enrichment?.security?.available
-      ? {
-          annee: territory.enrichment.security.year,
-          indicateurs: territory.enrichment.security.indicators.filter(
-            (indicator) => indicator.diffused,
-          ),
-          indicateursDiffuses: territory.enrichment.security.diffusedIndicatorCount,
-          note: territory.enrichment.security.note,
-        }
-      : null,
-    logementsSociaux: territory.enrichment?.housing?.available
-      ? {
-          annee: territory.enrichment.housing.year,
-          parcTotal: territory.enrichment.housing.totalUnits,
-          loues: territory.enrichment.housing.occupiedUnits,
-          vacantsRpls: territory.enrichment.housing.vacantUnits,
-          parcLogementsGlobal: territory.enrichment.housing.totalDwellings,
-          vacantsRp: territory.enrichment.housing.rpVacantDwellings,
-          tauxVacanceRp: territory.enrichment.housing.rpVacancyRatePercent,
-          partDuParcGlobal: territory.enrichment.housing.socialHousingSharePercent,
-          tauxVacanceRpls: territory.enrichment.housing.vacancyRatePercent,
-          note: territory.enrichment.housing.note,
-        }
-      : null,
-    mobilite: territory.enrichment?.mobility
-      ? {
-          irve: territory.enrichment.mobility.irve.available
-            ? {
-                pointsDeCharge: territory.enrichment.mobility.irve.chargingPoints,
-                stations: territory.enrichment.mobility.irve.stations,
-              }
-            : null,
-          domicileTravail: territory.enrichment.mobility.commute.available
-            ? {
-                actifsOccupes: territory.enrichment.mobility.commute.employedCount,
-                partVoiture: territory.enrichment.mobility.commute.carSharePercent,
-                partTransportsCommun:
-                  territory.enrichment.mobility.commute.publicTransportSharePercent,
-              }
-            : null,
-          note: [territory.enrichment.mobility.irve.note, territory.enrichment.mobility.commute.note]
-            .filter(Boolean)
-            .join(" "),
-        }
-      : null,
-    politiqueVille: territory.enrichment?.urbanPolicy?.available
-      ? {
-          qpv: territory.enrichment.urbanPolicy.hasQpv,
-          nombreQpv: territory.enrichment.urbanPolicy.qpvCount,
-          libelles: territory.enrichment.urbanPolicy.qpvLabels,
-          note: territory.enrichment.urbanPolicy.note,
-        }
-      : null,
-    fiscalite: territory.enrichment?.fiscal?.available
-      ? {
-          annee: territory.enrichment.fiscal.year,
-          tauxTfb: territory.enrichment.fiscal.propertyTaxBuiltRate,
-          tauxTfnb: territory.enrichment.fiscal.propertyTaxUnbuiltRate,
-          note: territory.enrichment.fiscal.note,
-        }
-      : null,
-    comptesPublics: territory.enrichment?.publicAccounts?.available
-      ? {
-          annee: territory.enrichment.publicAccounts.year,
-          recettesFonctionnement: territory.enrichment.publicAccounts.operatingRevenueEur,
-          recettesParHabitant:
-            territory.enrichment.publicAccounts.operatingRevenuePerCapitaEur,
-          encoursDette: territory.enrichment.publicAccounts.debtOutstandingEur,
-          detteParHabitant: territory.enrichment.publicAccounts.debtPerCapitaEur,
-          note: territory.enrichment.publicAccounts.note,
-        }
-      : null,
-    servicesProximite: territory.enrichment?.proximityServices?.available
-      ? {
-          franceServices: territory.enrichment.proximityServices.franceServicesCount,
-          structures: territory.enrichment.proximityServices.structureLabels,
-          note: territory.enrichment.proximityServices.note,
-        }
-      : null,
-    tourisme: territory.enrichment?.tourism?.available
-      ? {
-          annee: territory.enrichment.tourism.year,
-          placesHebergement: territory.enrichment.tourism.accommodationPlaces,
-          note: territory.enrichment.tourism.note,
-        }
-      : null,
-    geographie: {
-      aireAttraction: territory.enrichment?.geography?.attractionArea?.available
-        ? territory.enrichment.geography.attractionArea
-        : null,
-      comparatifEpci: territory.enrichment?.geography?.epciComparison?.available
-        ? territory.enrichment.geography.epciComparison
-        : null,
-    },
-    immobilier: territory.enrichment?.property?.available
-      ? {
-          annee: territory.enrichment.property.year,
-          prixM2Moyen: territory.enrichment.property.averagePricePerM2,
-          prixMoyenMutation: territory.enrichment.property.averageTransactionPrice,
-          mutations: territory.enrichment.property.mutationCount,
-          mutationsMaisons: territory.enrichment.property.houseMutations,
-          mutationsAppartements: territory.enrichment.property.apartmentMutations,
-          serieHistorique: territory.enrichment.property.priceHistory,
-          prixM2MoyenDepartement:
-            territory.enrichment.property.departmentAveragePricePerM2,
-          note: territory.enrichment.property.note,
-        }
-      : null,
-    indicateursDerives: territory.enrichment?.derived?.available
-      ? territory.enrichment.derived
-      : null,
-    sources: territory.sources.map((source) => source.name),
-  };
+  const facts = buildTerritorialFacts(territory);
 
   return `Analyse ce territoire à partir des données suivantes (ne rien inventer) :
 
@@ -272,16 +124,10 @@ function parseAnalysisContent(
   territory: TerritoryProfile,
 ): TerritoryAnalysis {
   const parsed = JSON.parse(content) as Partial<TerritoryAnalysis>;
+  const facts = buildTerritorialFacts(territory);
+  const { analysis: sanitized } = sanitizeTerritorialAnalysis(parsed, facts);
 
-  return {
-    summary: parsed.summary ?? "Analyse non disponible.",
-    strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
-    watchPoints: Array.isArray(parsed.watchPoints) ? parsed.watchPoints : [],
-    opportunities: Array.isArray(parsed.opportunities)
-      ? parsed.opportunities
-      : [],
-    dataLimits: computeDataLimits(territory),
-  };
+  return mergeSanitizedAnalysis(sanitized, computeDataLimits(territory));
 }
 
 export function isMistralConfigured(): boolean {
@@ -331,7 +177,7 @@ export async function analyzeTerritory(
           { role: "user", content: buildUserPrompt(territory) },
         ],
         response_format: { type: "json_object" },
-        temperature: 0.3,
+        temperature: 0.1,
       }),
     });
 
