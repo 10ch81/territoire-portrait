@@ -1,7 +1,9 @@
 import { loadJsonCache } from "../enrichment/cache";
 import type {
+  ArcepCommuneCache,
   BpeCommuneCache,
   FiscalCommuneCache,
+  FloresCommuneCache,
   HousingCommuneCache,
   IrveCommuneCache,
   PopulationCommuneCache,
@@ -386,6 +388,57 @@ function validateFiscalCache(findings: QualityFinding[]): void {
   }
 }
 
+function validateFloresCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<FloresCommuneCache>("flores-by-commune.json");
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/flores-by-commune.json",
+      message: "Cache FLORES absent — exécutez npm run ingest:flores",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    if (entry.totalEstablishments < 0 || entry.totalSalariedPosts < 0) {
+      findings.push({
+        ruleId: "flores-negative-total",
+        severity: "critical",
+        location: `flores-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message: "Totaux FLORES négatifs",
+      });
+    }
+  }
+}
+
+function validateArcepCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<ArcepCommuneCache>("arcep-by-commune.json");
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/arcep-by-commune.json",
+      message: "Cache ARCEP absent — exécutez npm run ingest:fibre",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    const percentFinding = isPercentInRange(
+      entry.fiberEligibleSharePercent,
+      "fiberEligibleSharePercent",
+      inseeCode,
+    );
+    if (percentFinding) {
+      findings.push(percentFinding);
+    }
+  }
+}
+
 export function validateInternalCache(): QualityFinding[] {
   const findings: QualityFinding[] = [];
 
@@ -396,6 +449,8 @@ export function validateInternalCache(): QualityFinding[] {
   validatePropertyCache(findings);
   validateSocialCache(findings);
   validateFiscalCache(findings);
+  validateFloresCache(findings);
+  validateArcepCache(findings);
 
   return findings;
 }

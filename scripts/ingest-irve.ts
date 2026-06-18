@@ -1,7 +1,7 @@
-import { createReadStream, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
-import { CACHE_DIR, downloadFile } from "./ingest-utils";
+import { CACHE_DIR, createCsvReadStream, downloadFile } from "./ingest-utils";
 import type { IrveCommuneCache } from "../lib/types";
 
 const OUTPUT_PATH = resolve(CACHE_DIR, "irve-by-commune.json");
@@ -44,7 +44,7 @@ async function aggregateIrve(): Promise<IrveCommuneCache> {
   const stationIdsByCommune = new Map<string, Set<string>>();
 
   const stream = createInterface({
-    input: createReadStream(CSV_PATH, { encoding: "utf-8" }),
+    input: createCsvReadStream(CSV_PATH),
     crlfDelay: Infinity,
   });
 

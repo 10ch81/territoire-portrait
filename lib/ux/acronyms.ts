@@ -16,6 +16,8 @@ export const ACRONYMS: Record<string, string> = {
   FILOSOFI: "Fichier localisé social et fiscal — revenus INSEE",
   OFGL: "Observatoire des finances et de la gestion publique locales",
   SIDE: "Système d'information sur la démographie des entreprises (INSEE)",
+  FLORES: "Fichier localisé des rémunérations et de l'emploi salarié — secteurs A17 INSEE",
+  FINESS: "Fichier national des établissements sanitaires et sociaux",
   QPV: "Quartier prioritaire de la politique de la ville",
 };
 

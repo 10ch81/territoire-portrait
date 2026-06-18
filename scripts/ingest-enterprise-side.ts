@@ -1,8 +1,9 @@
-import { createReadStream, existsSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
+  createCsvReadStream,
   downloadFile,
   extractZip,
   parseCsvLine,
@@ -61,7 +62,7 @@ async function ingestSideFile(
 
   const csvPath = findDataCsv(extractDir);
   const stream = createInterface({
-    input: createReadStream(csvPath, { encoding: "latin1" }),
+    input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 

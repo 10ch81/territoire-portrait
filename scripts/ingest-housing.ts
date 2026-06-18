@@ -1,5 +1,4 @@
 import {
-  createReadStream,
   existsSync,
   readdirSync,
   writeFileSync,
@@ -8,6 +7,7 @@ import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
+  createCsvReadStream,
   downloadFile,
   extractZip,
   parseCsvLine,
@@ -104,7 +104,7 @@ async function enrichWithTotalDwellings(
 
   const csvPath = findCsvFile(LOGEMENT_DIR, "base-cc-logement-2021");
   const stream = createInterface({
-    input: createReadStream(csvPath, { encoding: "latin1" }),
+    input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 

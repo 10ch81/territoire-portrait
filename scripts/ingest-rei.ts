@@ -1,8 +1,9 @@
-import { createReadStream, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
+  createCsvReadStream,
   downloadFile,
   extractZip,
   parseCsvLine,
@@ -25,7 +26,7 @@ async function aggregateRei(): Promise<FiscalCommuneCache> {
 
   const cache: FiscalCommuneCache = {};
   const stream = createInterface({
-    input: createReadStream(csvPath, { encoding: "latin1" }),
+    input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 

@@ -1,10 +1,50 @@
 {
-  "generatedAt": "2026-06-18T08:39:33.353Z",
-  "phase": "quality-all",
-  "findings": [],
+  "generatedAt": "2026-06-18T12:34:54.133Z",
+  "phase": "validate-internal",
+  "findings": [
+    {
+      "ruleId": "housing-unit-sum-exceeds",
+      "severity": "warning",
+      "location": "housing-by-commune.json:42163",
+      "inseeCode": "42163",
+      "class": "DEFINITION_DIFF",
+      "message": "Occupés + vacants (40) > total logements (37) — incohérence source RPLS",
+      "expected": 37,
+      "actual": 40
+    },
+    {
+      "ruleId": "housing-unit-sum-exceeds",
+      "severity": "warning",
+      "location": "housing-by-commune.json:59086",
+      "inseeCode": "59086",
+      "class": "DEFINITION_DIFF",
+      "message": "Occupés + vacants (43) > total logements (33) — incohérence source RPLS",
+      "expected": 33,
+      "actual": 43
+    },
+    {
+      "ruleId": "housing-share-exceeds-parc",
+      "severity": "warning",
+      "location": "housing-by-commune.json:71085",
+      "inseeCode": "71085",
+      "class": "DEFINITION_DIFF",
+      "message": "Part logements sociaux > 100 % (168.2 %) — périmètres RP / RPLS divergents",
+      "expected": 100,
+      "actual": 168.21192052980132
+    },
+    {
+      "ruleId": "property-share-sum",
+      "severity": "warning",
+      "location": "property-by-commune.json:74137",
+      "inseeCode": "74137",
+      "message": "Parts maisons + appartements = 99 % (attendu ~100 %)",
+      "expected": 100,
+      "actual": 99
+    }
+  ],
   "summary": {
     "ok": 0,
-    "warning": 0,
+    "warning": 4,
     "critical": 0,
     "failed": false
   }

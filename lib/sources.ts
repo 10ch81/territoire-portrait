@@ -29,6 +29,13 @@ const OFGL_URL = "https://data.ofgl.fr/";
 const SIDE_URL = "https://www.insee.fr/fr/statistiques/2011101";
 const TOURISM_URL =
   "https://www.insee.fr/fr/statistiques/fichier/2021703/DS_TOUR_CAP_CSV_2025_geo25.zip";
+const FLORES_URL =
+  "https://www.data.gouv.fr/datasets/nombre-detablissements-et-effectifs-salaries-en-17-grands-secteurs/";
+const FLORES_FILE_URL =
+  "https://api.insee.fr/melodi/file/DS_FLORES_A17/DS_FLORES_A17_2024_CSV_FR";
+const ARCEP_URL = "https://www.data.gouv.fr/datasets/ma-connexion-internet/";
+const FINESS_URL = "https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess/";
+const EDUCATION_URL = "https://www.data.gouv.fr/datasets/annuaire-de-leducation/";
 
 const SSMSI_URL =
   "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales";
@@ -53,6 +60,10 @@ export const SOURCE_IDS = {
   FRANCE_SERVICES: "france-services",
   INSEE_SIDE: "insee-side",
   INSEE_TOURISM: "insee-tourism",
+  INSEE_FLORES: "insee-flores",
+  ARCEP_FIBRE: "arcep-fibre",
+  FINESS: "finess",
+  EDUCATION_DIRECTORY: "education-directory",
   AAV: "aav2020",
   DVF: "dvf",
   SSMSI: "ssmsi",
@@ -287,6 +298,51 @@ export function createTourismSource(accessedAt: string): DataSource {
     accessedAt,
   };
 }
+
+export function createFloresSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_FLORES,
+    name: "INSEE — FLORES (emploi salarié A17)",
+    url: FLORES_URL,
+    description:
+      "Établissements actifs et postes salariés fin d'année par secteur A17 (commune).",
+    accessedAt,
+  };
+}
+
+export function createArcepSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.ARCEP_FIBRE,
+    name: "ARCEP — Ma connexion internet",
+    url: ARCEP_URL,
+    description:
+      "Couverture fibre et technologies d'accès internet fixe par commune.",
+    accessedAt,
+  };
+}
+
+export function createFinessSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.FINESS,
+    name: "FINESS — Établissements sanitaires et sociaux",
+    url: FINESS_URL,
+    description:
+      "Référentiel national des établissements sanitaires, sociaux et médico-sociaux.",
+    accessedAt,
+  };
+}
+
+export function createEducationSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.EDUCATION_DIRECTORY,
+    name: "Annuaire de l'Éducation",
+    url: EDUCATION_URL,
+    description: "Établissements scolaires ouverts par commune.",
+    accessedAt,
+  };
+}
+
+export const FLORES_MMELODI_FILE_URL = FLORES_FILE_URL;
 
 export const BPE_MMELODI_FILE_URL = BPE_FILE_URL;
 

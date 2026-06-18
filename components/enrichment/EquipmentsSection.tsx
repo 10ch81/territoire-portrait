@@ -10,6 +10,7 @@ interface EquipmentsSectionProps {
 
 export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
   const equipments = territory.enrichment?.equipments;
+  const education = territory.enrichment?.education;
   const derived = territory.enrichment?.derived;
 
   return (
@@ -131,6 +132,43 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
             />
           )}
         </div>
+
+        {education?.available ? (
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">
+              Scolarisation (Annuaire Éducation)
+            </h3>
+            <dl className="mt-3 space-y-3">
+              <DataRow
+                label="Établissements ouverts"
+                value={new Intl.NumberFormat("fr-FR").format(education.totalOpen)}
+              />
+              {education.bySector.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">Secteur</dt>
+                  <dd className="mt-2">
+                    <ul className="space-y-1 text-sm text-slate-700">
+                      {education.bySector.map((item) => (
+                        <li key={item.code}>
+                          {item.label} —{" "}
+                          {new Intl.NumberFormat("fr-FR").format(item.count)}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              ) : null}
+              {education.byLevel.slice(0, 6).map((item) => (
+                <DataRow
+                  key={item.code}
+                  label={item.label}
+                  value={new Intl.NumberFormat("fr-FR").format(item.count)}
+                />
+              ))}
+              <p className="text-xs text-slate-500">{education.note}</p>
+            </dl>
+          </div>
+        ) : null}
       </div>
     </DataSection>
   );

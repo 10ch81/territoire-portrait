@@ -82,7 +82,10 @@ Référence détaillée : [docs/mcp-datagouv.md](./mcp-datagouv.md) (matrice sou
 
 - [x] INSEE SIDE (démographie d'entreprises) + SIRENE API
 - [x] France Services
-- [ ] Annuaire de l'Éducation — **écarté** (~36 Mo+)
+- [x] Annuaire de l'Éducation — agrégats communaux (`ingest-education.ts`)
+- [x] FLORES A17 — emploi salarié par secteur (`ingest-flores.ts`)
+- [x] ARCEP — couverture fibre (`ingest-fibre.ts`)
+- [x] FINESS — établissements sanitaires et sociaux (`ingest-finess.ts`)
 - [ ] APL santé (DREES) — **écarté** (xlsx, pas bulk communal)
 - [ ] BANATIC — **reporté** (pas de JSON public par commune)
 - [x] OFGL (dette, recettes — API live, pas bulk)

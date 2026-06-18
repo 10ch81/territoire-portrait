@@ -19,6 +19,10 @@ const steps = [
   { name: "SIDE (stocks entreprises INSEE)", script: "scripts/ingest-enterprise-side.ts" },
   { name: "France Services", script: "scripts/ingest-services.ts" },
   { name: "Tourisme (capacités INSEE)", script: "scripts/ingest-tourism.ts" },
+  { name: "FLORES (emploi salarié A17)", script: "scripts/ingest-flores.ts" },
+  { name: "ARCEP (couverture fibre)", script: "scripts/ingest-fibre.ts" },
+  { name: "FINESS (santé & social)", script: "scripts/ingest-finess.ts" },
+  { name: "Annuaire Éducation", script: "scripts/ingest-education.ts" },
 ];
 
 for (const step of steps) {

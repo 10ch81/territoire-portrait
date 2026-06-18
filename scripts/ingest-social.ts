@@ -1,8 +1,9 @@
-import { createReadStream, existsSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
+  createCsvReadStream,
   downloadFile,
   extractZip,
   parseCsvLine,
@@ -71,7 +72,7 @@ async function ingestAgeBands(
 
   const csvPath = findCsvFile(RP_POP_DIR, "base-cc-evol-struct-pop-2021");
   const stream = createInterface({
-    input: createReadStream(csvPath, { encoding: "latin1" }),
+    input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 
@@ -124,7 +125,7 @@ async function ingestUnemployment(
 
   const csvPath = findCsvFile(RP_EMPLOI_DIR, "base-cc-emploi-pop-active-2021");
   const stream = createInterface({
-    input: createReadStream(csvPath, { encoding: "latin1" }),
+    input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 
@@ -177,7 +178,7 @@ async function ingestFilosofi(cache: SociodemographicsCommuneCache): Promise<voi
 
   const csvPath = findCsvFile(FILOSOFI_DIR, "cc_filosofi_2020_com");
   const stream = createInterface({
-    input: createReadStream(csvPath, { encoding: "latin1" }),
+    input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 

@@ -1,8 +1,9 @@
-import { createReadStream, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
+  createCsvReadStream,
   downloadFile,
   extractZip,
   parseCsvLine,
@@ -27,7 +28,7 @@ async function aggregatePopulation(): Promise<PopulationCommuneCache> {
 
   const cache: PopulationCommuneCache = {};
   const stream = createInterface({
-    input: createReadStream(resolve(EXTRACT_DIR, csvName), { encoding: "utf-8" }),
+    input: createCsvReadStream(resolve(EXTRACT_DIR, csvName)),
     crlfDelay: Infinity,
   });
 

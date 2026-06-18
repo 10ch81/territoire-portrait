@@ -107,12 +107,45 @@ export interface TerritorialFacts {
     tauxVacanceRpls: number | null;
     note: string;
   } | null;
+  emploiSalarie: {
+    source: string;
+    annee: number;
+    etablissements: number;
+    postesSalaries: number;
+    secteursA17: Array<{
+      code: string;
+      label: string;
+      establishments: number;
+      salariedPosts: number;
+    }>;
+    note: string;
+  } | null;
+  sante: {
+    finess: {
+      etablissements: number;
+      categories: Array<{ code: string; label: string; count: number }>;
+      types: Array<{ code: string; label: string; count: number }>;
+      note: string;
+    };
+  } | null;
+  scolarisation: {
+    etablissementsOuverts: number;
+    parSecteur: Array<{ code: string; label: string; count: number }>;
+    parNiveau: Array<{ code: string; label: string; count: number }>;
+    note: string;
+  } | null;
   mobilite: {
     irve: { pointsDeCharge: number; stations: number } | null;
     domicileTravail: {
       actifsOccupes: number | null;
       partVoiture: number | null;
       partTransportsCommun: number | null;
+    } | null;
+    connectiviteFixe: {
+      millesime: string;
+      partLocauxRaccordablesFibre: number | null;
+      technologies: string[];
+      note: string;
     } | null;
     note: string;
   } | null;
@@ -250,6 +283,34 @@ export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialF
           note: territory.enrichment.enterprises.note,
         }
       : null,
+    emploiSalarie: territory.enrichment?.employmentSectors?.available
+      ? {
+          source: "INSEE FLORES",
+          annee: territory.enrichment.employmentSectors.year,
+          etablissements: territory.enrichment.employmentSectors.totalEstablishments,
+          postesSalaries: territory.enrichment.employmentSectors.totalSalariedPosts,
+          secteursA17: territory.enrichment.employmentSectors.sectors.slice(0, 8),
+          note: territory.enrichment.employmentSectors.note,
+        }
+      : null,
+    sante: territory.enrichment?.health?.available
+      ? {
+          finess: {
+            etablissements: territory.enrichment.health.totalEstablishments,
+            categories: territory.enrichment.health.byCategory.slice(0, 6),
+            types: territory.enrichment.health.byType.slice(0, 6),
+            note: territory.enrichment.health.note,
+          },
+        }
+      : null,
+    scolarisation: territory.enrichment?.education?.available
+      ? {
+          etablissementsOuverts: territory.enrichment.education.totalOpen,
+          parSecteur: territory.enrichment.education.bySector,
+          parNiveau: territory.enrichment.education.byLevel.slice(0, 6),
+          note: territory.enrichment.education.note,
+        }
+      : null,
     equipements: territory.enrichment?.equipments?.available
       ? {
           annee: territory.enrichment.equipments.year,
@@ -315,7 +376,20 @@ export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialF
                   territory.enrichment.mobility.commute.publicTransportSharePercent,
               }
             : null,
-          note: [territory.enrichment.mobility.irve.note, territory.enrichment.mobility.commute.note]
+          connectiviteFixe: territory.enrichment.mobility.connectivity.available
+            ? {
+                millesime: territory.enrichment.mobility.connectivity.vintage,
+                partLocauxRaccordablesFibre:
+                  territory.enrichment.mobility.connectivity.fiberEligibleSharePercent,
+                technologies: territory.enrichment.mobility.connectivity.technologies,
+                note: territory.enrichment.mobility.connectivity.note,
+              }
+            : null,
+          note: [
+            territory.enrichment.mobility.irve.note,
+            territory.enrichment.mobility.commute.note,
+            territory.enrichment.mobility.connectivity.note,
+          ]
             .filter(Boolean)
             .join(" "),
         }

@@ -14,6 +14,7 @@ function formatEnterpriseCount(value: number, isCapped: boolean): string {
 
 export function EconomySection({ territory }: EconomySectionProps) {
   const enterprises = territory.enrichment?.enterprises;
+  const employmentSectors = territory.enrichment?.employmentSectors;
 
   return (
     <DataSection
@@ -23,9 +24,15 @@ export function EconomySection({ territory }: EconomySectionProps) {
         <>
           <AcronymTooltip term="SIDE" /> (référence statistique) ·{" "}
           <AcronymTooltip term="SIRENE" /> (complément administratif)
+          {employmentSectors?.available ? (
+            <>
+              {" "}
+              · <AcronymTooltip term="FLORES" /> (emploi salarié A17)
+            </>
+          ) : null}
         </>
       }
-      vintage={enterprises?.millesime}
+      vintage={employmentSectors?.year ?? enterprises?.millesime}
     >
       {enterprises ? (
         <dl className="space-y-3">
@@ -86,6 +93,36 @@ export function EconomySection({ territory }: EconomySectionProps) {
       ) : (
         <p className="text-sm text-slate-500">Donnée non disponible</p>
       )}
+
+      {employmentSectors?.available ? (
+        <div className="mt-6 border-t border-slate-100 pt-6">
+          <h3 className="text-base font-semibold text-slate-900">
+            Emploi salarié par secteur (FLORES)
+          </h3>
+          <dl className="mt-3 space-y-3">
+            <DataRow
+              label="Établissements actifs"
+              value={new Intl.NumberFormat("fr-FR").format(
+                employmentSectors.totalEstablishments,
+              )}
+            />
+            <DataRow
+              label="Postes salariés (fin d'année)"
+              value={new Intl.NumberFormat("fr-FR").format(
+                employmentSectors.totalSalariedPosts,
+              )}
+            />
+            {employmentSectors.sectors.slice(0, 8).map((sector) => (
+              <DataRow
+                key={sector.code}
+                label={sector.label}
+                value={`${new Intl.NumberFormat("fr-FR").format(sector.salariedPosts)} postes · ${new Intl.NumberFormat("fr-FR").format(sector.establishments)} établ.`}
+              />
+            ))}
+            <p className="text-xs text-slate-500">{employmentSectors.note}</p>
+          </dl>
+        </div>
+      ) : null}
     </DataSection>
   );
 }

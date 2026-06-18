@@ -1,7 +1,7 @@
-import { createReadStream, existsSync, writeFileSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
-import { CACHE_DIR, downloadFile } from "./ingest-utils";
+import { CACHE_DIR, createCsvReadStream, downloadFile } from "./ingest-utils";
 import type { ProximityServicesCommuneCache } from "../lib/types";
 
 const OUTPUT_PATH = resolve(CACHE_DIR, "france-services-by-commune.json");
@@ -42,7 +42,7 @@ async function main(): Promise<void> {
 
   const cache: ProximityServicesCommuneCache = {};
   const stream = createInterface({
-    input: createReadStream(CSV_PATH, { encoding: "utf-8" }),
+    input: createCsvReadStream(CSV_PATH),
     crlfDelay: Infinity,
   });
 

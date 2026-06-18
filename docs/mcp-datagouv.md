@@ -97,6 +97,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [API Recherche Entreprises / SIRENE](https://recherche-entreprises.api.gouv.fr) | Unités légales, ESS, RGE | C | ⚠️ | `enterprises.ts` (live) | Filtre `etat_administratif=A` ; définitions ≠ INSEE démographie entreprises ; plafond 10 000 |
 | [INSEE — démographie d'entreprises (SIDE)](https://www.insee.fr/fr/statistiques/2011101) | ULE / établissements économiquement actifs | R | ✅ | `ingest-enterprise-side.ts` → `enterprises.ts` | Stocks UL + ET ; complète SIRENE API |
+| [INSEE — FLORES A17](https://www.data.gouv.fr/datasets/nombre-detablissements-et-effectifs-salaries-en-17-grands-secteurs/) | Emploi salarié par secteur | R | ✅ | `ingest-flores.ts` → `employment-sectors.ts` | Postes fin d'année ; pas d'analyse d'évolution |
 | [data.gouv — ESS](https://www.data.gouv.fr/datasets/liste-des-entreprises-de-less) | Économie sociale et solidaire | C | ⚠️ | `enterprises.ts` (filtre API) | Comptage via API, pas fichier bulk |
 | [data.gouv — RGE](https://www.data.gouv.fr/datasets/liste-des-entreprises-rge) | Transition écologique locale | C | ⚠️ | `enterprises.ts` (filtre API) | Idem |
 
@@ -105,9 +106,10 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | Source | Thème | Niv. | Statut | Module / script | Notes |
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [INSEE — BPE 2024](https://api.insee.fr/melodi/file/DS_BPE/DS_BPE_2024_CSV_FR) | Commerces, santé, écoles, services | R | ✅ | `ingest-bpe.ts` → `equipments.ts` | Dénombrement, pas accessibilité |
-| [Annuaire de l'Éducation](https://www.data.gouv.fr/datasets/annuaire-de-leducation) | Établissements scolaires ouverts | C | ❌ 📋 P2 | — | **Écarté** (~36 Mo+) ; BPE domaine C partiellement substitue |
+| [Annuaire de l'Éducation](https://www.data.gouv.fr/datasets/annuaire-de-leducation) | Établissements scolaires ouverts | C | ✅ | `ingest-education.ts` → `education.ts` | Agrégats communaux (sans liste nominative) |
 | [France Services](https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services) | Accueil public de proximité | C | ✅ | `ingest-services.ts` → `proximity-services.ts` | |
 | [DREES — APL santé](https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl) | Accessibilité aux soins | C | ❌ 📋 P2 | — | **Écarté** (xlsx, pas bulk communal) |
+| [FINESS — réexposition data.gouv](https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess) | Établissements sanitaires et sociaux | C | ✅ | `ingest-finess.ts` → `health.ts` | Agrégats par catégorie ; pas d'accessibilité spatiale |
 | [CartoSanté / AtlaSanté](https://cartosante.atlasante.fr/) | Offre et accès PS | C | ❌ | — | Portail carto ; pas de bulk simple ; APL prioritaire |
 
 ### Mobilité et transition
@@ -117,6 +119,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | [BPE — domaine E (transport)](https://api.insee.fr/melodi/file/DS_BPE/DS_BPE_2024_CSV_FR) | Arrêts, gares recensés | C | ⚠️ | `equipments.ts` (`transport`) | Ne décrit pas l'offre horaire |
 | [transport.data.gouv.fr — GTFS](https://transport.data.gouv.fr/) | Lignes, arrêts, fréquences TC | R | ❌ 📋 P3 | — | **Reporté** : ~100 flux uniques, géocodage massif ; RP domicile-travail + BPE domaine E |
 | [IRVE national](https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/) | Bornes de recharge VE | C | ✅ | `ingest-irve.ts` → `mobility.ts` | |
+| [ARCEP — Ma connexion internet](https://www.data.gouv.fr/datasets/ma-connexion-internet/) | Couverture fibre fixe | R | ✅ | `ingest-fibre.ts` → `mobility.ts` | Part locaux raccordables ; estimation IPE |
 
 ### Logement et immobilier
 
@@ -152,7 +155,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | ----- | ---------- | ----------------- |
 | Démographie | ✅ Forte | — |
 | Emploi / revenus | ✅ Forte | Emploi salarié au lieu de travail |
-| Économie | ✅ Correcte | SIRENE + SIDE ; pas de répartition sectorielle |
+| Économie | ✅ Forte | Emploi salarié FLORES A17 ; emploi au lieu de travail absent |
 | Équipements | ✅ Forte | France Services ; APL et Annuaire Éducation écartés |
 | Mobilité | ⚠️ Partielle | RP domicile-travail + IRVE ; GTFS reporté |
 | Logement | ✅ Correcte | RPLS + vacance RP |
@@ -184,7 +187,11 @@ Ordre recommandé pour les prochaines ingestions. Chaque item suit le workflow M
 | # | Source | Thème | Effort estimé | Justification |
 | - | ------ | ----- | ------------- | ------------- |
 | 5 | INSEE SIDE (démographie d'entreprises) | Économie | ✅ Fait | `ingest-enterprise-side.ts` |
-| 6 | France Services | Services | ✅ Fait | `ingest-services.ts` ; Annuaire Éducation **écarté** |
+| 6 | France Services | Services | ✅ Fait | `ingest-services.ts` |
+| 6b | Annuaire Éducation | Éducation | ✅ Fait | `ingest-education.ts` (agrégats) |
+| 6c | FLORES A17 | Économie | ✅ Fait | `ingest-flores.ts` |
+| 6d | ARCEP fibre | Numérique fixe | ✅ Fait | `ingest-fibre.ts` |
+| 6e | FINESS | Santé | ✅ Fait | `ingest-finess.ts` |
 | 7 | APL santé (DREES) | Santé | **Écarté** | Fichiers xlsx, pas bulk communal |
 | 8 | BANATIC | Institutions | **Reporté** | Pas de JSON public par commune |
 | 9 | OFGL | Finances | ✅ Fait (API live) | Pas d'export bulk (~22 M lignes) |

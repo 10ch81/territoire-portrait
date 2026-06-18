@@ -51,6 +51,10 @@ npm run lint             # ESLint
 npm run typecheck        # vérification TypeScript
 npm run analyze:sample   # test Mistral avec Nantes (44109)
 npm run ingest:bpe       # ingestion BPE INSEE → data/cache/
+npm run ingest:flores    # emploi salarié A17
+npm run ingest:fibre     # couverture fibre ARCEP
+npm run ingest:finess    # établissements sanitaires et sociaux
+npm run ingest:education # annuaire scolaire (agrégats)
 npm run ingest:all       # toutes les ingestions
 npm run validate:internal   # cohérence interne cache
 npm run verify:reference    # golden communes vs APIs live

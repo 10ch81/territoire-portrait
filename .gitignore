@@ -53,6 +53,10 @@ yarn-error.log*
 !/data/cache/enterprise-side-by-commune.json
 !/data/cache/france-services-by-commune.json
 !/data/cache/tourism-by-commune.json
+!/data/cache/flores-by-commune.json
+!/data/cache/arcep-by-commune.json
+!/data/cache/finess-by-commune.json
+!/data/cache/education-by-commune.json
 
 # vercel
 .vercel

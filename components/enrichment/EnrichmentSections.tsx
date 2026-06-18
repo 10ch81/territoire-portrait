@@ -3,6 +3,7 @@ import { DemographicsSection } from "./DemographicsSection";
 import { EconomySection } from "./EconomySection";
 import { EquipmentsSection } from "./EquipmentsSection";
 import { FiscalSection } from "./FiscalSection";
+import { HealthSection } from "./HealthSection";
 import { GeographySection } from "./GeographySection";
 import { HousingSection } from "./HousingSection";
 import { MobilitySection } from "./MobilitySection";
@@ -27,6 +28,7 @@ export function EnrichmentSections({ territory }: EnrichmentSectionsProps) {
       {enrichment?.equipments ? (
         <EquipmentsSection territory={territory} />
       ) : null}
+      {enrichment?.health ? <HealthSection territory={territory} /> : null}
       {enrichment?.risks ? <RisksSection territory={territory} /> : null}
       {enrichment?.security ? <SecuritySection territory={territory} /> : null}
       {enrichment?.housing ? <HousingSection territory={territory} /> : null}

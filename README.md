@@ -96,6 +96,10 @@ docs/data-quality.md              # Boucle qualité des données
 | AAV 2020 (cache) | Aire d'attraction des villes |
 | DVF (cache) | Prix immobilier au m² |
 | RP + FILOSOFI (cache) | Structure par âge, chômage, revenus |
+| INSEE FLORES A17 (cache) | Emploi salarié par secteur (établissements, postes) |
+| ARCEP Ma connexion internet (cache) | Couverture fibre et technologies fixe |
+| FINESS (cache) | Établissements sanitaires et sociaux |
+| Annuaire Éducation (cache) | Établissements scolaires ouverts (agrégats) |
 
 ### Ingestion des caches locaux
 
@@ -109,6 +113,10 @@ npm run ingest:rei        # fiscalité locale (~17 Mo)
 npm run ingest:geography  # aires d'attraction 2020
 npm run ingest:property   # indicateurs DVF (série 2014-2024)
 npm run ingest:social     # structure par âge, chômage, revenus
+npm run ingest:flores     # emploi salarié A17 (~15 Mo cache JSON)
+npm run ingest:fibre      # couverture fibre ARCEP
+npm run ingest:finess     # établissements sanitaires et sociaux
+npm run ingest:education  # annuaire scolaire (agrégats communaux)
 ```
 
 Les caches agrégés sont stockés dans `data/cache/*-by-commune.json` (versionnés pour Vercel, dont `property-by-commune.json` et `social-by-commune.json`).

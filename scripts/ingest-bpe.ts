@@ -1,10 +1,10 @@
-import { createReadStream, createWriteStream, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { createWriteStream, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { pipeline } from "node:stream/promises";
 import { resolve } from "node:path";
 import { Readable } from "node:stream";
 import { BPE_MMELODI_FILE_URL } from "../lib/sources";
-import { extractZip } from "./ingest-utils";
+import { createCsvReadStream, extractZip } from "./ingest-utils";
 import type { BpeCommuneCache, BpeCommuneCacheEntry } from "../lib/types";
 
 const CACHE_DIR = resolve(process.cwd(), "data/cache");
@@ -44,7 +44,7 @@ async function aggregateCommuneData(): Promise<BpeCommuneCache> {
 
   const cache: BpeCommuneCache = {};
   const stream = createInterface({
-    input: createReadStream(DATA_CSV_PATH, { encoding: "utf-8" }),
+    input: createCsvReadStream(DATA_CSV_PATH),
     crlfDelay: Infinity,
   });
 
@@ -99,7 +99,7 @@ async function exportBpeTypeLabels(): Promise<Record<string, string>> {
 
   const labels: Record<string, string> = {};
   const stream = createInterface({
-    input: createReadStream(METADATA_CSV_PATH, { encoding: "utf-8" }),
+    input: createCsvReadStream(METADATA_CSV_PATH),
     crlfDelay: Infinity,
   });
 

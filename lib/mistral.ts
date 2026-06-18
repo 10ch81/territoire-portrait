@@ -83,6 +83,17 @@ Population :
 - Si avertissementDivergenceSireneSide est renseigné, le mentionner prudemment.
 - Les comptages ESS et RGE (SIRENE) proviennent de filtres API dédiés ; ne pas extrapoler la structure sectorielle ni les effectifs salariés.
 - SIDE, SIRENE, ESS et RGE peuvent être cités ensemble, mais leurs périmètres doivent rester distincts.
+- FLORES (emploiSalarie) décrit les postes salariés fin d'année et établissements par secteur A17 : ne pas confondre avec SIDE (stocks UL/ET) ni SIRENE.
+- Ne pas analyser l'évolution temporelle des séries FLORES ni en déduire un dynamisme récent.
+- Les secteurs FLORES A17 décrivent l'emploi salarié local, pas le lieu de résidence des actifs.
+
+Santé et scolarisation :
+- FINESS (sante.finess) recense des établissements ouverts : ne pas déduire l'accessibilité aux soins ni la desserte populationnelle.
+- Annuaire Éducation (scolarisation) complète le BPE : ne pas conclure à l'absence d'écoles si des agrégats sont fournis.
+
+Connectivité fixe :
+- connectiviteFixe (ARCEP) décrit la couverture internet fixe : ne pas confondre avec mobilité physique, IRVE ou offre de transport.
+- La part fibre ARCEP est une estimation (IPE opérateurs) : rester descriptif sans qualifier la « fracture numérique » sans autres sources.
 
 Équipements BPE :
 - equipements.total = occurrences recensées ; semantiqueDomaines = nombre de types par domaine (ne recompose pas le total).

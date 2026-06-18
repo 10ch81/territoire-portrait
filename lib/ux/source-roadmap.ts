@@ -33,8 +33,8 @@ export const SOURCE_ROADMAP: SourceRoadmapEntry[] = [
     theme: "Équipements",
     url: "https://www.data.gouv.fr/datasets/annuaire-de-leducation",
     description:
-      "Liste nominative des établissements scolaires. Écarté (export ~36 Mo+, pas d'agrégat communal léger).",
-    status: "planned",
+      "Agrégats d'établissements scolaires ouverts par commune (cache communal, sans liste nominative).",
+    status: "partial",
     priority: "P2",
   },
   {

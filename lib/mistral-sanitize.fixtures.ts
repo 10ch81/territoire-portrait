@@ -55,6 +55,9 @@ function baseFacts(overrides: Partial<TerritorialFacts> = {}): TerritorialFacts 
     evolutionDemographique: [{ year: 2020, population: 4900 }],
     structureParAge: null,
     entreprises: null,
+    emploiSalarie: null,
+    sante: null,
+    scolarisation: null,
     equipements: null,
     risques: null,
     securite: null,
@@ -131,6 +134,7 @@ export const urbanDenseFacts: TerritorialFacts = baseFacts({
       partVoiture: 12,
       partTransportsCommun: 68,
     },
+    connectiviteFixe: null,
     note: "",
   },
   immobilier: {
@@ -342,6 +346,7 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
       partVoiture: 78,
       partTransportsCommun: 4,
     },
+    connectiviteFixe: null,
     note: "Parts modales domicile-travail 2021",
   },
   fiscalite: {

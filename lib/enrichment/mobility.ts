@@ -1,8 +1,10 @@
-import { createCommuteSource, createIrveSource } from "../sources";
+import { createCommuteSource, createArcepSource, createIrveSource } from "../sources";
 import { isJsonCachePresent, loadJsonCache } from "./cache";
 import type {
+  ArcepCommuneCache,
   CommuteCommuneCache,
   CommuteSnapshot,
+  ConnectivitySnapshot,
   IrveSnapshot,
   MobilitySnapshot,
 } from "../types";
@@ -85,15 +87,61 @@ function loadCommutePart(inseeCode: string): CommuteSnapshot {
   };
 }
 
+function loadConnectivityPart(inseeCode: string): ConnectivitySnapshot {
+  if (!isJsonCachePresent("arcep-by-commune.json")) {
+    return {
+      vintage: "last",
+      fiberEligibleSharePercent: null,
+      totalPremises: null,
+      fiberEligiblePremises: null,
+      technologies: [],
+      available: false,
+      note:
+        "Cache ARCEP absent. Exécutez « npm run ingest:fibre » pour activer la couverture fibre.",
+    };
+  }
+
+  const cache = loadJsonCache<ArcepCommuneCache>("arcep-by-commune.json");
+  const entry = cache?.[inseeCode];
+
+  if (!entry) {
+    return {
+      vintage: "last",
+      fiberEligibleSharePercent: null,
+      totalPremises: null,
+      fiberEligiblePremises: null,
+      technologies: [],
+      available: false,
+      note: "Commune absente du cache ARCEP (Ma connexion internet).",
+    };
+  }
+
+  return {
+    vintage: entry.vintage,
+    fiberEligibleSharePercent: entry.fiberEligibleSharePercent,
+    totalPremises: entry.totalPremises,
+    fiberEligiblePremises: entry.fiberEligiblePremises,
+    technologies: entry.technologies,
+    available: entry.totalPremises > 0,
+    note:
+      "ARCEP — part estimée de locaux raccordables fibre (agrégat IPE opérateurs vs stock locaux). Ne mesure pas la mobilité physique.",
+  };
+}
+
 export function loadMobilitySnapshot(inseeCode: string): MobilitySnapshot {
   return {
     irve: loadIrvePart(inseeCode),
     commute: loadCommutePart(inseeCode),
+    connectivity: loadConnectivityPart(inseeCode),
   };
 }
 
 export function isMobilityAvailable(snapshot: MobilitySnapshot): boolean {
-  return snapshot.irve.available || snapshot.commute.available;
+  return (
+    snapshot.irve.available ||
+    snapshot.commute.available ||
+    snapshot.connectivity.available
+  );
 }
 
-export { createCommuteSource, createIrveSource };
+export { createCommuteSource, createIrveSource, createArcepSource };

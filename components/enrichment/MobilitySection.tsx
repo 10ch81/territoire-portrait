@@ -12,7 +12,10 @@ interface MobilitySectionProps {
 export function MobilitySection({ territory }: MobilitySectionProps) {
   const mobility = territory.enrichment?.mobility;
   const derived = territory.enrichment?.derived;
-  const hasContent = mobility?.irve.available || mobility?.commute.available;
+  const hasContent =
+    mobility?.irve.available ||
+    mobility?.commute.available ||
+    mobility?.connectivity.available;
 
   return (
     <DataSection
@@ -65,8 +68,35 @@ export function MobilitySection({ territory }: MobilitySectionProps) {
               ) : null}
             </>
           ) : null}
+          {mobility?.connectivity.available ? (
+            <>
+              <h3 className="pt-2 text-sm font-semibold text-slate-900">
+                Accès internet fixe (ARCEP)
+              </h3>
+              <DataRow
+                label="Part de locaux raccordables fibre"
+                value={formatPercent(mobility.connectivity.fiberEligibleSharePercent)}
+              />
+              {mobility.connectivity.technologies.length > 0 ? (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500">
+                    Technologies disponibles
+                  </dt>
+                  <dd className="mt-1 text-sm text-slate-900">
+                    {mobility.connectivity.technologies.join(" · ")}
+                  </dd>
+                </div>
+              ) : null}
+            </>
+          ) : null}
           <p className="text-xs text-slate-500">
-            {[mobility?.commute.note, mobility?.irve.note].filter(Boolean).join(" ")}
+            {[
+              mobility?.commute.note,
+              mobility?.irve.note,
+              mobility?.connectivity.note,
+            ]
+              .filter(Boolean)
+              .join(" ")}
           </p>
         </dl>
       ) : (

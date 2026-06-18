@@ -75,8 +75,15 @@ function appendEmploymentLimits(
 
   pushUnique(
     limits,
-    "Emplois salariés au lieu de travail, taux d'activité et répartition sectorielle de l'emploi (hors SIRENE) non disponibles.",
+    "Emplois salariés au lieu de travail et taux d'activité (hors SIRENE) non disponibles.",
   );
+
+  if (!enrichment.employmentSectors?.available) {
+    pushUnique(
+      limits,
+      "Répartition sectorielle de l'emploi salarié (FLORES A17) non disponible.",
+    );
+  }
 }
 
 function appendPopulationLimits(
@@ -128,10 +135,17 @@ function appendEnterpriseLimits(
     pushUnique(limits, enterprises.divergenceWarning);
   }
 
-  pushUnique(
-    limits,
-    "Pas de répartition sectorielle ni de tranches d'effectif salarié fiables.",
-  );
+  if (enrichment.employmentSectors?.available) {
+    pushUnique(
+      limits,
+      "FLORES INSEE (A17) : postes salariés fin d'année et établissements par secteur — ne pas analyser l'évolution temporelle ; distinct de SIDE (stocks UL/ET).",
+    );
+  } else {
+    pushUnique(
+      limits,
+      "Pas de répartition sectorielle ni de tranches d'effectif salarié fiables.",
+    );
+  }
 }
 
 function appendPropertyLimits(
@@ -276,17 +290,24 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
 
   appendEquipmentLimits(limits, enrichment);
 
-  if (enrichment.housing?.available) {
+  if (enrichment.education?.available) {
     pushUnique(
       limits,
-      "Données RPLS limitées au parc locatif social ; la vacance générale (RP logement) couvre l'ensemble du parc.",
+      "Scolarisation (Annuaire Éducation) : agrégats d'établissements ouverts ; complémentaire au BPE, sans liste nominative.",
+    );
+  }
+
+  if (enrichment.health?.available) {
+    pushUnique(
+      limits,
+      "FINESS : établissements sanitaires et sociaux ouverts ; ne mesure pas l'accessibilité géographique ni la desserte populationnelle.",
     );
   } else {
     appendUnavailable(
       limits,
-      enrichment.housing?.available,
-      "Données logement social (RPLS) non disponibles.",
-      enrichment.housing?.note,
+      enrichment.health?.available,
+      "Données santé (FINESS) non disponibles.",
+      enrichment.health?.note,
     );
   }
 
@@ -300,6 +321,20 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
     "Données de risques (Géorisques) non disponibles.",
     enrichment.risks?.note,
   );
+
+  if (enrichment.housing?.available) {
+    pushUnique(
+      limits,
+      "Données RPLS limitées au parc locatif social ; la vacance générale (RP logement) couvre l'ensemble du parc.",
+    );
+  } else {
+    appendUnavailable(
+      limits,
+      enrichment.housing?.available,
+      "Données logement social (RPLS) non disponibles.",
+      enrichment.housing?.note,
+    );
+  }
 
   if (enrichment.security?.available) {
     pushUnique(
@@ -321,10 +356,19 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
 
   appendUnavailable(
     limits,
-    enrichment.mobility?.irve.available || enrichment.mobility?.commute.available,
+    enrichment.mobility?.irve.available ||
+      enrichment.mobility?.commute.available ||
+      enrichment.mobility?.connectivity.available,
     "Données de mobilité non disponibles.",
     enrichment.mobility?.irve.note,
   );
+
+  if (enrichment.mobility?.connectivity.available) {
+    pushUnique(
+      limits,
+      "Couverture fibre (ARCEP) : estimation basée sur les IPE opérateurs ; distincte de la mobilité physique et des bornes IRVE.",
+    );
+  }
 
   if (enrichment.mobility?.commute.available) {
     pushUnique(

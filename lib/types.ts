@@ -167,9 +167,68 @@ export interface IrveSnapshot {
   note: string;
 }
 
+export interface ConnectivitySnapshot {
+  vintage: string;
+  fiberEligibleSharePercent: number | null;
+  totalPremises: number | null;
+  fiberEligiblePremises: number | null;
+  technologies: string[];
+  available: boolean;
+  note: string;
+}
+
 export interface MobilitySnapshot {
   irve: IrveSnapshot;
   commute: CommuteSnapshot;
+  connectivity: ConnectivitySnapshot;
+}
+
+export interface EmploymentSectorCount {
+  code: string;
+  label: string;
+  establishments: number;
+  salariedPosts: number;
+}
+
+export interface EmploymentSectorsSnapshot {
+  year: number;
+  totalEstablishments: number;
+  totalSalariedPosts: number;
+  sectors: EmploymentSectorCount[];
+  available: boolean;
+  note: string;
+}
+
+export interface HealthCategoryCount {
+  code: string;
+  label: string;
+  count: number;
+}
+
+export interface HealthSnapshot {
+  year: number;
+  totalEstablishments: number;
+  totalCapacity: number | null;
+  byCategory: HealthCategoryCount[];
+  byType: HealthCategoryCount[];
+  available: boolean;
+  note: string;
+}
+
+export interface EducationAggregateCount {
+  code: string;
+  label: string;
+  count: number;
+}
+
+export interface EducationSnapshot {
+  year: number;
+  totalOpen: number;
+  byType: EducationAggregateCount[];
+  bySector: EducationAggregateCount[];
+  byLevel: EducationAggregateCount[];
+  available: boolean;
+  note: string;
 }
 
 export interface QpvSnapshot {
@@ -294,7 +353,10 @@ export interface TerritoryEnrichment {
   populationHistory: PopulationHistorySnapshot | null;
   sociodemographics: SociodemographicsSnapshot | null;
   enterprises: EnterpriseSnapshot | null;
+  employmentSectors: EmploymentSectorsSnapshot | null;
   equipments: EquipmentSnapshot | null;
+  education: EducationSnapshot | null;
+  health: HealthSnapshot | null;
   risks: RisksSnapshot | null;
   security: SecuritySnapshot | null;
   housing: SocialHousingSnapshot | null;
@@ -518,3 +580,47 @@ export interface SecurityDepartmentCacheEntry {
 }
 
 export type SecurityDepartmentCache = Record<string, SecurityDepartmentCacheEntry>;
+
+export interface FloresSectorCacheEntry {
+  establishments: number;
+  salariedPosts: number;
+}
+
+export interface FloresCommuneCacheEntry {
+  year: number;
+  totalEstablishments: number;
+  totalSalariedPosts: number;
+  sectors: Record<string, FloresSectorCacheEntry>;
+}
+
+export type FloresCommuneCache = Record<string, FloresCommuneCacheEntry>;
+
+export interface ArcepCommuneCacheEntry {
+  vintage: string;
+  totalPremises: number;
+  fiberEligiblePremises: number;
+  fiberEligibleSharePercent: number | null;
+  technologies: string[];
+}
+
+export type ArcepCommuneCache = Record<string, ArcepCommuneCacheEntry>;
+
+export interface FinessCommuneCacheEntry {
+  year: number;
+  total: number;
+  totalCapacity: number | null;
+  byCategory: Record<string, number>;
+  byType: Record<string, number>;
+}
+
+export type FinessCommuneCache = Record<string, FinessCommuneCacheEntry>;
+
+export interface EducationCommuneCacheEntry {
+  year: number;
+  totalOpen: number;
+  byType: Record<string, number>;
+  bySector: Record<string, number>;
+  byLevel: Record<string, number>;
+}
+
+export type EducationCommuneCache = Record<string, EducationCommuneCacheEntry>;
