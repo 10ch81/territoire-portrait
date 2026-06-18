@@ -1268,6 +1268,7 @@ export function sanitizeTerritorialAnalysis(
 export function containsForbiddenPhrases(text: string): string[] {
   const probes = [
     "chef-lieu de l'EPCI",
+    "dynamisme entrepreneurial",
     "dynamique entrepreneuriale",
     "dynamique entrepreneuriale marquée",
     "tissu économique dynamique",

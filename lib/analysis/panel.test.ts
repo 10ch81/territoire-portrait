@@ -8,6 +8,7 @@ import {
   type PanelPreset,
 } from "./fixtures";
 import { selectAnalysisFactsForPrompt } from "./select-facts";
+import { hasDuplicateIndicatorInTarget } from "./dedupe-facts";
 import { isActionableOpportunity, isStudyOnlyFact } from "./score-facts";
 import { hasCriticalValidationIssue, validateAnalysisOutput } from "./validate-output";
 
@@ -16,12 +17,20 @@ const PANEL_PRESETS: PanelPreset[] = [
   "urbanDense",
   "periurban",
   "tourist",
+  "coastal",
+  "mountain",
   "coastalOrMountain",
+  "industrial",
+  "residential",
   "withQpv",
   "withoutQpv",
   "lowSsmsi",
   "lowDvf",
   "sideSireneDivergence",
+  "withFlores",
+  "withFiness",
+  "withEducation",
+  "withArcep",
   "fullEnrichment",
 ];
 
@@ -103,7 +112,7 @@ describe("panel multi-profils", () => {
     }
   });
 
-  it("sélection — couverture thématique et volume raisonnable", () => {
+  it("sélection — couverture thématique, déduplication et volume raisonnable", () => {
     const profile = createPanelProfile("fullEnrichment");
     const all = buildAnalysisFacts(profile);
     const selected = selectAnalysisFactsForPrompt(all, profile);
@@ -118,10 +127,26 @@ describe("panel multi-profils", () => {
         themes.has("centrality"),
     );
 
+    for (const target of ["watchPoints", "opportunities"] as const) {
+      assert.equal(hasDuplicateIndicatorInTarget(selected, target), false);
+    }
+
     const opps = selected.filter((f) => f.target === "opportunities");
     for (const opp of opps) {
       assert.equal(isStudyOnlyFact(opp), false);
     }
+  });
+
+  it("industrial — FLORES remonte dans les forces", () => {
+    const profile = createPanelProfile("industrial");
+    const selected = selectAnalysisFactsForPrompt(buildAnalysisFacts(profile), profile);
+    assert.ok(selected.some((f) => f.theme === "employment_sectors"));
+  });
+
+  it("withArcep — connectivité remonte dans les forces", () => {
+    const profile = createPanelProfile("withArcep");
+    const selected = selectAnalysisFactsForPrompt(buildAnalysisFacts(profile), profile);
+    assert.ok(selected.some((f) => f.theme === "connectivity"));
   });
 
   it("validation — rejette formulations interdites sur panel", () => {

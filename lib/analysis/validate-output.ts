@@ -170,13 +170,85 @@ function validatePercentContext(text: string, analysisFacts: AnalysisFact[]): bo
 }
 
 const OPPORTUNITY_STUDY_PATTERN =
-  /^(?:faire|mener|conduire)\s+(?:une\s+)?(?:analyse|étude)/i;
+  /^(?:faire|mener|conduire)\s+(?:une\s+)?(?:analyse|étude)|analyse plus poussée/i;
+
+const FORBIDDEN_OPPORTUNITY_PATTERN =
+  /(?:potentiel|dynamique).*(?:sous-exploité|à exploiter)|(?:sécurité|SSMSI).*(?:opportunité|levier)/i;
+
+function extractNumericTokens(text: string): number[] {
+  const percents = extractPercentTokens(text);
+  const integers: number[] = [];
+  const intMatches = text.matchAll(/\b\d[\d\s]*\d\b/g);
+  for (const match of intMatches) {
+    const parsed = Number.parseInt(match[0].replace(/\s/g, ""), 10);
+    if (!Number.isNaN(parsed)) integers.push(parsed);
+  }
+  return [...percents, ...integers];
+}
+
+function listHasDuplicateIndicator(items: string[]): boolean {
+  const keys = new Set<string>();
+  for (const item of items) {
+    for (const value of extractNumericTokens(item)) {
+      const key = `num:${value}`;
+      if (keys.has(key)) return true;
+      keys.add(key);
+    }
+  }
+  return false;
+}
+
+function listHasSemanticDuplicate(items: string[]): boolean {
+  for (let i = 0; i < items.length; i += 1) {
+    for (let j = i + 1; j < items.length; j += 1) {
+      const overlap = tokenOverlap(items[i], items[j]);
+      if (overlap >= 0.72) return true;
+    }
+  }
+  return false;
+}
+
+function tokenOverlap(a: string, b: string): number {
+  const tokensA = new Set(
+    a
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((t) => t.length > 3),
+  );
+  const tokensB = new Set(
+    b
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((t) => t.length > 3),
+  );
+  if (tokensA.size === 0 || tokensB.size === 0) return 0;
+  let overlap = 0;
+  for (const token of tokensA) {
+    if (tokensB.has(token)) overlap += 1;
+  }
+  return overlap / Math.min(tokensA.size, tokensB.size);
+}
+
+function listHasDuplicateTheme(items: string[], analysisFacts: AnalysisFact[]): boolean {
+  const themes: string[] = [];
+  for (const item of items) {
+    const matched = analysisFacts.filter((fact) =>
+      tokenOverlap(item, fact.sentence) >= 0.45,
+    );
+    for (const fact of matched) {
+      if (themes.includes(fact.theme)) return true;
+      themes.push(fact.theme);
+    }
+  }
+  return false;
+}
 
 function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string | null {
   if (!text.trim()) return "empty";
 
   if (containsForbiddenPhrases(text).length > 0) return "forbidden-phrase";
   if (containsInternalLeakage(text).length > 0) return "internal-leak";
+  if (FORBIDDEN_OPPORTUNITY_PATTERN.test(text)) return "forbidden-opportunity";
 
   for (const { pattern } of CROSS_THEME_PATTERNS) {
     if (pattern.test(text)) return "cross-theme";
@@ -185,6 +257,19 @@ function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string
   if (!validatePercentContext(text, analysisFacts)) return "numeric-context";
 
   return null;
+}
+
+function hasListValidationIssue(
+  items: string[],
+  field: "strengths" | "watchPoints" | "opportunities",
+  analysisFacts: AnalysisFact[],
+): boolean {
+  if (listHasDuplicateIndicator(items)) return true;
+  if (listHasSemanticDuplicate(items)) return true;
+  if (field !== "strengths" && listHasDuplicateTheme(items, analysisFacts)) {
+    return true;
+  }
+  return false;
 }
 
 function findReplacementFact(
@@ -225,17 +310,44 @@ function sanitizeList(
   analysisFacts: AnalysisFact[],
 ): string[] {
   const result: string[] = [];
-  const seen = new Set<string>();
+  const seenSentences = new Set<string>();
+  const seenIndicators = new Set<string>();
 
   for (const item of items) {
-    if (field === "opportunities" && OPPORTUNITY_STUDY_PATTERN.test(item.trim())) {
-      continue;
+    if (field === "opportunities") {
+      if (OPPORTUNITY_STUDY_PATTERN.test(item.trim())) continue;
+      if (FORBIDDEN_OPPORTUNITY_PATTERN.test(item)) continue;
     }
+
     const sanitized = sanitizeField(item, field, analysisFacts);
     if (!sanitized) continue;
-    if (seen.has(sanitized.toLowerCase())) continue;
-    seen.add(sanitized.toLowerCase());
+
+    const sentenceKey = sanitized.toLowerCase();
+    if (seenSentences.has(sentenceKey)) continue;
+
+    const indicatorConflict = extractNumericTokens(sanitized).some((value) => {
+      const key = `num:${value}`;
+      if (seenIndicators.has(key)) return true;
+      seenIndicators.add(key);
+      return false;
+    });
+    if (indicatorConflict) continue;
+
+    const semanticDuplicate = result.some(
+      (existing) => tokenOverlap(existing, sanitized) >= 0.72,
+    );
+    if (semanticDuplicate) continue;
+
+    seenSentences.add(sentenceKey);
     result.push(sanitized);
+  }
+
+  if (hasListValidationIssue(result, field, analysisFacts)) {
+    const fallback = analysisFacts
+      .filter((f) => f.target === field)
+      .slice(0, field === "opportunities" ? 3 : 4)
+      .map((f) => f.sentence);
+    return fallback.filter((sentence, index, list) => list.indexOf(sentence) === index);
   }
 
   return result;

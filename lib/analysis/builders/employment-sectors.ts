@@ -13,13 +13,13 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
     createFact({
       theme: "employment_sectors",
       target: "strengths",
-      sentence: `L'emploi salarié local est décrit par FLORES INSEE ${flores.year} : ${formatCount(flores.totalEstablishments)} établissements et ${formatCount(flores.totalSalariedPosts)} postes salariés au total.`,
+      sentence: `Les données FLORES documentent une fonction d'emploi local : ${formatCount(flores.totalSalariedPosts)} postes salariés fin d'année et ${formatCount(flores.totalEstablishments)} établissements en ${flores.year}.`,
       sourceKeys: ["insee-flores"],
       year: flores.year,
       confidence: "high",
       limitations: [
-        "FLORES = postes salariés fin d'année sur le lieu de travail ; pas d'analyse d'évolution temporelle.",
-        "Périmètre distinct de SIDE (stocks UL/ET) et de SIRENE.",
+        "FLORES complète SIDE en décrivant les postes salariés et établissements par secteur.",
+        "Périmètre distinct de SIDE (stocks UL/ET) ; pas d'analyse d'évolution temporelle.",
       ],
       numericBindings: [
         binding(
@@ -69,7 +69,7 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
         createFact({
           theme: "employment_sectors",
           target: "summary",
-          sentence: `Le secteur ${topSector.label} concentre ${weightPercent.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} % des postes salariés FLORES.`,
+          sentence: `Les postes salariés se concentrent notamment dans le secteur ${topSector.label} (${weightPercent.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} % des postes selon FLORES).`,
           sourceKeys: ["insee-flores"],
           year: flores.year,
           confidence: "high",

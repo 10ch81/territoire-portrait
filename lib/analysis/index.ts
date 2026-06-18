@@ -13,6 +13,14 @@ export {
   selectAnalysisFactsForPrompt,
 } from "./select-facts";
 export {
+  areSemanticallySimilar,
+  compareFactQuality,
+  dedupeFactsForTarget,
+  dedupeSelectedFacts,
+  hasDuplicateIndicatorInTarget,
+  indicatorKeys,
+} from "./dedupe-facts";
+export {
   isActionableOpportunity,
   isStudyOnlyFact,
   scoreAnalysisFact,

@@ -97,6 +97,10 @@ export function scoreAnalysisFact(
     score -= 10;
   }
 
+  if ((fact.limitations?.length ?? 0) >= 2) {
+    score += 5;
+  }
+
   return Math.max(0, score);
 }
 

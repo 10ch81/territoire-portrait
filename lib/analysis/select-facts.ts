@@ -1,4 +1,9 @@
 import type { TerritoryProfile } from "../types";
+import {
+  areSemanticallySimilar,
+  dedupeSelectedFacts,
+  indicatorKeys,
+} from "./dedupe-facts";
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
 import {
   isActionableOpportunity,
@@ -11,46 +16,70 @@ const TARGET_LIMITS: Record<AnalysisFactTarget, { min: number; max: number }> = 
   summary: { min: 2, max: 4 },
   strengths: { min: 3, max: 5 },
   watchPoints: { min: 3, max: 5 },
-  opportunities: { min: 3, max: 5 },
+  opportunities: { min: 2, max: 5 },
 };
 
-const IDENTITY_THEMES: AnalysisFactTheme[] = ["identity", "centrality", "demography"];
-const SERVICE_THEMES: AnalysisFactTheme[] = [
-  "equipments",
-  "education",
-  "health",
-  "public_services",
+const SUMMARY_THEMES: AnalysisFactTheme[] = ["identity", "centrality", "demography"];
+
+const STRENGTH_SLOTS: AnalysisFactTheme[][] = [
+  ["centrality"],
+  ["equipments"],
+  ["public_services"],
+  ["employment_sectors"],
+  ["health"],
+  ["education"],
+  ["connectivity"],
+  ["tourism"],
+  ["economy"],
+  ["mobility", "energy"],
 ];
-const ECONOMY_THEMES: AnalysisFactTheme[] = ["economy", "employment_sectors", "ess_rge"];
-const DEMO_THEMES: AnalysisFactTheme[] = ["demography", "ageing", "identity"];
-const HOUSING_THEMES: AnalysisFactTheme[] = ["housing", "social_housing"];
-const SPECIFIC_THEMES: AnalysisFactTheme[] = [
-  "risks",
-  "security",
-  "mobility",
-  "tourism",
-  "policy_city",
-  "connectivity",
-  "finances",
+
+const WATCH_POINT_SLOTS: AnalysisFactTheme[][] = [
+  ["demography"],
+  ["ageing"],
+  ["employment", "income"],
+  ["housing", "social_housing"],
+  ["risks"],
+  ["security"],
+  ["mobility"],
+  ["policy_city"],
+  ["finances"],
+];
+
+const OPPORTUNITY_SLOTS: AnalysisFactTheme[][] = [
+  ["housing"],
+  ["ess_rge"],
+  ["risks"],
+  ["connectivity"],
+  ["tourism"],
+  ["mobility"],
+  ["education", "health"],
+  ["public_services"],
+  ["policy_city"],
+];
+
+const STRICT_ONE_THEME_TARGETS: AnalysisFactTarget[] = [
+  "watchPoints",
+  "opportunities",
+];
+
+const SUMMARY_EXCLUDED_THEMES: AnalysisFactTheme[] = [
+  "employment_sectors",
+  "equipments",
   "energy",
   "real_estate",
+  "finances",
 ];
 
-function factSignature(fact: AnalysisFact): string {
-  const bindingKey = (fact.numericBindings ?? [])
-    .map((b) => `${b.theme}:${b.label}:${b.value}`)
-    .join("|");
-  return `${fact.theme}:${fact.sentence.slice(0, 80)}:${bindingKey}`;
-}
-
 function themesConflict(a: AnalysisFact, b: AnalysisFact): boolean {
-  const pairs: Array<[string, string]> = [
+  const pairs: Array<[AnalysisFactTheme, AnalysisFactTheme]> = [
     ["security", "risks"],
     ["economy", "employment_sectors"],
     ["equipments", "education"],
     ["equipments", "health"],
     ["mobility", "connectivity"],
     ["energy", "connectivity"],
+    ["housing", "social_housing"],
   ];
 
   return pairs.some(
@@ -59,18 +88,36 @@ function themesConflict(a: AnalysisFact, b: AnalysisFact): boolean {
   );
 }
 
-function canAdd(
+function sharesIndicator(a: AnalysisFact, b: AnalysisFact): boolean {
+  const keysA = new Set(indicatorKeys(a));
+  return indicatorKeys(b).some((key) => keysA.has(key));
+}
+
+function canAddToTarget(
   candidate: AnalysisFact,
   selected: AnalysisFact[],
   target: AnalysisFactTarget,
 ): boolean {
   if (selected.some((f) => f.id === candidate.id)) return false;
 
-  const signature = factSignature(candidate);
-  if (selected.some((f) => factSignature(f) === signature)) return false;
-
   const sameTarget = selected.filter((f) => f.target === target);
+
+  if (sameTarget.some((existing) => sharesIndicator(existing, candidate))) {
+    return false;
+  }
+
+  if (sameTarget.some((existing) => areSemanticallySimilar(existing, candidate))) {
+    return false;
+  }
+
   if (sameTarget.some((existing) => themesConflict(existing, candidate))) {
+    return false;
+  }
+
+  if (
+    STRICT_ONE_THEME_TARGETS.includes(target) &&
+    sameTarget.some((existing) => existing.theme === candidate.theme)
+  ) {
     return false;
   }
 
@@ -80,6 +127,10 @@ function canAdd(
       (other) => other.theme === candidate.theme && other.confidence !== "low",
     )
   ) {
+    return false;
+  }
+
+  if (target === "summary" && SUMMARY_EXCLUDED_THEMES.includes(candidate.theme)) {
     return false;
   }
 
@@ -104,26 +155,26 @@ function pickBestFromThemes(
     .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
   for (const candidate of themed) {
-    if (canAdd(candidate, selected, target)) {
+    if (canAddToTarget(candidate, selected, target)) {
       return candidate;
     }
   }
   return null;
 }
 
-function fillTarget(
+function fillTargetFromSlots(
   facts: AnalysisFact[],
   target: AnalysisFactTarget,
   context: ScoreContext,
   selected: AnalysisFact[],
-  coverageSlots: Array<AnalysisFactTheme[]>,
+  slots: AnalysisFactTheme[][],
 ): void {
   const limit = TARGET_LIMITS[target];
   const candidates = facts
     .filter((f) => f.target === target)
     .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
-  for (const slotThemes of coverageSlots) {
+  for (const slotThemes of slots) {
     if (selected.filter((f) => f.target === target).length >= limit.max) break;
     const pick = pickBestFromThemes(candidates, slotThemes, context, selected, target);
     if (pick) selected.push(pick);
@@ -131,9 +182,29 @@ function fillTarget(
 
   for (const candidate of candidates) {
     if (selected.filter((f) => f.target === target).length >= limit.max) break;
-    if (canAdd(candidate, selected, target)) {
+    if (canAddToTarget(candidate, selected, target)) {
       selected.push(candidate);
     }
+  }
+}
+
+function ensureMandatoryThemes(
+  facts: AnalysisFact[],
+  selected: AnalysisFact[],
+  context: ScoreContext,
+  themes: AnalysisFactTheme[],
+): void {
+  for (const theme of themes) {
+    if (selected.some((f) => f.theme === theme)) continue;
+
+    const candidate = facts
+      .filter((f) => f.theme === theme)
+      .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context))[0];
+
+    if (!candidate) continue;
+    if (selected.some((f) => f.id === candidate.id)) continue;
+
+    selected.push(candidate);
   }
 }
 
@@ -177,63 +248,34 @@ export function selectAnalysisFactsForPrompt(
 
   const selected: AnalysisFact[] = [];
 
-  const summarySlots = [IDENTITY_THEMES, DEMO_THEMES, ECONOMY_THEMES, HOUSING_THEMES];
-  fillTarget(facts, "summary", context, selected, summarySlots);
+  fillTargetFromSlots(facts, "summary", context, selected, [
+    SUMMARY_THEMES,
+    ["demography", "ageing"],
+    ["housing", "employment_sectors"],
+  ]);
 
-  const strengthSlots = [
-    SERVICE_THEMES,
-    ECONOMY_THEMES,
-    ["connectivity", "public_services"] as AnalysisFactTheme[],
-    ["tourism", "employment_sectors"] as AnalysisFactTheme[],
-  ];
-  fillTarget(facts, "strengths", context, selected, strengthSlots);
-
-  const watchSlots = [
-    HOUSING_THEMES,
-    ["employment", "income"] as AnalysisFactTheme[],
-    ["ageing", "demography"] as AnalysisFactTheme[],
-    ["policy_city", "security", "risks"] as AnalysisFactTheme[],
-  ];
-  fillTarget(facts, "watchPoints", context, selected, watchSlots);
-
-  const opportunitySlots = [
-    ["housing", "ess_rge", "risks"] as AnalysisFactTheme[],
-    ["connectivity", "tourism", "mobility"] as AnalysisFactTheme[],
-    ["education", "public_services", "policy_city"] as AnalysisFactTheme[],
-  ];
-  fillTarget(facts, "opportunities", context, selected, opportunitySlots);
+  fillTargetFromSlots(facts, "strengths", context, selected, STRENGTH_SLOTS);
+  fillTargetFromSlots(facts, "watchPoints", context, selected, WATCH_POINT_SLOTS);
+  fillTargetFromSlots(facts, "opportunities", context, selected, OPPORTUNITY_SLOTS);
 
   const hasIdentity = selected.some(
-    (f) => f.target === "summary" && IDENTITY_THEMES.includes(f.theme),
+    (f) => f.target === "summary" && SUMMARY_THEMES.includes(f.theme),
   );
   if (!hasIdentity) {
     const candidate =
       facts.find((f) => f.theme === "identity" && f.target === "summary") ??
-      facts.find((f) => f.theme === "demography");
-    if (candidate && canAdd({ ...candidate, target: "summary" }, selected, "summary")) {
-      selected.push({ ...candidate, target: "summary" });
-    }
-  }
+      facts.find((f) => f.theme === "demography" && f.target === "summary") ??
+      facts.find((f) => f.theme === "centrality");
 
-  const hasSpecific = selected.some((f) => SPECIFIC_THEMES.includes(f.theme));
-  if (!hasSpecific) {
-    const specific = facts
-      .filter((f) => SPECIFIC_THEMES.includes(f.theme))
-      .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
-    for (const candidate of specific) {
-      if (canAdd(candidate, selected, candidate.target)) {
-        selected.push(candidate);
-        break;
+    if (candidate) {
+      const summaryCandidate = { ...candidate, target: "summary" as const };
+      if (canAddToTarget(summaryCandidate, selected, "summary")) {
+        selected.push(summaryCandidate);
       }
     }
   }
 
-  for (const theme of ["security", "risks"] as AnalysisFactTheme[]) {
-    const fact = facts.find((f) => f.theme === theme);
-    if (fact && !selected.some((f) => f.id === fact.id)) {
-      selected.push(fact);
-    }
-  }
+  ensureMandatoryThemes(facts, selected, context, ["security", "risks"]);
 
-  return selected;
+  return dedupeSelectedFacts(selected, context);
 }

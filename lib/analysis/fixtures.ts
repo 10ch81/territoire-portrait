@@ -280,12 +280,20 @@ export type PanelPreset =
   | "urbanDense"
   | "periurban"
   | "tourist"
+  | "coastal"
+  | "mountain"
   | "coastalOrMountain"
+  | "industrial"
+  | "residential"
   | "withQpv"
   | "withoutQpv"
   | "lowSsmsi"
   | "lowDvf"
   | "sideSireneDivergence"
+  | "withFlores"
+  | "withFiness"
+  | "withEducation"
+  | "withArcep"
   | "fullEnrichment";
 
 function baseProfile(
@@ -445,16 +453,136 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
         },
       });
     case "coastalOrMountain":
-      return baseProfile("Commune littorale ou montagne", "99005", 2_100, 95, {
+    case "coastal":
+      return baseProfile("Commune littorale", "99005", 2_100, 95, {
         risks: {
-          radon: { potentialClass: "3", label: "Catégorie 3" },
+          radon: null,
           flood: { zones: ["Zone A", "Zone B"], count: 2 },
           catNatEvents: [
             { label: "Inondation et/ou Coulées de boue", startDate: "2019-01-01" },
-            { label: "Sécheresse", startDate: "2022-07-01" },
           ],
           available: true,
           note: "",
+        },
+      });
+    case "mountain":
+      return baseProfile("Commune de montagne", "99011", 1_800, 45, {
+        risks: {
+          radon: { potentialClass: "3", label: "Catégorie 3" },
+          flood: { zones: ["Zone A"], count: 1 },
+          catNatEvents: [{ label: "Sécheresse", startDate: "2022-07-01" }],
+          available: true,
+          note: "",
+        },
+      });
+    case "industrial":
+      return baseProfile("Commune industrielle", "99012", 22_000, 650, {
+        employmentSectors: {
+          year: 2022,
+          totalEstablishments: 420,
+          totalSalariedPosts: 8_500,
+          sectors: [
+            { code: "CF", label: "Industrie manufacturière", establishments: 85, salariedPosts: 3_200 },
+            { code: "GZ", label: "Commerce", establishments: 60, salariedPosts: 900 },
+          ],
+          available: true,
+          note: "",
+        },
+        enterprises: {
+          legalUnitsWithEstablishment: 900,
+          legalUnitsIsCapped: false,
+          essCount: 20,
+          rgeCount: 8,
+          inseeLegalUnits: 880,
+          inseeEstablishments: 950,
+          inseeSideYear: 2022,
+          millesime: "2022",
+          divergenceWarning: null,
+          note: "",
+        },
+      });
+    case "residential":
+      return baseProfile("Commune résidentielle", "99013", 28_000, 3_100, {
+        housing: {
+          year: 2021,
+          totalUnits: 2_800,
+          occupiedUnits: 2_700,
+          vacantUnits: 100,
+          totalDwellings: 14_000,
+          rpVacantDwellings: 420,
+          rpVacancyRatePercent: 3.0,
+          socialHousingSharePercent: 12,
+          vacancyRatePercent: null,
+          available: true,
+          note: "",
+        },
+        sociodemographics: {
+          year: 2021,
+          ageBands: [{ label: "30-44 ans", population: 6_500, sharePercent: 23.2 }],
+          unemploymentRate: 6.5,
+          medianDisposableIncome: 24_500,
+          available: true,
+          note: "",
+        },
+      });
+    case "withFlores":
+      return baseProfile("Commune avec FLORES", "99014", 9_000, 220, {
+        employmentSectors: {
+          year: 2022,
+          totalEstablishments: 180,
+          totalSalariedPosts: 2_100,
+          sectors: [
+            { code: "KQ", label: "Santé humaine", establishments: 25, salariedPosts: 450 },
+          ],
+          available: true,
+          note: "",
+        },
+      });
+    case "withFiness":
+      return baseProfile("Commune avec FINESS", "99015", 6_500, 180, {
+        health: {
+          year: 2024,
+          totalEstablishments: 8,
+          totalCapacity: null,
+          byCategory: [{ code: "1", label: "Établissements sanitaires", count: 2 }],
+          byType: [],
+          available: true,
+          note: "",
+        },
+      });
+    case "withEducation":
+      return baseProfile("Commune avec éducation", "99016", 11_000, 310, {
+        education: {
+          year: 2024,
+          totalOpen: 6,
+          byType: [{ code: "E", label: "École", count: 5 }],
+          bySector: [{ code: "PU", label: "Public", count: 5 }],
+          byLevel: [{ code: "1", label: "Élémentaire", count: 4 }],
+          available: true,
+          note: "",
+        },
+      });
+    case "withArcep":
+      return baseProfile("Commune avec ARCEP", "99017", 4_200, 140, {
+        mobility: {
+          irve: { year: 2024, chargingPoints: 0, stations: 0, available: false, note: "" },
+          commute: {
+            year: 2021,
+            employedCount: 1_800,
+            carSharePercent: 75.0,
+            publicTransportSharePercent: 3.0,
+            available: true,
+            note: "",
+          },
+          connectivity: {
+            vintage: "2025_T4",
+            fiberEligibleSharePercent: 88.0,
+            totalPremises: 2_000,
+            fiberEligiblePremises: 1_760,
+            technologies: ["Fibre"],
+            available: true,
+            note: "",
+          },
         },
       });
     case "withQpv":

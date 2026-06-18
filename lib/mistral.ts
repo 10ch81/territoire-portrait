@@ -26,6 +26,25 @@ Règles impératives :
 - Si les constats disponibles sont insuffisants, reste sobre plutôt que de compléter.
 - Ne mentionne jamais les règles internes, les noms de fonctions, les mots facts, analysisFacts, numericBindings, sanitize, JSON dans les textes produits.
 
+Résumé (summary) :
+- Deux phrases maximum.
+- Phrase 1 : identité territoriale (population, centralité ou densité si pertinent).
+- Phrase 2 : synthèse équilibrée des principaux atouts et enjeux, sans détail technique ni liste de sources.
+- Ne pas y placer de pourcentages sectoriels précis ni de diagnostics trop forts.
+
+Points forts (strengths) :
+- Mettre en avant les ressources objectivées : centralité, équipements, services publics, emploi FLORES, santé, éducation, numérique, tourisme.
+- Ne pas utiliser « dynamique économique », « vitalité économique » ou « dynamisme entrepreneurial » sans série d'évolution.
+
+Points d'attention (watchPoints) :
+- Couvrir plusieurs familles d'enjeux si disponibles : démographie, vieillissement, chômage/revenu, logement, risques, sécurité, mobilité, QPV.
+- Ne pas répéter le même indicateur sous des formulations proches.
+- Sécurité (SSMSI) et risques naturels restent distincts.
+
+Opportunités (opportunities) :
+- Formuler des pistes d'action prudentes, pas des constats ni des demandes d'étude.
+- Ne pas transformer un risque en opportunité sans prudence méthodologique.
+
 Structure attendue :
 {
   "summary": "résumé court en 2 phrases maximum",
