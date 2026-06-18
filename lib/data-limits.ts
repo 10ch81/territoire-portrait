@@ -1,4 +1,5 @@
 import type { TerritoryEnrichment, TerritoryProfile } from "./types";
+import { getPopulationDisplayMeta } from "./ux/population";
 
 function isPresent(value: number | null | undefined): value is number {
   return value !== null && value !== undefined && Number.isFinite(value);
@@ -78,6 +79,22 @@ function appendEmploymentLimits(
   );
 }
 
+function appendPopulationLimits(
+  limits: string[],
+  territory: TerritoryProfile,
+): void {
+  const meta = getPopulationDisplayMeta(territory);
+
+  pushUnique(
+    limits,
+    `Population affichée : ${meta.definition} (millésime ${meta.vintage}, API Géo).`,
+  );
+
+  for (const note of meta.consistencyNotes) {
+    pushUnique(limits, note);
+  }
+}
+
 function appendEnterpriseLimits(
   limits: string[],
   enrichment: TerritoryEnrichment,
@@ -85,21 +102,35 @@ function appendEnterpriseLimits(
   const enterprises = enrichment.enterprises;
 
   if (!enterprises) {
-    pushUnique(limits, "Données entreprises (SIRENE) non disponibles.");
+    pushUnique(limits, "Données entreprises (SIDE / SIRENE) non disponibles.");
     return;
   }
 
-  const totalLabel = isPresent(enterprises.legalUnitsWithEstablishment)
-    ? enterprises.legalUnitsIsCapped
-      ? `≥ ${enterprises.legalUnitsWithEstablishment} unités légales recensées (plafond API)`
-      : `${enterprises.legalUnitsWithEstablishment} unités légales recensées`
-    : "total communal inconnu";
+  if (enterprises.inseeLegalUnits !== null) {
+    pushUnique(
+      limits,
+      `Économie : référence statistique SIDE INSEE (${enterprises.inseeSideYear}) pour unités légales et établissements actifs ; SIRENE API = répertoire administratif complémentaire, pas indicateur de dynamisme.`,
+    );
+  } else {
+    const totalLabel = isPresent(enterprises.legalUnitsWithEstablishment)
+      ? enterprises.legalUnitsIsCapped
+        ? `≥ ${enterprises.legalUnitsWithEstablishment} unités légales recensées (plafond API)`
+        : `${enterprises.legalUnitsWithEstablishment} unités légales recensées`
+      : "total communal inconnu";
+
+    pushUnique(
+      limits,
+      `Données économiques SIRENE limitées aux comptages d'unités légales, ESS et RGE (${totalLabel}) : répertoire administratif, pas preuve de dynamisme économique.`,
+    );
+  }
+
+  if (enterprises.divergenceWarning) {
+    pushUnique(limits, enterprises.divergenceWarning);
+  }
 
   pushUnique(
     limits,
-    enterprises.inseeLegalUnits !== null
-      ? `Données économiques : comptages SIRENE (API) complétés par SIDE INSEE (${enterprises.inseeSideYear}) ; pas de répartition sectorielle ni de tranches d'effectif fiables.`
-      : `Données économiques SIRENE limitées aux comptages d'unités légales, ESS et RGE (${totalLabel}) : pas de répartition sectorielle ni de tranches d'effectif fiables.`,
+    "Pas de répartition sectorielle ni de tranches d'effectif salarié fiables.",
   );
 }
 
@@ -125,14 +156,14 @@ function appendPropertyLimits(
   if (hasTypologySplit) {
     pushUnique(
       limits,
-      "Prix DVF agrégés sur les mutations enregistrées, avec répartition maisons/appartements ; pas de distinction neuf/ancien ni de standing.",
+      "Prix DVF agrégés sur les mutations enregistrées (moyennes communales), avec répartition maisons/appartements ; pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus.",
     );
     return;
   }
 
   pushUnique(
     limits,
-    "Prix DVF agrégés sur les mutations enregistrées, sans typologie détaillée des biens.",
+    "Prix DVF agrégés sur les mutations enregistrées (moyennes communales), sans typologie détaillée ; pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus.",
   );
 }
 
@@ -155,14 +186,14 @@ function appendEquipmentLimits(
   if (hasEducationEquipments(enrichment)) {
     pushUnique(
       limits,
-      "Équipements BPE : dénombrement des équipements (dont enseignement et services de proximité) ; pas d'accessibilité, de qualité, de capacité scolaire ni de résultats.",
+      "Équipements BPE : dénombrement des équipements par domaine ; principaux types listés (top 8, non exhaustif) — ne pas confondre total domaine et liste partielle des types.",
     );
     return;
   }
 
   pushUnique(
     limits,
-    "Équipements BPE : dénombrement uniquement ; pas d'accessibilité, de qualité ni d'adéquation aux besoins.",
+    "Équipements BPE : dénombrement par domaine et principaux types (liste partielle) ; pas d'accessibilité, de qualité ni d'adéquation aux besoins.",
   );
 }
 
@@ -221,12 +252,7 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
     return limits;
   }
 
-  appendUnavailable(
-    limits,
-    enrichment.populationHistory?.available,
-    "Historique de population (INSEE) non disponible.",
-    enrichment.populationHistory?.note,
-  );
+  appendPopulationLimits(limits, territory);
 
   appendUnavailable(
     limits,
@@ -278,7 +304,11 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
   if (enrichment.security?.available) {
     pushUnique(
       limits,
-      "Sécurité (SSMSI) : faits enregistrés par la police/gendarmerie (lieu de commission) ; couverture communale partielle et pas de ressenti d'insécurité.",
+      "Sécurité (SSMSI) : faits enregistrés par la police/gendarmerie (lieu de commission) ; ne mesure pas le ressenti d'insécurité ni les faits non déclarés ; couverture communale partielle.",
+    );
+    pushUnique(
+      limits,
+      "Sécurité (SSMSI) : une seule année chargée — pas d'analyse de tendance interannuelle.",
     );
   } else {
     appendUnavailable(
@@ -323,6 +353,13 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
       enrichment.geography?.attractionArea?.available,
       "Zonage en aire d'attraction (AAV 2020) non disponible.",
       enrichment.geography?.attractionArea?.note,
+    );
+  }
+
+  if (enrichment.tourism?.available) {
+    pushUnique(
+      limits,
+      "Tourisme : capacités d'hébergement recensées uniquement ; pas de données de fréquentation — ne pas conclure à un sous-exploitation du potentiel.",
     );
   }
 

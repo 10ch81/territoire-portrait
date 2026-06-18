@@ -24,6 +24,11 @@ export function SecuritySection({ territory }: SecuritySectionProps) {
     >
       {security?.available ? (
         <div className="space-y-4">
+          <p className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            Faits enregistrés par la police et la gendarmerie (lieu de commission).
+            Ne mesure pas le ressenti d&apos;insécurité ni les faits non déclarés.
+            Une seule année chargée — pas d&apos;analyse de tendance.
+          </p>
           <p className="text-xs text-slate-500">
             {security.diffusedIndicatorCount}/{security.indicators.length} indicateurs
             diffusés pour cette commune (règles de secret statistique SSMSI).

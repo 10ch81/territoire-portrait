@@ -21,44 +21,14 @@ export function EconomySection({ territory }: EconomySectionProps) {
       title="Économie"
       subtitle={
         <>
-          Données <AcronymTooltip term="SIRENE" />
+          <AcronymTooltip term="SIDE" /> (référence statistique) ·{" "}
+          <AcronymTooltip term="SIRENE" /> (complément administratif)
         </>
       }
       vintage={enterprises?.millesime}
     >
       {enterprises ? (
         <dl className="space-y-3">
-          <DataRow
-            label="Entreprises (≥ 1 établissement actif)"
-            value={
-              enterprises.legalUnitsWithEstablishment !== null
-                ? formatEnterpriseCount(
-                    enterprises.legalUnitsWithEstablishment,
-                    enterprises.legalUnitsIsCapped,
-                  )
-                : "Donnée non disponible"
-            }
-          />
-          {enterprises.essCount !== null ? (
-            <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
-              <dt className="text-sm font-medium text-slate-500">
-                <AcronymTooltip term="ESS" />
-              </dt>
-              <dd className="text-sm text-slate-900 sm:text-right">
-                {new Intl.NumberFormat("fr-FR").format(enterprises.essCount)}
-              </dd>
-            </div>
-          ) : null}
-          {enterprises.rgeCount !== null ? (
-            <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
-              <dt className="text-sm font-medium text-slate-500">
-                <AcronymTooltip term="RGE" />
-              </dt>
-              <dd className="text-sm text-slate-900 sm:text-right">
-                {new Intl.NumberFormat("fr-FR").format(enterprises.rgeCount)}
-              </dd>
-            </div>
-          ) : null}
           {enterprises.inseeLegalUnits !== null ? (
             <DataRow
               label="Unités légales actives (INSEE SIDE)"
@@ -74,6 +44,42 @@ export function EconomySection({ territory }: EconomySectionProps) {
                 enterprises.inseeEstablishments,
               )}
             />
+          ) : null}
+          <DataRow
+            label="Unités légales SIRENE (≥ 1 établissement actif)"
+            value={
+              enterprises.legalUnitsWithEstablishment !== null
+                ? formatEnterpriseCount(
+                    enterprises.legalUnitsWithEstablishment,
+                    enterprises.legalUnitsIsCapped,
+                  )
+                : "Donnée non disponible"
+            }
+          />
+          {enterprises.essCount !== null ? (
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
+              <dt className="text-sm font-medium text-slate-500">
+                <AcronymTooltip term="ESS" /> (SIRENE)
+              </dt>
+              <dd className="text-sm text-slate-900 sm:text-right">
+                {new Intl.NumberFormat("fr-FR").format(enterprises.essCount)}
+              </dd>
+            </div>
+          ) : null}
+          {enterprises.rgeCount !== null ? (
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
+              <dt className="text-sm font-medium text-slate-500">
+                <AcronymTooltip term="RGE" /> (SIRENE)
+              </dt>
+              <dd className="text-sm text-slate-900 sm:text-right">
+                {new Intl.NumberFormat("fr-FR").format(enterprises.rgeCount)}
+              </dd>
+            </div>
+          ) : null}
+          {enterprises.divergenceWarning ? (
+            <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+              {enterprises.divergenceWarning}
+            </p>
           ) : null}
           <p className="text-xs text-slate-500">{enterprises.note}</p>
         </dl>

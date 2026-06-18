@@ -34,7 +34,7 @@ export function loadTourismSnapshot(inseeCode: string): TourismSnapshot {
     accommodationPlaces: entry.accommodationPlaces,
     available: entry.accommodationPlaces > 0,
     note:
-      "Nombre de places d'hébergement touristique (hôtels, campings, etc.) — INSEE, toutes catégories confondues.",
+      "Capacités d'hébergement touristique (hôtels, campings, etc.) — INSEE, toutes catégories confondues. Pas de données de fréquentation : potentiel à approfondir, pas de conclusion sur sous-exploitation.",
   };
 }
 

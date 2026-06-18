@@ -31,7 +31,7 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
           {equipments?.available ? (
             <dl className="mt-3 space-y-3">
               <DataRow
-                label="Total équipements"
+                label="Nombre d'équipements recensés"
                 value={new Intl.NumberFormat("fr-FR").format(
                   equipments.totalEquipments,
                 )}
@@ -47,7 +47,7 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
               {equipments.byDomain.length > 0 ? (
                 <div>
                   <dt className="text-sm font-medium text-slate-500">
-                    Par domaine
+                    Nombre d&apos;équipements par domaine
                   </dt>
                   <dd className="mt-2">
                     <ul className="space-y-1 text-sm text-slate-700">
@@ -64,7 +64,7 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
               {equipments.byType.length > 0 ? (
                 <div>
                   <dt className="text-sm font-medium text-slate-500">
-                    Principaux types
+                    Principaux types d&apos;équipements (top 8, non exhaustif)
                   </dt>
                   <dd className="mt-2">
                     <ul className="space-y-1 text-sm text-slate-700">

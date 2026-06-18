@@ -14,7 +14,7 @@ export function TourismSection({ territory }: TourismSectionProps) {
     <DataSection
       id="tourisme"
       title="Tourisme"
-      subtitle="Capacités d'hébergement (INSEE)"
+      subtitle="Capacités d'hébergement (INSEE) — sans données de fréquentation"
       vintage={tourism?.year}
     >
       {tourism?.available ? (

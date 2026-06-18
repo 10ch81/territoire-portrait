@@ -1,4 +1,5 @@
 import { computeDataLimits } from "./data-limits";
+import { getPopulationDisplayMeta } from "./ux/population";
 import type { AnalysisResult, TerritoryAnalysis, TerritoryProfile } from "./types";
 
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
@@ -11,13 +12,42 @@ Règles impératives :
 - Base ton analyse uniquement sur les données territoriales fournies.
 - Les limites des sources sont calculées côté serveur : concentre-toi sur summary, strengths, watchPoints et opportunities.
 - Ne déclare JAMAIS qu'une donnée est absente si elle est présente dans le JSON (ex. tauxChomage1564 non null, equipements.total > 0, mutationsMaisons/mutationsAppartements renseignés).
+
+Population :
+- Utilise populationLegale comme référence affichée (population municipale, millésime indiqué).
+- Si notesPopulation ou evolutionDemographique divergent, explique brièvement (millésimes ou périmètres distincts) sans contredire la population légale.
+- Ne jamais mélanger population légale et effectif recensé 2021 sans le préciser.
+
+Économie :
+- Privilégier inseeSideUnitesLegales et inseeSideEtablissements (SIDE INSEE) pour décrire le tissu économique local.
+- SIRENE (unitesLegalesAvecEtablissement) est un répertoire administratif complémentaire : ne JAMAIS en faire la preuve d'un « dynamisme entrepreneurial » ou d'une « vitalité économique marquée ».
+- Ne pas qualifier automatiquement une commune de dynamique sur la seule base du stock SIRENE.
+- Si avertissementDivergenceSireneSide est renseigné, le mentionner prudemment.
 - Les comptages ESS et RGE (SIRENE) proviennent de filtres API dédiés ; ne pas extrapoler la structure sectorielle ni les effectifs salariés.
+
+Équipements BPE :
+- total = nombre d'équipements recensés ; parDomaine = décomposition par catégorie ; parType = principaux types (liste partielle, non exhaustive).
+- Ne pas conclure à l'absence d'écoles ou de mairie si des comptages sont fournis.
+- Ne pas interpréter un total domaine « santé » comme égal à la somme des types listés (liste partielle).
+
+Sécurité SSMSI :
+- Faits enregistrés par police/gendarmerie (lieu de commission) ; ne mesure pas le ressenti d'insécurité ni les faits non déclarés.
+- Ne pas formuler de liens causaux (« signale des tensions sociales », « reflète l'insécurité ressentie ») sans croisement explicite avec d'autres sources.
+- Ne parler de tendance sécuritaire que si plusieurs années sont fournies (une seule année = pas de tendance).
+
+Immobilier DVF :
+- Prix agrégés sur les mutations enregistrées ; pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus.
+- Éviter les conclusions fortes sur l'accessibilité immobilière sans comparaison multi-échelle ou distribution.
+- Si un prix est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
+
+Tourisme :
+- Sans données de fréquentation, ne pas écrire « potentiel touristique sous-exploité ».
+- Préférer « potentiel touristique à approfondir » lorsque seules capacités d'hébergement et équipements sont disponibles.
+
+Autres :
 - Les données RPLS (loués / vacants) décrivent le parc locatif social ; la vacance générale (RP logement) porte sur l'ensemble du parc.
 - Les QPV sont des sous-périmètres communaux ; ne pas généraliser à toute la commune.
-- La BPE dénombre des équipements (y compris enseignement et services publics de proximité) : ne pas écrire qu'il n'y a pas d'écoles ou de mairie si des comptages sont fournis.
 - Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
-- Si un prix immobilier est null mais qu'un volume de mutations est fourni, mentionner le volume sans estimer de prix.
-- Les données SSMSI décrivent des faits enregistrés (lieu de commission), pas le ressenti d'insécurité ; ne pas stigmatiser une commune ni extrapoler au-delà des indicateurs diffusés.
 - Ne pas confondre le thème Sécurité (SSMSI) avec Risques (Géorisques : radon, inondations, CATNAT).
 - Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni texte autour.
 
@@ -52,6 +82,7 @@ function getMistralConfig(): { apiKey: string; model: string } | null {
 }
 
 function buildUserPrompt(territory: TerritoryProfile): string {
+  const populationMeta = getPopulationDisplayMeta(territory);
   const facts = {
     nom: territory.name,
     codeInsee: territory.inseeCode,
@@ -59,7 +90,10 @@ function buildUserPrompt(territory: TerritoryProfile): string {
     departement: territory.department,
     region: territory.region,
     epci: territory.epci,
-    population: territory.population,
+    populationLegale: territory.population,
+    populationMillesime: populationMeta.vintage,
+    definitionPopulation: populationMeta.definition,
+    notesPopulation: populationMeta.consistencyNotes,
     densiteHabKm2: territory.densityPerKm2,
     coordonnees: territory.coordinates,
     surfaceKm2: territory.surfaceKm2,
@@ -77,15 +111,22 @@ function buildUserPrompt(territory: TerritoryProfile): string {
       : null,
     entreprises: territory.enrichment?.enterprises
       ? {
-          unitesLegalesAvecEtablissement:
-            territory.enrichment.enterprises.legalUnitsWithEstablishment,
-          totalPlafonneApi: territory.enrichment.enterprises.legalUnitsIsCapped,
-          ess: territory.enrichment.enterprises.essCount,
-          rge: territory.enrichment.enterprises.rgeCount,
-          inseeSideUnitesLegales: territory.enrichment.enterprises.inseeLegalUnits,
-          inseeSideEtablissements:
-            territory.enrichment.enterprises.inseeEstablishments,
-          inseeSideAnnee: territory.enrichment.enterprises.inseeSideYear,
+          referenceStatistique: {
+            source: "INSEE SIDE",
+            annee: territory.enrichment.enterprises.inseeSideYear,
+            unitesLegales: territory.enrichment.enterprises.inseeLegalUnits,
+            etablissements: territory.enrichment.enterprises.inseeEstablishments,
+          },
+          complementAdministratif: {
+            source: "API SIRENE",
+            unitesLegalesAvecEtablissement:
+              territory.enrichment.enterprises.legalUnitsWithEstablishment,
+            totalPlafonneApi: territory.enrichment.enterprises.legalUnitsIsCapped,
+            ess: territory.enrichment.enterprises.essCount,
+            rge: territory.enrichment.enterprises.rgeCount,
+          },
+          avertissementDivergenceSireneSide:
+            territory.enrichment.enterprises.divergenceWarning,
           note: territory.enrichment.enterprises.note,
         }
       : null,

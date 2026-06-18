@@ -4,6 +4,7 @@ import {
   formatPropertyPrice,
 } from "@/lib/enrichment";
 import { formatPopulation } from "@/lib/territory";
+import { getPopulationDisplayMeta } from "@/lib/ux/population";
 import type { TerritoryProfile } from "@/lib/types";
 
 export interface KpiItem {
@@ -18,12 +19,14 @@ export function extractHeroKpis(territory: TerritoryProfile): KpiItem[] {
   const derived = enrichment?.derived;
   const property = enrichment?.property;
   const geography = enrichment?.geography;
+  const populationMeta = getPopulationDisplayMeta(territory);
   const kpis: KpiItem[] = [];
 
   kpis.push({
     id: "population",
-    label: "Population",
+    label: populationMeta.label,
     value: formatPopulation(territory.population),
+    hint: populationMeta.definition,
   });
 
   kpis.push({

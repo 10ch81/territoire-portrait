@@ -8,7 +8,7 @@ export const ACRONYMS: Record<string, string> = {
   EPCI: "Établissement public de coopération intercommunale",
   ESS: "Économie sociale et solidaire",
   RGE: "Reconnu garant de l'environnement",
-  SIRENE: "Répertoire des entreprises et établissements (INSEE)",
+  SIRENE: "Répertoire administratif des entreprises et établissements (INSEE) — complément, pas indicateur de dynamisme économique",
   INSEE: "Institut national de la statistique et des études économiques",
   AZI: "Atlas des zones inondables",
   CATNAT: "Catastrophes naturelles — régime d'indemnisation",

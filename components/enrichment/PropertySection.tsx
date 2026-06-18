@@ -26,6 +26,11 @@ export function PropertySection({ territory }: PropertySectionProps) {
     >
       {property?.available ? (
         <>
+          <p className="mb-3 text-xs text-slate-500">
+            Prix agrégés sur les mutations enregistrées (moyennes communales). Pas de
+            distinction neuf/ancien, standing, biens atypiques, lots multiples,
+            dépendances ni terrains nus.
+          </p>
           <PropertyPriceChart history={property.priceHistory} />
           <dl className="mt-3 space-y-3">
             <DataRow

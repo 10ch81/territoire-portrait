@@ -64,6 +64,8 @@ export interface EnterpriseSnapshot {
   inseeEstablishments: number | null;
   inseeSideYear: number | null;
   millesime: string;
+  /** Avertissement si SIRENE API et SIDE INSEE divergent fortement. */
+  divergenceWarning: string | null;
   note: string;
 }
 

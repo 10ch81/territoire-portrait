@@ -51,6 +51,37 @@ async function fetchEnterpriseTotal(
 
 const ENTERPRISE_SIDE_CACHE_FILE = "enterprise-side-by-commune.json";
 
+const SIRENE_SIDE_DIVERGENCE_RATIO = 1.35;
+
+function isPresent(value: number | null | undefined): value is number {
+  return value !== null && value !== undefined && Number.isFinite(value);
+}
+
+function computeSireneSideDivergence(
+  sireneUnits: number | null,
+  sideUnits: number | null,
+): string | null {
+  if (!isPresent(sireneUnits) || !isPresent(sideUnits) || sideUnits <= 0) {
+    return null;
+  }
+
+  const ratio = sireneUnits / sideUnits;
+  if (
+    ratio <= SIRENE_SIDE_DIVERGENCE_RATIO &&
+    ratio >= 1 / SIRENE_SIDE_DIVERGENCE_RATIO
+  ) {
+    return null;
+  }
+
+  const sireneLabel = new Intl.NumberFormat("fr-FR").format(sireneUnits);
+  const sideLabel = new Intl.NumberFormat("fr-FR").format(sideUnits);
+
+  return (
+    `Écart notable entre SIRENE API (${sireneLabel} unités légales) et SIDE INSEE (${sideLabel}) : ` +
+    "périmètres et méthodes distincts. Privilégier SIDE pour l'analyse économique ; SIRENE sert de répertoire administratif complémentaire."
+  );
+}
+
 function loadInseeSideCounts(inseeCode: string): {
   legalUnits: number | null;
   establishments: number | null;
@@ -85,16 +116,23 @@ export async function fetchEnterpriseSnapshot(
     return null;
   }
 
-  const noteParts = [
-    "Unités légales ayant au moins un établissement actif sur la commune (API SIRENE).",
-    "Comptages ESS et RGE issus de l'API (filtres dédiés).",
-  ];
+  const divergenceWarning = computeSireneSideDivergence(
+    base?.total ?? null,
+    side.legalUnits,
+  );
+
+  const noteParts: string[] = [];
 
   if (side.legalUnits !== null) {
     noteParts.push(
-      `Stocks INSEE SIDE (${side.year}) : unités légales et étabissements actifs sur la commune.`,
+      `Référence statistique : stocks INSEE SIDE (${side.year}) — unités légales et établissements actifs sur la commune.`,
     );
   }
+
+  noteParts.push(
+    "Complément administratif : unités légales avec ≥ 1 établissement actif (API SIRENE) ; ne pas en déduire un dynamisme économique.",
+    "Comptages ESS et RGE issus de l'API SIRENE (filtres dédiés).",
+  );
 
   if (base?.isCapped) {
     noteParts.push(
@@ -110,7 +148,8 @@ export async function fetchEnterpriseSnapshot(
     inseeLegalUnits: side.legalUnits,
     inseeEstablishments: side.establishments,
     inseeSideYear: side.year,
-    millesime: side.year ? `${side.year} / 2024-2025` : "2024-2025",
+    millesime: side.year ? `${side.year} (SIDE) / 2024-2025 (SIRENE)` : "2024-2025",
+    divergenceWarning,
     note: noteParts.join(" "),
   };
 }

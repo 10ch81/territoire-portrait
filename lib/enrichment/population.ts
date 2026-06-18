@@ -43,7 +43,7 @@ export function loadPopulationHistorySnapshot(
     latestPopulation,
     history,
     available: history.length > 0,
-    note: "Populations municipales INSEE (DS_POPULATIONS_HISTORIQUES).",
+    note: `Populations municipales INSEE (DS_POPULATIONS_HISTORIQUES). La population légale affichée en tête de fiche provient de l'API Géo.`,
   };
 }
 

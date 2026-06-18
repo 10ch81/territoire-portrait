@@ -43,7 +43,7 @@ export function loadPropertyMarketSnapshot(
     departmentAveragePricePerM2: entry.departmentAveragePricePerM2 ?? null,
     available: true,
     note:
-      "Indicateurs DVF agrégés par commune (série 2014-2024, répartition maisons/appartements, comparatif départemental).",
+      "Prix DVF : moyennes agrégées sur les mutations enregistrées (série 2014-2024). Pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus ; comparatif départemental indicatif.",
   };
 }
 

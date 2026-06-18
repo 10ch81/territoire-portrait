@@ -10,6 +10,7 @@ import {
 } from "@/lib/enrichment";
 import { formatDensity } from "@/lib/enrichment";
 import { formatPopulation } from "@/lib/territory";
+import { getPopulationDisplayMeta } from "@/lib/ux/population";
 import type { TerritoryProfile } from "@/lib/types";
 
 interface DemographicsSectionProps {
@@ -21,6 +22,7 @@ export function DemographicsSection({ territory }: DemographicsSectionProps) {
   const populationHistory = enrichment?.populationHistory;
   const derived = enrichment?.derived;
   const sociodemographics = enrichment?.sociodemographics;
+  const populationMeta = getPopulationDisplayMeta(territory);
 
   return (
     <DataSection
@@ -73,9 +75,15 @@ export function DemographicsSection({ territory }: DemographicsSectionProps) {
               value={formatDensity(territory.densityPerKm2)}
             />
             <DataRow
-              label="Population (légale)"
+              label={populationMeta.label}
               value={formatPopulation(territory.population)}
             />
+            <p className="text-xs text-slate-500">{populationMeta.definition}</p>
+            {populationMeta.consistencyNotes.map((note) => (
+              <p key={note} className="text-xs text-amber-800">
+                {note}
+              </p>
+            ))}
             {derived && derived.populationGrowthPercent != null ? (
               <DataRow
                 label={`Croissance ${derived.populationGrowthFromYear ?? ""}→${derived.populationGrowthToYear ?? ""}`}

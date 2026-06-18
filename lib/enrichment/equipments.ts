@@ -108,7 +108,7 @@ export function loadEquipmentSnapshot(inseeCode: string): EquipmentSnapshot {
     transport: buildTransportSnapshot(entry.byType ?? {}, labels, transportDomainCount),
     available: true,
     note:
-      "Dénombrement INSEE BPE 2024 par domaine et principaux types d'équipements (commune).",
+      "Dénombrement INSEE BPE 2024 : chaque ligne compte un équipement. Les domaines se décomposent le total ; les principaux types (top 8) sont une liste partielle, non exhaustive.",
   };
 }
 

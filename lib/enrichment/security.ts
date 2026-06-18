@@ -73,8 +73,7 @@ export function loadSecuritySnapshot(territory: TerritoryProfile): SecuritySnaps
     diffusedIndicatorCount,
     available: diffusedIndicatorCount > 0,
     note:
-      "Crimes et délits enregistrés par la police et la gendarmerie (lieu de commission, SSMSI). " +
-      "Taux pour 1 000 habitants lorsque l'indicateur est diffusé ; sinon non disponible (secret statistique).",
+      "Faits enregistrés par la police et la gendarmerie (lieu de commission, SSMSI). Ne mesure pas le ressenti d'insécurité ni les faits non déclarés. Taux pour 1 000 habitants lorsque diffusé ; une seule année — pas de tendance interannuelle.",
   };
 }
 
