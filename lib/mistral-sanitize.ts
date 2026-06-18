@@ -53,6 +53,191 @@ interface ReplacementRule {
   when?: (context: FactsContext) => boolean;
 }
 
+const INTERNAL_LEAK_PATTERNS: RegExp[] = [
+  /à décrire sans comparaison[^.;\n]*/gi,
+  /à interpréter sans comparaison[^.;\n]*/gi,
+  /comparaison homogène fournie/gi,
+  /comparaison (?:nationale|régionale|départementale|EPCI) non fournie dans les données/gi,
+  /sans comparaison (?:nationale|départementale|régionale) homogène(?: fournie)?/gi,
+  /non analysée dans les données disponibles/gi,
+  /non analysée dans les données/gi,
+  /\bsanitizer\b/gi,
+  /règle interne/gi,
+];
+
+export const INTERNAL_LEAK_MARKERS = [
+  "à décrire sans comparaison",
+  "comparaison homogène fournie",
+  "comparaison nationale non fournie",
+  "comparaison départementale non fournie",
+  "sans comparaison nationale homogène",
+  "sanitizer",
+  "règle interne",
+  "facts",
+  "json",
+] as const;
+
+function getUnemploymentVintage(facts: TerritorialFacts): number {
+  const note = facts.structureParAge?.note ?? "";
+  const match = note.match(/20\d{2}/);
+  return match ? Number.parseInt(match[0], 10) : 2021;
+}
+
+function unemploymentDescriptivePhrase(facts: TerritorialFacts, qualifier = "élevé"): string {
+  const year = getUnemploymentVintage(facts);
+  return `Taux de chômage des 15-64 ans ${qualifier} au recensement ${year}`;
+}
+
+export function containsInternalLeakage(text: string): string[] {
+  const lower = text.toLowerCase();
+  return INTERNAL_LEAK_MARKERS.filter((marker) => lower.includes(marker.toLowerCase()));
+}
+
+function cleanupSentenceArtifacts(text: string): string {
+  return text
+    .replace(/pôle de l['’]aire d'attraction/gi, "pôle d'une aire d'attraction")
+    .replace(/,\s*disponibles\b(?=\s*[.!?]|$)/gi, "")
+    .replace(/,\s*,+/g, ",")
+    .replace(/,\s*\./g, ".")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s+(?=[.!?])/g, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/^\s*[,;:]\s*/g, "")
+    .replace(/\s*[,;:]\s*$/g, "")
+    .trim();
+}
+
+function stripCrossThemeContamination(text: string): string {
+  const lower = text.toLowerCase();
+  const hasUnemployment = /\b(?:chômage|taux de chômage)\b/.test(lower);
+  const hasSecurity = /\b(?:ssmsi|sécurité|police|gendarmerie|faits enregistrés)\b/.test(lower);
+
+  if (hasUnemployment) {
+    return text
+      .replace(/[,;]\s+avec\s+un\s+taux\s+ssmsi[^.]*/gi, "")
+      .replace(/[,;]?\s*taux\s+ssmsi[^.]*/gi, "")
+      .replace(/[,;]?\s*pour\s+1000\s+habitants?[^.]*/gi, "")
+      .replace(/[,;]?\s*(?:indicateurs?\s+de\s+sécurité|faits enregistrés)[^.]*/gi, "");
+  }
+
+  if (hasSecurity) {
+    return text.replace(
+      /[,;]?\s*(?:taux de chômage|chômage des 15-64|recensement 20\d{2})[^.]*/gi,
+      "",
+    );
+  }
+
+  return text;
+}
+
+function repairDegenerateSentences(
+  text: string,
+  facts: TerritorialFacts,
+  context: FactsContext,
+): string {
+  const trimmed = text.trim();
+
+  if (/^taux\s*[.,]?$/i.test(trimmed)) {
+    return context.hasDepartmentSecurityBenchmark
+      ? "Indicateurs de sécurité enregistrée à interpréter avec prudence"
+      : "Indicateurs de sécurité enregistrée à interpréter selon la définition et le millésime disponibles";
+  }
+
+  if (/^(?:chômage|taux de chômage)\s*[.,]?$/i.test(trimmed)) {
+    return unemploymentDescriptivePhrase(facts);
+  }
+
+  return text;
+}
+
+function finalizeUserFacingText(text: string): string {
+  let result = text;
+
+  for (const pattern of INTERNAL_LEAK_PATTERNS) {
+    result = result.replace(pattern, "");
+  }
+
+  result = cleanupSentenceArtifacts(result);
+
+  if (!result || /^[,.;\s]*$/.test(result)) {
+    return "";
+  }
+
+  return result;
+}
+
+function sanitizeThemedComparisons(
+  text: string,
+  facts: TerritorialFacts,
+  context: FactsContext,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  let result = text;
+  const unemploymentPhrase = unemploymentDescriptivePhrase(facts);
+
+  const themedRules: Array<{ pattern: RegExp; replacement: string; rule: string }> = [
+    {
+      pattern:
+        /taux de chômage[^.]{0,120}?(?:supérieur|inférieur|élevé|faible)(?:e|es)?[^.]{0,120}?(?:indicateurs départementaux|moyenne départementale|taux national|moyenne nationale)[^.]*/gi,
+      replacement: unemploymentPhrase,
+      rule: "unemployment-comparison-rewrite",
+    },
+    {
+      pattern: /le taux de chômage est (?:inférieur|supérieur)(?:e)? au taux national\.?/gi,
+      replacement: unemploymentDescriptivePhrase(facts, "modéré"),
+      rule: "unemployment-national-rewrite",
+    },
+    {
+      pattern:
+        /(?:chômage|taux de chômage)[^.]{0,80}?à décrire sans comparaison[^.]*/gi,
+      replacement: unemploymentPhrase,
+      rule: "unemployment-leak-rewrite",
+    },
+    {
+      pattern:
+        /taux de chômage[^.]{0,40}?élevé[^.]{0,80}?(?:comparaison|homogène|départementale)[^.]*/gi,
+      replacement: unemploymentPhrase,
+      rule: "unemployment-elevated-leak-rewrite",
+    },
+  ];
+
+  if (!context.hasDepartmentSecurityBenchmark) {
+    themedRules.push(
+      {
+        pattern:
+          /\btaux\s+(?:supérieur|inférieur)(?:e|es)?\s+aux?\s+indicateurs\s+départementaux\.?/gi,
+        replacement:
+          "Indicateurs de sécurité enregistrée à interpréter selon la définition et le millésime disponibles",
+        rule: "security-dept-comparison-rewrite",
+      },
+      {
+        pattern:
+          /(?:indicateurs? de sécurité|sécurité|faits)[^.]{0,100}?(?:supérieur|inférieur)(?:e|es)?[^.]{0,80}?(?:indicateurs départementaux|département)[^.]*/gi,
+        replacement:
+          "Indicateurs de sécurité enregistrée à interpréter selon la définition et le millésime disponibles",
+        rule: "security-comparison-rewrite",
+      },
+    );
+  }
+
+  for (const themedRule of themedRules) {
+    result = result.replace(themedRule.pattern, (match) => {
+      warnings.push({
+        field,
+        index,
+        original: match,
+        sanitized: themedRule.replacement,
+        rule: themedRule.rule,
+      });
+      return themedRule.replacement;
+    });
+  }
+
+  return result;
+}
+
 const STATIC_REPLACEMENTS: ReplacementRule[] = [
   {
     id: "epci-chef-lieu",
@@ -118,14 +303,15 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
   {
     id: "department-indicators-comparison",
     pattern:
-      /(?:supérieur|inférieur)(?:e|es)?\s+aux?\s+indicateurs\s+départementaux/gi,
-    replacement: "à décrire sans comparaison départementale homogène fournie",
+      /(?:,?\s*)?(?:supérieur|inférieur)(?:e|es)?\s+aux?\s+indicateurs\s+départementaux(?:\s+disponibles)?/gi,
+    replacement: "",
+    when: (context) => !context.hasDepartmentSecurityBenchmark,
   },
   {
     id: "unemployment-department-comparison",
     pattern:
       /(?:chômage|taux de chômage)[^.]{0,50}(?:supérieur|inférieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+départementale/gi,
-    replacement: "taux de chômage élevé au recensement",
+    replacement: "",
   },
   {
     id: "security-stakes",
@@ -174,14 +360,13 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
   {
     id: "limited-public-transport-offer",
     pattern: /offre de transport collectif limitée/gi,
-    replacement:
-      "offre réelle de transport collectif non analysée dans les données disponibles",
+    replacement: "équipements de mobilité recensés ; offre de transport collectif à approfondir",
   },
   {
     id: "limited-collective-transport",
     pattern: /transport collectif limité/gi,
     replacement:
-      "équipements de transport recensés dans la BPE ; offre réelle de transport collectif non analysée",
+      "équipements de transport recensés dans la BPE ; offre de transport collectif à approfondir",
   },
   {
     id: "entrepreneurial-fabric",
@@ -202,8 +387,7 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
   {
     id: "strong-territorial-accessibility",
     pattern: /accessibilité territoriale (?:forte|marquée|élevée)/gi,
-    replacement:
-      "équipements de mobilité recensés, sans preuve d'accessibilité territoriale globale",
+    replacement: "équipements de mobilité recensés",
   },
   {
     id: "real-estate-agencies-major-lever",
@@ -235,8 +419,7 @@ const CONTEXTUAL_REPLACEMENTS: ReplacementRule[] = [
   {
     id: "transport-offer-limited",
     pattern: /offre de transport limitée/gi,
-    replacement:
-      "offre réelle de transport collectif non analysée dans les données disponibles",
+    replacement: "équipements de mobilité recensés ; offre de transport collectif à approfondir",
     when: (context) => !context.hasRealTransportOffer,
   },
   {
@@ -248,57 +431,79 @@ const CONTEXTUAL_REPLACEMENTS: ReplacementRule[] = [
   {
     id: "commute-outbound",
     pattern: /actifs travaillant hors de la commune/gi,
-    replacement:
-      "parts modales domicile-travail (sans flux sortants mesurés)",
+    replacement: "parts modales domicile-travail disponibles",
     when: (context) => !context.hasCommuteOutboundFlows,
   },
   {
     id: "commute-outbound-variant",
     pattern: /actifs travaillant hors commune/gi,
-    replacement:
-      "parts modales domicile-travail (sans flux sortants mesurés)",
+    replacement: "parts modales domicile-travail disponibles",
     when: (context) => !context.hasCommuteOutboundFlows,
   },
   {
     id: "national-average",
-    pattern: /moyenne nationale/gi,
-    replacement: "comparaison nationale non fournie dans les données",
+    pattern: /,?\s*(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |au )?moyenne nationale/gi,
+    replacement: "",
     when: (context) => !context.hasNationalBenchmark,
   },
   {
     id: "regional-average",
-    pattern: /moyenne régionale/gi,
-    replacement: "comparaison régionale non fournie dans les données",
+    pattern: /,?\s*(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne régionale/gi,
+    replacement: "",
     when: (context) => !context.hasRegionalBenchmark,
   },
   {
     id: "department-average",
-    pattern: /moyenne départementale/gi,
-    replacement: "comparaison départementale non fournie dans les données",
+    pattern: /,?\s*(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne départementale/gi,
+    replacement: "",
     when: (context) => !context.hasAnyDepartmentBenchmark,
   },
   {
     id: "epci-average",
-    pattern: /moyenne (?:de l['’])?EPCI/gi,
-    replacement: "comparaison EPCI non fournie dans les données",
+    pattern: /,?\s*(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne (?:de l['’])?EPCI/gi,
+    replacement: "",
+    when: (context) => !context.hasEpciBenchmark,
+  },
+  {
+    id: "national-average-phrase",
+    pattern: /\bmoyenne nationale\b/gi,
+    replacement: "",
+    when: (context) => !context.hasNationalBenchmark,
+  },
+  {
+    id: "regional-average-phrase",
+    pattern: /\bmoyenne régionale\b/gi,
+    replacement: "",
+    when: (context) => !context.hasRegionalBenchmark,
+  },
+  {
+    id: "department-average-phrase",
+    pattern: /\bmoyenne départementale\b/gi,
+    replacement: "",
+    when: (context) => !context.hasAnyDepartmentBenchmark,
+  },
+  {
+    id: "epci-average-phrase",
+    pattern: /\bmoyenne (?:de l['’])?EPCI\b/gi,
+    replacement: "",
     when: (context) => !context.hasEpciBenchmark,
   },
   {
     id: "national-unemployment",
     pattern: /(?:taux (?:de )?chômage|chômage) (?:national|BIT)/gi,
-    replacement: "taux de chômage local (sans comparaison nationale homogène)",
+    replacement: "",
     when: (context) => !context.hasNationalBenchmark,
   },
   {
     id: "below-national-unemployment",
     pattern: /(?:inférieur|supérieur)(?:e)?(?:\s+\w+){0,4}\s+au\s+taux\s+national/gi,
-    replacement: "à interpréter sans comparaison nationale homogène",
+    replacement: "",
     when: (context) => !context.hasNationalBenchmark,
   },
   {
     id: "versus-national-rate",
     pattern: /\bau taux national\b/gi,
-    replacement: "sans comparaison nationale homogène fournie",
+    replacement: "",
     when: (context) => !context.hasNationalBenchmark,
   },
   {
@@ -352,15 +557,15 @@ const CONTEXTUAL_REPLACEMENTS: ReplacementRule[] = [
   {
     id: "below-department-average",
     pattern:
-      /(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+départementale/gi,
-    replacement: "à décrire sans comparaison départementale homogène",
+      /(?:,?\s*)?(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+départementale/gi,
+    replacement: "",
     when: (context) => !context.hasAnyDepartmentBenchmark,
   },
   {
     id: "below-regional-average",
     pattern:
-      /(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+régionale/gi,
-    replacement: "à décrire sans comparaison régionale homogène",
+      /(?:,?\s*)?(?:inférieur|supérieur)(?:e|es)?\s+(?:à la |aux? )?moyenne\s+régionale/gi,
+    replacement: "",
     when: (context) => !context.hasRegionalBenchmark,
   },
   {
@@ -558,12 +763,15 @@ function applyReplacementRules(
 function sanitizeText(
   text: string,
   context: FactsContext,
+  facts: TerritorialFacts,
   warnings: SanitizationWarning[],
   field: AnalysisTextField,
   index?: number,
 ): string {
-  let sanitized = applyReplacementRules(
-    text,
+  let sanitized = sanitizeThemedComparisons(text, facts, context, warnings, field, index);
+
+  sanitized = applyReplacementRules(
+    sanitized,
     STATIC_REPLACEMENTS,
     context,
     warnings,
@@ -583,6 +791,9 @@ function sanitizeText(
   sanitized = sanitizeCatNatInflation(sanitized, context, warnings, field, index);
   sanitized = sanitizeBpeMisleadingBreakdown(sanitized, context, warnings, field, index);
   sanitized = sanitizeAavCategoryLabel(sanitized, context, warnings, field, index);
+  sanitized = stripCrossThemeContamination(sanitized);
+  sanitized = repairDegenerateSentences(sanitized, facts, context);
+  sanitized = finalizeUserFacingText(sanitized);
 
   return sanitized.trim();
 }
@@ -590,11 +801,12 @@ function sanitizeText(
 function sanitizeStringList(
   items: string[],
   context: FactsContext,
+  facts: TerritorialFacts,
   warnings: SanitizationWarning[],
   field: AnalysisTextField,
 ): string[] {
   return items
-    .map((item, index) => sanitizeText(item, context, warnings, field, index))
+    .map((item, index) => sanitizeText(item, context, facts, warnings, field, index))
     .filter((item) => item.length > 0);
 }
 
@@ -626,17 +838,19 @@ export function sanitizeTerritorialAnalysis(
 
   return {
     analysis: {
-      summary: sanitizeText(normalized.summary, context, warnings, "summary"),
-      strengths: sanitizeStringList(normalized.strengths, context, warnings, "strengths"),
+      summary: sanitizeText(normalized.summary, context, facts, warnings, "summary"),
+      strengths: sanitizeStringList(normalized.strengths, context, facts, warnings, "strengths"),
       watchPoints: sanitizeStringList(
         normalized.watchPoints,
         context,
+        facts,
         warnings,
         "watchPoints",
       ),
       opportunities: sanitizeStringList(
         normalized.opportunities,
         context,
+        facts,
         warnings,
         "opportunities",
       ),
@@ -675,6 +889,7 @@ export function containsForbiddenPhrases(text: string): string[] {
     "tissu entrepreneurial local",
     "accessibilité aux infrastructures",
     "marché immobilier actif",
+    ...INTERNAL_LEAK_MARKERS,
   ];
 
   const lower = text.toLowerCase();

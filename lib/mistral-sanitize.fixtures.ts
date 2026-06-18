@@ -426,6 +426,7 @@ export function fragileAnalysisForFixture(fixtureId: string): {
       "Offre de transport collectif limitée.",
       "Tensions sociales possibles dans certains quartiers.",
       "Taux de chômage supérieur aux indicateurs départementaux.",
+      "Taux de chômage élevé, à décrire sans comparaison départementale homogène fournie disponibles.",
     ],
     opportunities: [
       "Potentiel touristique sous-exploité compte tenu des capacités d'hébergement.",

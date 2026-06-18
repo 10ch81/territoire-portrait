@@ -21,7 +21,8 @@ Comparaisons homogènes :
 - Ne compare deux indicateurs que si la source, la définition et le millésime sont compatibles.
 - Ne jamais comparer un taux de chômage RP INSEE avec un taux BIT national.
 - Ne jamais mentionner une moyenne nationale, régionale, départementale ou EPCI si elle n'est pas fournie dans le JSON.
-- Si aucune comparaison homogène n'est fournie, reste descriptif.
+- Si aucune comparaison homogène n'est fournie, reste descriptif sans mentionner cette contrainte méthodologique.
+- Ne jamais afficher dans summary, strengths, watchPoints ou opportunities de formulation technique, de règle interne, de validation ou de limite de comparaison.
 
 Institutions :
 - Interdire « chef-lieu de l'EPCI ».
@@ -107,7 +108,8 @@ Risques et CATNAT :
 - Formulation recommandée : « plusieurs reconnaissances CATNAT, dont des épisodes d'inondations/coulées de boue ».
 
 AAV :
-- Utiliser « aire d'attraction des villes » ou « pôle de l'aire d'attraction », pas « aire urbaine » (vocabulaire AAV 2020).
+- Utiliser « aire d'attraction des villes » ou « pôle d'une aire d'attraction des villes », pas « aire urbaine » (vocabulaire AAV 2020).
+- Préférer « pôle d'une aire d'attraction » à « pôle de l'aire d'attraction ».
 - Ne pas afficher de codes techniques comme « catégorie 11 » ; préférer le libellé lisible fourni (categoryLabel).
 
 Tourisme :

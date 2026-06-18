@@ -6,6 +6,7 @@ import {
 } from "./mistral-sanitize.fixtures";
 import {
   containsForbiddenPhrases,
+  containsInternalLeakage,
   sanitizeTerritorialAnalysis,
 } from "./mistral-sanitize";
 
@@ -72,6 +73,7 @@ describe("sanitizeTerritorialAnalysis", () => {
       assert.ok(Array.isArray(analysis.strengths));
       assert.ok(Array.isArray(analysis.watchPoints));
       assert.ok(Array.isArray(analysis.opportunities));
+      assert.equal(containsInternalLeakage(text).length, 0);
     });
   }
 
@@ -101,7 +103,61 @@ describe("sanitizeTerritorialAnalysis", () => {
     );
 
     assert.equal(analysis.summary.toLowerCase().includes("au taux national"), false);
-    assert.match(analysis.summary, /sans comparaison nationale homogène/i);
+    assert.match(analysis.summary, /taux de chômage des 15-64 ans/i);
+    assert.match(analysis.summary, /recensement 2021/i);
+    assert.equal(containsInternalLeakage(analysis.summary).length, 0);
+  });
+
+  it("supprime les fuites de règles internes sur le chômage", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary:
+          "Taux de chômage élevé, à décrire sans comparaison départementale homogène fournie disponibles.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES[0].facts,
+    );
+
+    const text = collectText(analysis);
+    assert.equal(text.toLowerCase().includes("à décrire sans comparaison"), false);
+    assert.equal(text.toLowerCase().includes("comparaison homogène fournie"), false);
+    assert.match(analysis.summary, /taux de chômage des 15-64 ans élevé au recensement 2021/i);
+  });
+
+  it("ne mélange pas chômage et sécurité dans une même phrase", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: [
+          "Taux de chômage élevé au recensement 2021, avec un taux SSMSI de 12 pour 1000 habitants.",
+        ],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES[0].facts,
+    );
+
+    const phrase = analysis.watchPoints[0].toLowerCase();
+    assert.match(phrase, /chômage/);
+    assert.equal(phrase.includes("ssmsi"), false);
+    assert.equal(phrase.includes("pour 1000"), false);
+  });
+
+  it("corrige pôle de l'aire en pôle d'une aire", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Pôle de l'aire d'attraction des villes de moins de 50 000 habitants.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.match(analysis.summary, /pôle d'une aire d'attraction/i);
+    assert.equal(analysis.summary.toLowerCase().includes("pôle de l'aire"), false);
   });
 
   it("remplace la tendance si une seule année est disponible", () => {
@@ -214,6 +270,11 @@ describe("sanitizeTerritorialAnalysis", () => {
       analysis.watchPoints[0].toLowerCase().includes("supérieur aux indicateurs départementaux"),
       false,
     );
+    assert.match(
+      analysis.watchPoints[0],
+      /indicateurs de sécurité enregistrée à interpréter selon la définition et le millésime disponibles/i,
+    );
+    assert.equal(containsInternalLeakage(analysis.watchPoints[0]).length, 0);
   });
 
   it("corrige le vocabulaire AAV et les codes techniques", () => {
@@ -348,6 +409,7 @@ describe("sanitizeTerritorialAnalysis", () => {
     assert.deepEqual(analysis, prudent);
     assert.equal(warnings.length, 0);
     assert.equal(containsForbiddenPhrases(collectText(analysis)).length, 0);
+    assert.equal(containsInternalLeakage(collectText(analysis)).length, 0);
   });
 
   it("Saint-Girons — régression sur le profil typique", () => {
