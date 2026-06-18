@@ -37,11 +37,9 @@ Points forts (strengths) :
 - Ne pas utiliser « dynamique économique », « vitalité économique » ou « dynamisme entrepreneurial » sans série d'évolution.
 
 Points d'attention (watchPoints) :
-- Couvrir en priorité les familles d'enjeux disponibles : démographie, vieillissement, chômage/revenu, logement, risques naturels, sécurité enregistrée.
-- Ne pas omettre démographie ni chômage/revenu lorsque les constats signalent un enjeu.
+- Couvrir plusieurs familles d'enjeux si disponibles : démographie, vieillissement, chômage/revenu, logement, risques, sécurité, mobilité, QPV.
 - Ne pas répéter le même indicateur sous des formulations proches.
 - Sécurité (SSMSI) et risques naturels restent distincts.
-- Ne pas ajouter de qualification géographique ou interprétative (« au cœur de », « significatif », « marqué ») absente des constats serveur ; préférer « documenté par », « recensé par », « décrit par » ou « à interpréter avec prudence ».
 
 Opportunités (opportunities) :
 - Formuler des pistes d'action prudentes, pas des constats ni des demandes d'étude.

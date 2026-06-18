@@ -104,26 +104,6 @@ const CROSS_THEME_PATTERNS: Array<{ pattern: RegExp; rule: string }> = [
   },
 ];
 
-const INTERPRETIVE_ADJECTIVE_PATTERN =
-  /\b(?:significatif(?:ve|s|ves)?|notable(?:s)?|important(?:e|es)?|marqué(?:e|s|es)?|considérable(?:s)?)\b/i;
-
-const GEOGRAPHIC_QUALIFIER_PATTERN = /\bau c[œoe]ur\b/i;
-
-function isPhraseAuthorizedInFacts(text: string, analysisFacts: AnalysisFact[]): boolean {
-  const lower = text.toLowerCase();
-  return analysisFacts.some((fact) => {
-    const factLower = fact.sentence.toLowerCase();
-    if (INTERPRETIVE_ADJECTIVE_PATTERN.test(text)) {
-      const match = lower.match(INTERPRETIVE_ADJECTIVE_PATTERN);
-      if (match && factLower.includes(match[0].toLowerCase())) return true;
-    }
-    if (GEOGRAPHIC_QUALIFIER_PATTERN.test(text) && GEOGRAPHIC_QUALIFIER_PATTERN.test(fact.sentence)) {
-      return true;
-    }
-    return false;
-  });
-}
-
 function extractPercentTokens(text: string): number[] {
   const tokens: number[] = [];
   const matches = text.matchAll(/-?\d+[.,]\d+\s*(?:%|pour cent)/gi);
@@ -291,20 +271,29 @@ function listHasDuplicateTheme(items: string[], analysisFacts: AnalysisFact[]): 
   return false;
 }
 
+const UNSOURCED_QUALIFIER_PATTERN =
+  /\b(?:au c[œoe]ur de|significatif(?:le|ve|s)?|marqu[ée](?:e|es|s)?|majeur(?:e|es|s)?|strat[ée]gique(?:s)?|dynamique(?:s)?)\b/i;
+
+function qualifierAllowedByFacts(text: string, analysisFacts: AnalysisFact[]): boolean {
+  return analysisFacts.some(
+    (fact) =>
+      UNSOURCED_QUALIFIER_PATTERN.test(fact.sentence) &&
+      tokenOverlap(text, fact.sentence) >= 0.35,
+  );
+}
+
+function hasUnsourcedQualifier(text: string, analysisFacts: AnalysisFact[]): boolean {
+  if (!UNSOURCED_QUALIFIER_PATTERN.test(text)) return false;
+  return !qualifierAllowedByFacts(text, analysisFacts);
+}
+
 function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string | null {
   if (!text.trim()) return "empty";
 
   if (containsForbiddenPhrases(text).length > 0) return "forbidden-phrase";
   if (containsInternalLeakage(text).length > 0) return "internal-leak";
   if (FORBIDDEN_OPPORTUNITY_PATTERN.test(text)) return "forbidden-opportunity";
-
-  if (INTERPRETIVE_ADJECTIVE_PATTERN.test(text) && !isPhraseAuthorizedInFacts(text, analysisFacts)) {
-    return "interpretive-adjective";
-  }
-
-  if (GEOGRAPHIC_QUALIFIER_PATTERN.test(text) && !isPhraseAuthorizedInFacts(text, analysisFacts)) {
-    return "geographic-qualifier";
-  }
+  if (hasUnsourcedQualifier(text, analysisFacts)) return "unsourced-qualifier";
 
   for (const { pattern } of CROSS_THEME_PATTERNS) {
     if (pattern.test(text)) return "cross-theme";
@@ -451,4 +440,9 @@ export function hasCriticalValidationIssue(
 }
 
 // Exported for tests
-export { extractPercentTokens, CROSS_THEME_PATTERNS };
+export {
+  extractPercentTokens,
+  CROSS_THEME_PATTERNS,
+  UNSOURCED_QUALIFIER_PATTERN,
+  hasUnsourcedQualifier,
+};

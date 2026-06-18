@@ -239,6 +239,47 @@ describe("validateAnalysisOutput", () => {
     assert.doesNotMatch(result.opportunities.join(" "), /filière touristique/i);
   });
 
+  it("rejette qualificatifs interprétatifs non sourcés", () => {
+    const result = validateAnalysisOutput(
+      {
+        summary: "Commune au cœur d'un territoire dynamique et stratégique.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      analysisFacts,
+    );
+
+    assert.doesNotMatch(result.summary, /au cœur de/i);
+    assert.doesNotMatch(result.summary, /stratégique/i);
+    assert.doesNotMatch(result.summary, /dynamique/i);
+  });
+
+  it("conserve un qualificatif présent dans un analysisFact", () => {
+    const factWithQualifier: typeof analysisFacts[number] = {
+      id: "test-marked",
+      theme: "demography",
+      target: "summary",
+      sentence: "Recul démographique marqué documenté par les séries INSEE.",
+      evidence: ["populationHistory"],
+      sourceKeys: ["insee-population"],
+      confidence: "high",
+      year: 2022,
+    };
+
+    const result = validateAnalysisOutput(
+      {
+        summary: "Recul démographique marqué documenté par les séries INSEE.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      [...analysisFacts, factWithQualifier],
+    );
+
+    assert.match(result.summary, /marqué/i);
+  });
+
   it("conserve une sortie valide structurée", () => {
     const result = validateAnalysisOutput(
       {
@@ -259,33 +300,5 @@ describe("validateAnalysisOutput", () => {
     assert.ok(result.strengths.length > 0);
     assert.ok(result.watchPoints.length > 0);
     assert.ok(result.opportunities.length > 0);
-  });
-
-  it("rejette les adjectifs interprétatifs non présents dans les constats", () => {
-    const result = validateAnalysisOutput(
-      {
-        summary: "Enjeu significatif sur le territoire.",
-        strengths: [],
-        watchPoints: [],
-        opportunities: [],
-      },
-      analysisFacts,
-    );
-
-    assert.doesNotMatch(result.summary, /significatif/i);
-  });
-
-  it("rejette les qualifications géographiques absentes des constats", () => {
-    const result = validateAnalysisOutput(
-      {
-        summary: "Commune au cœur de l'Ariège, avec un recul démographique.",
-        strengths: [],
-        watchPoints: [],
-        opportunities: [],
-      },
-      analysisFacts,
-    );
-
-    assert.doesNotMatch(result.summary, /au cœur/i);
   });
 });

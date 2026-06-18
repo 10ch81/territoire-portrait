@@ -6,8 +6,13 @@ import {
   hasDuplicateIndicatorInTarget,
   indicatorKeys,
 } from "./dedupe-facts";
-import { saintGironsProfile } from "./fixtures";
+import { createPanelProfile, saintGironsProfile } from "./fixtures";
+import {
+  isEligibleWatchPointUpgrade,
+  scoreWatchPointCandidate,
+} from "./score-facts";
 import { selectAnalysisFactsForPrompt } from "./select-facts";
+import type { AnalysisFact } from "./types";
 
 describe("dedupe-facts", () => {
   it("indicatorKeys distingue deux valeurs d'un même thème", () => {
@@ -31,7 +36,7 @@ describe("dedupe-facts", () => {
 });
 
 describe("selectAnalysisFactsForPrompt", () => {
-  it("limite le volume et conserve sécurité + risques séparés", () => {
+  it("limite le volume et garde sécurité/risques séparés si présents", () => {
     const all = buildAnalysisFacts(saintGironsProfile);
     const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
 
@@ -40,8 +45,11 @@ describe("selectAnalysisFactsForPrompt", () => {
 
     const security = selected.find((f) => f.theme === "security");
     const risks = selected.find((f) => f.theme === "risks");
-    assert.ok(security);
-    assert.ok(risks);
+    if (security && risks) {
+      assert.notEqual(security.id, risks.id);
+      assert.doesNotMatch(security.sentence, /CATNAT|Géorisques/i);
+      assert.doesNotMatch(risks.sentence, /SSMSI/i);
+    }
   });
 
   it("évite les doublons d'indicateur dans une même rubrique", () => {
@@ -78,24 +86,92 @@ describe("selectAnalysisFactsForPrompt", () => {
     );
   });
 
-  it("produit au moins 3 watchPoints si 4 familles d'enjeux robustes", () => {
+  it("produit 3 à 4 watchPoints sans checklist obligatoire", () => {
     const all = buildAnalysisFacts(saintGironsProfile);
     const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
     const watchPoints = selected.filter((f) => f.target === "watchPoints");
 
     assert.ok(watchPoints.length >= 3);
-    assert.ok(watchPoints.some((f) => f.theme === "security"));
-    assert.ok(watchPoints.some((f) => f.theme === "risks"));
+    assert.ok(watchPoints.length <= 4);
   });
 
-  it("inclut démographie et emploi dans watchPoints lorsque enjeux signalés", () => {
+  it("ne conserve pas un watchPoint faible si un constat prioritaire mieux scoré est disponible", () => {
+    const profile = createPanelProfile("fullEnrichment");
+    const context = { territory: profile };
+
+    const weakWatchPoint: AnalysisFact = {
+      id: "watch-weak-tourism",
+      theme: "tourism",
+      target: "watchPoints",
+      sentence:
+        "Capacité d'hébergement touristique limitée, à interpréter avec prudence selon les données disponibles.",
+      evidence: ["tourism"],
+      sourceKeys: ["tourism"],
+      confidence: "medium",
+      year: 2024,
+    };
+
+    const strongWatchPoint: AnalysisFact = {
+      id: "watch-strong-income",
+      theme: "income",
+      target: "watchPoints",
+      sentence:
+        "Revenu médian disponible par unité de consommation inférieur aux références régionales recensées.",
+      evidence: ["sociodemographics"],
+      sourceKeys: ["filosofi"],
+      confidence: "high",
+      year: 2021,
+      numericBindings: [
+        {
+          value: 19_500,
+          label: "revenu médian disponible",
+          theme: "income",
+          allowedContexts: ["revenu", "médian"],
+        },
+      ],
+    };
+
+    const all = [
+      ...buildAnalysisFacts(profile).filter((fact) => fact.id !== weakWatchPoint.id),
+      weakWatchPoint,
+      strongWatchPoint,
+    ];
+
+    const selected = selectAnalysisFactsForPrompt(all, profile);
+    const watchPoints = selected.filter((fact) => fact.target === "watchPoints");
+
+    const eligibleUnselected = all.filter(
+      (fact) =>
+        fact.target === "watchPoints" &&
+        !watchPoints.some((selectedFact) => selectedFact.id === fact.id) &&
+        isEligibleWatchPointUpgrade(fact, context),
+    );
+
+    for (const watchPoint of watchPoints) {
+      const watchScore = scoreWatchPointCandidate(watchPoint, context);
+      for (const candidate of eligibleUnselected) {
+        const candidateScore = scoreWatchPointCandidate(candidate, context);
+        const couldReplace = candidateScore > watchScore;
+        assert.equal(
+          couldReplace,
+          false,
+          `un constat prioritaire (${candidate.id}) ne devrait pas rester écarté au profit de ${watchPoint.id}`,
+        );
+      }
+    }
+  });
+
+  it("conserve sécurité et risques séparés lorsqu'ils coexistent", () => {
     const all = buildAnalysisFacts(saintGironsProfile);
     const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
-    const watchPoints = selected.filter((f) => f.target === "watchPoints");
-    const watchThemes = new Set(watchPoints.map((f) => f.theme));
+    const security = selected.find((f) => f.theme === "security");
+    const risks = selected.find((f) => f.theme === "risks");
 
-    assert.ok(watchThemes.has("demography"), "recul démographique attendu");
-    assert.ok(watchThemes.has("employment"), "chômage élevé attendu");
+    if (security && risks) {
+      assert.notEqual(security.id, risks.id);
+      assert.doesNotMatch(security.sentence, /CATNAT|Géorisques/i);
+      assert.doesNotMatch(risks.sentence, /SSMSI/i);
+    }
   });
 
   it("sépare tourisme et France Services dans les strengths", () => {
