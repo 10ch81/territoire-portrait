@@ -62,6 +62,23 @@ describe("sanitizeTerritorialAnalysis", () => {
       assert.equal(text.toLowerCase().includes("acteurs mobilisables"), false);
       assert.equal(text.toLowerCase().includes("agences immobilières locales"), false);
       assert.equal(text.toLowerCase().includes("équipements, dont commerces"), false);
+      assert.equal(text.toLowerCase().includes("offre économique locale marquée"), false);
+      assert.equal(text.toLowerCase().includes("dynamique démographique en déclin"), false);
+      assert.equal(text.toLowerCase().includes("leviers potentiels pour des dynamiques collaboratives"), false);
+      if (fixture.facts.departement?.name) {
+        assert.equal(
+          text.toLowerCase().includes(
+            `commune-centre de ${fixture.facts.departement.name.toLowerCase()}`,
+          ),
+          false,
+        );
+        assert.equal(
+          text.toLowerCase().includes(
+            `commune-centre de l'${fixture.facts.departement.name.toLowerCase()}`,
+          ),
+          false,
+        );
+      }
       if (fixture.facts.mobilite?.domicileTravail) {
         assert.equal(
           text.toLowerCase().includes("actifs travaillant hors de la commune"),
@@ -143,6 +160,87 @@ describe("sanitizeTerritorialAnalysis", () => {
     assert.match(phrase, /chômage/);
     assert.equal(phrase.includes("ssmsi"), false);
     assert.equal(phrase.includes("pour 1000"), false);
+  });
+
+  it("remplace la qualification départementale par une centralité territoriale adaptée", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Commune-centre de l'Ariège, pôle local structurant.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.equal(analysis.summary.toLowerCase().includes("commune-centre de l'ariège"), false);
+    assert.match(analysis.summary, /commune-centre de l'EPCI/i);
+  });
+
+  it("remplace l'offre économique vague par une formulation SIDE", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Offre économique locale marquée selon les données disponibles.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES[0].facts,
+    );
+
+    assert.equal(analysis.summary.toLowerCase().includes("offre économique locale marquée"), false);
+    assert.match(analysis.summary, /tissu économique local décrit par les données SIDE/i);
+  });
+
+  it("préfère recul démographique à dynamique démographique en déclin", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Dynamique démographique en déclin depuis plusieurs années.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      COMMUNE_FIXTURES[0].facts,
+    );
+
+    assert.equal(analysis.summary.toLowerCase().includes("dynamique démographique en déclin"), false);
+    assert.match(analysis.summary, /recul démographique/i);
+  });
+
+  it("corrige un pourcentage agrégé 60+ incohérent avec les tranches", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Population vieillissante avec 23,9 % de la population à 60 ans et plus.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.equal(analysis.summary.includes("23,9"), false);
+    assert.match(analysis.summary, /38,1\s*%/);
+    assert.match(analysis.summary, /60\s*ans\s*et\s*plus/i);
+  });
+
+  it("adoucit les leviers ESS collaboratifs", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: [],
+        opportunities: ["Leviers potentiels pour des dynamiques collaboratives via l'ESS."],
+      },
+      COMMUNE_FIXTURES.find((fixture) => fixture.id === "sirene-side-divergence")!.facts,
+    );
+
+    assert.equal(
+      analysis.opportunities[0]
+        .toLowerCase()
+        .includes("leviers potentiels pour des dynamiques collaboratives"),
+      false,
+    );
+    assert.match(analysis.opportunities[0], /ressources à examiner pour des projets locaux/i);
   });
 
   it("corrige pôle de l'aire en pôle d'une aire", () => {

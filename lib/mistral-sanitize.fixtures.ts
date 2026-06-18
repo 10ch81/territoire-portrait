@@ -68,6 +68,11 @@ function baseFacts(overrides: Partial<TerritorialFacts> = {}): TerritorialFacts 
     geographie: {
       aireAttraction: null,
       comparatifEpci: null,
+      centraliteTerritoriale: {
+        qualificationRecommandee: "commune-centre de son bassin territorial",
+        centraliteDepartementale: false,
+        note: "",
+      },
     },
     immobilier: null,
     indicateursDerives: null,
@@ -84,6 +89,7 @@ export const urbanDenseFacts: TerritorialFacts = baseFacts({
   densiteHabKm2: 20_000,
   structureParAge: {
     tranches: [],
+    aggregatsAge: null,
     tauxChomage1564: 7.8,
     revenuMedianDisponible: 28_000,
     note: "RP 2021",
@@ -280,7 +286,19 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
   densiteHabKm2: 280,
   evolutionDemographique: [{ year: 2020, population: 6_250 }],
   structureParAge: {
-    tranches: [],
+    tranches: [
+      { label: "60-74 ans", population: 1_180, sharePercent: 18.5 },
+      { label: "75-89 ans", population: 770, sharePercent: 12.1 },
+      { label: "90 ans ou plus", population: 48, sharePercent: 7.5 },
+    ],
+    aggregatsAge: {
+      soixanteQuatorze: 18.5,
+      soixanteQuinzeQuatreVingtNeuf: 12.1,
+      quatreVingtDixPlus: 7.5,
+      soixantePlus: 38.1,
+      fiable: true,
+      note: "60 ans et plus = somme des parts 60-74, 75-89 et 90+.",
+    },
     tauxChomage1564: 11.2,
     revenuMedianDisponible: 19_500,
     note: "RP 2021",
@@ -346,6 +364,11 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
       epciAveragePopulation: 1_100,
       epciAverageDensity: 35,
       available: true,
+      note: "",
+    },
+    centraliteTerritoriale: {
+      qualificationRecommandee: "commune-centre de l'EPCI",
+      centraliteDepartementale: false,
       note: "",
     },
   },
@@ -427,6 +450,8 @@ export function fragileAnalysisForFixture(fixtureId: string): {
       "Tensions sociales possibles dans certains quartiers.",
       "Taux de chômage supérieur aux indicateurs départementaux.",
       "Taux de chômage élevé, à décrire sans comparaison départementale homogène fournie disponibles.",
+      "Offre économique locale marquée selon le stock SIDE.",
+      "Dynamique démographique en déclin sur la période récente.",
     ],
     opportunities: [
       "Potentiel touristique sous-exploité compte tenu des capacités d'hébergement.",

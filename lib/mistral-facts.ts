@@ -1,3 +1,4 @@
+import { computeAgeAggregates } from "./age-aggregates";
 import { getPopulationDisplayMeta } from "./ux/population";
 import type {
   AttractionAreaSnapshot,
@@ -28,6 +29,14 @@ export interface TerritorialFacts {
       population: number;
       sharePercent: number | null;
     }>;
+    aggregatsAge: {
+      soixanteQuatorze: number | null;
+      soixanteQuinzeQuatreVingtNeuf: number | null;
+      quatreVingtDixPlus: number | null;
+      soixantePlus: number | null;
+      fiable: boolean;
+      note: string;
+    } | null;
     tauxChomage1564: number | null;
     revenuMedianDisponible: number | null;
     note: string;
@@ -140,6 +149,11 @@ export interface TerritorialFacts {
   geographie: {
     aireAttraction: AttractionAreaSnapshot | null;
     comparatifEpci: EpciComparisonSnapshot | null;
+    centraliteTerritoriale: {
+      qualificationRecommandee: string;
+      centraliteDepartementale: boolean;
+      note: string;
+    } | null;
   };
   immobilier: {
     annee: number;
@@ -162,6 +176,20 @@ export interface TerritorialFacts {
 
 export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialFacts {
   const populationMeta = getPopulationDisplayMeta(territory);
+  const sociodemographics = territory.enrichment?.sociodemographics;
+  const ageBands = sociodemographics?.available ? sociodemographics.ageBands : [];
+  const ageAggregates = ageBands.length > 0 ? computeAgeAggregates(ageBands) : null;
+  const epciRank = territory.enrichment?.geography?.epciComparison?.communeRankByPopulation;
+  const isAavCentre = territory.enrichment?.geography?.attractionArea?.categoryLabel
+    ?.toLowerCase()
+    .includes("commune-centre");
+
+  const territorialCentralityPhrase =
+    epciRank === 1
+      ? "commune-centre de l'EPCI"
+      : isAavCentre
+        ? "commune-centre de son bassin territorial"
+        : "commune-centre de son bassin territorial";
 
   return {
     nom: territory.name,
@@ -180,13 +208,25 @@ export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialF
     evolutionDemographique: territory.enrichment?.populationHistory?.available
       ? territory.enrichment.populationHistory.history
       : null,
-    structureParAge: territory.enrichment?.sociodemographics?.available
+    structureParAge: sociodemographics?.available
       ? {
-          tranches: territory.enrichment.sociodemographics.ageBands,
-          tauxChomage1564: territory.enrichment.sociodemographics.unemploymentRate,
-          revenuMedianDisponible:
-            territory.enrichment.sociodemographics.medianDisposableIncome,
-          note: territory.enrichment.sociodemographics.note,
+          tranches: ageBands,
+          aggregatsAge: ageAggregates
+            ? {
+                soixanteQuatorze: ageAggregates.part60_74,
+                soixanteQuinzeQuatreVingtNeuf: ageAggregates.part75_89,
+                quatreVingtDixPlus: ageAggregates.part90Plus,
+                soixantePlus: ageAggregates.part60Plus,
+                fiable: ageAggregates.reliable,
+                note:
+                  ageAggregates.reliable
+                    ? "60 ans et plus = somme des parts 60-74, 75-89 et 90+ (recensement 2021)."
+                    : "Agrégat 60 ans et plus non fiable : tranches 60-74, 75-89 et 90+ incomplètes.",
+              }
+            : null,
+          tauxChomage1564: sociodemographics.unemploymentRate,
+          revenuMedianDisponible: sociodemographics.medianDisposableIncome,
+          note: sociodemographics.note,
         }
       : null,
     entreprises: territory.enrichment?.enterprises
@@ -328,6 +368,12 @@ export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialF
       comparatifEpci: territory.enrichment?.geography?.epciComparison?.available
         ? territory.enrichment.geography.epciComparison
         : null,
+      centraliteTerritoriale: {
+        qualificationRecommandee: territorialCentralityPhrase,
+        centraliteDepartementale: false,
+        note:
+          "Ne pas qualifier une commune de « commune-centre de [département] » sans centralité départementale explicite.",
+      },
     },
     immobilier: territory.enrichment?.property?.available
       ? {

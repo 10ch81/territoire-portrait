@@ -1,5 +1,10 @@
 import type { TerritorialFacts } from "./mistral-facts";
 import type { TerritoryAnalysis } from "./types";
+import {
+  AGE_AGGREGATE_ROUNDING_TOLERANCE,
+  formatFrenchPercentOneDecimal,
+  parseFrenchPercentToken,
+} from "./age-aggregates";
 
 export type AnalysisTextField = "summary" | "strengths" | "watchPoints" | "opportunities";
 
@@ -44,6 +49,11 @@ interface FactsContext {
   aavCategoryLabel: string | null;
   bpeQualitativeSummary: string | null;
   bpeDomainCountsAreTypeCounts: boolean;
+  departmentName: string | null;
+  hasDepartmentCentrality: boolean;
+  territorialCentralityPhrase: string;
+  ageAggregate60Plus: number | null;
+  ageAggregate60PlusReliable: boolean;
 }
 
 interface ReplacementRule {
@@ -340,6 +350,42 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
       "acteurs potentiellement mobilisables, sous réserve d'une analyse locale plus fine",
   },
   {
+    id: "ess-collaborative-levers",
+    pattern: /leviers potentiels pour des dynamiques collaboratives/gi,
+    replacement: "ressources à examiner pour des projets locaux",
+  },
+  {
+    id: "ess-collaborative-dynamics",
+    pattern: /dynamiques collaboratives/gi,
+    replacement: "projets locaux",
+  },
+  {
+    id: "marked-local-economic-offer",
+    pattern: /offre économique locale marquée/gi,
+    replacement: "tissu économique local décrit par les données SIDE",
+  },
+  {
+    id: "local-economic-offer",
+    pattern: /offre économique locale/gi,
+    replacement: "tissu économique local décrit par les données SIDE",
+  },
+  {
+    id: "marked-local-economic-fabric",
+    pattern: /tissu économique local marqué/gi,
+    replacement:
+      "tissu économique local structuré autour des unités légales et établissements actifs recensés par SIDE",
+  },
+  {
+    id: "demographic-decline-dynamics",
+    pattern: /dynamique démographique en déclin/gi,
+    replacement: "recul démographique",
+  },
+  {
+    id: "demographic-decline-abstract",
+    pattern: /dynamique démographique négative/gi,
+    replacement: "population en recul",
+  },
+  {
     id: "ess-structured-sector",
     pattern: /filière ESS structurée/gi,
     replacement:
@@ -594,6 +640,121 @@ const CONTEXTUAL_REPLACEMENTS: ReplacementRule[] = [
   },
 ];
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function sanitizeDepartmentCentrality(
+  text: string,
+  context: FactsContext,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  if (context.hasDepartmentCentrality || !context.departmentName) {
+    return text;
+  }
+
+  const escapedDepartment = escapeRegExp(context.departmentName);
+  const patterns = [
+    new RegExp(`commune-centre de (?:l['’])?${escapedDepartment}`, "gi"),
+    new RegExp(`commune-centre du ${escapedDepartment}`, "gi"),
+    new RegExp(`commune-centre d['’]${escapedDepartment}`, "gi"),
+    /commune-centre du département/gi,
+    /commune-centre de (?:son |le |la |l['’])?département/gi,
+    new RegExp(`chef-lieu de (?:l['’])?${escapedDepartment}`, "gi"),
+    new RegExp(`chef-lieu du ${escapedDepartment}`, "gi"),
+  ];
+
+  let result = text;
+  for (const pattern of patterns) {
+    result = result.replace(pattern, (match) => {
+      warnings.push({
+        field,
+        index,
+        original: match,
+        sanitized: context.territorialCentralityPhrase,
+        rule: "department-centrality-rewrite",
+      });
+      return context.territorialCentralityPhrase;
+    });
+  }
+
+  return result;
+}
+
+function replaceSixtyPlusPercent(
+  match: string,
+  percentToken: string,
+  context: FactsContext,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  const parsed = parseFrenchPercentToken(percentToken);
+
+  if (parsed === null) {
+    return match;
+  }
+
+  if (!context.ageAggregate60PlusReliable || context.ageAggregate60Plus === null) {
+    const replacement = match
+      .replace(/\d+[,.]?\d*\s*%/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+    warnings.push({
+      field,
+      index,
+      original: match,
+      sanitized: replacement,
+      rule: "age-aggregate-percent-removed",
+    });
+    return replacement;
+  }
+
+  if (Math.abs(parsed - context.ageAggregate60Plus) <= AGE_AGGREGATE_ROUNDING_TOLERANCE) {
+    return match;
+  }
+
+  const corrected = formatFrenchPercentOneDecimal(context.ageAggregate60Plus);
+  const replacement = match.replace(percentToken, corrected);
+  warnings.push({
+    field,
+    index,
+    original: match,
+    sanitized: replacement,
+    rule: "age-aggregate-percent-corrected",
+  });
+  return replacement;
+}
+
+function sanitizeAgeAggregateMentions(
+  text: string,
+  context: FactsContext,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  const patterns = [
+    /(\d+[,.]?\d*)\s*%([^.;]{0,80}?60\s*ans\s*et\s*plus)/gi,
+    /(60\s*ans\s*et\s*plus)([^.;]{0,80}?)(\d+[,.]?\d*)\s*%/gi,
+  ];
+
+  let result = text;
+
+  result = result.replace(patterns[0], (match, percentToken: string) =>
+    replaceSixtyPlusPercent(match, percentToken, context, warnings, field, index),
+  );
+
+  result = result.replace(
+    patterns[1],
+    (match, _label: string, _middle: string, percentToken: string) =>
+      replaceSixtyPlusPercent(match, percentToken, context, warnings, field, index),
+  );
+
+  return result;
+}
+
 function countCatNatTypes(
   events: Array<{ label: string; startDate: string | null }>,
 ): { floodLike: number; other: number } {
@@ -627,6 +788,9 @@ function buildFactsContext(facts: TerritorialFacts): FactsContext {
     facts.securite?.indicateurs.some(
       (indicator) => indicator.departmentRatePer1000 != null,
     ) ?? false;
+  const territorialCentralityPhrase =
+    facts.geographie.centraliteTerritoriale?.qualificationRecommandee ??
+    "commune-centre de son bassin territorial";
 
   return {
     hasNationalBenchmark: false,
@@ -653,6 +817,12 @@ function buildFactsContext(facts: TerritorialFacts): FactsContext {
     bpeQualitativeSummary: facts.equipements?.resumeQualitatif ?? null,
     bpeDomainCountsAreTypeCounts:
       facts.equipements?.semantiqueDomaines.recomposeLeTotal === false,
+    departmentName: facts.departement?.name ?? null,
+    hasDepartmentCentrality:
+      facts.geographie.centraliteTerritoriale?.centraliteDepartementale ?? false,
+    territorialCentralityPhrase,
+    ageAggregate60Plus: facts.structureParAge?.aggregatsAge?.soixantePlus ?? null,
+    ageAggregate60PlusReliable: facts.structureParAge?.aggregatsAge?.fiable ?? false,
   };
 }
 
@@ -791,6 +961,8 @@ function sanitizeText(
   sanitized = sanitizeCatNatInflation(sanitized, context, warnings, field, index);
   sanitized = sanitizeBpeMisleadingBreakdown(sanitized, context, warnings, field, index);
   sanitized = sanitizeAavCategoryLabel(sanitized, context, warnings, field, index);
+  sanitized = sanitizeDepartmentCentrality(sanitized, context, warnings, field, index);
+  sanitized = sanitizeAgeAggregateMentions(sanitized, context, warnings, field, index);
   sanitized = stripCrossThemeContamination(sanitized);
   sanitized = repairDegenerateSentences(sanitized, facts, context);
   sanitized = finalizeUserFacingText(sanitized);
@@ -889,6 +1061,10 @@ export function containsForbiddenPhrases(text: string): string[] {
     "tissu entrepreneurial local",
     "accessibilité aux infrastructures",
     "marché immobilier actif",
+    "offre économique locale marquée",
+    "offre économique locale",
+    "dynamique démographique en déclin",
+    "leviers potentiels pour des dynamiques collaboratives",
     ...INTERNAL_LEAK_MARKERS,
   ];
 

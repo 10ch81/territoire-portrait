@@ -27,6 +27,8 @@ Comparaisons homogènes :
 Institutions :
 - Interdire « chef-lieu de l'EPCI ».
 - Utiliser « commune-centre » si les données de rang, population, densité, équipements ou AAV le justifient.
+- Ne jamais écrire « commune-centre de [département] » sans centralité départementale explicite (centraliteDepartementale).
+- Si la centralité est déduite de l'EPCI, de l'AAV ou du bassin local, préférer la qualification fournie dans geographie.centraliteTerritoriale.qualificationRecommandee.
 - Utiliser « siège de l'EPCI » uniquement si explicitement fourni.
 - Utiliser « chef-lieu » uniquement pour des périmètres administratifs appropriés et fournis.
 
@@ -45,7 +47,8 @@ Mélange de périmètres :
 - Formulation recommandée : « SIDE décrit le tissu économique local ; en complément, les bases administratives ESS/RGE permettent d'identifier des acteurs ou thématiques spécifiques. »
 - Ne pas déduire de filière économique ou de dynamique collaborative sans données sectorielles, effectifs ou projets.
 - Ne pas présenter les structures ESS ou entreprises RGE comme directement mobilisables sans précaution.
-- Formulation recommandée ESS/RGE : « Les bases ESS et RGE permettent d'identifier des acteurs potentiellement mobilisables, sous réserve d'une analyse locale plus fine. »
+- Formulation recommandée ESS/RGE : « acteurs potentiellement mobilisables, sous réserve d'une analyse locale plus fine » ou « ressources à examiner pour des projets locaux ».
+- Éviter « leviers potentiels pour des dynamiques collaboratives ».
 
 Centralité institutionnelle :
 - Remplacer « fonction centrale économique et administrative » par « fonction de centralité territoriale et économique », sauf si les fonctions administratives sont explicitement fournies.
@@ -61,11 +64,15 @@ Fiscalité :
 
 Population :
 - Utilise populationLegale comme référence affichée (population municipale, millésime indiqué).
+- Préférer « recul démographique » ou « population en recul » à « dynamique démographique en déclin ».
 - Si notesPopulation ou evolutionDemographique divergent, explique brièvement (millésimes ou périmètres distincts) sans contredire la population légale.
 - Ne jamais mélanger population légale et effectif recensé 2021 sans le préciser.
+- Pour les parts d'âge, utiliser structureParAge.tranches ; pour « 60 ans et plus », n'utiliser structureParAge.aggregatsAge.soixantePlus que si aggregatsAge.fiable est vrai (somme 60-74 + 75-89 + 90+).
 
 Économie :
 - Privilégier inseeSideUnitesLegales et inseeSideEtablissements (SIDE INSEE) pour décrire le tissu économique local.
+- Préférer « tissu économique local décrit par les données SIDE » ou « tissu économique local structuré autour des unités légales et établissements actifs recensés par SIDE ».
+- Ne pas écrire « offre économique locale marquée » ni « offre économique » si les données décrivent surtout des établissements ou unités légales.
 - Préférer « tissu économique local » à « tissu entrepreneurial local » lorsque l'analyse repose surtout sur SIDE/SIRENE.
 - SIRENE (unitesLegalesAvecEtablissement) est un répertoire administratif complémentaire : ne JAMAIS en faire la preuve d'un « dynamisme entrepreneurial » ou d'une « vitalité économique marquée ».
 - Ne pas suggérer un dynamisme entrepreneurial sans données de créations, d'évolution ou d'emploi.
