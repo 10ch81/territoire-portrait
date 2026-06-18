@@ -65,6 +65,9 @@ Fiscalité :
 Population :
 - Utilise populationLegale comme référence affichée (population municipale, millésime indiqué).
 - Préférer « recul démographique » ou « population en recul » à « dynamique démographique en déclin ».
+- Pour l'évolution 2010→2022 ou équivalent, utiliser uniquement indicateursDerives.croissancePopulation ou evolutionDemographique ; ne jamais confondre avec une part d'âge.
+- Ne jamais associer une part des 60 ans et plus (aggregatsAge.soixantePlus) à une phrase de recul, baisse ou croissance démographique.
+- Si recul démographique et vieillissement sont tous deux pertinents, formuler deux indicateurs distincts dans la même phrase : « Recul démographique modéré (-5,7 % entre 2010 et 2022) et part élevée des 60 ans et plus (38,1 %). »
 - Si notesPopulation ou evolutionDemographique divergent, explique brièvement (millésimes ou périmètres distincts) sans contredire la population légale.
 - Ne jamais mélanger population légale et effectif recensé 2021 sans le préciser.
 - Pour les parts d'âge, utiliser structureParAge.tranches ; pour « 60 ans et plus », n'utiliser structureParAge.aggregatsAge.soixantePlus que si aggregatsAge.fiable est vrai (somme 60-74 + 75-89 + 90+).
@@ -125,6 +128,7 @@ Tourisme :
 
 Autres :
 - Les données RPLS (loués / vacants) décrivent le parc locatif social des bailleurs sociaux ; 0 logement RPLS ne prouve pas l'absence de toute offre abordable.
+- Ne pas écrire « absence de logements sociaux » ; préférer « absence de parc locatif social recensé dans RPLS » ou « aucun logement locatif social recensé dans RPLS ».
 - La vacance générale (RP logement) porte sur l'ensemble du parc.
 - Ne pas utiliser le nombre d'agences immobilières comme levier direct de politique publique.
 - Préférer : « en lien avec les acteurs du logement, les propriétaires, les collectivités et les dispositifs de réhabilitation. »
@@ -132,6 +136,7 @@ Autres :
 - Les QPV sont des sous-périmètres communaux ; ne pas généraliser à toute la commune.
 - Si tauxChomage1564 est renseigné, tu peux l'utiliser ; ne pas conclure à une absence de données sur l'emploi local pour ce seul indicateur.
 - Ne pas confondre le thème Sécurité (SSMSI) avec Risques (Géorisques : radon, inondations, CATNAT).
+- Ne pas mélanger faits SSMSI et risques naturels/CATNAT dans un même point d'attention ; séparer en deux formulations distinctes si nécessaire.
 - Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni texte autour.
 
 Structure JSON attendue :

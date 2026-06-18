@@ -65,6 +65,8 @@ describe("sanitizeTerritorialAnalysis", () => {
       assert.equal(text.toLowerCase().includes("offre économique locale marquée"), false);
       assert.equal(text.toLowerCase().includes("dynamique démographique en déclin"), false);
       assert.equal(text.toLowerCase().includes("leviers potentiels pour des dynamiques collaboratives"), false);
+      assert.equal(text.toLowerCase().includes("absence de logements sociaux"), false);
+      assert.equal(/recul démographique[^.]{0,80}\(-38,1\s*%/i.test(text), false);
       if (fixture.facts.departement?.name) {
         assert.equal(
           text.toLowerCase().includes(
@@ -205,6 +207,60 @@ describe("sanitizeTerritorialAnalysis", () => {
 
     assert.equal(analysis.summary.toLowerCase().includes("dynamique démographique en déclin"), false);
     assert.match(analysis.summary, /recul démographique/i);
+  });
+
+  it("corrige le croisement recul démographique / part des 60 ans et plus", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Recul démographique modéré (-38,1 % entre 2010 et 2022).",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.equal(analysis.summary.includes("-38,1"), false);
+    assert.match(analysis.summary, /-5,7\s*%/);
+    assert.match(analysis.summary, /60\s*ans\s*et\s*plus/i);
+    assert.match(analysis.summary, /38,1\s*%/);
+  });
+
+  it("reformule l'absence de logements sociaux RPLS", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "Absence de logements sociaux (RPLS) sur la commune.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    assert.equal(analysis.summary.toLowerCase().includes("absence de logements sociaux"), false);
+    assert.match(analysis.summary, /parc locatif social recensé dans RPLS/i);
+  });
+
+  it("sépare sécurité SSMSI et risques naturels", () => {
+    const { analysis } = sanitizeTerritorialAnalysis(
+      {
+        summary: "",
+        strengths: [],
+        watchPoints: [
+          "Indicateurs de sécurité en hausse avec destructions et violences, aggravés par plusieurs inondations CATNAT.",
+        ],
+        opportunities: [],
+      },
+      saintGironsFactsFromFixtures(),
+    );
+
+    const text = analysis.watchPoints[0].toLowerCase();
+    assert.match(text, /sécurité|faits enregistrés/i);
+    assert.match(text, /risques naturels|catnat|inondation/i);
+    assert.equal(
+      /sécurité[^.]{0,120}catnat[^.]{0,120}sécurité/i.test(analysis.watchPoints[0]),
+      false,
+    );
   });
 
   it("corrige un pourcentage agrégé 60+ incohérent avec les tranches", () => {

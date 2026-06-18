@@ -284,7 +284,10 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
   epci: { code: "200027183", name: "CC Couserans Pyrenées" },
   populationLegale: 6_184,
   densiteHabKm2: 280,
-  evolutionDemographique: [{ year: 2020, population: 6_250 }],
+  evolutionDemographique: [
+    { year: 2010, population: 6_560 },
+    { year: 2022, population: 6_184 },
+  ],
   structureParAge: {
     tranches: [
       { label: "60-74 ans", population: 1_180, sharePercent: 18.5 },
@@ -383,6 +386,28 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
     prixM2MoyenDepartement: 1_300,
     note: "",
   },
+  indicateursDerives: {
+    populationGrowthPercent: -5.7,
+    populationGrowthFromYear: 2010,
+    populationGrowthToYear: 2022,
+    irvePointsPer1000Residents: 0.97,
+    socialHousingVacancyRatePercent: null,
+    equipmentsPer1000Residents: 13.7,
+    available: true,
+    note: "",
+  },
+  logementsSociaux: {
+    annee: 2024,
+    parcTotal: 0,
+    loues: 0,
+    vacantsRpls: 0,
+    parcLogementsGlobal: 3_200,
+    vacantsRp: 180,
+    tauxVacanceRp: 5.6,
+    partDuParcGlobal: 0,
+    tauxVacanceRpls: null,
+    note: "RPLS",
+  },
   tourisme: {
     annee: 2025,
     placesHebergement: 320,
@@ -477,7 +502,7 @@ export function fragileAnalysisForFixture(fixtureId: string): {
   if (fixtureId === "saint-girons") {
     return {
       summary:
-        "Saint-Girons, chef-lieu de l'EPCI, pôle d'une aire urbaine avec fonction centrale économique et administrative.",
+        "Saint-Girons, chef-lieu de l'EPCI, pôle d'une aire urbaine avec fonction centrale économique et administrative. Recul démographique modéré (-38,1 % entre 2010 et 2022).",
       strengths: [
         "Complémentarité entre SIDE et ESS/RGE avec des RGE incluses dans le stock SIDE.",
         "Dynamique immobilière soutenue sur 42 mutations.",

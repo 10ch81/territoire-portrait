@@ -5,6 +5,15 @@ import {
   formatFrenchPercentOneDecimal,
   parseFrenchPercentToken,
 } from "./age-aggregates";
+import {
+  computePopulationGrowthFromHistory,
+  formatFrenchSignedPercent,
+  isAgeShareContext,
+  isDemographicAgeCrossing,
+  isDemographicEvolutionContext,
+  parseSignedFrenchPercentToken,
+  percentMatchesPopulationGrowth,
+} from "./demographic-indicators";
 
 export type AnalysisTextField = "summary" | "strengths" | "watchPoints" | "opportunities";
 
@@ -54,6 +63,9 @@ interface FactsContext {
   territorialCentralityPhrase: string;
   ageAggregate60Plus: number | null;
   ageAggregate60PlusReliable: boolean;
+  populationGrowthPercent: number | null;
+  populationGrowthFromYear: number | null;
+  populationGrowthToYear: number | null;
 }
 
 interface ReplacementRule {
@@ -386,6 +398,21 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
     replacement: "population en recul",
   },
   {
+    id: "social-housing-absence",
+    pattern: /absence de logements sociaux(?:\s*\(RPLS\))?/gi,
+    replacement: "absence de parc locatif social recensé dans RPLS",
+  },
+  {
+    id: "no-social-housing",
+    pattern: /aucun logement social(?:\s*\(RPLS\))?/gi,
+    replacement: "aucun logement locatif social recensé dans RPLS",
+  },
+  {
+    id: "no-social-housing-parc",
+    pattern: /absence de parc locatif social(?!\s+recensé)/gi,
+    replacement: "absence de parc locatif social recensé dans RPLS",
+  },
+  {
     id: "ess-structured-sector",
     pattern: /filière ESS structurée/gi,
     replacement:
@@ -644,6 +671,184 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function sanitizeDemographicCrossing(
+  text: string,
+  context: FactsContext,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  if (!isDemographicEvolutionContext(text) || context.populationGrowthPercent === null) {
+    return text;
+  }
+
+  const evolutionWithPercent =
+    /((?:recul démographique|baisse de population|population en recul|croissance(?:\s+démographique|\s+de la population)?)[^.]{0,120}?)\((-?\d+[,.]?\d*)\s*%([^)]*)\)/gi;
+
+  let result = text.replace(
+    evolutionWithPercent,
+    (match, prefix: string, percentToken: string, suffix: string) => {
+      const signed = parseSignedFrenchPercentToken(percentToken);
+
+      if (signed === null) {
+        return match;
+      }
+
+      if (percentMatchesPopulationGrowth(signed, context.populationGrowthPercent)) {
+        return match;
+      }
+
+      if (
+        !isDemographicAgeCrossing(
+          signed,
+          context.populationGrowthPercent,
+          context.ageAggregate60PlusReliable ? context.ageAggregate60Plus : null,
+        )
+      ) {
+        const growthPercent = context.populationGrowthPercent as number;
+        const corrected = formatFrenchSignedPercent(growthPercent);
+        const replacement = `${prefix}(${corrected}${suffix})`;
+        warnings.push({
+          field,
+          index,
+          original: match,
+          sanitized: replacement,
+          rule: "demographic-growth-percent-corrected",
+        });
+        return replacement;
+      }
+
+      const growthPercent = context.populationGrowthPercent as number;
+      const correctedGrowth = formatFrenchSignedPercent(growthPercent);
+      let replacement = `${prefix}(${correctedGrowth}${suffix})`;
+
+      if (
+        context.ageAggregate60PlusReliable &&
+        context.ageAggregate60Plus !== null &&
+        !isAgeShareContext(text)
+      ) {
+        const ageShare = formatFrenchPercentOneDecimal(context.ageAggregate60Plus);
+        replacement += ` et part élevée des 60 ans et plus (${ageShare} %)`;
+      }
+
+      warnings.push({
+        field,
+        index,
+        original: match,
+        sanitized: replacement,
+        rule: "demographic-age-crossing-rewrite",
+      });
+      return replacement;
+    },
+  );
+
+  const evolutionWithoutParens =
+    /((?:recul démographique|baisse de population|population en recul)[^.]{0,60}?)(-?\d+[,.]?\d*)\s*%/gi;
+
+  result = result.replace(
+    evolutionWithoutParens,
+    (match, prefix: string, percentToken: string) => {
+      if (prefix.trimEnd().endsWith("(") || isAgeShareContext(match)) {
+        return match;
+      }
+
+      const signed = parseSignedFrenchPercentToken(percentToken);
+      if (signed === null || context.populationGrowthPercent === null) {
+        return match;
+      }
+
+      if (percentMatchesPopulationGrowth(signed, context.populationGrowthPercent)) {
+        return match;
+      }
+
+      if (
+        !isDemographicAgeCrossing(
+          signed,
+          context.populationGrowthPercent,
+          context.ageAggregate60PlusReliable ? context.ageAggregate60Plus : null,
+        )
+      ) {
+        return match;
+      }
+
+      const growthPercent = context.populationGrowthPercent as number;
+      const correctedGrowth = formatFrenchSignedPercent(growthPercent);
+      let replacement = `${prefix}${correctedGrowth}`;
+
+      if (context.ageAggregate60PlusReliable && context.ageAggregate60Plus !== null) {
+        const ageShare = formatFrenchPercentOneDecimal(context.ageAggregate60Plus);
+        replacement += ` et part élevée des 60 ans et plus (${ageShare} %)`;
+      }
+
+      warnings.push({
+        field,
+        index,
+        original: match,
+        sanitized: replacement,
+        rule: "demographic-age-crossing-inline-rewrite",
+      });
+      return replacement;
+    },
+  );
+
+  return result;
+}
+
+const SECURITY_THEME_PATTERN =
+  /\b(?:ssmsi|sécurité|police|gendarmerie|faits enregistrés|destructions?|violences?)\b/i;
+const RISK_THEME_PATTERN =
+  /\b(?:catnat|inondation|radon|géorisques?|risques? naturels?|coulées? de boue)\b/i;
+
+function sanitizeSecurityRiskSeparation(
+  text: string,
+  warnings: SanitizationWarning[],
+  field: AnalysisTextField,
+  index?: number,
+): string {
+  const hasSecurity = SECURITY_THEME_PATTERN.test(text);
+  const hasRisks = RISK_THEME_PATTERN.test(text);
+
+  if (!hasSecurity || !hasRisks) {
+    return text;
+  }
+
+  const clauses = text
+    .split(/(?<=[.;])\s+/)
+    .map((clause) => clause.trim())
+    .filter((clause) => clause.length > 0);
+
+  const securityClauses = clauses.filter((clause) => SECURITY_THEME_PATTERN.test(clause));
+  const riskClauses = clauses.filter(
+    (clause) => RISK_THEME_PATTERN.test(clause) && !SECURITY_THEME_PATTERN.test(clause),
+  );
+
+  let replacement: string;
+
+  if (securityClauses.length > 0 && riskClauses.length > 0) {
+    replacement = `${securityClauses.join(" ")} ${riskClauses.join(" ")}`.replace(
+      /\s+/g,
+      " ",
+    );
+  } else {
+    replacement =
+      "Indicateurs de sécurité enregistrée à interpréter avec prudence. Exposition aux risques naturels, avec plusieurs reconnaissances CATNAT à prendre en compte.";
+  }
+
+  if (!replacement.endsWith(".")) {
+    replacement += ".";
+  }
+
+  warnings.push({
+    field,
+    index,
+    original: text,
+    sanitized: replacement,
+    rule: "security-risk-theme-separation",
+  });
+
+  return replacement;
+}
+
 function sanitizeDepartmentCentrality(
   text: string,
   context: FactsContext,
@@ -691,9 +896,13 @@ function replaceSixtyPlusPercent(
   field: AnalysisTextField,
   index?: number,
 ): string {
-  const parsed = parseFrenchPercentToken(percentToken);
+  const parsed = parseSignedFrenchPercentToken(percentToken);
 
   if (parsed === null) {
+    return match;
+  }
+
+  if (percentMatchesPopulationGrowth(parsed, context.populationGrowthPercent)) {
     return match;
   }
 
@@ -735,16 +944,28 @@ function sanitizeAgeAggregateMentions(
   field: AnalysisTextField,
   index?: number,
 ): string {
+  if (isDemographicEvolutionContext(text) && !isAgeShareContext(text)) {
+    return text;
+  }
+
   const patterns = [
-    /(\d+[,.]?\d*)\s*%([^.;]{0,80}?60\s*ans\s*et\s*plus)/gi,
-    /(60\s*ans\s*et\s*plus)([^.;]{0,80}?)(\d+[,.]?\d*)\s*%/gi,
+    /(-?\d+[,.]?\d*)\s*%([^.;]{0,80}?60\s*ans\s*et\s*plus)/gi,
+    /(60\s*ans\s*et\s*plus)([^.;]{0,80}?)(-?\d+[,.]?\d*)\s*%/gi,
   ];
 
   let result = text;
 
-  result = result.replace(patterns[0], (match, percentToken: string) =>
-    replaceSixtyPlusPercent(match, percentToken, context, warnings, field, index),
-  );
+  result = result.replace(patterns[0], (match, percentToken: string) => {
+    const parsed = parseSignedFrenchPercentToken(percentToken);
+    if (
+      parsed !== null &&
+      percentMatchesPopulationGrowth(parsed, context.populationGrowthPercent)
+    ) {
+      return match;
+    }
+
+    return replaceSixtyPlusPercent(match, percentToken, context, warnings, field, index);
+  });
 
   result = result.replace(
     patterns[1],
@@ -791,6 +1012,14 @@ function buildFactsContext(facts: TerritorialFacts): FactsContext {
   const territorialCentralityPhrase =
     facts.geographie.centraliteTerritoriale?.qualificationRecommandee ??
     "commune-centre de son bassin territorial";
+  const derivedGrowth = facts.indicateursDerives;
+  const historyGrowth = computePopulationGrowthFromHistory(facts.evolutionDemographique);
+  const populationGrowthPercent =
+    derivedGrowth?.populationGrowthPercent ?? historyGrowth.percent;
+  const populationGrowthFromYear =
+    derivedGrowth?.populationGrowthFromYear ?? historyGrowth.fromYear;
+  const populationGrowthToYear =
+    derivedGrowth?.populationGrowthToYear ?? historyGrowth.toYear;
 
   return {
     hasNationalBenchmark: false,
@@ -823,6 +1052,9 @@ function buildFactsContext(facts: TerritorialFacts): FactsContext {
     territorialCentralityPhrase,
     ageAggregate60Plus: facts.structureParAge?.aggregatsAge?.soixantePlus ?? null,
     ageAggregate60PlusReliable: facts.structureParAge?.aggregatsAge?.fiable ?? false,
+    populationGrowthPercent,
+    populationGrowthFromYear,
+    populationGrowthToYear,
   };
 }
 
@@ -962,7 +1194,9 @@ function sanitizeText(
   sanitized = sanitizeBpeMisleadingBreakdown(sanitized, context, warnings, field, index);
   sanitized = sanitizeAavCategoryLabel(sanitized, context, warnings, field, index);
   sanitized = sanitizeDepartmentCentrality(sanitized, context, warnings, field, index);
+  sanitized = sanitizeDemographicCrossing(sanitized, context, warnings, field, index);
   sanitized = sanitizeAgeAggregateMentions(sanitized, context, warnings, field, index);
+  sanitized = sanitizeSecurityRiskSeparation(sanitized, warnings, field, index);
   sanitized = stripCrossThemeContamination(sanitized);
   sanitized = repairDegenerateSentences(sanitized, facts, context);
   sanitized = finalizeUserFacingText(sanitized);
@@ -1065,6 +1299,7 @@ export function containsForbiddenPhrases(text: string): string[] {
     "offre économique locale",
     "dynamique démographique en déclin",
     "leviers potentiels pour des dynamiques collaboratives",
+    "absence de logements sociaux",
     ...INTERNAL_LEAK_MARKERS,
   ];
 
