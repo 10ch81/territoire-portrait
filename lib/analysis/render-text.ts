@@ -79,6 +79,32 @@ export function joinFrenchList(items: string[]): string {
   return `${cleaned.slice(0, -1).join(", ")} et ${cleaned.at(-1)}`;
 }
 
+/**
+ * Jointure de fragments prépositionnels déjà contractés :
+ * au chômage ; au chômage et à la vacance ; au chômage, à la vacance et aux risques.
+ */
+export function joinFrenchPrepositionalList(items: string[]): string {
+  return joinFrenchList(items);
+}
+
+/**
+ * Forme après « à » avec contractions françaises (à le → au, à les → aux).
+ * Construit en amont — pas de correction regex en aval.
+ */
+export function frenchAfterA(nominative: string): string {
+  const n = nominative.trim();
+  if (/^le /i.test(n)) return `au ${n.slice(3)}`;
+  if (/^la /i.test(n)) return `à la ${n.slice(3)}`;
+  if (/^les /i.test(n)) return `aux ${n.slice(4)}`;
+  if (/^l'/i.test(n)) return `à ${n}`;
+  if (/^certains? /i.test(n)) return `à ${n}`;
+  if (/^certaines? /i.test(n)) return `à ${n}`;
+  if (/^un /i.test(n)) return `à ${n}`;
+  if (/^une /i.test(n)) return `à ${n}`;
+  if (/^des /i.test(n)) return `à ${n}`;
+  return `à ${n}`;
+}
+
 /** Finition légère des phrases affichées (listes), sans toucher au résumé déterministe. */
 export function polishRenderedSentence(text: string): string {
   return normalizeArcepWording(stripFloresPerCapitaRatio(resolveOptionalPluralMarkers(text))).trim();

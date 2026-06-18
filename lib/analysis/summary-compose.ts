@@ -1,6 +1,6 @@
 import type { AnalysisFact } from "./types";
 import type { DemographySnapshot } from "./summary-phrases";
-import { joinFrenchList } from "./render-text";
+import { joinFrenchPrepositionalList } from "./render-text";
 
 const DEFAULT_ASSET_PHRASE = "peu d'atouts documentés dans les sources consultées";
 
@@ -8,48 +8,53 @@ export function resolveAssetPhrase(fact: AnalysisFact): string | null {
   return fact.summaryAssetPhrase?.trim() || null;
 }
 
-export function resolveIssuePhrase(fact: AnalysisFact): string | null {
-  return fact.summaryIssuePhrase?.trim() || null;
+export function resolveIssueAfterA(fact: AnalysisFact): string | null {
+  return fact.summaryIssueAfterA?.trim() || null;
+}
+
+function formatIssuesClause(afterAItems: string[]): string {
+  if (afterAItems.length === 0) return "";
+  return `avec des enjeux liés ${joinFrenchPrepositionalList(afterAItems)}`;
 }
 
 export function buildSummaryPhrase2(
   assetPhrase: string,
   demography: DemographySnapshot,
-  issuePhrases: string[],
+  issueAfterA: string[],
   contextPhrase?: string | null,
 ): string {
-  const issues = joinFrenchList(issuePhrases);
   const context = contextPhrase?.trim() || null;
+  const issuesClause = formatIssuesClause(issueAfterA);
 
   if (demography.trend === "growth" && context) {
     const base = `Le portrait met en évidence ${assetPhrase} et ${context}`;
-    if (issuePhrases.length === 0) {
+    if (issueAfterA.length === 0) {
       return `${base}.`;
     }
-    return `${base}, avec des enjeux liés à ${issues}.`;
+    return `${base}, ${issuesClause}.`;
   }
 
   if (demography.trend === "decline" && context) {
     const base = `Le portrait met en évidence ${assetPhrase}, avec ${context}`;
-    if (issuePhrases.length === 0) {
+    if (issueAfterA.length === 0) {
       return `${base}.`;
     }
-    return `${base} et des enjeux liés à ${issues}.`;
+    return `${base} et des enjeux liés ${joinFrenchPrepositionalList(issueAfterA)}.`;
   }
 
   if (demography.trend === "stable" && context) {
     const base = `Le portrait met en évidence ${assetPhrase} et ${context}`;
-    if (issuePhrases.length === 0) {
+    if (issueAfterA.length === 0) {
       return `${base}.`;
     }
-    return `${base}, avec des enjeux liés à ${issues}.`;
+    return `${base}, ${issuesClause}.`;
   }
 
   const base = `Le portrait met en évidence ${assetPhrase}`;
-  if (issuePhrases.length === 0) {
+  if (issueAfterA.length === 0) {
     return `${base}.`;
   }
-  return `${base}, avec des enjeux liés à ${issues}.`;
+  return `${base}, ${issuesClause}.`;
 }
 
 export function pickDefaultAssetPhrase(): string {
@@ -72,6 +77,15 @@ const FORBIDDEN_SUMMARY_PATTERNS: RegExp[] = [
   /Elle combine/i,
   /avec une évolution de/i,
   /et le taux de chômage/i,
+  /\bà le\b/i,
+  /\bà les\b/i,
+  /\bde le\b/i,
+  /\bde les\b/i,
+  /liés à le\b/i,
+  /liés à les\b/i,
+  /liés à au\b/i,
+  /avec des enjeux liés à le\b/i,
+  /avec des enjeux liés à les\b/i,
 ];
 
 /** Détecte des fragments non prêts ou des formulations interdites dans le résumé. */
@@ -79,9 +93,23 @@ export function hasUnreadySummaryFragments(summary: string): boolean {
   return FORBIDDEN_SUMMARY_PATTERNS.some((pattern) => pattern.test(summary));
 }
 
-/** Vérifie que les groupes nominaux insérés après « liés à » ont un article. */
-export function issuePhrasesAreGrammatical(issuePhrases: string[]): boolean {
-  return issuePhrases.every((phrase) =>
-    /^(?:le |la |les |l'|certains |des |une |un )/i.test(phrase.trim()),
+/** Validation défensive des contractions françaises incorrectes. */
+export function hasInvalidFrenchContractions(text: string): boolean {
+  return (
+    /\bà le\b/i.test(text) ||
+    /\bà les\b/i.test(text) ||
+    /\bde le\b/i.test(text) ||
+    /\bde les\b/i.test(text) ||
+    /liés à le\b/i.test(text) ||
+    /liés à les\b/i.test(text) ||
+    /liés à au\b/i.test(text) ||
+    /avec des enjeux liés à le\b/i.test(text)
+  );
+}
+
+/** Vérifie que les fragments afterA sont prépositionnels et contractés. */
+export function issueAfterAFragmentsAreGrammatical(issueAfterA: string[]): boolean {
+  return issueAfterA.every((phrase) =>
+    /^(?:au |à la |aux |à l'|à certains? |à certaines? |à un |à une |à des )/i.test(phrase.trim()),
   );
 }

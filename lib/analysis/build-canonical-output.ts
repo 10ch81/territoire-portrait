@@ -7,7 +7,7 @@ import {
   buildSummaryPhrase2,
   pickDefaultAssetPhrase,
   resolveAssetPhrase,
-  resolveIssuePhrase,
+  resolveIssueAfterA,
 } from "./summary-compose";
 import {
   extractDemographySnapshot,
@@ -16,7 +16,7 @@ import {
 } from "./summary-phrases";
 import {
   hasSummaryAssetPhrase,
-  hasSummaryIssuePhrase,
+  hasSummaryIssueAfterA,
 } from "./summary-fragments";
 
 const SUMMARY_ATOUT_THEMES: AnalysisFactTheme[] = [
@@ -102,7 +102,7 @@ function pickSummaryEnjeux(
   for (const fact of facts) {
     if (fact.target !== "watchPoints") continue;
     if (!shouldIncludeAsSummaryEnjeu(fact)) continue;
-    if (!hasSummaryIssuePhrase(fact)) continue;
+    if (!hasSummaryIssueAfterA(fact)) continue;
     picks.push(fact);
     if (picks.length >= maxEnjeux) break;
   }
@@ -135,14 +135,14 @@ export function buildDeterministicSummary(
   const demography = extractDemographySnapshot(territory, selectedFacts);
   const assetFact = pickSummaryAtouts(selectedFacts, territory)[0];
   const assetPhrase = assetFact ? resolveAssetPhrase(assetFact) : null;
-  const issuePhrases = pickSummaryEnjeux(selectedFacts, demography)
-    .map(resolveIssuePhrase)
+  const issueAfterA = pickSummaryEnjeux(selectedFacts, demography)
+    .map(resolveIssueAfterA)
     .filter((phrase): phrase is string => phrase !== null);
 
   const phrase2 = buildSummaryPhrase2(
     assetPhrase ?? pickDefaultAssetPhrase(),
     demography,
-    issuePhrases,
+    issueAfterA,
     demography.contextPhrase,
   );
 

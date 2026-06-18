@@ -44,6 +44,7 @@ export function createFact(input: CreateFactInput): AnalysisFact {
     numericBindings: input.numericBindings,
     summaryAssetPhrase: input.summaryAssetPhrase,
     summaryIssuePhrase: input.summaryIssuePhrase,
+    summaryIssueAfterA: input.summaryIssueAfterA,
     summaryContextPhrase: input.summaryContextPhrase,
   };
 }

@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   containsOptionalPluralMarker,
+  frenchAfterA,
   joinFrenchList,
+  joinFrenchPrepositionalList,
   renderCountedLabel,
   resolveOptionalPluralMarkers,
   stripFloresPerCapitaRatio,
@@ -42,5 +44,34 @@ describe("render-text", () => {
       "la vacance résidentielle et le chômage des 15-64 ans",
     );
     assert.equal(joinFrenchList(["a", "b", "c"]), "a, b et c");
+  });
+
+  it("frenchAfterA — contractions après préposition à", () => {
+    assert.equal(frenchAfterA("le chômage des 15-64 ans"), "au chômage des 15-64 ans");
+    assert.equal(frenchAfterA("la vacance résidentielle"), "à la vacance résidentielle");
+    assert.equal(frenchAfterA("les risques naturels identifiés"), "aux risques naturels identifiés");
+    assert.equal(frenchAfterA("l'endettement communal"), "à l'endettement communal");
+    assert.equal(
+      frenchAfterA("certains indicateurs de sécurité enregistrée"),
+      "à certains indicateurs de sécurité enregistrée",
+    );
+    assert.equal(frenchAfterA("une fragilité documentée"), "à une fragilité documentée");
+    assert.equal(frenchAfterA("un enjeu local"), "à un enjeu local");
+  });
+
+  it("joinFrenchPrepositionalList — coordination prépositionnelle", () => {
+    assert.equal(joinFrenchPrepositionalList(["au chômage"]), "au chômage");
+    assert.equal(
+      joinFrenchPrepositionalList(["au chômage", "à la vacance résidentielle"]),
+      "au chômage et à la vacance résidentielle",
+    );
+    assert.equal(
+      joinFrenchPrepositionalList([
+        "au chômage",
+        "à la vacance résidentielle",
+        "aux risques naturels identifiés",
+      ]),
+      "au chômage, à la vacance résidentielle et aux risques naturels identifiés",
+    );
   });
 });

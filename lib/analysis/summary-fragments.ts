@@ -5,6 +5,14 @@ import {
 import { formatFrenchPercentOneDecimal } from "../age-aggregates";
 import type { TerritoryProfile } from "../types";
 import type { AnalysisFact, AnalysisFactSummaryFragments } from "./types";
+import { frenchAfterA } from "./render-text";
+
+function withIssueFragments(nominative: string): AnalysisFactSummaryFragments {
+  return {
+    summaryIssuePhrase: nominative,
+    summaryIssueAfterA: frenchAfterA(nominative),
+  };
+}
 
 function formatDemographyPercentMagnitude(percent: number): string {
   return `${formatFrenchPercentOneDecimal(Math.abs(percent))} %`;
@@ -179,70 +187,70 @@ function fragmentsForFact(
 
     case "employment":
       if (fact.target === "watchPoints") {
-        return { summaryIssuePhrase: "le chômage des 15-64 ans" };
+        return withIssueFragments("le chômage des 15-64 ans");
       }
       return {};
 
     case "housing":
       if (fact.target === "watchPoints" && /logements vacants/i.test(fact.sentence)) {
-        return { summaryIssuePhrase: "la vacance résidentielle" };
+        return withIssueFragments("la vacance résidentielle");
       }
       return {};
 
     case "social_housing":
       if (fact.target === "watchPoints") {
-        return { summaryIssuePhrase: "le parc locatif social recensé" };
+        return withIssueFragments("le parc locatif social recensé");
       }
       return {};
 
     case "policy_city":
       if (fact.target === "watchPoints") {
-        return { summaryIssuePhrase: "la présence de quartiers prioritaires" };
+        return withIssueFragments("la présence de quartiers prioritaires");
       }
       return {};
 
     case "security":
       if (fact.target === "watchPoints") {
-        return { summaryIssuePhrase: "certains indicateurs de sécurité enregistrée" };
+        return withIssueFragments("certains indicateurs de sécurité enregistrée");
       }
       return {};
 
     case "risks":
       if (fact.target === "watchPoints") {
         if (/catastrophe naturelle/i.test(fact.sentence)) {
-          return { summaryIssuePhrase: "les reconnaissances de catastrophe naturelle" };
+          return withIssueFragments("les reconnaissances de catastrophe naturelle");
         }
         if (/inondation/i.test(fact.sentence)) {
-          return { summaryIssuePhrase: "l'exposition aux risques d'inondation" };
+          return withIssueFragments("l'exposition aux risques d'inondation");
         }
         if (/radon/i.test(fact.sentence)) {
-          return { summaryIssuePhrase: "le potentiel radon recensé" };
+          return withIssueFragments("le potentiel radon recensé");
         }
-        return { summaryIssuePhrase: "les risques naturels identifiés" };
+        return withIssueFragments("les risques naturels identifiés");
       }
       return {};
 
     case "ageing":
       if (fact.target === "watchPoints") {
-        return { summaryIssuePhrase: "le vieillissement de la population" };
+        return withIssueFragments("le vieillissement de la population");
       }
       return {};
 
     case "finances":
       if (fact.target === "watchPoints" && /dette/i.test(fact.sentence)) {
-        return { summaryIssuePhrase: "l'endettement communal" };
+        return withIssueFragments("l'endettement communal");
       }
       return {};
 
     case "real_estate":
       if (fact.target === "watchPoints") {
-        return { summaryIssuePhrase: "le marché immobilier local" };
+        return withIssueFragments("le marché immobilier local");
       }
       return {};
 
     case "income":
       if (fact.target === "watchPoints") {
-        return { summaryIssuePhrase: "le niveau de revenu médian des ménages" };
+        return withIssueFragments("le niveau de revenu médian des ménages");
       }
       return {};
 
@@ -271,4 +279,8 @@ export function hasSummaryAssetPhrase(fact: AnalysisFact): boolean {
 
 export function hasSummaryIssuePhrase(fact: AnalysisFact): boolean {
   return typeof fact.summaryIssuePhrase === "string" && fact.summaryIssuePhrase.length > 0;
+}
+
+export function hasSummaryIssueAfterA(fact: AnalysisFact): boolean {
+  return typeof fact.summaryIssueAfterA === "string" && fact.summaryIssueAfterA.length > 0;
 }

@@ -5,14 +5,22 @@ import { buildAnalysisFacts } from "./build-analysis-facts";
 import { buildCanonicalAnalysisOutput } from "./build-canonical-output";
 import { createPanelProfile, saintGironsProfile, type PanelPreset } from "./fixtures";
 import { selectAnalysisFactsForPrompt } from "./select-facts";
-import { hasUnreadySummaryFragments, issuePhrasesAreGrammatical } from "./summary-compose";
+import {
+  hasInvalidFrenchContractions,
+  hasUnreadySummaryFragments,
+  issueAfterAFragmentsAreGrammatical,
+} from "./summary-compose";
 import {
   extractDemographySnapshot,
   hasAwkwardSummaryConcatenation,
   summaryMentionsAbsentSources,
   summaryMislabelsGrowthAsDecline,
 } from "./summary-phrases";
-import { hasSummaryAssetPhrase, hasSummaryIssuePhrase } from "./summary-fragments";
+import {
+  hasSummaryAssetPhrase,
+  hasSummaryIssueAfterA,
+  hasSummaryIssuePhrase,
+} from "./summary-fragments";
 import { validateAnalysisOutput } from "./validate-output";
 
 const SUMMARY_PROFILES: PanelPreset[] = [
@@ -40,7 +48,15 @@ function buildValidatedSummary(preset: PanelPreset) {
 
 function assertSummaryGrammar(summary: string, selected: ReturnType<typeof buildValidatedSummary>["selected"]) {
   assert.equal(hasUnreadySummaryFragments(summary), false);
+  assert.equal(hasInvalidFrenchContractions(summary), false);
   assert.equal(hasAwkwardSummaryConcatenation(summary), false);
+  assert.doesNotMatch(summary, /\bà le\b/i);
+  assert.doesNotMatch(summary, /\bà les\b/i);
+  assert.doesNotMatch(summary, /\bde le\b/i);
+  assert.doesNotMatch(summary, /\bde les\b/i);
+  assert.doesNotMatch(summary, /liés à le\b/i);
+  assert.doesNotMatch(summary, /liés à les\b/i);
+  assert.doesNotMatch(summary, /avec des enjeux liés à le\b/i);
   assert.doesNotMatch(summary, /met en évidence centralité\b/i);
   assert.doesNotMatch(summary, /liés à taux\b/i);
   assert.doesNotMatch(summary, /\bincivilités\b/i);
@@ -49,13 +65,13 @@ function assertSummaryGrammar(summary: string, selected: ReturnType<typeof build
   assert.doesNotMatch(summary, /recul de population de\s+-/i);
   assert.doesNotMatch(summary, /logements (?:raccordables|éligibles) à la fibre/i);
 
-  const issuePhrases = selected
-    .filter((fact) => fact.target === "watchPoints" && hasSummaryIssuePhrase(fact))
-    .map((fact) => fact.summaryIssuePhrase!)
+  const issueAfterA = selected
+    .filter((fact) => fact.target === "watchPoints" && hasSummaryIssueAfterA(fact))
+    .map((fact) => fact.summaryIssueAfterA!)
     .filter((phrase) => summary.includes(phrase));
 
-  if (issuePhrases.length > 0) {
-    assert.equal(issuePhrasesAreGrammatical(issuePhrases), true);
+  if (issueAfterA.length > 0) {
+    assert.equal(issueAfterAFragmentsAreGrammatical(issueAfterA), true);
   }
 }
 
@@ -87,12 +103,16 @@ describe("summary multi-profils", () => {
     assert.doesNotMatch(result.summary, /recul de population de -/i);
   });
 
-  it("urbanDense — grande commune dense", () => {
+  it("urbanDense — grande commune dense avec contractions correctes", () => {
     const { territory, result } = buildValidatedSummary("urbanDense");
 
     assert.match(result.summary, /85[\s\u202f]?000 habitants/i);
     assert.match(result.summary, /4[\s\u202f]?200 habitants\/km²/i);
     assert.equal(summaryMentionsAbsentSources(result.summary, territory), false);
+    if (/enjeux liés/i.test(result.summary)) {
+      assert.match(result.summary, /enjeux liés au chômage|enjeux liés à certains|enjeux liés à la /i);
+      assert.doesNotMatch(result.summary, /enjeux liés à le /i);
+    }
   });
 
   it("withoutQpv — pas de quartiers prioritaires dans le résumé", () => {
@@ -125,7 +145,7 @@ describe("summary multi-profils", () => {
     );
   });
 
-  it("tous les constats retenus pour le résumé ont des fragments dédiés", () => {
+  it("tous les constats retenus pour le résumé ont des fragments nominatif et afterA", () => {
     const { selected } = buildValidatedSummary("fullEnrichment");
     const assetCandidates = selected.filter(
       (fact) => fact.target === "strengths" && hasSummaryAssetPhrase(fact),
@@ -139,10 +159,12 @@ describe("summary multi-profils", () => {
     }
     for (const fact of issueCandidates) {
       assert.match(fact.summaryIssuePhrase!, /^(?:un |une |des |la |le |les |l'|certains )/i);
+      assert.ok(fact.summaryIssueAfterA);
+      assert.equal(issueAfterAFragmentsAreGrammatical([fact.summaryIssueAfterA!]), true);
     }
   });
 
-  it("Saint-Girons — recul et enjeux avec articles", () => {
+  it("Saint-Girons — enjeux avec contractions prépositionnelles", () => {
     const territory = {
       ...saintGironsProfile,
       epci: { code: "200067940", name: "CC Couserans-Pyrénées" },
@@ -160,8 +182,10 @@ describe("summary multi-profils", () => {
 
     assert.match(result.summary, /recul de population de 5,7\s*% entre 2010 et 2022/i);
     assert.match(result.summary, /Le portrait met en évidence/i);
-    if (/enjeux liés à/i.test(result.summary)) {
-      assert.doesNotMatch(result.summary, /enjeux liés à taux/i);
+    if (/enjeux liés/i.test(result.summary)) {
+      assert.match(result.summary, /enjeux liés à la vacance résidentielle/i);
+      assert.doesNotMatch(result.summary, /enjeux liés à le /i);
+      assert.doesNotMatch(result.summary, /enjeux liés à la la /i);
     }
     assertSummaryGrammar(result.summary, selected);
   });

@@ -44,8 +44,10 @@ export type NumericBinding = {
 export type AnalysisFactSummaryFragments = {
   /** Groupe nominal après « met en évidence » — article inclus. */
   summaryAssetPhrase?: string;
-  /** Groupe nominal après « liés à » — article inclus. */
+  /** Groupe nominal (nominatif) — affichage autonome ou référence interne. */
   summaryIssuePhrase?: string;
+  /** Forme après « à » avec contractions (ex. au chômage, à la vacance). */
+  summaryIssueAfterA?: string;
   /** Contexte démographique ou complément après « met en évidence ». */
   summaryContextPhrase?: string;
 };
