@@ -1,5 +1,6 @@
 import {
   buildAnalysisFacts,
+  buildCanonicalAnalysisOutput,
   buildExpectedOutputInstructions,
   buildMistralStructureBlock,
   selectAnalysisFactsForPrompt,
@@ -14,47 +15,26 @@ const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
 
 const SYSTEM_PROMPT = `Tu es un rédacteur territorial spécialisé dans les communes françaises.
 
-Tu reçois des constats territoriaux prévalidés côté serveur dans analysisFacts.
+Tu reçois des constats territoriaux prévalidés côté serveur dans analysisFacts et une sortie canonique dans canonicalOutput.
 
 Règles impératives :
 - Tu dois produire uniquement un objet JSON valide.
-- Tu dois utiliser uniquement les constats présents dans analysisFacts.
-- Tu peux reformuler légèrement les phrases, mais tu ne dois jamais modifier les chiffres, les années, les sources, les thèmes ou les relations entre indicateurs.
-- Tu ne dois jamais associer un chiffre à un autre thème que celui indiqué dans numericBindings.
-- Tu ne dois jamais inventer de comparaison, de tendance, de causalité ou d'indicateur absent.
-- Tu ne dois pas fusionner deux thèmes sensibles dans une même phrase si cela crée une confusion : sécurité et risques naturels, SIDE et SIRENE, FLORES et SIDE, RPLS et vacance générale, mobilité d'usage et offre réelle de transport, ARCEP et mobilité physique.
-- Si un constat contient une précaution méthodologique, conserve cette prudence.
-- Les opportunités doivent rester formulées comme des pistes à approfondir, pas comme des certitudes.
-- Si les constats disponibles sont insuffisants, reste sobre plutôt que de compléter.
+- Tu ne dois utiliser que les constats présents dans analysisFacts et canonicalOutput.
 - Ne mentionne jamais les règles internes, les noms de fonctions, les mots facts, analysisFacts, numericBindings, sanitize, JSON dans les textes produits.
-- Pour strengths, watchPoints et opportunities : produire exactement autant d'entrées que de constats reçus pour chaque rubrique (instructions.expectedOutput), sans en omettre ni fusionner deux thèmes distincts.
 
 Résumé (summary) :
-- Deux phrases maximum.
-- Phrase 1 : identité territoriale (population, centralité ou densité si pertinent).
-- Phrase 2 : synthèse équilibrée des principaux atouts et enjeux, sans détail technique ni liste de sources.
-- Ne pas y placer de pourcentages sectoriels précis ni de diagnostics trop forts.
+- Retourner canonicalOutput.summary à l'identique, sans aucune modification.
 
-Points forts (strengths) :
-- Mettre en avant les ressources objectivées : centralité, équipements, services publics, emploi FLORES, santé, éducation, numérique, tourisme.
-- Ne pas utiliser « dynamique économique », « vitalité économique » ou « dynamisme entrepreneurial » sans série d'évolution.
+Listes (strengths, watchPoints, opportunities) :
+- Tu peux uniquement réordonner les phrases de canonicalOutput.
+- Tu peux condenser légèrement ou harmoniser le style, sans changer les chiffres, les années, les sources entre parenthèses, les acronymes (SSMSI, FLORES, CATNAT, ARCEP, INSEE, BPE, etc.) ni les substantifs techniques.
+- Si une phrase contient un chiffre ou une source, elle doit rester quasi identique au constat serveur correspondant.
+- Interdit de calculer ou d'inventer un ratio (ex. « 50 postes pour 100 habitants ») absent des constats.
+- Produire exactement autant d'entrées que de constats par rubrique (instructions.expectedOutput), sans en omettre ni fusionner deux thèmes distincts.
+- Sécurité (SSMSI) et risques naturels (CATNAT) restent des entrées séparées.
 
-Points d'attention (watchPoints) :
-- Reprendre chaque constat watchPoints fourni (évolution démographique, vieillissement, emploi/revenu, logement, risques, sécurité, mobilité, QPV selon disponibilité).
-- Ne pas répéter le même indicateur sous des formulations proches.
-- Sécurité (SSMSI) et risques naturels restent distincts.
-
-Opportunités (opportunities) :
-- Formuler des pistes d'action prudentes, pas des constats ni des demandes d'étude.
-- Ne pas transformer un risque en opportunité sans prudence méthodologique.
-- Ne pas parler de « filière touristique » sans données d'acteurs, flux ou emplois touristiques.
-
-Séparation stricte des thèmes (ne jamais fusionner dans une même phrase) :
-- SSMSI (sécurité enregistrée) et Géorisques/CATNAT (risques naturels).
-- France Services et capacité d'hébergement touristique.
-- ARCEP (fibre) et mobilité physique (voiture, transports, IRVE).
-- SIDE et FLORES sans rappeler leurs périmètres distincts.
-- RPLS (parc locatif social) et vacance générale RP sans préciser les périmètres.
+Opportunités :
+- Formuler des pistes d'action prudentes, pas des certitudes ni des demandes d'étude.
 
 ${buildMistralStructureBlock()}`;
 
@@ -82,6 +62,7 @@ function getMistralConfig(): { apiKey: string; model: string } | null {
 
 function buildUserPrompt(territory: TerritoryProfile): string {
   const analysisFacts = getSelectedAnalysisFacts(territory);
+  const canonicalOutput = buildCanonicalAnalysisOutput(territory, analysisFacts);
   const debug = process.env.ANALYSIS_DEBUG_RAW_FACTS === "true";
 
   const payload = {
@@ -93,10 +74,14 @@ function buildUserPrompt(territory: TerritoryProfile): string {
       epci: territory.epci,
     },
     analysisFacts,
+    canonicalOutput,
     instructions: {
       outputFormat: "json",
       allowedKeys: ["summary", "strengths", "watchPoints", "opportunities"],
       expectedOutput: buildExpectedOutputInstructions(analysisFacts),
+      summaryPolicy: "Retourner canonicalOutput.summary sans modification.",
+      listPolicy:
+        "Réordonner uniquement les listes de canonicalOutput ; conserver chiffres, sources et substantifs techniques.",
     },
     ...(debug ? { rawFacts: buildTerritorialFacts(territory) } : {}),
   };
@@ -130,6 +115,7 @@ function parseAnalysisContent(
   const validated = validateAnalysisOutput(
     parsed as Parameters<typeof validateAnalysisOutput>[0],
     selectedFacts,
+    territory,
   );
 
   return {

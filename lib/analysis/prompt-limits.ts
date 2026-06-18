@@ -45,17 +45,16 @@ export function countSelectedByTarget(
 }
 
 export function buildExpectedOutputInstructions(facts: AnalysisFact[]): string {
-  const summaryCount = countSelectedByTarget(facts, "summary");
   const strengthsCount = countSelectedByTarget(facts, "strengths");
   const watchCount = countSelectedByTarget(facts, "watchPoints");
   const opportunitiesCount = countSelectedByTarget(facts, "opportunities");
 
   return [
-    "Volumes attendus (alignés sur les constats fournis) :",
-    `- summary : ${ANALYSIS_OUTPUT_LIMITS.summary.sentences} phrases maximum, en s'appuyant sur les ${summaryCount} constat(s) summary.`,
-    `- strengths : exactement ${strengthsCount} point(s) fort(s) — un par constat strengths reçu, sans en omettre.`,
-    `- watchPoints : exactement ${watchCount} point(s) d'attention — un par constat watchPoints reçu, sans en omettre ni fusionner.`,
-    `- opportunities : exactement ${opportunitiesCount} opportunité(s) — une par constat opportunities reçu, sans en omettre.`,
+    "Volumes attendus (alignés sur canonicalOutput) :",
+    "- summary : retourner canonicalOutput.summary à l'identique.",
+    `- strengths : exactement ${strengthsCount} point(s) fort(s) — réordonnés depuis canonicalOutput, quasi verbatim.`,
+    `- watchPoints : exactement ${watchCount} point(s) d'attention — réordonnés depuis canonicalOutput, quasi verbatim.`,
+    `- opportunities : exactement ${opportunitiesCount} opportunité(s) — réordonnées depuis canonicalOutput, quasi verbatim.`,
   ].join("\n");
 }
 
@@ -64,10 +63,10 @@ export function buildMistralStructureBlock(): string {
 
   return `Structure attendue :
 {
-  "summary": "résumé court en ${summary.sentences} phrases maximum",
-  "strengths": ["${strengths.min} à ${strengths.max} points forts — autant que de constats strengths fournis"],
-  "watchPoints": ["${watchPoints.min} à ${watchPoints.max} points d'attention — autant que de constats watchPoints fournis"],
-  "opportunities": ["${opportunities.min} à ${opportunities.max} opportunités — autant que de constats opportunities fournis"]
+  "summary": "identique à canonicalOutput.summary (${summary.sentences} phrases)",
+  "strengths": ["${strengths.min} à ${strengths.max} points forts — réordonnés depuis canonicalOutput"],
+  "watchPoints": ["${watchPoints.min} à ${watchPoints.max} points d'attention — réordonnés depuis canonicalOutput"],
+  "opportunities": ["${opportunities.min} à ${opportunities.max} opportunités — réordonnées depuis canonicalOutput"]
 }`;
 }
 

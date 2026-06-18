@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildAnalysisFacts } from "./build-analysis-facts";
 import { saintGironsProfile } from "./fixtures";
+import { selectAnalysisFactsForPrompt } from "./select-facts";
 import { hasCriticalValidationIssue, validateAnalysisOutput } from "./validate-output";
 
 describe("validateAnalysisOutput", () => {
   const analysisFacts = buildAnalysisFacts(saintGironsProfile);
+  const selectedFacts = selectAnalysisFactsForPrompt(analysisFacts, saintGironsProfile);
 
   it("rejette recul démographique avec part 60+", () => {
     const result = validateAnalysisOutput(
@@ -15,7 +17,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.summary, /-38,1\s*%/);
@@ -30,7 +33,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.strengths.join(" "), /-5,7\s*%/);
@@ -44,7 +48,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: ["Absence de logements sociaux sur la commune."],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.watchPoints.join(" "), /absence de logements sociaux/i);
@@ -58,7 +63,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: ["Potentiel touristique sous-exploité."],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.opportunities.join(" "), /sous-exploité/i);
@@ -72,7 +78,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.summary, /prix.*stables/i);
@@ -86,7 +93,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: ["Tendance à la hausse des faits enregistrés."],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.watchPoints.join(" "), /tendance à la hausse/i);
@@ -100,7 +108,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.summary, /chef-lieu de l'EPCI/i);
@@ -114,7 +123,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.summary, /sans comparaison/i);
@@ -138,7 +148,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: ["Fracture numérique importante malgré 72,5 % de fibre."],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.watchPoints.join(" "), /fracture numérique/i);
@@ -152,7 +163,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: ["Desserte médicale insuffisante selon FINESS."],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.watchPoints.join(" "), /desserte/i);
@@ -166,7 +178,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.strengths.join(" "), /dynamisme sectoriel/i);
@@ -180,7 +193,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: ["Le taux de chômage atteint 25,0 % au recensement 2021."],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.watchPoints.join(" "), /25,0\s*%/);
@@ -196,7 +210,8 @@ describe("validateAnalysisOutput", () => {
         ],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(
@@ -215,7 +230,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: [],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     const strengthsText = result.strengths.join(" ");
@@ -233,7 +249,8 @@ describe("validateAnalysisOutput", () => {
         watchPoints: [],
         opportunities: ["Développer la filière touristique locale."],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.opportunities.join(" "), /filière touristique/i);
@@ -252,7 +269,8 @@ describe("validateAnalysisOutput", () => {
         ],
         opportunities: ["Potentiel touristique à approfondir, faute de données de fréquentation."],
       },
-      analysisFacts,
+      selectedFacts,
+      saintGironsProfile,
     );
 
     assert.ok(result.summary.length > 0);

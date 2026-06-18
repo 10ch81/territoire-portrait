@@ -11,13 +11,18 @@ import {
   POPULATION_GROWTH_TOLERANCE,
 } from "../demographic-indicators";
 import { containsForbiddenPhrases, containsInternalLeakage } from "../mistral-sanitize";
-import type { TerritoryAnalysis } from "../types";
+import type { TerritoryAnalysis, TerritoryProfile } from "../types";
+import {
+  buildDeterministicSummary,
+  resolveVerbatimList,
+} from "./build-canonical-output";
 import { ensureOutputCoverage } from "./ensure-output-coverage";
 import { ANALYSIS_OUTPUT_LIMITS } from "./prompt-limits";
 import {
   hasUnsourcedClaimIssue,
   stripUnsourcedClaims,
 } from "./unsourced-claims";
+import { hasForbiddenDerivedRatio } from "./verify-numeric-claims";
 import type {
   AnalysisFact,
   AnalysisFactTheme,
@@ -290,6 +295,7 @@ function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string
 
   if (!validatePercentContext(text, analysisFacts)) return "numeric-context";
   if (hasUnsourcedClaimIssue(text, analysisFacts)) return "unsourced-claim";
+  if (hasForbiddenDerivedRatio(text, analysisFacts)) return "derived-ratio";
 
   return null;
 }
@@ -396,33 +402,31 @@ function sanitizeList(
 export function validateAnalysisOutput(
   analysis: RawTerritorialAnalysisOutput,
   analysisFacts: AnalysisFact[],
+  territory: TerritoryProfile,
 ): Omit<TerritoryAnalysis, "dataLimits"> {
-  const summaryRaw =
-    typeof analysis.summary === "string" ? analysis.summary : "Analyse non disponible.";
-  const summarySanitized =
-    sanitizeField(summaryRaw, "summary", analysisFacts) || "Analyse non disponible.";
+  const deterministicSummary = buildDeterministicSummary(territory, analysisFacts);
 
   const covered = ensureOutputCoverage(
     {
-      summary: summarySanitized,
-      strengths: sanitizeList(
+      summary: deterministicSummary,
+      strengths: resolveVerbatimList(
         Array.isArray(analysis.strengths)
-          ? analysis.strengths.filter((i): i is string => typeof i === "string")
-          : [],
+          ? analysis.strengths.filter((item): item is string => typeof item === "string")
+          : undefined,
         "strengths",
         analysisFacts,
       ),
-      watchPoints: sanitizeList(
+      watchPoints: resolveVerbatimList(
         Array.isArray(analysis.watchPoints)
-          ? analysis.watchPoints.filter((i): i is string => typeof i === "string")
-          : [],
+          ? analysis.watchPoints.filter((item): item is string => typeof item === "string")
+          : undefined,
         "watchPoints",
         analysisFacts,
       ),
-      opportunities: sanitizeList(
+      opportunities: resolveVerbatimList(
         Array.isArray(analysis.opportunities)
-          ? analysis.opportunities.filter((i): i is string => typeof i === "string")
-          : [],
+          ? analysis.opportunities.filter((item): item is string => typeof item === "string")
+          : undefined,
         "opportunities",
         analysisFacts,
       ),
@@ -431,14 +435,10 @@ export function validateAnalysisOutput(
   );
 
   return {
-    summary: sanitizeField(covered.summary, "summary", analysisFacts) || covered.summary,
-    strengths: covered.strengths.map((item) => sanitizeField(item, "strengths", analysisFacts)).filter(Boolean),
-    watchPoints: covered.watchPoints
-      .map((item) => sanitizeField(item, "watchPoints", analysisFacts))
-      .filter(Boolean),
-    opportunities: covered.opportunities
-      .map((item) => sanitizeField(item, "opportunities", analysisFacts))
-      .filter(Boolean),
+    summary: stripUnsourcedClaims(deterministicSummary, analysisFacts) || deterministicSummary,
+    strengths: covered.strengths,
+    watchPoints: covered.watchPoints,
+    opportunities: covered.opportunities,
   };
 }
 

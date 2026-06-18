@@ -155,6 +155,7 @@ describe("panel multi-profils", () => {
 
   it("validation — rejette formulations interdites sur panel", () => {
     const facts = buildAnalysisFacts(saintGironsProfile);
+    const selected = selectAnalysisFactsForPrompt(facts, saintGironsProfile);
     const result = validateAnalysisOutput(
       {
         summary: "Un tissu économique dynamique structure la commune.",
@@ -162,7 +163,8 @@ describe("panel multi-profils", () => {
         watchPoints: ["Tendance à la hausse des prix."],
         opportunities: ["Faire une analyse plus poussée du territoire."],
       },
-      facts,
+      selected,
+      saintGironsProfile,
     );
 
     assert.doesNotMatch(result.summary, /dynamique/i);

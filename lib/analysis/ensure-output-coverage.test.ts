@@ -11,6 +11,7 @@ import {
 } from "./ensure-output-coverage";
 import { saintGironsProfile } from "./fixtures";
 import { ANALYSIS_OUTPUT_LIMITS } from "./prompt-limits";
+import { buildCanonicalAnalysisOutput } from "./build-canonical-output";
 import {
   hasUnsourcedGeoRole,
   hasUnsourcedQualifier,
@@ -133,6 +134,7 @@ describe("ensure-output-coverage", () => {
       buildAnalysisFacts(saintGironsProfile),
       saintGironsProfile,
     );
+    const canonical = buildCanonicalAnalysisOutput(saintGironsProfile, selected);
 
     const result = validateAnalysisOutput(
       {
@@ -152,18 +154,14 @@ describe("ensure-output-coverage", () => {
         ],
       },
       selected,
+      saintGironsProfile,
     );
 
+    assert.equal(result.summary, canonical.summary);
     assert.match(result.summary, /-5,7\s*%/);
-    assert.doesNotMatch(result.summary, /;\s*La population/);
-    assert.doesNotMatch(result.summary, /pôle structurant du Couserans/i);
-    assert.doesNotMatch(result.summary, /\bsignificative\b/i);
-    assert.doesNotMatch(result.summary, /\bdiversifiée\b/i);
+    assert.doesNotMatch(result.summary, /pôle structurant/i);
     assert.ok(result.watchPoints.length <= ANALYSIS_OUTPUT_LIMITS.watchPoints.max);
-    assert.doesNotMatch(
-      result.watchPoints.join(" "),
-      /recule de -5,7\s*%/,
-    );
+    assert.ok(result.watchPoints.every((item) => selected.some((fact) => fact.sentence === item)));
   });
 
   it("normalise le conditionnel des opportunités", () => {

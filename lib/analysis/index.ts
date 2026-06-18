@@ -9,6 +9,13 @@ export type {
 
 export { buildAnalysisFacts } from "./build-analysis-facts";
 export {
+  buildCanonicalAnalysisOutput,
+  buildDeterministicSummary,
+  buildVerbatimLists,
+  inferFactOrder,
+  resolveVerbatimList,
+} from "./build-canonical-output";
+export {
   ANALYSIS_OUTPUT_LIMITS,
   buildExpectedOutputInstructions,
   buildMistralStructureBlock,
@@ -35,4 +42,7 @@ export {
   validateAnalysisOutput,
 } from "./validate-output";
 
+export {
+  hasForbiddenDerivedRatio,
+} from "./verify-numeric-claims";
 export { formatCount, formatPercent, formatPricePerM2, formatSignedPercent } from "./format";
