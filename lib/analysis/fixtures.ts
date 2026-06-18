@@ -294,6 +294,8 @@ export type PanelPreset =
   | "withFiness"
   | "withEducation"
   | "withArcep"
+  | "demographicGrowth"
+  | "sireneCapped"
   | "fullEnrichment";
 
 function baseProfile(
@@ -597,7 +599,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
         },
       });
     case "withoutQpv":
-      return baseProfile("Commune sans QPV", "99007", 18_000, 2_800, {
+      return baseProfile("Commune périurbaine standard", "99007", 18_000, 2_800, {
         urbanPolicy: {
           year: 2024,
           hasQpv: false,
@@ -657,6 +659,65 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           millesime: "2022",
           divergenceWarning:
             "Écart entre SIDE (480 UL) et SIRENE live (512 UL) : millésimes ou périmètres distincts.",
+          note: "",
+        },
+      });
+    case "demographicGrowth":
+      return baseProfile("Commune en croissance démographique", "99012", 15_000, 350, {
+        derived: {
+          populationGrowthPercent: 12.4,
+          populationGrowthFromYear: 2010,
+          populationGrowthToYear: 2022,
+          irvePointsPer1000Residents: null,
+          socialHousingVacancyRatePercent: null,
+          equipmentsPer1000Residents: 45,
+          available: true,
+          note: "",
+        },
+        populationHistory: {
+          latestYear: 2022,
+          latestPopulation: 15_000,
+          history: [
+            { year: 2010, population: 13_350 },
+            { year: 2022, population: 15_000 },
+          ],
+          available: true,
+          note: "",
+        },
+        sociodemographics: {
+          year: 2021,
+          ageBands: [],
+          unemploymentRate: 8.2,
+          medianDisposableIncome: 19_500,
+          available: true,
+          note: "",
+        },
+        housing: {
+          year: 2021,
+          totalUnits: 1_200,
+          occupiedUnits: 1_150,
+          vacantUnits: 50,
+          totalDwellings: 7_500,
+          rpVacantDwellings: 280,
+          rpVacancyRatePercent: 3.7,
+          socialHousingSharePercent: 12,
+          vacancyRatePercent: null,
+          available: true,
+          note: "",
+        },
+      });
+    case "sireneCapped":
+      return baseProfile("Commune SIRENE plafonnée", "99013", 20_000, 500, {
+        enterprises: {
+          legalUnitsWithEstablishment: 10_000,
+          legalUnitsIsCapped: true,
+          essCount: 120,
+          rgeCount: 45,
+          inseeLegalUnits: null,
+          inseeEstablishments: null,
+          inseeSideYear: null,
+          millesime: "2024",
+          divergenceWarning: null,
           note: "",
         },
       });

@@ -1,5 +1,5 @@
 import type { TerritoryProfile } from "../../types";
-import { formatCount } from "../format";
+import { formatBoundedCountLabel, formatCount } from "../format";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -7,7 +7,45 @@ export function buildEconomyFacts(territory: TerritoryProfile): AnalysisFact[] {
   const facts: AnalysisFact[] = [];
   const enterprises = territory.enrichment?.enterprises;
 
-  if (!enterprises?.inseeLegalUnits && !enterprises?.inseeEstablishments) {
+  if (!enterprises) {
+    return facts;
+  }
+
+  const sireneUnits = enterprises.legalUnitsWithEstablishment;
+  if (
+    sireneUnits !== null &&
+    enterprises.inseeLegalUnits === null &&
+    enterprises.inseeEstablishments === null
+  ) {
+    const ulLabel = formatBoundedCountLabel(
+      sireneUnits,
+      enterprises.legalUnitsIsCapped,
+      "unités légales recensées",
+    );
+    facts.push(
+      createFact({
+        theme: "economy",
+        target: "summary",
+        sentence: `Le répertoire SIRENE identifie ${ulLabel} sur la commune.`,
+        sourceKeys: ["sirene"],
+        confidence: enterprises.legalUnitsIsCapped ? "medium" : "high",
+        limitations: enterprises.legalUnitsIsCapped
+          ? [
+              "Total SIRENE plafonné par l'API à 10 000 résultats ; valeur minimale documentée.",
+            ]
+          : ["SIRENE est un répertoire administratif complémentaire ; périmètre distinct de SIDE."],
+        numericBindings: [
+          binding(sireneUnits, "unités légales SIRENE", "economy", [
+            "SIRENE",
+            "unités légales",
+            "entreprises",
+          ]),
+        ],
+      }),
+    );
+  }
+
+  if (!enterprises.inseeLegalUnits && !enterprises.inseeEstablishments) {
     return facts;
   }
 

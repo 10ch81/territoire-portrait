@@ -1,5 +1,6 @@
 import type { TerritoryProfile } from "../../types";
 import { formatPercent } from "../format";
+import { renderCountedLabel } from "../render-text";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -14,7 +15,7 @@ export function buildConnectivityFacts(territory: TerritoryProfile): AnalysisFac
       createFact({
         theme: "connectivity",
         target: "strengths",
-        sentence: `Environ ${formatPercent(connectivity.fiberEligibleSharePercent)} des logements peuvent être connectés à la fibre (${connectivity.vintage}, ARCEP).`,
+        sentence: `${formatPercent(connectivity.fiberEligibleSharePercent)} des locaux sont raccordables à la fibre selon l'ARCEP.`,
         sourceKeys: ["arcep-fibre"],
         year: connectivity.vintage,
         confidence: "high",
@@ -26,7 +27,7 @@ export function buildConnectivityFacts(territory: TerritoryProfile): AnalysisFac
             connectivity.fiberEligibleSharePercent,
             "part locaux raccordables fibre",
             "connectivity",
-            ["fibre", "connectés", "ARCEP", "connectivité", "internet"],
+            ["fibre", "raccordables", "ARCEP", "connectivité", "internet"],
           ),
         ],
       }),

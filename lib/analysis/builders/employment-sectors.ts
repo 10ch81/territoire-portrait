@@ -9,16 +9,7 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
 
   if (!flores?.available) return facts;
 
-  const population = territory.population;
-  const postsPer100Residents =
-    population !== null && population > 0
-      ? Math.round((flores.totalSalariedPosts / population) * 100)
-      : null;
-
-  const mainStrengthSentence =
-    postsPer100Residents !== null
-      ? `${formatCount(flores.totalSalariedPosts)} postes salariés et ${formatCount(flores.totalEstablishments)} établissements recensés en ${flores.year}, soit environ ${formatCount(postsPer100Residents)} postes pour 100 habitants (FLORES).`
-      : `${formatCount(flores.totalSalariedPosts)} postes salariés et ${formatCount(flores.totalEstablishments)} établissements recensés en ${flores.year} (FLORES).`;
+  const mainStrengthSentence = `${formatCount(flores.totalSalariedPosts)} postes salariés et ${formatCount(flores.totalEstablishments)} établissements recensés par FLORES (${flores.year}).`;
 
   facts.push(
     createFact({
@@ -45,15 +36,6 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
           "employment_sectors",
           ["postes salariés", "FLORES", "emploi salarié"],
         ),
-        ...(postsPer100Residents !== null
-          ? [
-              binding(postsPer100Residents, "postes pour 100 habitants FLORES", "employment_sectors", [
-                "postes",
-                "100 habitants",
-                "FLORES",
-              ]),
-            ]
-          : []),
       ],
     }),
   );
@@ -106,6 +88,12 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
       );
     }
   }
+
+  const population = territory.population;
+  const postsPer100Residents =
+    population !== null && population > 0
+      ? Math.round((flores.totalSalariedPosts / population) * 100)
+      : null;
 
   if (postsPer100Residents !== null && postsPer100Residents >= 15) {
     facts.push(

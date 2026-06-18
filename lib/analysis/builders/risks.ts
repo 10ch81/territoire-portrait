@@ -1,4 +1,5 @@
 import type { TerritoryProfile } from "../../types";
+import { renderCountedLabel } from "../render-text";
 import { createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -26,7 +27,13 @@ export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
         limitations: [
           "Risques naturels (CATNAT/Géorisques) ; distinct des indicateurs SSMSI.",
         ],
-        evidence: [`${risks.catNatEvents.length} reconnaissance(s) CATNAT recensée(s).`],
+        evidence: [
+          `${renderCountedLabel(
+            risks.catNatEvents.length,
+            "reconnaissance CATNAT recensée",
+            "reconnaissances CATNAT recensées",
+          )}.`,
+        ],
       }),
     );
   }
@@ -36,7 +43,7 @@ export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
       createFact({
         theme: "risks",
         target: "watchPoints",
-        sentence: `Des zones à risque d'inondation sont recensées sur la commune (${risks.flood.count} zone(s)).`,
+        sentence: `Des zones à risque d'inondation sont recensées sur la commune (${renderCountedLabel(risks.flood.count, "zone", "zones")}).`,
         sourceKeys: ["georisques"],
         confidence: "high",
         limitations: ["Données Géorisques ; distinct de la sécurité enregistrée SSMSI."],

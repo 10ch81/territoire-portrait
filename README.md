@@ -28,7 +28,7 @@ Renseignez `.env.local` :
 
 ```env
 MISTRAL_API_KEY=votre_cle
-MISTRAL_MODEL=mistral-large-latest
+MISTRAL_MODEL=mistral-small-latest
 ```
 
 ## Lancement
@@ -54,7 +54,7 @@ Ce script analyse la commune exemple **Nantes (44109)** sans exposer la clé API
 | Variable          | Obligatoire | Description                          |
 | ----------------- | ----------- | ------------------------------------ |
 | `MISTRAL_API_KEY` | Non*        | Clé API Mistral (analyse IA)         |
-| `MISTRAL_MODEL`   | Non         | Modèle Mistral (défaut : large)      |
+| `MISTRAL_MODEL`   | Non         | Modèle Mistral (défaut : small)      |
 
 \* Sans clé, l'application fonctionne mais affiche un message clair à la place de l'analyse IA.
 

@@ -1,6 +1,7 @@
 import type {
   AnalysisFact,
   AnalysisFactConfidence,
+  AnalysisFactSummaryFragments,
   AnalysisFactTarget,
   AnalysisFactTheme,
   NumericBinding,
@@ -27,7 +28,7 @@ type CreateFactInput = {
   confidence?: AnalysisFactConfidence;
   limitations?: string[];
   numericBindings?: NumericBinding[];
-};
+} & AnalysisFactSummaryFragments;
 
 export function createFact(input: CreateFactInput): AnalysisFact {
   return {
@@ -41,6 +42,9 @@ export function createFact(input: CreateFactInput): AnalysisFact {
     confidence: input.confidence ?? "high",
     limitations: input.limitations,
     numericBindings: input.numericBindings,
+    summaryAssetPhrase: input.summaryAssetPhrase,
+    summaryIssuePhrase: input.summaryIssuePhrase,
+    summaryContextPhrase: input.summaryContextPhrase,
   };
 }
 

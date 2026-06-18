@@ -142,7 +142,7 @@ describe("ensure-output-coverage", () => {
           "Saint-Girons, pôle structurant du Couserans, compte 6 008 habitants en 2022. Elle présente une dynamique significative et diversifiée, avec des enjeux démographiques marqués et des risques naturels.",
         strengths: [
           "2 988 postes salariés recensés en 2024 (FLORES).",
-          "96,6 % des logements peuvent être connectés à la fibre (ARCEP).",
+          "96,6 % des locaux sont raccordables à la fibre selon l'ARCEP.",
         ],
         watchPoints: [
           "Les 60 ans et plus représentent 38,1 % de la population en 2021.",
@@ -158,7 +158,7 @@ describe("ensure-output-coverage", () => {
     );
 
     assert.equal(result.summary, canonical.summary);
-    assert.match(result.summary, /-5,7\s*%/);
+    assert.match(result.summary, /recul de population de 5,7\s*% entre 2010 et 2022/);
     assert.doesNotMatch(result.summary, /pôle structurant/i);
     assert.ok(result.watchPoints.length <= ANALYSIS_OUTPUT_LIMITS.watchPoints.max);
     assert.ok(result.watchPoints.every((item) => selected.some((fact) => fact.sentence === item)));
@@ -204,6 +204,15 @@ describe("unsourced-claims", () => {
 
     assert.doesNotMatch(stripped, /\bsignificative\b/i);
     assert.doesNotMatch(stripped, /\bdiversifiée\b/i);
+  });
+
+  it("ne retire pas l'EPCI quand Pyrénées fait partie du nom officiel", () => {
+    const facts = buildAnalysisFacts(saintGironsProfile);
+    const summary =
+      "Saint-Girons, commune de 6 008 habitants en 2022, appartient à CC Couserans-Pyrénées (Ariège) et présente une densité de 316 habitants/km².";
+
+    assert.equal(hasUnsourcedGeoRole(summary, facts), false);
+    assert.equal(stripUnsourcedClaims(summary, facts), summary);
   });
 });
 

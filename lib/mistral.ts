@@ -56,7 +56,7 @@ function getMistralConfig(): { apiKey: string; model: string } | null {
 
   return {
     apiKey,
-    model: process.env.MISTRAL_MODEL?.trim() || "mistral-large-latest",
+    model: process.env.MISTRAL_MODEL?.trim() || "mistral-small-latest",
   };
 }
 

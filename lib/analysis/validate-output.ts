@@ -16,6 +16,7 @@ import {
   buildDeterministicSummary,
   resolveVerbatimList,
 } from "./build-canonical-output";
+import { polishRenderedSentence } from "./render-text";
 import { ensureOutputCoverage } from "./ensure-output-coverage";
 import { ANALYSIS_OUTPUT_LIMITS } from "./prompt-limits";
 import {
@@ -36,7 +37,7 @@ const THEME_CONTEXT_KEYWORDS: Partial<
   ageing: isAgeShareContext,
   employment: (text) => /\b(?:chômage|taux de chômage)\b/i.test(text),
   housing: (text) => /\b(?:logements vacants|vacance|logements)\b/i.test(text),
-  connectivity: (text) => /\b(?:fibre|ARCEP|connectés|internet)\b/i.test(text),
+  connectivity: (text) => /\b(?:fibre|ARCEP|raccordables|internet)\b/i.test(text),
   mobility: (text) => /\b(?:voiture|domicile-travail|transports en commun)\b/i.test(text),
   health: (text) => /\b(?:FINESS|santé|sanitaires|accompagnement social)\b/i.test(text),
   education: (text) => /\b(?:scolaires|Annuaire Éducation|scolarisation)\b/i.test(text),
@@ -435,10 +436,10 @@ export function validateAnalysisOutput(
   );
 
   return {
-    summary: stripUnsourcedClaims(deterministicSummary, analysisFacts) || deterministicSummary,
-    strengths: covered.strengths,
-    watchPoints: covered.watchPoints,
-    opportunities: covered.opportunities,
+    summary: deterministicSummary,
+    strengths: covered.strengths.map(polishRenderedSentence),
+    watchPoints: covered.watchPoints.map(polishRenderedSentence),
+    opportunities: covered.opportunities.map(polishRenderedSentence),
   };
 }
 

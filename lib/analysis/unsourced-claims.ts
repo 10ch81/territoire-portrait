@@ -46,6 +46,13 @@ export function hasUnsourcedQualifier(text: string, analysisFacts: AnalysisFact[
 }
 
 export function hasUnsourcedGeoRole(text: string, analysisFacts: AnalysisFact[]): boolean {
+  if (/\bappartient à\b[^.]*\b(?:pyrénées|pyrenees)\b/i.test(text)) {
+    return false;
+  }
+  if (/\b(?:CC|CA|CU|MET)\s+[\w-]*(?:pyrénées|pyrenees)/i.test(text)) {
+    return false;
+  }
+
   if (!UNSOURCED_GEO_ROLE_PATTERN.test(text)) return false;
 
   const centralityFacts = analysisFacts.filter((fact) => fact.theme === "centrality");
@@ -85,9 +92,12 @@ export function stripUnsourcedClaims(text: string, analysisFacts: AnalysisFact[]
         .replace(/,?\s*[^.,]*\bpôle structurant\b[^.,]*/gi, "")
         .replace(/,?\s*[^.,]*\bau cœur de[^.,]*/gi, "")
         .replace(/,?\s*[^.,]*\bau coeur de[^.,]*/gi, "")
-        .replace(/,?\s*[^.,]*\bcoeur des[^.,]*/gi, "")
-        .replace(/,?\s*[^.,]*\bpyrénées[^.,]*/gi, "")
-        .replace(/,?\s*[^.,]*\bpyrenees[^.,]*/gi, "");
+        .replace(/,?\s*[^.,]*\bcoeur des[^.,]*/gi, "");
+      if (!/\bappartient à\b/i.test(result)) {
+        result = result
+          .replace(/,?\s*[^.,]*\bpyrénées[^.,]*/gi, "")
+          .replace(/,?\s*[^.,]*\bpyrenees[^.,]*/gi, "");
+      }
     }
   }
 

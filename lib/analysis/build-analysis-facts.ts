@@ -27,6 +27,7 @@ import {
   buildPublicServicesFacts,
 } from "./builders/misc";
 import { buildOpportunityFacts } from "./builders/opportunities";
+import { enrichFactsWithSummaryFragments } from "./summary-fragments";
 
 type FactBuilder = (territory: TerritoryProfile) => AnalysisFact[];
 
@@ -60,5 +61,6 @@ const BUILDERS: FactBuilder[] = [
 
 export function buildAnalysisFacts(territory: TerritoryProfile): AnalysisFact[] {
   resetFactCounter();
-  return BUILDERS.flatMap((builder) => builder(territory));
+  const facts = BUILDERS.flatMap((builder) => builder(territory));
+  return enrichFactsWithSummaryFragments(facts, territory);
 }

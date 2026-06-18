@@ -1,5 +1,6 @@
 import type { TerritoryProfile } from "../../types";
 import { formatPercent } from "../format";
+import { renderCountedLabel } from "../render-text";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -73,7 +74,7 @@ export function buildEnergyFacts(territory: TerritoryProfile): AnalysisFact[] {
     createFact({
       theme: "energy",
       target: "summary",
-      sentence: `La commune compte ${irve.chargingPoints.toLocaleString("fr-FR")} points de recharge pour véhicules électriques (${irve.stations} station(s), IRVE).`,
+      sentence: `La commune compte ${irve.chargingPoints.toLocaleString("fr-FR")} points de recharge pour véhicules électriques (${renderCountedLabel(irve.stations, "station", "stations")}, IRVE).`,
       sourceKeys: ["irve"],
       year: irve.year,
       confidence: "high",

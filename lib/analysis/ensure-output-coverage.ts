@@ -7,7 +7,6 @@ import {
 } from "../demographic-indicators";
 import { ANALYSIS_OUTPUT_LIMITS, watchPointRetentionRank } from "./prompt-limits";
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
-import { stripUnsourcedClaims } from "./unsourced-claims";
 
 const COVERAGE_SENTENCE_OVERLAP = 0.32;
 
@@ -15,18 +14,23 @@ const THEME_COVERAGE_MATCHERS: Partial<
   Record<AnalysisFactTheme, (text: string) => boolean>
 > = {
   demography: isDemographicEvolutionContext,
-  ageing: (text) => /\b(?:60 ans et plus|personnes âgées|vieillissement)\b/i.test(text),
-  employment: (text) => /\b(?:chômage|taux de chômage)\b/i.test(text),
+  ageing: (text) =>
+    /\b(?:60 ans et plus|personnes \u00e2g\u00e9es|vieillissement)\b/i.test(text),
+  employment: (text) => /\b(?:ch\u00f4mage|taux de ch\u00f4mage)\b/i.test(text),
   housing: (text) => /\b(?:logements vacants|vacance|logements)\b/i.test(text),
-  security: (text) => /\b(?:sécurité enregistrée|SSMSI|délinquance)\b/i.test(text),
-  risks: (text) => /\b(?:CATNAT|catastrophe naturelle|inondation|Géorisques)\b/i.test(text),
-  employment_sectors: (text) => /\b(?:FLORES|postes salariés)\b/i.test(text),
-  connectivity: (text) => /\b(?:fibre|ARCEP|connectés)\b/i.test(text),
+  security: (text) =>
+    /\b(?:s\u00e9curit\u00e9 enregistr\u00e9e|SSMSI|d\u00e9linquance)\b/i.test(text),
+  risks: (text) =>
+    /\b(?:CATNAT|catastrophe naturelle|inondation|G\u00e9orisques)\b/i.test(text),
+  employment_sectors: (text) => /\b(?:FLORES|postes salari\u00e9s)\b/i.test(text),
+  connectivity: (text) => /\b(?:fibre|ARCEP|raccordables)\b/i.test(text),
   public_services: (text) => /\bFrance Services\b/i.test(text),
-  economy: (text) => /\b(?:SIDE|entreprises|établissements actifs)\b/i.test(text),
+  economy: (text) =>
+    /\b(?:SIDE|entreprises|\u00e9tablissements actifs)\b/i.test(text),
   ess_rge: (text) => /\b(?:ESS|RGE)\b/i.test(text),
-  health: (text) => /\b(?:FINESS|santé)\b/i.test(text),
-  education: (text) => /\b(?:scolaires|Annuaire Éducation)\b/i.test(text),
+  health: (text) => /\b(?:FINESS|sant\u00e9)\b/i.test(text),
+  education: (text) =>
+    /\b(?:scolaires|Annuaire \u00c9ducation)\b/i.test(text),
 };
 
 function tokenOverlap(a: string, b: string): number {
@@ -215,7 +219,7 @@ export function summaryHasDemographicGrowth(summary: string, fact: AnalysisFact)
   if (!isDemographicEvolutionContext(summary)) return false;
 
   const growthBinding = fact.numericBindings?.find((binding) =>
-    binding.label.includes("évolution"),
+    binding.label.includes("\u00e9volution"),
   );
   if (!growthBinding || typeof growthBinding.value !== "number") {
     return isSelectedFactCovered(fact, [summary]);
@@ -233,7 +237,9 @@ function extractGrowthClause(fact: AnalysisFact): string {
 }
 
 function formatGrowthPhrase(fact: AnalysisFact): string | null {
-  const binding = fact.numericBindings?.find((entry) => entry.label.includes("évolution"));
+  const binding = fact.numericBindings?.find((entry) =>
+    entry.label.includes("\u00e9volution"),
+  );
   if (!binding || typeof binding.value !== "number") return null;
 
   const years = fact.sentence.match(/entre (\d{4}) et (\d{4})/i);
@@ -272,11 +278,11 @@ export function ensureSummaryDemography(
 
     second = second
       .replace(
-        /\bd[''](?:enjeux|défis) démographiques(?:\s+[^,.;]*)?/gi,
+        /\bd[''](?:enjeux|d\u00e9fis) d\u00e9mographiques(?:\s+[^,.;]*)?/gi,
         growthPhrase.match(/^(un|une)\s/i) ? `d'${growthPhrase}` : growthPhrase,
       )
       .replace(
-        /\b(?:avec\s+des?\s+)?(?:enjeux|défis) démographiques(?:\s+[^,.;]*)?/gi,
+        /\b(?:avec\s+des?\s+)?(?:enjeux|d\u00e9fis) d\u00e9mographiques(?:\s+[^,.;]*)?/gi,
         `avec ${growthPhrase}`,
       )
       .replace(/\bd['']avec\b/gi, "d'")
@@ -330,7 +336,6 @@ function snapListToSourceSentences(
     const best = [...sources].sort(
       (a, b) => tokenOverlap(item, b.sentence) - tokenOverlap(item, a.sentence),
     )[0]!;
-    if (tokenOverlap(item, best.sentence) >= 0.72) return item;
     return best.sentence;
   });
 }
@@ -439,17 +444,22 @@ export function ensureOutputCoverage(
   watchPoints: string[];
   opportunities: string[];
 } {
-  const summary = stripUnsourcedClaims(
-    ensureSummaryDemography(output.summary, selectedFacts),
-    selectedFacts,
-  );
+  const summary = output.summary;
 
   return {
     summary,
-    strengths: ensureListCoverage(output.strengths, "strengths", selectedFacts),
+    strengths: snapListToSourceSentences(
+      ensureListCoverage(output.strengths, "strengths", selectedFacts),
+      selectedFacts,
+      "strengths",
+    ),
     watchPoints: ensureWatchPointsCoverage(output.watchPoints, selectedFacts, summary),
     opportunities: normalizeOpportunityTone(
-      output.opportunities ?? [],
+      snapListToSourceSentences(
+        output.opportunities ?? [],
+        selectedFacts,
+        "opportunities",
+      ),
       selectedFacts,
     ),
   };

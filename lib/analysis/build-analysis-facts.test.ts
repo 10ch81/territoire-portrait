@@ -99,7 +99,7 @@ describe("buildAnalysisFacts", () => {
     assert.ok(connectivity);
     assert.match(mobility!.sentence, /69,3\s*%/);
     assert.match(connectivity!.sentence, /ARCEP/);
-    assert.match(connectivity!.sentence, /fibre/i);
+    assert.match(connectivity!.sentence, /locaux sont raccordables à la fibre/i);
     assert.doesNotMatch(connectivity!.sentence, /voiture/i);
   });
 

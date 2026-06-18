@@ -1,5 +1,6 @@
 import type { TerritoryProfile } from "../../types";
 import { formatCount } from "../format";
+import { renderCountedLabel } from "../render-text";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -109,7 +110,11 @@ export function buildEquipmentFacts(territory: TerritoryProfile): AnalysisFact[]
       createFact({
         theme: "equipments",
         target: "summary",
-        sentence: `${formatCount(transport.totalEquipments)} équipement(s) de transport recensé(s) sur la commune ; cela ne décrit pas l'offre horaire réelle (BPE ${equipments.year}).`,
+        sentence: `${renderCountedLabel(
+          transport.totalEquipments,
+          "équipement de transport recensé",
+          "équipements de transport recensés",
+        )} sur la commune ; cela ne décrit pas l'offre horaire réelle (BPE ${equipments.year}).`,
         sourceKeys: ["insee-bpe"],
         year: equipments.year,
         confidence: "medium",

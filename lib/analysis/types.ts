@@ -40,6 +40,16 @@ export type NumericBinding = {
   allowedContexts: string[];
 };
 
+/** Fragment rédigé pour insertion dans le résumé déterministe (jamais un label interne). */
+export type AnalysisFactSummaryFragments = {
+  /** Groupe nominal après « met en évidence » — article inclus. */
+  summaryAssetPhrase?: string;
+  /** Groupe nominal après « liés à » — article inclus. */
+  summaryIssuePhrase?: string;
+  /** Contexte démographique ou complément après « met en évidence ». */
+  summaryContextPhrase?: string;
+};
+
 export type AnalysisFact = {
   id: string;
   theme: AnalysisFactTheme;
@@ -51,7 +61,7 @@ export type AnalysisFact = {
   confidence: AnalysisFactConfidence;
   limitations?: string[];
   numericBindings?: NumericBinding[];
-};
+} & AnalysisFactSummaryFragments;
 
 export type RawTerritorialAnalysisOutput = {
   summary?: string;

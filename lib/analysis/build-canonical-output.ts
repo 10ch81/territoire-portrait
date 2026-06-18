@@ -3,6 +3,21 @@ import type { TerritoryProfile } from "../types";
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
 import { formatCount } from "./format";
 import { isSelectedFactCovered } from "./ensure-output-coverage";
+import {
+  buildSummaryPhrase2,
+  pickDefaultAssetPhrase,
+  resolveAssetPhrase,
+  resolveIssuePhrase,
+} from "./summary-compose";
+import {
+  extractDemographySnapshot,
+  isFactEligibleForSummary,
+  shouldIncludeAsSummaryEnjeu,
+} from "./summary-phrases";
+import {
+  hasSummaryAssetPhrase,
+  hasSummaryIssuePhrase,
+} from "./summary-fragments";
 
 const SUMMARY_ATOUT_THEMES: AnalysisFactTheme[] = [
   "centrality",
@@ -40,19 +55,17 @@ function tokenOverlap(a: string, b: string): number {
   return overlap / Math.min(tokensA.size, tokensB.size);
 }
 
-function lowercaseFirst(text: string): string {
-  if (!text) return text;
-  return text.charAt(0).toLowerCase() + text.slice(1);
-}
-
-function stripSourceSuffix(sentence: string): string {
-  return sentence.replace(/\s*\([^)]*\)\.?\s*$/g, "").replace(/\.$/, "").trim();
+function formatEpciAffiliation(epciName: string, departmentName?: string): string {
+  const label = departmentName ? `${epciName} (${departmentName})` : epciName;
+  if (/^(CC|CA|CU|MET)\b/i.test(epciName) || /^communauté/i.test(epciName)) {
+    return `la ${label}`;
+  }
+  return label;
 }
 
 function formatAffiliation(territory: TerritoryProfile): string {
   if (territory.epci?.name) {
-    const dept = territory.department?.name;
-    return dept ? `${territory.epci.name} (${dept})` : territory.epci.name;
+    return formatEpciAffiliation(territory.epci.name, territory.department?.name);
   }
   if (territory.department?.name) {
     return `le département ${territory.department.name}`;
@@ -60,76 +73,41 @@ function formatAffiliation(territory: TerritoryProfile): string {
   return "son territoire intercommunal";
 }
 
-function toSummaryClause(fact: AnalysisFact): string {
-  if (fact.theme === "demography") {
-    const evolution = fact.sentence.match(
-      /(?:la population (?:recule|progresse)|recul|progression)[^.]*(?:entre \d{4} et \d{4})?/i,
-    );
-    if (evolution) {
-      return lowercaseFirst(stripSourceSuffix(evolution[0]));
-    }
-  }
-
-  let clause = stripSourceSuffix(fact.sentence);
-  const ratioSplit = clause.match(/^(.+?),\s*soit environ \d[\d\s]* postes pour 100 habitants/i);
-  if (ratioSplit) {
-    clause = ratioSplit[1]!;
-  }
-
-  if (clause.length > 110) {
-    const comma = clause.indexOf(",");
-    if (comma > 24) {
-      clause = clause.slice(0, comma);
-    }
-  }
-
-  return lowercaseFirst(clause);
-}
-
-function joinSummaryClauses(clauses: string[]): string {
-  const cleaned = clauses.filter(Boolean);
-  if (cleaned.length === 0) {
-    return "peu d'éléments documentés";
-  }
-  if (cleaned.length === 1) {
-    return cleaned[0]!;
-  }
-  return `${cleaned[0]} et ${cleaned[1]}`;
-}
-
-function pickSummaryAtouts(facts: AnalysisFact[]): AnalysisFact[] {
-  const strengths = facts.filter((fact) => fact.target === "strengths");
-  const picks: AnalysisFact[] = [];
+function pickSummaryAtouts(
+  facts: AnalysisFact[],
+  territory: TerritoryProfile,
+): AnalysisFact[] {
+  const strengths = facts.filter(
+    (fact) =>
+      fact.target === "strengths" &&
+      isFactEligibleForSummary(fact, territory) &&
+      hasSummaryAssetPhrase(fact),
+  );
 
   for (const theme of SUMMARY_ATOUT_THEMES) {
-    if (picks.length >= 2) break;
     const fact = strengths.find((candidate) => candidate.theme === theme);
-    if (fact) picks.push(fact);
+    if (fact) return [fact];
   }
 
-  if (picks.length === 0) {
-    return strengths.slice(0, 2);
-  }
-
-  return picks.slice(0, 2);
+  return strengths.slice(0, 1);
 }
 
-function pickSummaryEnjeux(facts: AnalysisFact[]): AnalysisFact[] {
+function pickSummaryEnjeux(
+  facts: AnalysisFact[],
+  demography: ReturnType<typeof extractDemographySnapshot>,
+): AnalysisFact[] {
+  const maxEnjeux = demography.trend === "decline" ? 1 : 2;
   const picks: AnalysisFact[] = [];
-  const demographySummary = facts.find(
-    (fact) => fact.theme === "demography" && fact.target === "summary",
-  );
-  if (demographySummary) {
-    picks.push(demographySummary);
-  }
 
   for (const fact of facts) {
-    if (fact.target !== "watchPoints" || fact.theme === "demography") continue;
-    if (picks.length >= 2) break;
+    if (fact.target !== "watchPoints") continue;
+    if (!shouldIncludeAsSummaryEnjeu(fact)) continue;
+    if (!hasSummaryIssuePhrase(fact)) continue;
     picks.push(fact);
+    if (picks.length >= maxEnjeux) break;
   }
 
-  return picks.slice(0, 2);
+  return picks;
 }
 
 export function buildDeterministicSummary(
@@ -154,9 +132,19 @@ export function buildDeterministicSummary(
     ? `${name}, commune de ${population}, appartient à ${affiliation} et présente une densité de ${density}.`
     : `${name}, commune de ${population}, appartient à ${affiliation}.`;
 
-  const atouts = pickSummaryAtouts(selectedFacts).map(toSummaryClause);
-  const enjeux = pickSummaryEnjeux(selectedFacts).map(toSummaryClause);
-  const phrase2 = `Elle combine ${joinSummaryClauses(atouts)} avec ${joinSummaryClauses(enjeux)}.`;
+  const demography = extractDemographySnapshot(territory, selectedFacts);
+  const assetFact = pickSummaryAtouts(selectedFacts, territory)[0];
+  const assetPhrase = assetFact ? resolveAssetPhrase(assetFact) : null;
+  const issuePhrases = pickSummaryEnjeux(selectedFacts, demography)
+    .map(resolveIssuePhrase)
+    .filter((phrase): phrase is string => phrase !== null);
+
+  const phrase2 = buildSummaryPhrase2(
+    assetPhrase ?? pickDefaultAssetPhrase(),
+    demography,
+    issuePhrases,
+    demography.contextPhrase,
+  );
 
   return `${phrase1} ${phrase2}`;
 }

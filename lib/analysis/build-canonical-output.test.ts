@@ -14,17 +14,26 @@ import { validateAnalysisOutput } from "./validate-output";
 
 describe("build-canonical-output", () => {
   it("compose un résumé déterministe en deux phrases", () => {
+    const territory = {
+      ...saintGironsProfile,
+      epci: { code: "200067940", name: "CC Couserans-Pyrénées" },
+      densityPerKm2: 316,
+    };
     const selected = selectAnalysisFactsForPrompt(
-      buildAnalysisFacts(saintGironsProfile),
-      saintGironsProfile,
+      buildAnalysisFacts(territory),
+      territory,
     );
-    const summary = buildDeterministicSummary(saintGironsProfile, selected);
+    const summary = buildDeterministicSummary(territory, selected);
 
     assert.match(summary, /Saint-Girons, commune de 6[\s\u202f]?008 habitants en 2022/);
-    assert.match(summary, /Couserans Pyren/);
-    assert.match(summary, /280 habitants\/km²/);
-    assert.match(summary, /Elle combine .+ avec .+\./);
-    assert.match(summary, /-5,7\s*%/);
+    assert.match(summary, /appartient à la CC Couserans-Pyrénées \(Ariège\)/);
+    assert.match(summary, /316 habitants\/km²/);
+    assert.match(summary, /Le portrait met en évidence/i);
+    assert.match(summary, /recul de population de 5,7\s*% entre 2010 et 2022/);
+    assert.match(summary, /enjeux liés à/i);
+    assert.doesNotMatch(summary, /recul de population de -/i);
+    assert.doesNotMatch(summary, /avec la population recule/i);
+    assert.doesNotMatch(summary, /structure\(s\)/i);
     assert.doesNotMatch(summary, /d['']avec\b/i);
     assert.doesNotMatch(summary, /des avec\b/i);
   });
@@ -71,6 +80,10 @@ describe("build-canonical-output", () => {
       ),
       false,
     );
+    assert.doesNotMatch(
+      facts.find((f) => f.theme === "employment_sectors" && f.target === "strengths")!.sentence,
+      /postes pour 100 habitants/i,
+    );
   });
 
   it("validateAnalysisOutput force le résumé déterministe et les listes verbatim", () => {
@@ -96,5 +109,33 @@ describe("build-canonical-output", () => {
     assert.ok(result.watchPoints.every((item) => selected.some((fact) => fact.sentence === item)));
     assert.doesNotMatch(result.summary, /pôle structurant/i);
     assert.doesNotMatch(result.strengths.join(" "), /50 postes pour 100 habitants/i);
+  });
+
+  it("préserve EPCI et densité quand le nom contient Pyrénées", () => {
+    const territory = {
+      ...saintGironsProfile,
+      epci: { code: "200067940", name: "CC Couserans-Pyrénées" },
+      densityPerKm2: 316,
+    };
+    const selected = selectAnalysisFactsForPrompt(
+      buildAnalysisFacts(territory),
+      territory,
+    );
+
+    const result = validateAnalysisOutput(
+      {
+        summary: "Saint-Girons, commune de 6 008 habitants en 2022.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      selected,
+      territory,
+    );
+
+    assert.match(result.summary, /appartient à la CC Couserans-Pyrénées \(Ariège\)/);
+    assert.match(result.summary, /316 habitants\/km²/);
+    assert.doesNotMatch(result.summary, /^Saint-Girons, commune de 6[\s\u202f]?008 habitants en 2022\.\s*Elle combine/);
+    assert.match(result.summary, /Le portrait met en évidence/i);
   });
 });

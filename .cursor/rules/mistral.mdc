@@ -12,6 +12,6 @@ alwaysApply: false
 - Prompt système : rédacteur territorial, pas d'invention de chiffres, JSON structuré (`summary`, `strengths`, `watchPoints`, `opportunities`).
 - Post-traitement : `validateAnalysisOutput` dans `lib/analysis/validate-output.ts` + formulations interdites via `containsForbiddenPhrases` dans `lib/mistral-sanitize.ts`.
 - Legacy (debug uniquement) : `buildTerritorialFacts` / `sanitizeTerritorialAnalysis` dans `lib/mistral-facts.ts` et `lib/mistral-sanitize.ts`.
-- Modèle configurable via `MISTRAL_MODEL` (défaut : `mistral-large-latest`).
+- Modèle configurable via `MISTRAL_MODEL` (défaut : `mistral-small-latest`).
 - Sans clé API : retourner un résultat gracieux, ne pas faire planter l'application.
 - Température basse (≈ 0.1) pour des analyses factuelles.

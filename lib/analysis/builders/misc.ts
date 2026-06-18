@@ -1,4 +1,5 @@
 import type { TerritoryProfile } from "../../types";
+import { renderCountedLabel } from "../render-text";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -12,7 +13,11 @@ export function buildPublicServicesFacts(territory: TerritoryProfile): AnalysisF
     createFact({
       theme: "public_services",
       target: "strengths",
-      sentence: `${services.franceServicesCount} structure(s) France Services recensée(s) sur la commune.`,
+      sentence: `${renderCountedLabel(
+        services.franceServicesCount,
+        "structure France Services recensée",
+        "structures France Services recensées",
+      )} sur la commune.`,
       sourceKeys: ["france-services"],
       year: services.year,
       confidence: "high",
