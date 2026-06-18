@@ -48,6 +48,8 @@ yarn-error.log*
 !/data/cache/property-by-commune.json
 !/data/cache/security-by-commune.json
 !/data/cache/security-by-department.json
+!/data/cache/commute-by-commune.json
+!/data/cache/qpv-by-commune.json
 
 # vercel
 .vercel

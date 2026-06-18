@@ -14,6 +14,8 @@ const CACHE_FILES = [
   "property-by-commune.json",
   "social-by-commune.json",
   "geography-by-commune.json",
+  "commute-by-commune.json",
+  "qpv-by-commune.json",
 ];
 
 export function checkCacheStaleness(): QualityFinding[] {
