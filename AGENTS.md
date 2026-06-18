@@ -1,4 +1,4 @@
-# Portrait IA de territoire — Instructions agent
+# Portrait de territoire — Instructions agent
 
 ## Objectif
 

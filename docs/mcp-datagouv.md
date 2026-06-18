@@ -1,4 +1,4 @@
-# MCP data.gouv.fr dans Portrait IA de territoire
+# MCP data.gouv.fr dans Portrait de territoire
 
 ## Rôle du MCP
 

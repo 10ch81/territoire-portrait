@@ -1,4 +1,4 @@
-# Feuille de route UX — Portrait IA de territoire
+# Feuille de route UX — Portrait de territoire
 
 Document de référence pour l'évolution de l'expérience utilisateur.  
 Statut des sprints : voir cases cochées dans les titres au fil de l'implémentation.

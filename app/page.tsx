@@ -10,7 +10,7 @@ export default function HomePage() {
           Portrait territorial
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          Portrait IA de territoire
+          Portrait de territoire
         </h1>
         <p className="max-w-2xl text-base leading-relaxed text-slate-600">
           Saisissez une commune française pour générer une fiche claire à partir

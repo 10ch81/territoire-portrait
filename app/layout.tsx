@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Portrait IA de territoire",
+  title: "Portrait de territoire",
   description:
     "Générez une fiche territoriale claire à partir de données publiques françaises, enrichie d'une analyse IA.",
 };
@@ -33,7 +33,7 @@ export default function RootLayout({
         <header className="border-b border-slate-200 bg-white">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
             <Link href="/" className="font-semibold text-slate-900">
-              Portrait IA de territoire
+              Portrait de territoire
             </Link>
             <span className="text-xs text-slate-500">MVP · données publiques</span>
           </div>

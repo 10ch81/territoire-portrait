@@ -1,4 +1,4 @@
-# Portrait IA de territoire
+# Portrait de territoire
 
 MVP Next.js pour générer une **fiche territoriale** d'une commune française à partir de données publiques, enrichie d'une **analyse IA Mistral** côté serveur.
 
