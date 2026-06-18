@@ -398,6 +398,36 @@ const STATIC_REPLACEMENTS: ReplacementRule[] = [
     replacement: "population en recul",
   },
   {
+    id: "geographic-heart-qualifier",
+    pattern: /au c[œoe]ur (?:de|du|des|d[''])[^.]{0,80}/gi,
+    replacement: "",
+  },
+  {
+    id: "interpretive-significative",
+    pattern: /\bsignificatif(?:ve|s|ves)?\b/gi,
+    replacement: "documenté par les sources disponibles",
+  },
+  {
+    id: "interpretive-notable",
+    pattern: /\bnotable(?:s)?\b/gi,
+    replacement: "recensé par les données disponibles",
+  },
+  {
+    id: "interpretive-important",
+    pattern: /\bimportant(?:e|es)?\b/gi,
+    replacement: "à interpréter avec prudence",
+  },
+  {
+    id: "interpretive-marque",
+    pattern: /\bmarqué(?:e|s|es)?\b/gi,
+    replacement: "décrit par les données disponibles",
+  },
+  {
+    id: "interpretive-considerable",
+    pattern: /\bconsidérable(?:s)?\b/gi,
+    replacement: "documenté par les sources disponibles",
+  },
+  {
     id: "social-housing-absence",
     pattern: /absence de logements sociaux(?:\s*\(RPLS\))?/gi,
     replacement: "absence de parc locatif social recensé dans RPLS",
@@ -1308,6 +1338,9 @@ export function containsForbiddenPhrases(text: string): string[] {
     "absence de logements sociaux",
     "filière touristique",
     "développement de la filière",
+    "au cœur",
+    "significatif",
+    "significative",
     ...INTERNAL_LEAK_MARKERS,
   ];
 

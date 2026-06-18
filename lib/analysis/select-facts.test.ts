@@ -88,6 +88,16 @@ describe("selectAnalysisFactsForPrompt", () => {
     assert.ok(watchPoints.some((f) => f.theme === "risks"));
   });
 
+  it("inclut démographie et emploi dans watchPoints lorsque enjeux signalés", () => {
+    const all = buildAnalysisFacts(saintGironsProfile);
+    const selected = selectAnalysisFactsForPrompt(all, saintGironsProfile);
+    const watchPoints = selected.filter((f) => f.target === "watchPoints");
+    const watchThemes = new Set(watchPoints.map((f) => f.theme));
+
+    assert.ok(watchThemes.has("demography"), "recul démographique attendu");
+    assert.ok(watchThemes.has("employment"), "chômage élevé attendu");
+  });
+
   it("sépare tourisme et France Services dans les strengths", () => {
     const profile = {
       ...saintGironsProfile,

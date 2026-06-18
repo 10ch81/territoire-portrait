@@ -13,13 +13,19 @@ import {
 } from "./score-facts";
 import {
   countRobustWatchPointFamilies,
+  findRemovableWatchPoint,
+  missingIssueWatchPointFamilies,
   missingWatchPointFamilies,
   WATCH_POINT_FAMILIES,
 } from "./watch-point-coverage";
 
 export {
   countRobustWatchPointFamilies,
+  familyHasIssueSignal,
+  missingIssueWatchPointFamilies,
   missingWatchPointFamilies,
+  PRIORITY_WATCH_POINT_FAMILIES,
+  signalsWatchPointIssue,
   WATCH_POINT_FAMILIES,
 } from "./watch-point-coverage";
 
@@ -209,13 +215,61 @@ function fillTargetFromSlots(
   }
 }
 
-function ensureMandatoryWatchThemes(
+function addWatchPointFact(
   facts: AnalysisFact[],
   selected: AnalysisFact[],
   context: ScoreContext,
-  themes: AnalysisFactTheme[],
+  family: AnalysisFactTheme[],
+): boolean {
+  const limit = TARGET_LIMITS.watchPoints;
+  const pick = pickBestFromThemes(
+    facts.filter((f) => f.target === "watchPoints" || family.includes(f.theme)),
+    family,
+    context,
+    selected,
+    "watchPoints",
+  );
+
+  if (!pick) return false;
+
+  const watchPick =
+    pick.target === "watchPoints" ? pick : { ...pick, target: "watchPoints" as const };
+
+  if (canAddToTarget(watchPick, selected, "watchPoints")) {
+    selected.push(watchPick);
+    return true;
+  }
+
+  const watchCount = selected.filter((f) => f.target === "watchPoints").length;
+  if (watchCount < limit.max) return false;
+
+  const removable = findRemovableWatchPoint(selected, family, (fact) =>
+    scoreAnalysisFact(fact, context),
+  );
+  if (!removable) return false;
+
+  const idx = selected.indexOf(removable);
+  selected.splice(idx, 1);
+
+  if (canAddToTarget(watchPick, selected, "watchPoints")) {
+    selected.push(watchPick);
+    return true;
+  }
+
+  selected.splice(idx, 0, removable);
+  return false;
+}
+
+function ensurePriorityWatchPointCoverage(
+  facts: AnalysisFact[],
+  selected: AnalysisFact[],
+  context: ScoreContext,
 ): void {
-  for (const theme of themes) {
+  for (const family of missingIssueWatchPointFamilies(facts, selected)) {
+    addWatchPointFact(facts, selected, context, family);
+  }
+
+  for (const theme of ["security", "risks"] as AnalysisFactTheme[]) {
     if (selected.some((f) => f.target === "watchPoints" && f.theme === theme)) {
       continue;
     }
@@ -226,14 +280,7 @@ function ensureMandatoryWatchThemes(
 
     if (!candidate) continue;
 
-    const watchCandidate: AnalysisFact = {
-      ...candidate,
-      target: "watchPoints",
-    };
-
-    if (canAddToTarget(watchCandidate, selected, "watchPoints")) {
-      selected.push(watchCandidate);
-    }
+    addWatchPointFact(facts, selected, context, [theme]);
   }
 }
 
@@ -249,24 +296,25 @@ function ensureWatchPointsMinimum(
 
   let watchCount = selected.filter((f) => f.target === "watchPoints").length;
 
-  for (const family of missingWatchPointFamilies(facts, selected)) {
+  const issueFamilies = missingIssueWatchPointFamilies(facts, selected);
+  const issueFamilyKeys = new Set(issueFamilies.map((family) => family.join(",")));
+  const familiesToFill = [
+    ...issueFamilies,
+    ...missingWatchPointFamilies(facts, selected).filter(
+      (family) => !issueFamilyKeys.has(family.join(",")),
+    ),
+  ];
+
+  const seenFamilies = new Set<string>();
+  for (const family of familiesToFill) {
+    const familyKey = family.join(",");
+    if (seenFamilies.has(familyKey)) continue;
+    seenFamilies.add(familyKey);
+
     if (watchCount >= limit.max || watchCount >= minimum) break;
 
-    const pick = pickBestFromThemes(
-      facts.filter((f) => f.target === "watchPoints" || family.includes(f.theme)),
-      family,
-      context,
-      selected,
-      "watchPoints",
-    );
-
-    if (pick) {
-      const watchPick =
-        pick.target === "watchPoints" ? pick : { ...pick, target: "watchPoints" as const };
-      if (canAddToTarget(watchPick, selected, "watchPoints")) {
-        selected.push(watchPick);
-        watchCount += 1;
-      }
+    if (addWatchPointFact(facts, selected, context, family)) {
+      watchCount += 1;
     }
   }
 
@@ -350,8 +398,8 @@ export function selectAnalysisFactsForPrompt(
     }
   }
 
+  ensurePriorityWatchPointCoverage(facts, selected, context);
   ensureWatchPointsMinimum(facts, selected, context);
-  ensureMandatoryWatchThemes(facts, selected, context, ["security", "risks"]);
 
   return dedupeSelectedFacts(selected, context);
 }

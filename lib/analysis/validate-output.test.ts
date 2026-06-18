@@ -260,4 +260,32 @@ describe("validateAnalysisOutput", () => {
     assert.ok(result.watchPoints.length > 0);
     assert.ok(result.opportunities.length > 0);
   });
+
+  it("rejette les adjectifs interprétatifs non présents dans les constats", () => {
+    const result = validateAnalysisOutput(
+      {
+        summary: "Enjeu significatif sur le territoire.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      analysisFacts,
+    );
+
+    assert.doesNotMatch(result.summary, /significatif/i);
+  });
+
+  it("rejette les qualifications géographiques absentes des constats", () => {
+    const result = validateAnalysisOutput(
+      {
+        summary: "Commune au cœur de l'Ariège, avec un recul démographique.",
+        strengths: [],
+        watchPoints: [],
+        opportunities: [],
+      },
+      analysisFacts,
+    );
+
+    assert.doesNotMatch(result.summary, /au cœur/i);
+  });
 });

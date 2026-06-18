@@ -104,6 +104,26 @@ const CROSS_THEME_PATTERNS: Array<{ pattern: RegExp; rule: string }> = [
   },
 ];
 
+const INTERPRETIVE_ADJECTIVE_PATTERN =
+  /\b(?:significatif(?:ve|s|ves)?|notable(?:s)?|important(?:e|es)?|marqué(?:e|s|es)?|considérable(?:s)?)\b/i;
+
+const GEOGRAPHIC_QUALIFIER_PATTERN = /\bau c[œoe]ur\b/i;
+
+function isPhraseAuthorizedInFacts(text: string, analysisFacts: AnalysisFact[]): boolean {
+  const lower = text.toLowerCase();
+  return analysisFacts.some((fact) => {
+    const factLower = fact.sentence.toLowerCase();
+    if (INTERPRETIVE_ADJECTIVE_PATTERN.test(text)) {
+      const match = lower.match(INTERPRETIVE_ADJECTIVE_PATTERN);
+      if (match && factLower.includes(match[0].toLowerCase())) return true;
+    }
+    if (GEOGRAPHIC_QUALIFIER_PATTERN.test(text) && GEOGRAPHIC_QUALIFIER_PATTERN.test(fact.sentence)) {
+      return true;
+    }
+    return false;
+  });
+}
+
 function extractPercentTokens(text: string): number[] {
   const tokens: number[] = [];
   const matches = text.matchAll(/-?\d+[.,]\d+\s*(?:%|pour cent)/gi);
@@ -277,6 +297,14 @@ function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string
   if (containsForbiddenPhrases(text).length > 0) return "forbidden-phrase";
   if (containsInternalLeakage(text).length > 0) return "internal-leak";
   if (FORBIDDEN_OPPORTUNITY_PATTERN.test(text)) return "forbidden-opportunity";
+
+  if (INTERPRETIVE_ADJECTIVE_PATTERN.test(text) && !isPhraseAuthorizedInFacts(text, analysisFacts)) {
+    return "interpretive-adjective";
+  }
+
+  if (GEOGRAPHIC_QUALIFIER_PATTERN.test(text) && !isPhraseAuthorizedInFacts(text, analysisFacts)) {
+    return "geographic-qualifier";
+  }
 
   for (const { pattern } of CROSS_THEME_PATTERNS) {
     if (pattern.test(text)) return "cross-theme";

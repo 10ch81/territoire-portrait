@@ -1,5 +1,6 @@
 import type { TerritoryProfile } from "../types";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
+import { signalsWatchPointIssue } from "./watch-point-coverage";
 
 const CONFIDENCE_SCORE = { high: 30, medium: 15, low: 0 } as const;
 
@@ -89,8 +90,8 @@ export function scoreAnalysisFact(
 
   score += intensityBonus(fact, context.territory);
 
-  if (STUDY_ONLY_PATTERN.test(fact.sentence)) {
-    score -= 25;
+  if (fact.target === "watchPoints" && signalsWatchPointIssue(fact)) {
+    score += 12;
   }
 
   if (fact.target === "opportunities" && fact.confidence === "low") {

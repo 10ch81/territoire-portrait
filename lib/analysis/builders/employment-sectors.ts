@@ -96,7 +96,7 @@ export function buildEmploymentSectorsFacts(territory: TerritoryProfile): Analys
       createFact({
         theme: "employment_sectors",
         target: "strengths",
-        sentence: `FLORES recense ${formatCount(flores.totalSalariedPosts)} postes salariés fin d'année, suggérant une fonction d'emploi local significative au regard de la population.`,
+        sentence: `FLORES recense ${formatCount(flores.totalSalariedPosts)} postes salariés fin d'année, décrit par les données sectorielles A17 disponibles au regard de la population.`,
         sourceKeys: ["insee-flores"],
         year: flores.year,
         confidence: "medium",
