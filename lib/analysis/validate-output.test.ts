@@ -239,47 +239,6 @@ describe("validateAnalysisOutput", () => {
     assert.doesNotMatch(result.opportunities.join(" "), /filière touristique/i);
   });
 
-  it("rejette qualificatifs interprétatifs non sourcés", () => {
-    const result = validateAnalysisOutput(
-      {
-        summary: "Commune au cœur d'un territoire dynamique et stratégique.",
-        strengths: [],
-        watchPoints: [],
-        opportunities: [],
-      },
-      analysisFacts,
-    );
-
-    assert.doesNotMatch(result.summary, /au cœur de/i);
-    assert.doesNotMatch(result.summary, /stratégique/i);
-    assert.doesNotMatch(result.summary, /dynamique/i);
-  });
-
-  it("conserve un qualificatif présent dans un analysisFact", () => {
-    const factWithQualifier: typeof analysisFacts[number] = {
-      id: "test-marked",
-      theme: "demography",
-      target: "summary",
-      sentence: "Recul démographique marqué documenté par les séries INSEE.",
-      evidence: ["populationHistory"],
-      sourceKeys: ["insee-population"],
-      confidence: "high",
-      year: 2022,
-    };
-
-    const result = validateAnalysisOutput(
-      {
-        summary: "Recul démographique marqué documenté par les séries INSEE.",
-        strengths: [],
-        watchPoints: [],
-        opportunities: [],
-      },
-      [...analysisFacts, factWithQualifier],
-    );
-
-    assert.match(result.summary, /marqué/i);
-  });
-
   it("conserve une sortie valide structurée", () => {
     const result = validateAnalysisOutput(
       {

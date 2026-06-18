@@ -7,13 +7,13 @@ import {
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
 import {
   isActionableOpportunity,
-  isEligibleWatchPointUpgrade,
   isStudyOnlyFact,
   scoreAnalysisFact,
-  scoreWatchPointCandidate,
   type ScoreContext,
 } from "./score-facts";
 import {
+  countRobustWatchPointFamilies,
+  missingWatchPointFamilies,
   WATCH_POINT_FAMILIES,
 } from "./watch-point-coverage";
 
@@ -26,7 +26,7 @@ export {
 const TARGET_LIMITS: Record<AnalysisFactTarget, { min: number; max: number }> = {
   summary: { min: 2, max: 4 },
   strengths: { min: 3, max: 5 },
-  watchPoints: { min: 2, max: 4 },
+  watchPoints: { min: 3, max: 5 },
   opportunities: { min: 2, max: 5 },
 };
 
@@ -171,10 +171,9 @@ function pickBestFromThemes(
   selected: AnalysisFact[],
   target: AnalysisFactTarget,
 ): AnalysisFact | null {
-  const scoreFn = target === "watchPoints" ? scoreWatchPointCandidate : scoreAnalysisFact;
   const themed = candidates
     .filter((f) => themes.includes(f.theme))
-    .sort((a, b) => scoreFn(b, context) - scoreFn(a, context));
+    .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
   for (const candidate of themed) {
     if (canAddToTarget(candidate, selected, target)) {
@@ -192,10 +191,9 @@ function fillTargetFromSlots(
   slots: AnalysisFactTheme[][],
 ): void {
   const limit = TARGET_LIMITS[target];
-  const scoreFn = target === "watchPoints" ? scoreWatchPointCandidate : scoreAnalysisFact;
   const candidates = facts
     .filter((f) => f.target === target)
-    .sort((a, b) => scoreFn(b, context) - scoreFn(a, context));
+    .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
   for (const slotThemes of slots) {
     if (selected.filter((f) => f.target === target).length >= limit.max) break;
@@ -211,127 +209,77 @@ function fillTargetFromSlots(
   }
 }
 
+function ensureMandatoryWatchThemes(
+  facts: AnalysisFact[],
+  selected: AnalysisFact[],
+  context: ScoreContext,
+  themes: AnalysisFactTheme[],
+): void {
+  for (const theme of themes) {
+    if (selected.some((f) => f.target === "watchPoints" && f.theme === theme)) {
+      continue;
+    }
+
+    const candidate = facts
+      .filter((f) => f.theme === theme)
+      .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context))[0];
+
+    if (!candidate) continue;
+
+    const watchCandidate: AnalysisFact = {
+      ...candidate,
+      target: "watchPoints",
+    };
+
+    if (canAddToTarget(watchCandidate, selected, "watchPoints")) {
+      selected.push(watchCandidate);
+    }
+  }
+}
+
 function ensureWatchPointsMinimum(
   facts: AnalysisFact[],
   selected: AnalysisFact[],
   context: ScoreContext,
 ): void {
   const limit = TARGET_LIMITS.watchPoints;
-  const targetCount = Math.min(3, limit.max);
+  const robustFamilies = countRobustWatchPointFamilies(facts);
+  const minimum =
+    robustFamilies >= 4 ? Math.min(limit.max, Math.max(3, limit.min)) : limit.min;
+
   let watchCount = selected.filter((f) => f.target === "watchPoints").length;
 
-  while (watchCount < targetCount && watchCount < limit.max) {
+  for (const family of missingWatchPointFamilies(facts, selected)) {
+    if (watchCount >= limit.max || watchCount >= minimum) break;
+
+    const pick = pickBestFromThemes(
+      facts.filter((f) => f.target === "watchPoints" || family.includes(f.theme)),
+      family,
+      context,
+      selected,
+      "watchPoints",
+    );
+
+    if (pick) {
+      const watchPick =
+        pick.target === "watchPoints" ? pick : { ...pick, target: "watchPoints" as const };
+      if (canAddToTarget(watchPick, selected, "watchPoints")) {
+        selected.push(watchPick);
+        watchCount += 1;
+      }
+    }
+  }
+
+  while (watchCount < minimum && watchCount < limit.max) {
     const candidates = facts
-      .filter((f) => f.target === "watchPoints" && f.confidence !== "low")
-      .sort(
-        (a, b) => scoreWatchPointCandidate(b, context) - scoreWatchPointCandidate(a, context),
-      );
+      .filter((f) => f.target === "watchPoints")
+      .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
     const next = candidates.find((c) => canAddToTarget(c, selected, "watchPoints"));
     if (!next) break;
 
     selected.push(next);
     watchCount += 1;
-  }
-}
-
-function rebalanceWatchPointPriority(
-  facts: AnalysisFact[],
-  selected: AnalysisFact[],
-  context: ScoreContext,
-): void {
-  const watchIndices = selected
-    .map((fact, index) => ({ fact, index }))
-    .filter(({ fact }) => fact.target === "watchPoints");
-
-  if (watchIndices.length === 0) return;
-
-  const upgradeCandidates = facts
-    .filter(
-      (fact) =>
-        !selected.some((existing) => existing.id === fact.id) &&
-        isEligibleWatchPointUpgrade(fact, context),
-    )
-    .map((fact) =>
-      fact.target === "watchPoints" ? fact : { ...fact, target: "watchPoints" as const },
-    )
-    .sort(
-      (a, b) => scoreWatchPointCandidate(b, context) - scoreWatchPointCandidate(a, context),
-    );
-
-  for (const candidate of upgradeCandidates) {
-    let weakestIndex = -1;
-    let weakestScore = Infinity;
-
-    for (const { fact, index } of watchIndices) {
-      const score = scoreWatchPointCandidate(fact, context);
-      if (score < weakestScore) {
-        weakestScore = score;
-        weakestIndex = index;
-      }
-    }
-
-    if (weakestIndex < 0) break;
-
-    const candidateScore = scoreWatchPointCandidate(candidate, context);
-    if (candidateScore <= weakestScore) continue;
-
-    const withoutWeakest = selected.filter((_, index) => index !== weakestIndex);
-    if (!canAddToTarget(candidate, withoutWeakest, "watchPoints")) continue;
-
-    selected[weakestIndex] = candidate;
-    watchIndices[watchIndices.findIndex(({ index }) => index === weakestIndex)] = {
-      fact: candidate,
-      index: weakestIndex,
-    };
-  }
-}
-
-function resolveWatchPointTargetCount(
-  watchFacts: AnalysisFact[],
-  context: ScoreContext,
-): number {
-  if (watchFacts.length <= 3) return watchFacts.length;
-
-  const scored = watchFacts
-    .map((fact) => ({ fact, score: scoreWatchPointCandidate(fact, context) }))
-    .sort((a, b) => b.score - a.score);
-
-  const topFour = scored.slice(0, 4);
-  const themes = new Set(topFour.map(({ fact }) => fact.theme));
-
-  if (topFour.length < 4 || themes.size < 4) {
-    return 3;
-  }
-
-  const thirdScore = topFour[2].score;
-  const fourthScore = topFour[3].score;
-  const scoresAreClose = fourthScore >= thirdScore - 12;
-  const scoresAreStrong = thirdScore >= 45 && fourthScore >= 42;
-
-  return scoresAreClose && scoresAreStrong ? 4 : 3;
-}
-
-function trimWatchPointsToTarget(
-  selected: AnalysisFact[],
-  context: ScoreContext,
-): void {
-  const watchFacts = selected.filter((fact) => fact.target === "watchPoints");
-  const targetCount = resolveWatchPointTargetCount(watchFacts, context);
-
-  if (watchFacts.length <= targetCount) return;
-
-  const ranked = watchFacts
-    .map((fact) => ({ fact, score: scoreWatchPointCandidate(fact, context) }))
-    .sort((a, b) => b.score - a.score);
-
-  const keepIds = new Set(ranked.slice(0, targetCount).map(({ fact }) => fact.id));
-
-  for (let index = selected.length - 1; index >= 0; index -= 1) {
-    const fact = selected[index];
-    if (fact.target === "watchPoints" && !keepIds.has(fact.id)) {
-      selected.splice(index, 1);
-    }
   }
 }
 
@@ -403,8 +351,7 @@ export function selectAnalysisFactsForPrompt(
   }
 
   ensureWatchPointsMinimum(facts, selected, context);
-  rebalanceWatchPointPriority(facts, selected, context);
-  trimWatchPointsToTarget(selected, context);
+  ensureMandatoryWatchThemes(facts, selected, context, ["security", "risks"]);
 
   return dedupeSelectedFacts(selected, context);
 }

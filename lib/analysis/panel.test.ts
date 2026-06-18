@@ -134,7 +134,6 @@ describe("panel multi-profils", () => {
 
     const watchPoints = selected.filter((f) => f.target === "watchPoints");
     assert.ok(watchPoints.length >= 3);
-    assert.ok(watchPoints.length <= 4);
 
     const opps = selected.filter((f) => f.target === "opportunities");
     for (const opp of opps) {
