@@ -89,6 +89,18 @@ export const rennesLikeProfile: TerritoryProfile = {
       available: true,
       note: "",
     },
+    enterprises: {
+      legalUnitsWithEstablishment: 18_500,
+      legalUnitsIsCapped: false,
+      essCount: 7_873,
+      rgeCount: 130,
+      inseeLegalUnits: 12_400,
+      inseeEstablishments: 14_200,
+      inseeSideYear: 2022,
+      millesime: "2022",
+      divergenceWarning: null,
+      note: "",
+    },
     security: {
       year: 2024,
       indicators: [
