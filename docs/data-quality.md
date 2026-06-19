@@ -123,9 +123,10 @@ Extension de `.github/workflows/refresh-cache.yml` :
 
 1. `npm run ingest:all`
 2. `npm run validate:internal` — échec si règles critiques
-3. `npm run verify:reference` — échec si écart classé `PARSER_BUG` ou `JOIN_KEY_ERROR`
-4. Commit `data/cache/*.json` **seulement** si ingest et vérifications OK (ou écarts warning uniquement)
-5. Artefact ou commit de `data/quality/latest.json` (rapport JSON)
+3. `npm run validate:typology` — golden communes (profils + cache ≥ 30k)
+4. `npm run verify:reference` — échec si écart classé `PARSER_BUG` ou `JOIN_KEY_ERROR`
+5. Commit `data/cache/*.json` **seulement** si ingest et vérifications OK (ou écarts warning uniquement)
+6. Artefact ou commit de `data/quality/latest.json` (rapport JSON)
 
 **Manuel** : GitHub → Actions → *Refresh data cache* → *Run workflow*
 

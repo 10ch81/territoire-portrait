@@ -2,6 +2,7 @@ import { buildReport, mergeReports, shouldFailCi, writeLatestReport } from "../l
 import { verifyGoldenCommunes } from "../lib/quality/reference";
 import { validateInternalCache } from "../lib/quality/rules";
 import { checkCacheStaleness } from "../lib/quality/staleness";
+import { validateTypologySample } from "./validate-typology-sample";
 
 function printSummary(report: ReturnType<typeof buildReport>): void {
   const { summary } = report;
@@ -35,6 +36,9 @@ async function main(): Promise<void> {
     ...validateInternalCache(),
     ...checkCacheStaleness(),
   ]);
+
+  console.log("▶ validate:typology");
+  await validateTypologySample();
 
   console.log("▶ verify:reference");
   const referenceFindings = await verifyGoldenCommunes();

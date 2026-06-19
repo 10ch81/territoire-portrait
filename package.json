@@ -30,6 +30,7 @@
     "ingest:social": "tsx scripts/ingest-social.ts",
     "ingest:all": "tsx scripts/ingest-all.ts",
     "validate:internal": "tsx scripts/validate-internal.ts",
+    "validate:typology": "tsx scripts/validate-typology-sample.ts",
     "verify:reference": "tsx scripts/verify-reference.ts",
     "quality:all": "tsx scripts/quality-all.ts",
     "quality:sample": "tsx scripts/quality-sample.ts",

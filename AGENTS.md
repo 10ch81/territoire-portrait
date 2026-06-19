@@ -61,8 +61,9 @@ npm run ingest:geography # aires d'attraction 2020
 npm run ingest:typology  # densité INSEE, UU, PVD, ACV, FRR, Villages d'avenir
 npm run ingest:all       # toutes les ingestions
 npm run validate:internal   # cohérence interne cache
+npm run validate:typology   # golden communes typologie (cache + profils)
 npm run verify:reference    # golden communes vs APIs live
-npm run quality:all         # validate + verify
+npm run quality:all         # validate + typology + verify
 npm run check:source-vintages  # phase 1 — millésimes producteurs vs lib/sources.ts
 npm run quality:sample      # validate + verify sur Rennes (35238)
 ```

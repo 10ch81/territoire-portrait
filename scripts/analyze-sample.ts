@@ -1,7 +1,10 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { analyzeTerritory } from "../lib/mistral";
+import { buildAnalysisFacts } from "../lib/analysis/build-analysis-facts";
+import { buildCanonicalAnalysisOutput } from "../lib/analysis/build-canonical-output";
+import { selectAnalysisFactsForPrompt } from "../lib/analysis/select-facts";
 import { getEnrichedTerritoryByInsee } from "../lib/enrichment";
+import { analyzeTerritory } from "../lib/mistral";
 
 function loadEnvLocal(): void {
   const envPath = resolve(process.cwd(), ".env.local");
@@ -32,6 +35,29 @@ function loadEnvLocal(): void {
   }
 }
 
+function assertTypologyInSummary(territory: NonNullable<Awaited<ReturnType<typeof getEnrichedTerritoryByInsee>>>): void {
+  const typologyLabel = territory.enrichment?.territoryTypology?.summaryLabel;
+  console.log("Typologie:", typologyLabel ?? "—");
+
+  if (!typologyLabel) {
+    console.error("Typologie absente — vérifier data/cache/typology-by-commune.json");
+    process.exit(1);
+  }
+
+  const facts = buildAnalysisFacts(territory);
+  const selected = selectAnalysisFactsForPrompt(facts, territory);
+  const canonical = buildCanonicalAnalysisOutput(territory, selected);
+
+  console.log("Résumé déterministe (extrait):", canonical.summary.slice(0, 320));
+
+  if (!canonical.summary.includes(typologyLabel)) {
+    console.error("Le résumé déterministe n'intègre pas le fragment typologique attendu.");
+    process.exit(1);
+  }
+
+  console.log("Fragment typologique présent dans le résumé déterministe.\n");
+}
+
 async function main(): Promise<void> {
   loadEnvLocal();
 
@@ -47,7 +73,10 @@ async function main(): Promise<void> {
 
   console.log("Territoire :", territory.name);
   console.log("Population :", territory.population ?? "Donnée non disponible");
-  console.log("\n🤖 Appel Mistral…\n");
+
+  assertTypologyInSummary(territory);
+
+  console.log("🤖 Appel Mistral…\n");
 
   const result = await analyzeTerritory(territory);
 
