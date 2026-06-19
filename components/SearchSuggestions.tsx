@@ -1,19 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import {
   EXAMPLE_COMMUNES,
   loadRecentCommunes,
   type RecentCommune,
 } from "@/lib/ux/recent-communes";
 
-export function SearchSuggestions() {
-  const [recent, setRecent] = useState<RecentCommune[]>([]);
+function subscribeRecentCommunes(onStoreChange: () => void): () => void {
+  window.addEventListener("storage", onStoreChange);
+  return () => window.removeEventListener("storage", onStoreChange);
+}
 
-  useEffect(() => {
-    setRecent(loadRecentCommunes());
-  }, []);
+function getRecentCommunesSnapshot(): RecentCommune[] {
+  return loadRecentCommunes();
+}
+
+function getRecentCommunesServerSnapshot(): RecentCommune[] {
+  return [];
+}
+
+export function SearchSuggestions() {
+  const recent = useSyncExternalStore(
+    subscribeRecentCommunes,
+    getRecentCommunesSnapshot,
+    getRecentCommunesServerSnapshot,
+  );
 
   if (recent.length === 0) {
     return (
