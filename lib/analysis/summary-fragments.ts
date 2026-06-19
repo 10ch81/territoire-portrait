@@ -211,14 +211,14 @@ function fragmentsForFact(
 
     case "security":
       if (fact.target === "watchPoints") {
-        return withIssueFragments("certains indicateurs de sécurité enregistrée");
+        return withIssueFragments("certains indicateurs de sécurité");
       }
       return {};
 
     case "risks":
       if (fact.target === "watchPoints") {
         if (/catastrophe naturelle/i.test(fact.sentence)) {
-          return withIssueFragments("les reconnaissances de catastrophe naturelle");
+          return withIssueFragments("les catastrophes naturelles");
         }
         if (/inondation/i.test(fact.sentence)) {
           return withIssueFragments("l'exposition aux risques d'inondation");

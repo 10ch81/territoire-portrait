@@ -52,8 +52,8 @@ describe("render-text", () => {
     assert.equal(frenchAfterA("les risques naturels identifiés"), "aux risques naturels identifiés");
     assert.equal(frenchAfterA("l'endettement communal"), "à l'endettement communal");
     assert.equal(
-      frenchAfterA("certains indicateurs de sécurité enregistrée"),
-      "à certains indicateurs de sécurité enregistrée",
+      frenchAfterA("certains indicateurs de sécurité"),
+      "à certains indicateurs de sécurité",
     );
     assert.equal(frenchAfterA("une fragilité documentée"), "à une fragilité documentée");
     assert.equal(frenchAfterA("un enjeu local"), "à un enjeu local");
