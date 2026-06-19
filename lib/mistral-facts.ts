@@ -107,6 +107,13 @@ export interface TerritorialFacts {
     tauxVacanceRp: number | null;
     partDuParcGlobal: number | null;
     tauxVacanceRpls: number | null;
+    lovac: {
+      millesime: number | null;
+      vacantsParcPrive: number | null;
+      tauxVacanceParcPrive: number | null;
+      vacantsStructurels: number | null;
+      note: string | null;
+    } | null;
     note: string;
   } | null;
   emploiSalarie: {
@@ -360,6 +367,17 @@ export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialF
           tauxVacanceRp: territory.enrichment.housing.rpVacancyRatePercent,
           partDuParcGlobal: territory.enrichment.housing.socialHousingSharePercent,
           tauxVacanceRpls: territory.enrichment.housing.vacancyRatePercent,
+          lovac: territory.enrichment.housing.privateVacantDwellings !== null
+            ? {
+                millesime: territory.enrichment.housing.lovacVintage,
+                vacantsParcPrive: territory.enrichment.housing.privateVacantDwellings,
+                tauxVacanceParcPrive:
+                  territory.enrichment.housing.privateVacancyRatePercent,
+                vacantsStructurels:
+                  territory.enrichment.housing.privateVacantStructural,
+                note: territory.enrichment.housing.lovacNote,
+              }
+            : null,
           note: territory.enrichment.housing.note,
         }
       : null,

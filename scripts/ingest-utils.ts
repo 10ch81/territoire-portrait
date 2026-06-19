@@ -4,6 +4,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import type { ReadStream } from "node:fs";
@@ -14,6 +15,49 @@ import { resolve } from "node:path";
 import { Readable } from "node:stream";
 
 export const CACHE_DIR = resolve(process.cwd(), "data/cache");
+
+/** Seuil par défaut pour les téléchargements bulk (20 Mo). */
+export const DEFAULT_MAX_DOWNLOAD_BYTES = 20 * 1024 * 1024;
+
+/**
+ * Vérifie via HEAD que la ressource ne dépasse pas maxBytes.
+ * Si Content-Length est absent, la vérification est ignorée (contrôle post-téléchargement recommandé).
+ */
+export async function assertDownloadUnderMaxBytes(
+  url: string,
+  maxBytes = DEFAULT_MAX_DOWNLOAD_BYTES,
+): Promise<void> {
+  const response = await fetch(url, { method: "HEAD" });
+
+  if (!response.ok) {
+    return;
+  }
+
+  const contentLength = response.headers.get("content-length");
+  if (!contentLength) {
+    return;
+  }
+
+  const size = Number.parseInt(contentLength, 10);
+  if (Number.isFinite(size) && size > maxBytes) {
+    throw new Error(
+      `Ressource trop lourde (${(size / 1024 / 1024).toFixed(1)} Mo > ${(maxBytes / 1024 / 1024).toFixed(0)} Mo) : ${url}`,
+    );
+  }
+}
+
+/** Vérifie la taille d'un fichier local déjà téléchargé. */
+export function assertFileUnderMaxBytes(
+  filePath: string,
+  maxBytes = DEFAULT_MAX_DOWNLOAD_BYTES,
+): void {
+  const { size } = statSync(filePath);
+  if (size > maxBytes) {
+    throw new Error(
+      `Fichier trop lourd (${(size / 1024 / 1024).toFixed(1)} Mo > ${(maxBytes / 1024 / 1024).toFixed(0)} Mo) : ${filePath}`,
+    );
+  }
+}
 
 export function parseCsvLine(line: string, delimiter = ";"): string[] {
   return line.split(delimiter).map((cell) => cell.replace(/^"|"$/g, "").trim());

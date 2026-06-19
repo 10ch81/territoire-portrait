@@ -167,6 +167,27 @@ export function DemographicsSection({ territory }: DemographicsSectionProps) {
             />
           )}
         </div>
+
+        {enrichment?.socialBenefits?.available ? (
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">
+              Prestations sociales (CNAF {enrichment.socialBenefits.rsaVintage})
+            </h3>
+            <dl className="mt-3 space-y-3">
+              {enrichment.socialBenefits.rsaShareAmongHouseholdsPercent !== null ? (
+                <DataRow
+                  label="Part des ménages allocataires du RSA"
+                  value={formatRate(
+                    enrichment.socialBenefits.rsaShareAmongHouseholdsPercent,
+                  )}
+                />
+              ) : null}
+              <p className="text-xs text-slate-500">
+                {enrichment.socialBenefits.note}
+              </p>
+            </dl>
+          </div>
+        ) : null}
       </div>
     </DataSection>
   );

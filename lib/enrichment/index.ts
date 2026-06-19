@@ -7,7 +7,7 @@ import {
   createFloresSource,
 } from "./employment-sectors";
 import { loadEquipmentSnapshot, createBpeSource } from "./equipments";
-import { loadEducationSnapshot, createEducationSource } from "./education";
+import { loadEducationSnapshot, createEducationSource, createIpsSource } from "./education";
 import { loadHealthSnapshot, createFinessSource } from "./health";
 import {
   loadPopulationHistorySnapshot,
@@ -22,7 +22,7 @@ import {
   createArcepSource,
 } from "./mobility";
 import { loadQpvSnapshot, createQpvSource } from "./urban-policy";
-import { loadSocialHousingSnapshot, createRplsSource } from "./housing";
+import { loadSocialHousingSnapshot, createRplsSource, createLovacSource } from "./housing";
 import { loadLocalTaxSnapshot, createReiSource } from "./fiscal";
 import {
   fetchPublicAccountsSnapshot,
@@ -52,6 +52,14 @@ import {
   createRpEmploymentSource,
   createRpPopulationSource,
 } from "./sociodemographics";
+import {
+  loadLabourMarketSnapshot,
+  createFranceTravailSource,
+} from "./labour-market";
+import {
+  loadSocialBenefitsSnapshot,
+  createCafSource,
+} from "./social-benefits";
 
 function collectEnrichmentSources(
   accessedAt: string,
@@ -71,6 +79,17 @@ function collectEnrichmentSources(
       sources.push(createFilosofiSource(accessedAt));
     }
   }
+  if (enrichment.labourMarket?.available) {
+    sources.push(
+      createFranceTravailSource(
+        accessedAt,
+        enrichment.labourMarket.quarter ?? undefined,
+      ),
+    );
+  }
+  if (enrichment.socialBenefits?.available) {
+    sources.push(createCafSource(accessedAt));
+  }
   if (enrichment.enterprises) {
     sources.push(createEnterpriseSource(accessedAt));
     if (enrichment.enterprises.inseeLegalUnits !== null) {
@@ -85,6 +104,9 @@ function collectEnrichmentSources(
   }
   if (enrichment.education?.available) {
     sources.push(createEducationSource(accessedAt));
+    if (enrichment.education.averageIps !== null) {
+      sources.push(createIpsSource(accessedAt));
+    }
   }
   if (enrichment.health?.available) {
     sources.push(createFinessSource(accessedAt));
@@ -99,6 +121,12 @@ function collectEnrichmentSources(
     sources.push(createRplsSource(accessedAt));
     if (enrichment.housing.rpVacancyRatePercent !== null) {
       sources.push(createRpHousingSource(accessedAt));
+    }
+    if (
+      enrichment.housing.privateVacantDwellings !== null ||
+      enrichment.housing.privateVacancyRatePercent !== null
+    ) {
+      sources.push(createLovacSource(accessedAt));
     }
   }
   if (enrichment.mobility && isMobilityAvailable(enrichment.mobility)) {
@@ -177,6 +205,8 @@ export async function enrichTerritory(
 
   const populationHistory = loadPopulationHistorySnapshot(territory.inseeCode);
   const sociodemographics = loadSociodemographicsSnapshot(territory.inseeCode);
+  const labourMarket = loadLabourMarketSnapshot(territory.inseeCode);
+  const socialBenefits = loadSocialBenefitsSnapshot(territory.inseeCode);
   const employmentSectors = loadEmploymentSectorsSnapshot(territory.inseeCode);
   const equipments = loadEquipmentSnapshot(territory.inseeCode);
   const education = loadEducationSnapshot(territory.inseeCode);
@@ -193,6 +223,8 @@ export async function enrichTerritory(
   const enrichment: TerritoryEnrichment = {
     populationHistory,
     sociodemographics,
+    labourMarket,
+    socialBenefits,
     enterprises,
     employmentSectors,
     equipments,

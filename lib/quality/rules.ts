@@ -2,9 +2,13 @@ import { loadJsonCache } from "../enrichment/cache";
 import type {
   ArcepCommuneCache,
   BpeCommuneCache,
+  CafCommuneCache,
   FiscalCommuneCache,
   FloresCommuneCache,
   HousingCommuneCache,
+  IpsCommuneCache,
+  FranceTravailCommuneCache,
+  LovacCommuneCache,
   IrveCommuneCache,
   PopulationCommuneCache,
   PropertyCommuneCache,
@@ -414,6 +418,138 @@ function validateFloresCache(findings: QualityFinding[]): void {
   }
 }
 
+function validateLovacCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<LovacCommuneCache>("lovac-by-commune.json");
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/lovac-by-commune.json",
+      message: "Cache LOVAC absent — exécutez npm run ingest:lovac",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    if (
+      entry.privateVacantDwellings !== null &&
+      entry.privateVacantDwellings < 0
+    ) {
+      findings.push({
+        ruleId: "lovac-negative",
+        severity: "critical",
+        location: `lovac-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message: "Valeur LOVAC négative (logements vacants parc privé)",
+      });
+    }
+
+    const percentFinding = isPercentInRange(
+      entry.privateVacancyRatePercent,
+      "taux vacance parc privé LOVAC",
+      inseeCode,
+    );
+    if (percentFinding) {
+      findings.push(percentFinding);
+    }
+
+    if (
+      entry.privateVacantStructural !== null &&
+      entry.privateVacantDwellings !== null &&
+      entry.privateVacantStructural > entry.privateVacantDwellings + COUNT_TOLERANCE
+    ) {
+      findings.push({
+        ruleId: "lovac-structural-exceeds-total",
+        severity: "warning",
+        location: `lovac-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message:
+          "Vacance structurelle LOVAC supérieure au total des vacants parc privé",
+      });
+    }
+  }
+}
+
+function validateFranceTravailCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<FranceTravailCommuneCache>(
+    "france-travail-by-commune.json",
+  );
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/france-travail-by-commune.json",
+      message: "Cache France Travail absent — exécutez npm run ingest:france-travail",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    if (entry.totalJobSeekers !== null && entry.totalJobSeekers < 0) {
+      findings.push({
+        ruleId: "france-travail-negative",
+        severity: "critical",
+        location: `france-travail-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message: "Effectif France Travail négatif",
+      });
+    }
+  }
+}
+
+function validateCafCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<CafCommuneCache>("caf-by-commune.json");
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/caf-by-commune.json",
+      message: "Cache CNAF absent — exécutez npm run ingest:caf",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    const percentFinding = isPercentInRange(
+      entry.rsaShareAmongHouseholdsPercent,
+      "rsaShareAmongHouseholdsPercent",
+      inseeCode,
+    );
+    if (percentFinding) {
+      findings.push(percentFinding);
+    }
+  }
+}
+
+function validateIpsCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<IpsCommuneCache>("ips-by-commune.json");
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/ips-by-commune.json",
+      message: "Cache IPS absent — exécutez npm run ingest:ips",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    if (entry.averageIps < 0 || entry.schoolsWithIps < 1) {
+      findings.push({
+        ruleId: "ips-invalid",
+        severity: "warning",
+        location: `ips-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message: "Agrégat IPS communal invalide",
+      });
+    }
+  }
+}
+
 function validateArcepCache(findings: QualityFinding[]): void {
   const cache = loadJsonCache<ArcepCommuneCache>("arcep-by-commune.json");
 
@@ -444,6 +580,10 @@ export function validateInternalCache(): QualityFinding[] {
 
   validateBpeCache(findings);
   validateHousingCache(findings);
+  validateLovacCache(findings);
+  validateFranceTravailCache(findings);
+  validateCafCache(findings);
+  validateIpsCache(findings);
   validatePopulationCache(findings);
   validateIrveCache(findings);
   validatePropertyCache(findings);

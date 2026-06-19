@@ -133,16 +133,18 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
           )}
         </div>
 
-        {education?.available ? (
+        {education && (education.available || education.averageIps !== null) ? (
           <div>
             <h3 className="text-base font-semibold text-slate-900">
               Scolarisation (Annuaire Éducation)
             </h3>
             <dl className="mt-3 space-y-3">
-              <DataRow
-                label="Établissements ouverts"
-                value={new Intl.NumberFormat("fr-FR").format(education.totalOpen)}
-              />
+              {education.totalOpen > 0 ? (
+                <DataRow
+                  label="Établissements ouverts"
+                  value={new Intl.NumberFormat("fr-FR").format(education.totalOpen)}
+                />
+              ) : null}
               {education.bySector.length > 0 ? (
                 <div>
                   <dt className="text-sm font-medium text-slate-500">Secteur</dt>
@@ -165,6 +167,31 @@ export function EquipmentsSection({ territory }: EquipmentsSectionProps) {
                   value={new Intl.NumberFormat("fr-FR").format(item.count)}
                 />
               ))}
+              {education.averageIps !== null && education.ipsSchoolYear ? (
+                <>
+                  <DataRow
+                    label={`IPS moyen des écoles (DEPP ${education.ipsSchoolYear})`}
+                    value={education.averageIps.toLocaleString("fr-FR")}
+                  />
+                  {education.schoolsWithIps !== null ? (
+                    <DataRow
+                      label="Écoles avec IPS"
+                      value={new Intl.NumberFormat("fr-FR").format(
+                        education.schoolsWithIps,
+                      )}
+                    />
+                  ) : null}
+                  {education.ipsMin !== null && education.ipsMax !== null ? (
+                    <DataRow
+                      label="Plage IPS (min – max)"
+                      value={`${education.ipsMin.toLocaleString("fr-FR")} – ${education.ipsMax.toLocaleString("fr-FR")}`}
+                    />
+                  ) : null}
+                </>
+              ) : null}
+              {education.ipsNote ? (
+                <p className="text-xs text-slate-500">{education.ipsNote}</p>
+              ) : null}
               <p className="text-xs text-slate-500">{education.note}</p>
             </dl>
           </div>

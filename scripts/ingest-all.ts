@@ -24,6 +24,11 @@ const steps = [
   { name: "ARCEP (couverture fibre)", script: "scripts/ingest-fibre.ts" },
   { name: "FINESS (santé & social)", script: "scripts/ingest-finess.ts" },
   { name: "Annuaire Éducation", script: "scripts/ingest-education.ts" },
+  { name: "LOVAC (vacance parc privé)", script: "scripts/ingest-lovac.ts" },
+  { name: "France Travail (inscrits communaux)", script: "scripts/ingest-france-travail.ts" },
+  { name: "IPS DEPP (écoles)", script: "scripts/ingest-ips.ts" },
+  { name: "APL DREES (accessibilité soins — skip documenté)", script: "scripts/ingest-apl.ts" },
+  { name: "CNAF (indicateurs précarité / RSA)", script: "scripts/ingest-caf.ts" },
 ];
 
 for (const step of steps) {

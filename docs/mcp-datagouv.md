@@ -77,7 +77,9 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | [INSEE — Populations historiques](https://api.insee.fr/melodi/file/DS_POPULATIONS_HISTORIQUES/) | Évolution démographique | R | ✅ | `ingest-population.ts` → `population.ts` | Série historique par commune |
 | [INSEE — RP 2022 structure par âge](https://www.insee.fr/fr/statistiques/8581696) | Pyramide des âges | R | ✅ | `ingest-social.ts` → `sociodemographics.ts` | Millésime RP 2022 |
 | [INSEE — RP 2022 emploi / chômage](https://www.insee.fr/fr/statistiques/8581444) | Chômage 15-64 ans | R | ✅ | `ingest-social.ts` | Taux au recensement, pas au BIT |
+| [France Travail — inscrits communaux](https://www.data.gouv.fr/datasets/inscrits-a-france-travail-donnees-communales-trimestrielles-brutes) | Demande d'emploi trimestrielle | C | ✅ | `ingest-france-travail.ts` → `labour-market.ts` | Catégorie ABC ; distinct du chômage RP |
 | [INSEE — FILOSOFI](https://www.insee.fr/fr/statistiques/8984752) | Niveau de vie médian | R | ✅ | `ingest-social.ts` | Millésime 2023 (Filosofi 2) |
+| [CNAF — Indicateurs territoriaux de précarité](https://www.data.gouv.fr/datasets/indicateurs-territoriaux-de-precarite-par-commune-epci-departement-et-region) | Part allocataires RSA | C | ✅ | `ingest-caf.ts` → `social-benefits.ts` | Seul agrégat CAF bulk ≤ 20 Mo ; indicateur partiel |
 | [INSEE — RP logement 2022](https://www.insee.fr/fr/statistiques/8581474) | Vacance, parc total, statut d'occupation | R | ✅ | `ingest-housing.ts` | Vacance générale (P22_LOGVAC) + RPLS |
 | [SIG Ville / INSEE TAG QPV](https://www.insee.fr/fr/information/8186239) | QPV, politique de la ville | R | ✅ | `ingest-qpv.ts` | Table d'appartenance QPV 2025 |
 | [INSEE — RP mobilité domicile-travail](https://www.insee.fr/fr/statistiques/8581610) | Modes de transport des actifs | R | ✅ | `ingest-commute.ts` | Tableau NAV2A 2022 (usage déclaré) |
@@ -113,8 +115,10 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [INSEE — BPE 2024](https://api.insee.fr/melodi/file/DS_BPE/DS_BPE_2024_CSV_FR) | Commerces, santé, écoles, services | R | ✅ | `ingest-bpe.ts` → `equipments.ts` | Dénombrement, pas accessibilité |
 | [Annuaire de l'Éducation](https://www.data.gouv.fr/datasets/annuaire-de-leducation) | Établissements scolaires ouverts | C | ✅ | `ingest-education.ts` → `education.ts` | Agrégats communaux (sans liste nominative) |
+| [DEPP — IPS écoles](https://www.data.gouv.fr/datasets/indices-de-position-sociale-dans-les-ecoles-a-partir-de-2022) | Contexte social scolaire | C | ✅ | `ingest-ips.ts` → `education.ts` | Moyenne communale ; écoles éligibles uniquement |
 | [France Services](https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services) | Accueil public de proximité | C | ✅ | `ingest-services.ts` → `proximity-services.ts` | |
-| [DREES — APL santé](https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl) | Accessibilité aux soins | C | ❌ 📋 P2 | — | **Écarté** (xlsx, pas bulk communal) |
+| [DREES — APL santé](https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl) | Accessibilité aux soins | C | ❌ 📋 P2 | `ingest-apl.ts` (skip) | **Bloqué** — export data.drees vide ; pas bulk communal ≤ 20 Mo |
+| [Cerema — LOVAC](https://www.data.gouv.fr/datasets/logements-vacants-du-parc-prive-par-commune-departement-region-france) | Vacance parc privé structurelle | R | ✅ | `ingest-lovac.ts` → `housing.ts` | Secret statistique < 11 logements ; distinct RP/RPLS |
 | [FINESS — réexposition data.gouv](https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess) | Établissements sanitaires et sociaux | C | ✅ | `ingest-finess.ts` → `health.ts` | Agrégats par catégorie ; pas d'accessibilité spatiale |
 | [CartoSanté / AtlaSanté](https://cartosante.atlasante.fr/) | Offre et accès PS | C | ❌ | — | Portail carto ; pas de bulk simple ; APL prioritaire |
 
@@ -198,7 +202,8 @@ Ordre recommandé pour les prochaines ingestions. Chaque item suit le workflow M
 | 6c | FLORES A17 | Économie | ✅ Fait | `ingest-flores.ts` |
 | 6d | ARCEP fibre | Numérique fixe | ✅ Fait | `ingest-fibre.ts` |
 | 6e | FINESS | Santé | ✅ Fait | `ingest-finess.ts` |
-| 7 | APL santé (DREES) | Santé | **Écarté** | Fichiers xlsx, pas bulk communal |
+| 7 | APL santé (DREES) | Santé | **Bloqué** | Export data.drees vide ; pas bulk communal ≤ 20 Mo (`ingest-apl.ts` skip) |
+| 7b | CNAF — indicateurs précarité | Social | ✅ Fait | `ingest-caf.ts` — part RSA (indicateur partiel) |
 | 8 | BANATIC | Institutions | **Reporté** | Pas de JSON public par commune |
 | 9 | OFGL | Finances | ✅ Fait (API live) | Pas d'export bulk (~22 M lignes) |
 | 10 | PPRN (catalogues régionaux) | Risques | **Reporté** | GéoJSON hétérogène |

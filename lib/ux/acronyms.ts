@@ -23,6 +23,10 @@ export const ACRONYMS: Record<string, string> = {
   ACV: "Action cœur de ville — programme ANCT de revitalisation des centres-villes",
   FRR: "France Ruralités Revitalisation — zonage de soutien aux territoires ruraux",
   UU: "Unité urbaine — agglomération au sens INSEE (UU2020)",
+  LOVAC: "Logements vacants du parc privé — base Cerema croisant fichiers fiscaux et fonciers",
+  IPS: "Indice de position sociale — contexte socio-économique des écoles (DEPP)",
+  RSA: "Revenu de solidarité active — prestation minimale versée par la CAF",
+  CAF: "Caisse d'allocations familiales — organisme de prestations sociales",
 };
 
 export function getAcronymDefinition(term: string): string | undefined {

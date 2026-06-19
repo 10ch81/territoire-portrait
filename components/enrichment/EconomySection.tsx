@@ -123,6 +123,41 @@ export function EconomySection({ territory }: EconomySectionProps) {
           </dl>
         </div>
       ) : null}
+
+      {territory.enrichment?.labourMarket?.available ? (
+        <div className="mt-6 border-t border-slate-100 pt-6">
+          <h3 className="text-base font-semibold text-slate-900">
+            Demande d&apos;emploi (France Travail {territory.enrichment.labourMarket.quarter})
+          </h3>
+          <dl className="mt-3 space-y-3">
+            <DataRow
+              label="Inscrits catégorie ABC (moyenne trimestrielle)"
+              value={new Intl.NumberFormat("fr-FR").format(
+                territory.enrichment.labourMarket.totalJobSeekers ?? 0,
+              )}
+            />
+            {territory.enrichment.labourMarket.under25 !== null ? (
+              <DataRow
+                label="Dont moins de 25 ans"
+                value={new Intl.NumberFormat("fr-FR").format(
+                  territory.enrichment.labourMarket.under25,
+                )}
+              />
+            ) : null}
+            {territory.enrichment.labourMarket.age50AndOver !== null ? (
+              <DataRow
+                label="Dont 50 ans et plus"
+                value={new Intl.NumberFormat("fr-FR").format(
+                  territory.enrichment.labourMarket.age50AndOver,
+                )}
+              />
+            ) : null}
+            <p className="text-xs text-slate-500">
+              {territory.enrichment.labourMarket.note}
+            </p>
+          </dl>
+        </div>
+      ) : null}
     </DataSection>
   );
 }

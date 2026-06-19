@@ -98,3 +98,97 @@ export function buildEmploymentFacts(territory: TerritoryProfile): AnalysisFact[
 
   return facts;
 }
+
+export function buildLabourMarketFacts(territory: TerritoryProfile): AnalysisFact[] {
+  const facts: AnalysisFact[] = [];
+  const labourMarket = territory.enrichment?.labourMarket;
+
+  if (!labourMarket?.available || labourMarket.totalJobSeekers == null) {
+    return facts;
+  }
+
+  facts.push(
+    createFact({
+      theme: "employment",
+      target: "summary",
+      sentence: `${labourMarket.totalJobSeekers.toLocaleString("fr-FR")} inscrits à France Travail en moyenne sur le trimestre ${labourMarket.quarter ?? ""} (catégorie ABC).`,
+      sourceKeys: ["france-travail-defm"],
+      year: labourMarket.quarter
+        ? Number.parseInt(labourMarket.quarter.split("-")[0] ?? "", 10)
+        : undefined,
+      confidence: "medium",
+      limitations: [
+        labourMarket.note,
+        "Ne pas confondre avec le taux de chômage RP (BIT recensement).",
+      ],
+      numericBindings: [
+        binding(
+          labourMarket.totalJobSeekers,
+          "inscrits France Travail ABC",
+          "employment",
+          ["France Travail", "inscrits", "demandeurs d'emploi", "ABC"],
+        ),
+      ],
+    }),
+  );
+
+  if (labourMarket.under25 != null) {
+    facts.push(
+      createFact({
+        theme: "employment",
+        target: "summary",
+        sentence: `${labourMarket.under25.toLocaleString("fr-FR")} inscrits de moins de 25 ans sur le trimestre ${labourMarket.quarter ?? ""} (France Travail).`,
+        sourceKeys: ["france-travail-defm"],
+        confidence: "medium",
+        limitations: ["Effectifs arrondis au multiple de 5."],
+        numericBindings: [
+          binding(
+            labourMarket.under25,
+            "inscrits France Travail moins de 25 ans",
+            "employment",
+            ["moins de 25 ans", "jeunes", "France Travail"],
+          ),
+        ],
+      }),
+    );
+  }
+
+  return facts;
+}
+
+export function buildSocialBenefitsFacts(territory: TerritoryProfile): AnalysisFact[] {
+  const facts: AnalysisFact[] = [];
+  const socialBenefits = territory.enrichment?.socialBenefits;
+
+  if (
+    !socialBenefits?.available ||
+    socialBenefits.rsaShareAmongHouseholdsPercent == null
+  ) {
+    return facts;
+  }
+
+  facts.push(
+    createFact({
+      theme: "employment",
+      target: "summary",
+      sentence: `${formatPercent(socialBenefits.rsaShareAmongHouseholdsPercent)} des ménages sont allocataires du RSA (CNAF ${socialBenefits.rsaVintage ?? ""}).`,
+      sourceKeys: ["cnaf-precarite"],
+      year: socialBenefits.rsaVintage ?? undefined,
+      confidence: "medium",
+      limitations: [
+        socialBenefits.note,
+        "Indicateur partiel : ne remplace pas un diagnostic complet des prestations sociales communales.",
+      ],
+      numericBindings: [
+        binding(
+          socialBenefits.rsaShareAmongHouseholdsPercent,
+          "part allocataires RSA parmi les ménages",
+          "employment",
+          ["RSA", "CNAF", "allocataires", "ménages", "précarité"],
+        ),
+      ],
+    }),
+  );
+
+  return facts;
+}

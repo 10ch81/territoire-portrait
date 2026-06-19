@@ -1,10 +1,36 @@
-import type { TerritoryProfile, TerritoryEnrichment } from "../types";
+import type { TerritoryProfile, TerritoryEnrichment, SocialHousingSnapshot } from "../types";
 import type { ComparisonProfile, TerritoryTypology } from "../typology/types";
+
+const HOUSING_LOVAC_ABSENT: Pick<
+  SocialHousingSnapshot,
+  | "lovacVintage"
+  | "privateVacantDwellings"
+  | "privateVacancyRatePercent"
+  | "privateVacantStructural"
+  | "lovacNote"
+> = {
+  lovacVintage: null,
+  privateVacantDwellings: null,
+  privateVacancyRatePercent: null,
+  privateVacantStructural: null,
+  lovacNote: null,
+};
+
+const EDUCATION_IPS_ABSENT = {
+  ipsSchoolYear: null,
+  averageIps: null,
+  schoolsWithIps: null,
+  ipsMin: null,
+  ipsMax: null,
+  ipsNote: null,
+} as const;
 
 function baseEnrichment(overrides: Partial<TerritoryEnrichment> = {}): TerritoryEnrichment {
   return {
     populationHistory: null,
     sociodemographics: null,
+    labourMarket: null,
+    socialBenefits: null,
     enterprises: null,
     employmentSectors: null,
     equipments: null,
@@ -135,6 +161,7 @@ export const saintGironsProfile: TerritoryProfile = {
       rpVacancyRatePercent: 18.8,
       socialHousingSharePercent: 0,
       vacancyRatePercent: null,
+      ...HOUSING_LOVAC_ABSENT,
       available: true,
       note: "RPLS + RP logement",
     },
@@ -182,6 +209,7 @@ export const saintGironsProfile: TerritoryProfile = {
         { code: "PR", label: "Privé", count: 1 },
       ],
       byLevel: [{ code: "1", label: "Élémentaire", count: 3 }],
+      ...EDUCATION_IPS_ABSENT,
       available: true,
       note: "",
     },
@@ -429,6 +457,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           rpVacancyRatePercent: 7.6,
           socialHousingSharePercent: 18,
           vacancyRatePercent: null,
+          ...HOUSING_LOVAC_ABSENT,
           available: true,
           note: "",
         },
@@ -526,6 +555,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           rpVacancyRatePercent: 3.0,
           socialHousingSharePercent: 12,
           vacancyRatePercent: null,
+          ...HOUSING_LOVAC_ABSENT,
           available: true,
           note: "",
         },
@@ -572,6 +602,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           byType: [{ code: "E", label: "École", count: 5 }],
           bySector: [{ code: "PU", label: "Public", count: 5 }],
           byLevel: [{ code: "1", label: "Élémentaire", count: 4 }],
+          ...EDUCATION_IPS_ABSENT,
           available: true,
           note: "",
         },
@@ -715,6 +746,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           rpVacancyRatePercent: 3.7,
           socialHousingSharePercent: 12,
           vacancyRatePercent: null,
+          ...HOUSING_LOVAC_ABSENT,
           available: true,
           note: "",
         },
@@ -740,6 +772,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           rpVacancyRatePercent: 12.5,
           socialHousingSharePercent: 8,
           vacancyRatePercent: null,
+          ...HOUSING_LOVAC_ABSENT,
           available: true,
           note: "",
         },
@@ -890,6 +923,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           rpVacancyRatePercent: 12.0,
           socialHousingSharePercent: 22,
           vacancyRatePercent: null,
+          ...HOUSING_LOVAC_ABSENT,
           available: true,
           note: "",
         },
@@ -940,6 +974,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           rpVacancyRatePercent: 2.5,
           socialHousingSharePercent: 10,
           vacancyRatePercent: null,
+          ...HOUSING_LOVAC_ABSENT,
           available: true,
           note: "",
         },
@@ -1090,6 +1125,7 @@ export function createTypologyProfile(
             rpVacancyRatePercent: 7.1,
             socialHousingSharePercent: 15,
             vacancyRatePercent: null,
+            ...HOUSING_LOVAC_ABSENT,
             available: true,
             note: "",
           },
@@ -1210,6 +1246,7 @@ export function createTypologyProfile(
             rpVacancyRatePercent: 8.7,
             socialHousingSharePercent: 4,
             vacancyRatePercent: null,
+            ...HOUSING_LOVAC_ABSENT,
             available: true,
             note: "",
           },

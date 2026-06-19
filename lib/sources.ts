@@ -11,6 +11,10 @@ const POPULATION_HISTORY_URL =
 const GEORISQUES_URL = "https://georisques.gouv.fr/";
 const RPLS_URL =
   "https://www.data.gouv.fr/datasets/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/";
+const LOVAC_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/logements-vacants-du-parc-prive-par-commune-departement-region-france/";
+export const LOVAC_FILE_URL =
+  "https://static.data.gouv.fr/resources/logements-vacants-du-parc-prive-lovac-par-commune-departement-region-et-france/20250528-090420/lovac-opendata-communes.csv";
 const IRVE_URL =
   "https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/";
 const REI_URL =
@@ -36,6 +40,9 @@ export const RP_VINTAGE = 2022;
 
 /** Millésime du fichier RPLS (logements sociaux) — distinct du RP communale. */
 export const RPLS_VINTAGE = 2021;
+
+/** Millésime LOVAC (vacance parc privé, au 1er janvier). */
+export const LOVAC_VINTAGE = 2025;
 
 /** Millésime FILOSOFI (Filosofi 2 à partir de 2023). */
 export const FILOSOFI_VINTAGE = 2023;
@@ -75,9 +82,37 @@ const FLORES_FILE_URL =
 const ARCEP_URL = "https://www.data.gouv.fr/datasets/ma-connexion-internet/";
 const FINESS_URL = "https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess/";
 const EDUCATION_URL = "https://www.data.gouv.fr/datasets/annuaire-de-leducation/";
+export const IPS_ECOLES_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/indices-de-position-sociale-dans-les-ecoles-a-partir-de-2022";
+export const IPS_ECOLES_FILE_URL =
+  "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-ips-ecoles-ap2022/exports/csv?delimiter=%3B";
+export const IPS_SCHOOL_YEAR = "2024-2025";
 
 const SSMSI_URL =
   "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales";
+
+const FRANCE_TRAVAIL_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/inscrits-a-france-travail-donnees-communales-trimestrielles-brutes";
+export const FRANCE_TRAVAIL_API_BASE =
+  "https://data.dares.travail-emploi.gouv.fr/api/explore/v2.1/catalog/datasets/dares_defm_communales-brutes";
+
+/** Dernier trimestre ingéré — recalculé par `ingest-france-travail`. */
+export const FRANCE_TRAVAIL_QUARTER = "2024-T4";
+
+/**
+ * APL DREES — non intégrée (skipped: true).
+ * Gate MCP : export CSV data.drees vide ; jeux data.gouv en xlsx/7z sans bulk communal ≤ 20 Mo.
+ */
+export const APL_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl/";
+
+const CNAF_PRECARITE_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/indicateurs-territoriaux-de-precarite-par-commune-epci-departement-et-region/";
+export const CNAF_PRECARITE_FILE_URL =
+  "https://static.data.gouv.fr/resources/indicateurs-territoriaux-de-precarite-par-commune-epci-departement-et-region/20260306-112349/20260306-indicateurs-precarite.csv";
+
+/** Millésime de la part RSA (CNAF) dans les indicateurs territoriaux de précarité. */
+export const CNAF_RSA_VINTAGE = 2024;
 
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
@@ -92,6 +127,8 @@ export const SOURCE_IDS = {
   INSEE_FILOSOFI: "insee-filosofi",
   GEORISQUES: "georisques",
   RPLS: "rpls",
+  CEREMA_LOVAC: "cerema-lovac",
+  FRANCE_TRAVAIL_DEFM: "france-travail-defm",
   IRVE: "irve",
   QPV: "qpv-sig-ville",
   REI: "rei",
@@ -103,6 +140,8 @@ export const SOURCE_IDS = {
   ARCEP_FIBRE: "arcep-fibre",
   FINESS: "finess",
   EDUCATION_DIRECTORY: "education-directory",
+  DEPP_IPS_ECOLES: "depp-ips-ecoles",
+  CNAF_PRECARITE: "cnaf-precarite",
   AAV: "aav2020",
   INSEE_DENSITY_GRID: "insee-density-grid",
   INSEE_URBAN_UNIT: "insee-urban-unit",
@@ -214,6 +253,42 @@ export function createRplsSource(accessedAt: string): DataSource {
     name: "RPLS — Parc locatif social",
     url: RPLS_URL,
     description: "Répertoire des logements locatifs des bailleurs sociaux agrégé par commune.",
+    accessedAt,
+  };
+}
+
+export function createLovacSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.CEREMA_LOVAC,
+    name: `Cerema — LOVAC ${LOVAC_VINTAGE} (parc privé vacants)`,
+    url: LOVAC_DATASET_URL,
+    description:
+      "Logements vacants du parc privé par commune (croisement DGFiP / Fichiers fonciers) — vacance structurelle distincte du recensement.",
+    accessedAt,
+  };
+}
+
+export function createFranceTravailSource(
+  accessedAt: string,
+  quarter = FRANCE_TRAVAIL_QUARTER,
+): DataSource {
+  return {
+    id: SOURCE_IDS.FRANCE_TRAVAIL_DEFM,
+    name: `France Travail — Inscrits communaux (${quarter})`,
+    url: FRANCE_TRAVAIL_DATASET_URL,
+    description:
+      "Demandeurs d'emploi inscrits à France Travail (catégorie ABC, moyenne trimestrielle communale, DARES).",
+    accessedAt,
+  };
+}
+
+export function createCafSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.CNAF_PRECARITE,
+    name: `CNAF — Part allocataires RSA (${CNAF_RSA_VINTAGE})`,
+    url: CNAF_PRECARITE_DATASET_URL,
+    description:
+      "Part des allocataires du RSA parmi les ménages (indicateurs territoriaux de précarité CNAF) — seul agrégat CAF en bulk communal ≤ 20 Mo.",
     accessedAt,
   };
 }
@@ -446,6 +521,17 @@ export function createEducationSource(accessedAt: string): DataSource {
     name: "Annuaire de l'Éducation",
     url: EDUCATION_URL,
     description: "Établissements scolaires ouverts par commune.",
+    accessedAt,
+  };
+}
+
+export function createIpsSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.DEPP_IPS_ECOLES,
+    name: `DEPP — IPS écoles (${IPS_SCHOOL_YEAR})`,
+    url: IPS_ECOLES_DATASET_URL,
+    description:
+      "Indice de position sociale des écoles (agrégat communal des établissements éligibles).",
     accessedAt,
   };
 }

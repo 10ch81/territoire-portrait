@@ -20,6 +20,8 @@ import { buildRealEstateFacts } from "./builders/real-estate";
 import {
   buildEmploymentFacts,
   buildIncomeFacts,
+  buildLabourMarketFacts,
+  buildSocialBenefitsFacts,
 } from "./builders/income-employment";
 import {
   buildFinancesFacts,
@@ -40,6 +42,8 @@ const BUILDERS: FactBuilder[] = [
   buildAgeingFacts,
   buildIncomeFacts,
   buildEmploymentFacts,
+  buildLabourMarketFacts,
+  buildSocialBenefitsFacts,
   buildEconomyFacts,
   buildEssRgeFacts,
   buildEmploymentSectorsFacts,

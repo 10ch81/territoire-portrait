@@ -94,6 +94,39 @@ function appendEmploymentLimits(
   }
 }
 
+function appendLabourMarketLimits(
+  limits: string[],
+  enrichment: TerritoryEnrichment,
+): void {
+  if (enrichment.labourMarket?.available) {
+    pushUnique(
+      limits,
+      `France Travail (${enrichment.labourMarket.quarter ?? "trimestre récent"}) : inscrits catégorie ABC — distinct du chômage RP ${RP_VINTAGE} ; effectifs arrondis au multiple de 5 ; prudence sur petites communes et depuis 2025 (inscription automatique).`,
+    );
+    return;
+  }
+
+  if (enrichment.labourMarket?.note) {
+    pushUnique(limits, enrichment.labourMarket.note);
+  }
+}
+
+function appendSocialBenefitsLimits(
+  limits: string[],
+  enrichment: TerritoryEnrichment,
+): void {
+  if (enrichment.socialBenefits?.available) {
+    pushUnique(
+      limits,
+      `CNAF (${enrichment.socialBenefits.rsaVintage ?? "millésime récent"}) : part des allocataires RSA parmi les ménages — indicateur partiel ; ne couvre pas l'ensemble des prestations CAF (AAH, prime d'activité, aides logement, etc.).`,
+    );
+  }
+
+  if (enrichment.socialBenefits?.note && !enrichment.socialBenefits.available) {
+    pushUnique(limits, enrichment.socialBenefits.note);
+  }
+}
+
 function appendPopulationLimits(
   limits: string[],
   territory: TerritoryProfile,
@@ -294,6 +327,10 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
     appendEmploymentLimits(limits, enrichment);
   }
 
+  appendLabourMarketLimits(limits, enrichment);
+
+  appendSocialBenefitsLimits(limits, enrichment);
+
   appendEnterpriseLimits(limits, enrichment);
 
   appendEquipmentLimits(limits, enrichment);
@@ -303,6 +340,10 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
       limits,
       "Scolarisation (Annuaire Éducation) : agrégats d'établissements ouverts ; complémentaire au BPE, sans liste nominative.",
     );
+  }
+
+  if (enrichment.education?.averageIps != null && enrichment.education?.ipsNote) {
+    pushUnique(limits, enrichment.education.ipsNote);
   }
 
   if (enrichment.health?.available) {
@@ -318,6 +359,11 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
       enrichment.health?.note,
     );
   }
+
+  pushUnique(
+    limits,
+    "APL DREES (accessibilité aux soins) : non intégrée — pas de bulk communal CSV/JSON ≤ 20 Mo (export data.drees vide ; jeux data.gouv en xlsx/7z).",
+  );
 
   appendPropertyLimits(limits, enrichment);
 
@@ -335,6 +381,14 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
       limits,
       "Données RPLS limitées au parc locatif social ; la vacance générale (RP logement) couvre l'ensemble du parc.",
     );
+    if (enrichment.housing.privateVacantDwellings !== null) {
+      pushUnique(
+        limits,
+        "LOVAC : vacance du parc privé (sources fiscales Cerema/DGFiP) — distincte du recensement RP ; surestimation possible (logements fiscalement vacants).",
+      );
+    } else if (enrichment.housing.lovacNote) {
+      pushUnique(limits, enrichment.housing.lovacNote);
+    }
   } else {
     appendUnavailable(
       limits,

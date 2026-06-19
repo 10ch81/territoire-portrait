@@ -20,7 +20,8 @@ export function HousingSection({ territory }: HousingSectionProps) {
       title="Logement"
       subtitle={
         <>
-          <AcronymTooltip term="RPLS" /> {RPLS_VINTAGE} · RP {RP_VINTAGE}
+          <AcronymTooltip term="RPLS" /> {RPLS_VINTAGE} · RP {RP_VINTAGE} ·{" "}
+          <AcronymTooltip term="LOVAC" />
         </>
       }
       vintage={housing?.year}
@@ -68,6 +69,27 @@ export function HousingSection({ territory }: HousingSectionProps) {
               label="Taux de vacance (RPLS)"
               value={formatPercent(housing.vacancyRatePercent)}
             />
+          ) : null}
+          {housing.privateVacantDwellings !== null && housing.lovacVintage !== null ? (
+            <DataRow
+              label={`Logements vacants parc privé (LOVAC ${housing.lovacVintage})`}
+              value={formatPopulation(housing.privateVacantDwellings)}
+            />
+          ) : null}
+          {housing.privateVacancyRatePercent !== null && housing.lovacVintage !== null ? (
+            <DataRow
+              label={`Taux de vacance parc privé (LOVAC ${housing.lovacVintage})`}
+              value={formatPercent(housing.privateVacancyRatePercent)}
+            />
+          ) : null}
+          {housing.privateVacantStructural !== null && housing.lovacVintage !== null ? (
+            <DataRow
+              label={`Vacance structurelle ≥ 2 ans (LOVAC ${housing.lovacVintage})`}
+              value={formatPopulation(housing.privateVacantStructural)}
+            />
+          ) : null}
+          {housing.lovacNote ? (
+            <p className="text-xs text-slate-500">{housing.lovacNote}</p>
           ) : null}
           <p className="text-xs text-slate-500">{housing.note}</p>
         </dl>

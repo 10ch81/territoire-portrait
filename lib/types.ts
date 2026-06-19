@@ -107,6 +107,24 @@ export interface SociodemographicsSnapshot {
   note: string;
 }
 
+export interface LabourMarketSnapshot {
+  quarter: string | null;
+  totalJobSeekers: number | null;
+  categoryA: number | null;
+  under25: number | null;
+  age50AndOver: number | null;
+  longTerm: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface SocialBenefitsSnapshot {
+  rsaVintage: number | null;
+  rsaShareAmongHouseholdsPercent: number | null;
+  available: boolean;
+  note: string;
+}
+
 export interface PopulationHistorySnapshot {
   latestYear: number | null;
   latestPopulation: number | null;
@@ -148,6 +166,11 @@ export interface SocialHousingSnapshot {
   rpVacancyRatePercent: number | null;
   socialHousingSharePercent: number | null;
   vacancyRatePercent: number | null;
+  lovacVintage: number | null;
+  privateVacantDwellings: number | null;
+  privateVacancyRatePercent: number | null;
+  privateVacantStructural: number | null;
+  lovacNote: string | null;
   available: boolean;
   note: string;
 }
@@ -229,6 +252,12 @@ export interface EducationSnapshot {
   byType: EducationAggregateCount[];
   bySector: EducationAggregateCount[];
   byLevel: EducationAggregateCount[];
+  ipsSchoolYear: string | null;
+  averageIps: number | null;
+  schoolsWithIps: number | null;
+  ipsMin: number | null;
+  ipsMax: number | null;
+  ipsNote: string | null;
   available: boolean;
   note: string;
 }
@@ -354,6 +383,8 @@ export interface SecuritySnapshot {
 export interface TerritoryEnrichment {
   populationHistory: PopulationHistorySnapshot | null;
   sociodemographics: SociodemographicsSnapshot | null;
+  labourMarket: LabourMarketSnapshot | null;
+  socialBenefits: SocialBenefitsSnapshot | null;
   enterprises: EnterpriseSnapshot | null;
   employmentSectors: EmploymentSectorsSnapshot | null;
   equipments: EquipmentSnapshot | null;
@@ -517,6 +548,38 @@ export type QpvCommuneCache = Record<string, QpvCommuneCacheEntry>;
 
 export type HousingCommuneCache = Record<string, HousingCommuneCacheEntry>;
 
+export interface LovacCommuneCacheEntry {
+  vintage: number;
+  privateTotalDwellings: number | null;
+  privateVacantDwellings: number | null;
+  privateVacantStructural: number | null;
+  privateVacancyRatePercent: number | null;
+  suppressed: boolean;
+}
+
+export type LovacCommuneCache = Record<string, LovacCommuneCacheEntry>;
+
+export interface FranceTravailCommuneCacheEntry {
+  quarter: string;
+  totalJobSeekers: number | null;
+  categoryA: number | null;
+  under25: number | null;
+  age50AndOver: number | null;
+  longTerm: number | null;
+}
+
+export type FranceTravailCommuneCache = Record<
+  string,
+  FranceTravailCommuneCacheEntry
+>;
+
+export interface CafCommuneCacheEntry {
+  rsaShareAmongHouseholdsPercent: number | null;
+  vintage: number;
+}
+
+export type CafCommuneCache = Record<string, CafCommuneCacheEntry>;
+
 export interface IrveCommuneCacheEntry {
   year: number;
   chargingPoints: number;
@@ -652,3 +715,13 @@ export interface EducationCommuneCacheEntry {
 }
 
 export type EducationCommuneCache = Record<string, EducationCommuneCacheEntry>;
+
+export interface IpsCommuneCacheEntry {
+  schoolYear: string;
+  averageIps: number;
+  schoolsWithIps: number;
+  ipsMin: number;
+  ipsMax: number;
+}
+
+export type IpsCommuneCache = Record<string, IpsCommuneCacheEntry>;
