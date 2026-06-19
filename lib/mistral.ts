@@ -7,7 +7,7 @@ import {
   selectAnalysisFactsForPrompt,
   validateAnalysisOutput,
 } from "./analysis";
-import { buildFinalTerritorialAnalysis } from "./analysis/evaluation-helpers";
+import { buildEditorialLayer, buildFinalTerritorialAnalysis } from "./analysis/evaluation-helpers";
 import { computeDataLimits } from "./data-limits";
 import { buildTerritorialFacts } from "./mistral-facts";
 import { mergeSanitizedAnalysis } from "./mistral-sanitize";
@@ -161,11 +161,14 @@ function parseAnalysisContent(
     territory,
   );
 
+  const merged = mergeSanitizedAnalysis(validated, computeDataLimits(territory));
+
   return {
     ok: true,
-    analysis: enforceFinalAnalysisInvariants(
-      mergeSanitizedAnalysis(validated, computeDataLimits(territory)),
-    ),
+    analysis: enforceFinalAnalysisInvariants({
+      ...merged,
+      editorial: buildEditorialLayer(territory, selectedFacts, validated.summary),
+    }),
   };
 }
 

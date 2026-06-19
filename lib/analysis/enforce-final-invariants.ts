@@ -108,11 +108,23 @@ export function enforceFinalAnalysisInvariants(
 ): TerritoryAnalysis {
   const summary = sanitizeSummaryText(analysis.summary);
 
-  return {
+  const result: TerritoryAnalysis = {
     summary,
     strengths: enforceListField(analysis.strengths, "strengths"),
     watchPoints: enforceListField(analysis.watchPoints, "watchPoints"),
     opportunities: enforceListField(analysis.opportunities, "opportunities"),
     dataLimits: [...analysis.dataLimits],
   };
+
+  if (analysis.editorial) {
+    result.editorial = {
+      ...analysis.editorial,
+      summary: sanitizeSummaryText(analysis.editorial.summary),
+      strengths: enforceListField(analysis.editorial.strengths, "strengths"),
+      watchPoints: enforceListField(analysis.editorial.watchPoints, "watchPoints"),
+      opportunities: enforceListField(analysis.editorial.opportunities, "opportunities"),
+    };
+  }
+
+  return result;
 }

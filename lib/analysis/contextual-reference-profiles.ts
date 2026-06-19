@@ -89,6 +89,18 @@ export const rennesLikeProfile: TerritoryProfile = {
       available: true,
       note: "",
     },
+    enterprises: {
+      legalUnitsWithEstablishment: 18_500,
+      legalUnitsIsCapped: false,
+      essCount: 7_873,
+      rgeCount: 130,
+      inseeLegalUnits: 12_400,
+      inseeEstablishments: 14_200,
+      inseeSideYear: 2022,
+      millesime: "2022",
+      divergenceWarning: null,
+      note: "",
+    },
     security: {
       year: 2024,
       indicators: [
@@ -221,6 +233,29 @@ export const bousseLikeProfile: TerritoryProfile = {
       note: "",
     },
     risks: periurbanBase.enrichment!.risks,
+    derived: {
+      populationGrowthPercent: 12.4,
+      populationGrowthFromYear: 2010,
+      populationGrowthToYear: 2022,
+      irvePointsPer1000Residents: null,
+      socialHousingVacancyRatePercent: null,
+      equipmentsPer1000Residents: null,
+      available: true,
+      note: "",
+    },
+    geography: {
+      attractionArea: periurbanBase.enrichment!.geography?.attractionArea ?? null,
+      epciComparison: {
+        available: true,
+        epciName: "Communauté de communes du Bassin de Boulay",
+        communeCount: 12,
+        communeRankByPopulation: 2,
+        communeRankByDensity: 3,
+        epciAveragePopulation: 1800,
+        epciAverageDensity: 95,
+        note: "",
+      },
+    },
     territoryTypology: {
       comparisonProfile: "petite_centralite",
       summaryLabel: "petite centralité",

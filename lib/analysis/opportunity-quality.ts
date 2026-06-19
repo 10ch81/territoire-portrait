@@ -76,6 +76,11 @@ function isWeakEssRgeMobilization(
     return false;
   }
 
+  const territoryContext = buildTerritoryContext(territory);
+  if (territoryContext.isLargeCity === true || territoryContext.isDenseUrban === true) {
+    return true;
+  }
+
   const enterprises = territory.enrichment?.enterprises;
   const essCount = enterprises?.essCount ?? 0;
   const rgeCount = enterprises?.rgeCount ?? 0;

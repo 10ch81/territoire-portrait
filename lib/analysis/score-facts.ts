@@ -4,6 +4,7 @@ import {
   contextSelectionScorePenalty,
   isMechanicalContextStrength,
 } from "./context/context-relevance";
+import { editorialScorePenalty } from "./editorial-relevance";
 import {
   hasOpportunityTraceability,
   isStudyOnlyOpportunity,
@@ -179,6 +180,7 @@ export function scoreAnalysisFact(
 
   const territoryContext = buildTerritoryContext(context.territory);
   score += contextSelectionScorePenalty(fact, context.territory, territoryContext);
+  score += editorialScorePenalty(fact, territoryContext);
 
   return Math.max(0, score);
 }

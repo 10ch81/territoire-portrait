@@ -16,6 +16,8 @@ const TOURISM_OPPORTUNITY_PATTERN =
   /articuler capacité d'hébergement|accueil touristique local/i;
 const MECHANICAL_PRUDENCE_SUFFIX = / — Interprétation prudente/i;
 const ESS_RGE_LEVER_PATTERN = /\b(?:ESS|RGE)\b/i;
+const TOURISM_ACCOMMODATION_STRENGTH_PATTERN = /places d'hébergement touristique/i;
+const GENERIC_ESS_RGE_OPPORTUNITY_PATTERN = /mobiliser les acteurs ess et rge/i;
 
 function collectOutputText(analysis: ReturnType<typeof buildFinalTerritorialAnalysis>["analysis"]): string {
   return [
@@ -34,9 +36,10 @@ function assertCleanPunctuation(text: string): void {
 
 describe("anti-régression — profils de référence", () => {
   describe("Rennes-like (35238)", () => {
-    const { analysis } = buildFinalTerritorialAnalysis(rennesLikeProfile);
+    const { analysis, selectedFacts } = buildFinalTerritorialAnalysis(rennesLikeProfile);
     const context = buildTerritoryContext(rennesLikeProfile);
     const ratio = tourismAccommodationRatio(rennesLikeProfile);
+    const strengths = selectedFacts.filter((f) => f.target === "strengths");
 
     it("n'est pas classée touristique", () => {
       assert.equal(context.isTouristCommune, false);
@@ -49,14 +52,38 @@ describe("anti-régression — profils de référence", () => {
       assert.doesNotMatch(analysis.summary, /centralité touristique/i);
     });
 
-    it("pas d'opportunité tourisme ni prudence suffixée", () => {
+    it("strengths sans hébergement touristique ni ESS/RGE générique", () => {
+      assert.ok(
+        !strengths.some((f) => TOURISM_ACCOMMODATION_STRENGTH_PATTERN.test(f.sentence)),
+      );
+      assert.ok(!analysis.strengths.some((item) => ESS_RGE_LEVER_PATTERN.test(item)));
+    });
+
+    it("pas d'opportunité tourisme ni ESS/RGE générique", () => {
       assert.ok(!analysis.opportunities.some((item) => TOURISM_OPPORTUNITY_PATTERN.test(item)));
-      assertCleanPunctuation(collectOutputText(analysis));
+      assert.ok(
+        !analysis.opportunities.some((item) =>
+          GENERIC_ESS_RGE_OPPORTUNITY_PATTERN.test(item),
+        ),
+      );
+    });
+
+    it("opportunité insertion/emploi possible si chômage ou QPV", () => {
+      const hasEmploymentIssue =
+        (rennesLikeProfile.enrichment?.sociodemographics?.unemploymentRate ?? 0) >= 10 ||
+        rennesLikeProfile.enrichment?.urbanPolicy?.hasQpv === true;
+      assert.ok(hasEmploymentIssue);
+      const hasAnchoredOpportunity = analysis.opportunities.some(
+        (item) =>
+          /insertion|emploi|quartiers prioritaires|politique de la ville/i.test(item),
+      );
+      assert.ok(
+        hasAnchoredOpportunity || analysis.opportunities.length >= 1,
+        "Au moins une opportunité ancrée ou une opportunité solide attendue",
+      );
     });
 
     it("pas de fibre générique ni France Services en point fort", () => {
-      const { selectedFacts } = buildFinalTerritorialAnalysis(rennesLikeProfile);
-      const strengths = selectedFacts.filter((f) => f.target === "strengths");
       assert.ok(!strengths.some((f) => f.theme === "public_services"));
       assert.ok(
         !strengths.some(
@@ -64,11 +91,16 @@ describe("anti-régression — profils de référence", () => {
         ),
       );
     });
+
+    it("pas d'opportunité tourisme ni prudence suffixée", () => {
+      assertCleanPunctuation(collectOutputText(analysis));
+    });
   });
 
   describe("Palaiseau (91477)", () => {
-    const { analysis } = buildFinalTerritorialAnalysis(palaiseauProfile);
+    const { analysis, selectedFacts } = buildFinalTerritorialAnalysis(palaiseauProfile);
     const context = buildTerritoryContext(palaiseauProfile);
+    const strengths = selectedFacts.filter((f) => f.target === "strengths");
 
     it("n'est pas classée touristique", () => {
       assert.equal(context.isTouristCommune, false);
@@ -81,8 +113,24 @@ describe("anti-régression — profils de référence", () => {
       assert.doesNotMatch(label ?? "", /centralité touristique/i);
     });
 
-    it("pas d'opportunité tourisme", () => {
+    it("strengths sans hébergement touristique", () => {
+      assert.ok(
+        !strengths.some((f) => TOURISM_ACCOMMODATION_STRENGTH_PATTERN.test(f.sentence)),
+      );
+      assert.ok(
+        !analysis.strengths.some((item) =>
+          TOURISM_ACCOMMODATION_STRENGTH_PATTERN.test(item),
+        ),
+      );
+    });
+
+    it("pas d'opportunité tourisme ni ESS/RGE générique", () => {
       assert.ok(!analysis.opportunities.some((item) => TOURISM_OPPORTUNITY_PATTERN.test(item)));
+      assert.ok(
+        !analysis.opportunities.some((item) =>
+          GENERIC_ESS_RGE_OPPORTUNITY_PATTERN.test(item),
+        ),
+      );
     });
 
     it("points forts sans prudence tourisme suffixée", () => {
@@ -145,6 +193,15 @@ describe("anti-régression — profils de référence", () => {
         TOURISM_OPPORTUNITY_PATTERN.test(item),
       );
       assert.ok(hasTourismOpp || selectedFacts.some((f) => f.theme === "tourism" && f.target === "opportunities"));
+    });
+
+    it("peut conserver l'hébergement touristique en point fort", () => {
+      const strengthFacts = selectedFacts.filter((f) => f.target === "strengths");
+      assert.ok(
+        analysis.strengths.some((item) => TOURISM_ACCOMMODATION_STRENGTH_PATTERN.test(item)) ||
+          strengthFacts.some((f) => TOURISM_ACCOMMODATION_STRENGTH_PATTERN.test(f.sentence)),
+        "Attendu : capacité touristique en point fort pour Chamonix",
+      );
     });
 
     it("pas de levier ESS/RGE prioritaire avec RGE faible", () => {

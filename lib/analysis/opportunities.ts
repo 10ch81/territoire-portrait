@@ -136,20 +136,14 @@ function isTourismEligible(
 
 function isEssRgeEligible(
   territory: TerritoryProfile,
-  watchThemes: Set<AnalysisFactTheme>,
+  _watchThemes: Set<AnalysisFactTheme>,
   relatedWatchPointThemes: AnalysisFactTheme[],
 ): boolean {
   const enterprises = territory.enrichment?.enterprises;
   const essCount = enterprises?.essCount ?? 0;
   const rgeCount = enterprises?.rgeCount ?? 0;
 
-  const linkedIssue =
-    relatedWatchPointThemes.length > 0 ||
-    watchThemes.has("employment") ||
-    watchThemes.has("housing") ||
-    watchThemes.has("energy");
-
-  if (!linkedIssue) {
+  if (relatedWatchPointThemes.length === 0) {
     return false;
   }
 
@@ -349,7 +343,7 @@ function alignedWatchThemes(
   const alignment: Partial<Record<AnalysisFactTheme, AnalysisFactTheme[]>> = {
     housing: ["housing"],
     risks: ["risks"],
-    ess_rge: ["employment", "housing", "income"],
+    ess_rge: ["employment", "housing", "income", "policy_city"],
     employment: ["employment"],
     security: ["security"],
     mobility: ["mobility"],

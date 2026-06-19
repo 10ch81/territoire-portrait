@@ -1,4 +1,5 @@
 import type { TerritoryProfile } from "../../types";
+import { isEditoriallyRelevantForTarget } from "../editorial-relevance";
 import type { AnalysisFact, AnalysisFactTheme } from "../types";
 import type { TerritoryContext } from "./buildTerritoryContext";
 
@@ -161,6 +162,18 @@ export function isContextuallySelectableForTarget(
   if (
     target === "opportunities" &&
     isMechanicalContextOpportunity(fact, territory, context, relatedWatchPointThemes)
+  ) {
+    return false;
+  }
+
+  if (
+    !isEditoriallyRelevantForTarget(
+      fact,
+      target,
+      territory,
+      context,
+      relatedWatchPointThemes,
+    )
   ) {
     return false;
   }
