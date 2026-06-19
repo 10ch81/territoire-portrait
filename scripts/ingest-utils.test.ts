@@ -42,3 +42,14 @@ test("detectCsvEncoding par défaut UTF-8 pour données numériques", () => {
     assert.equal(detectCsvEncoding(path), "utf-8");
   });
 });
+
+test("detectCsvEncoding reste UTF-8 malgré un octet invalide isolé (FINESS)", () => {
+  const content = Buffer.concat([
+    Buffer.from("nom;libcategetab\n001;Maison de santé", "utf-8"),
+    Buffer.from([0xff]),
+    Buffer.from(";002;Centre médical", "utf-8"),
+  ]);
+  withTempCsv(content, (path) => {
+    assert.equal(detectCsvEncoding(path), "utf-8");
+  });
+});

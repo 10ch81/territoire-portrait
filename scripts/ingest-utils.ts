@@ -19,7 +19,11 @@ export function parseCsvLine(line: string, delimiter = ";"): string[] {
   return line.split(delimiter).map((cell) => cell.replace(/^"|"$/g, "").trim());
 }
 
-const FRENCH_ACCENTS = /[éèêàâùûôîçÉÊÀÂÙÛÔÎÇ]/;
+const FRENCH_ACCENTS = /[éèêàâùûôîçÉÊÀÂÙÛÔÎÇ]/g;
+
+function countFrenchAccents(text: string): number {
+  return text.match(FRENCH_ACCENTS)?.length ?? 0;
+}
 
 /** Supprime le BOM UTF-8 éventuel en tête de ligne CSV. */
 export function stripCsvBom(line: string): string {
@@ -38,12 +42,12 @@ export function detectCsvEncoding(filePath: string): BufferEncoding {
   }
 
   const utf8 = sample.toString("utf-8");
-  if (utf8.includes("\uFFFD")) {
-    return "latin1";
-  }
-
   const latin1 = sample.toString("latin1");
-  if (FRENCH_ACCENTS.test(latin1) && !FRENCH_ACCENTS.test(utf8)) {
+  const utf8Accents = countFrenchAccents(utf8);
+  const latin1Accents = countFrenchAccents(latin1);
+
+  // Latin-1 explicite (ex. REI DGFiP) : plus d'accents valides qu'en UTF-8.
+  if (latin1Accents > utf8Accents) {
     return "latin1";
   }
 
