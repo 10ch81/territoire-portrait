@@ -3,9 +3,11 @@ import {
   buildCanonicalAnalysisOutput,
   buildExpectedOutputInstructions,
   buildMistralStructureBlock,
+  enforceFinalAnalysisInvariants,
   selectAnalysisFactsForPrompt,
   validateAnalysisOutput,
 } from "./analysis";
+import { buildFinalTerritorialAnalysis } from "./analysis/evaluation-helpers";
 import { computeDataLimits } from "./data-limits";
 import { buildTerritorialFacts } from "./mistral-facts";
 import { mergeSanitizedAnalysis } from "./mistral-sanitize";
@@ -39,12 +41,53 @@ Opportunités :
 ${buildMistralStructureBlock()}`;
 
 function emptyAnalysis(territory: TerritoryProfile): TerritoryAnalysis {
-  return {
+  return enforceFinalAnalysisInvariants({
     summary: "",
     strengths: [],
     watchPoints: [],
     opportunities: [],
     dataLimits: computeDataLimits(territory),
+  });
+}
+
+function isTerritorialAnalysisInsufficient(analysis: TerritoryAnalysis): boolean {
+  return (
+    analysis.summary.trim().length === 0 &&
+    analysis.strengths.length === 0 &&
+    analysis.watchPoints.length === 0 &&
+    analysis.opportunities.length === 0
+  );
+}
+
+function buildCanonicalTerritoryAnalysis(territory: TerritoryProfile): TerritoryAnalysis {
+  return buildFinalTerritorialAnalysis(territory).analysis;
+}
+
+function buildDegradedAnalysisResult(
+  territory: TerritoryProfile,
+  options: {
+    configured: boolean;
+    error?: string;
+  },
+): AnalysisResult {
+  const canonicalAnalysis = buildCanonicalTerritoryAnalysis(territory);
+
+  if (isTerritorialAnalysisInsufficient(canonicalAnalysis)) {
+    return {
+      analysis: emptyAnalysis(territory),
+      configured: options.configured,
+      llmUsed: false,
+      degraded: true,
+      error: options.error,
+    };
+  }
+
+  return {
+    analysis: canonicalAnalysis,
+    configured: options.configured,
+    llmUsed: false,
+    degraded: true,
+    error: options.error,
   };
 }
 
@@ -120,7 +163,9 @@ function parseAnalysisContent(
 
   return {
     ok: true,
-    analysis: mergeSanitizedAnalysis(validated, computeDataLimits(territory)),
+    analysis: enforceFinalAnalysisInvariants(
+      mergeSanitizedAnalysis(validated, computeDataLimits(territory)),
+    ),
   };
 }
 
@@ -150,11 +195,10 @@ export async function analyzeTerritory(
   const config = getMistralConfig();
 
   if (!config) {
-    return {
-      analysis: emptyAnalysis(territory),
+    return buildDegradedAnalysisResult(territory, {
       configured: false,
       error: getMissingApiKeyMessage(),
-    };
+    });
   }
 
   try {
@@ -178,11 +222,10 @@ export async function analyzeTerritory(
     if (!response.ok) {
       const errorBody = await response.text();
       console.error("Erreur Mistral:", response.status, errorBody);
-      return {
-        analysis: emptyAnalysis(territory),
+      return buildDegradedAnalysisResult(territory, {
         configured: true,
         error: `L'analyse IA a échoué (statut ${response.status}). Vérifiez la clé API et le modèle.`,
-      };
+      });
     }
 
     const data = (await response.json()) as {
@@ -192,33 +235,32 @@ export async function analyzeTerritory(
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
-      return {
-        analysis: emptyAnalysis(territory),
+      return buildDegradedAnalysisResult(territory, {
         configured: true,
         error: "Réponse Mistral vide ou inattendue.",
-      };
+      });
     }
 
     const parseResult = parseAnalysisContent(content, territory);
 
     if (!parseResult.ok) {
-      return {
-        analysis: emptyAnalysis(territory),
+      return buildDegradedAnalysisResult(territory, {
         configured: true,
         error: parseResult.error,
-      };
+      });
     }
 
     return {
       analysis: parseResult.analysis,
       configured: true,
+      llmUsed: true,
+      degraded: false,
     };
   } catch (error) {
     console.error("Erreur lors de l'appel Mistral:", error);
-    return {
-      analysis: emptyAnalysis(territory),
+    return buildDegradedAnalysisResult(territory, {
       configured: true,
       error: "Erreur réseau lors de l'appel à l'API Mistral.",
-    };
+    });
   }
 }

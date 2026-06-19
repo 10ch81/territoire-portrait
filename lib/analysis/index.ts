@@ -69,6 +69,11 @@ export {
   hasCriticalValidationIssue,
   validateAnalysisOutput,
 } from "./validate-output";
+export {
+  enforceFinalAnalysisInvariants,
+  hasFinalInternalLeakage,
+  stripFinalInternalLeakage,
+} from "./enforce-final-invariants";
 
 export {
   hasForbiddenDerivedRatio,

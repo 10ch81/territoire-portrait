@@ -1,0 +1,33 @@
+---
+description: Règles qualité de l'analyse territoriale IA
+globs: lib/analysis/**,lib/mistral.ts,lib/mistral-facts.ts,lib/mistral-sanitize.ts,lib/data-limits.ts,app/api/analyze/**,scripts/analyze-sample.ts
+alwaysApply: false
+---
+
+# Analyse territoriale — règles qualité
+
+## Principe produit
+
+L'analyse IA ne doit jamais inventer de données. Les phrases finales doivent être issues de faits serveur validés.
+
+Le LLM, s'il est utilisé, ne peut pas créer de fond. Il peut uniquement réordonner des faits existants ou des IDs de faits.
+
+## Invariants non négociables
+
+- strengths max: 4
+- watchPoints max: 5
+- opportunities max: 4
+- aucun thème cité dans le summary ne doit être absent des faits sélectionnés
+- aucun watchPoint ne doit être basé sur un signal faible sans benchmark
+- ne jamais dire "les indicateurs de sécurité dépassent..." si un seul indicateur dépasse la référence
+- ne jamais sélectionner une opportunité générique sans levier précis
+- pour les communes touristiques, les ratios par habitant doivent être accompagnés d'une prudence
+- en cas d'échec Mistral, retourner canonicalOutput, pas emptyAnalysis
+
+## Workflow
+
+- Commencer par des tests métier.
+- Ne pas modifier les fixtures pour faire passer un test.
+- Préférer de petites PRs ciblées.
+- Après chaque modification, lancer typecheck et tests liés à l'analyse.
+- Ne pas faire de refactor global sans test de non-régression.

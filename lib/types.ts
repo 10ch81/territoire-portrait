@@ -416,6 +416,10 @@ export interface TerritoryAnalysis {
 export interface AnalysisResult {
   analysis: TerritoryAnalysis | null;
   configured: boolean;
+  /** true si la sortie provient d'un appel Mistral réussi. */
+  llmUsed?: boolean;
+  /** true si la sortie est la version canonique serveur (sans LLM ou après échec Mistral). */
+  degraded?: boolean;
   error?: string;
 }
 
