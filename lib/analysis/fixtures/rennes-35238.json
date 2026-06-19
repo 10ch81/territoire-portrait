@@ -1,0 +1,1897 @@
+{
+  "name": "Rennes",
+  "inseeCode": "35238",
+  "postalCodes": [
+    "35000",
+    "35200",
+    "35700"
+  ],
+  "department": {
+    "code": "35",
+    "name": "Ille-et-Vilaine"
+  },
+  "region": {
+    "code": "53",
+    "name": "Bretagne"
+  },
+  "epci": {
+    "code": "243500139",
+    "name": "Rennes Métropole"
+  },
+  "population": 230890,
+  "densityPerKm2": 4587.349176168593,
+  "coordinates": {
+    "latitude": 48.1159,
+    "longitude": -1.6884
+  },
+  "surfaceKm2": 50.3319,
+  "sources": [
+    {
+      "id": "geo-api-communes",
+      "name": "API Géo — Communes",
+      "url": "https://geo.api.gouv.fr/communes",
+      "description": "Référentiel officiel des communes françaises (nom, code INSEE, population, EPCI, coordonnées).",
+      "accessedAt": "2026-06-19T09:21:36.436Z"
+    },
+    {
+      "id": "insee-population",
+      "name": "INSEE — Populations légales (via API Géo)",
+      "url": "https://www.data.gouv.fr/fr/datasets/populations-legales/",
+      "description": "Population municipale diffusée via l'API Géo (millésime populations légales).",
+      "accessedAt": "2026-06-19T09:21:36.436Z"
+    },
+    {
+      "id": "insee-population-history",
+      "name": "INSEE — Populations historiques",
+      "url": "https://api.insee.fr/melodi/file/DS_POPULATIONS_HISTORIQUES/DS_POPULATIONS_HISTORIQUES_CSV_FR",
+      "description": "Séries historiques de population municipale par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-rp-population",
+      "name": "INSEE — Recensement 2022 (structure par âge)",
+      "url": "https://www.insee.fr/fr/statistiques/8581696",
+      "description": "Structure par tranches d'âge de la population communale (RP 2022).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-rp-employment",
+      "name": "INSEE — Recensement 2022 (emploi)",
+      "url": "https://www.insee.fr/fr/statistiques/8581444",
+      "description": "Population active et chômage au recensement 2022.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-filosofi",
+      "name": "INSEE — FILOSOFI 2023 (revenus)",
+      "url": "https://www.insee.fr/fr/statistiques/8984752",
+      "description": "Niveau de vie médian des ménages (Filosofi 2, millésime 2023). Non comparable aux millésimes 2012-2021.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "recherche-entreprises",
+      "name": "API Recherche Entreprises (SIRENE)",
+      "url": "https://recherche-entreprises.api.gouv.fr",
+      "description": "Entreprises et établissements recensés via la base SIRENE (data.gouv.fr).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-side",
+      "name": "INSEE — SIDE (stocks d'entreprises)",
+      "url": "https://www.insee.fr/fr/statistiques/2011101",
+      "description": "Stocks d'unités légales et d'étabissements actifs par commune (SIDE).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-flores",
+      "name": "INSEE — FLORES (emploi salarié A17)",
+      "url": "https://www.data.gouv.fr/datasets/nombre-detablissements-et-effectifs-salaries-en-17-grands-secteurs/",
+      "description": "Établissements actifs et postes salariés fin d'année par secteur A17 (commune).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-bpe",
+      "name": "INSEE — Base permanente des équipements (BPE 2024)",
+      "url": "https://www.data.gouv.fr/datasets/denombrement-des-equipements-commerce-sport-services-sante/",
+      "description": "Dénombrement des équipements et services accessibles à la population par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "education-directory",
+      "name": "Annuaire de l'Éducation",
+      "url": "https://www.data.gouv.fr/datasets/annuaire-de-leducation/",
+      "description": "Établissements scolaires ouverts par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "finess",
+      "name": "FINESS — Établissements sanitaires et sociaux",
+      "url": "https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess/",
+      "description": "Référentiel national des établissements sanitaires, sociaux et médico-sociaux.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "georisques",
+      "name": "Géorisques",
+      "url": "https://georisques.gouv.fr/",
+      "description": "Radon, inondations (AZI) et reconnaissances CATNAT par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "ssmsi",
+      "name": "SSMSI — Délinquance enregistrée",
+      "url": "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales",
+      "description": "Principaux indicateurs de crimes et délits enregistrés par la police et la gendarmerie (lieu de commission).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "rpls",
+      "name": "RPLS — Parc locatif social",
+      "url": "https://www.data.gouv.fr/datasets/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/",
+      "description": "Répertoire des logements locatifs des bailleurs sociaux agrégé par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-rp-housing",
+      "name": "INSEE — RP 2022 logement",
+      "url": "https://www.insee.fr/fr/statistiques/8581474",
+      "description": "Parc de logements et vacance générale au recensement 2022.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "irve",
+      "name": "IRVE — Bornes de recharge",
+      "url": "https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/",
+      "description": "Fichier consolidé national des bornes de recharge pour véhicules électriques.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-rp-commute",
+      "name": "INSEE — RP 2022 mobilité domicile-travail",
+      "url": "https://www.insee.fr/fr/statistiques/8581610",
+      "description": "Modes de transport principal des actifs occupés de 15 ans ou plus (recensement 2022).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "arcep-fibre",
+      "name": "ARCEP — Ma connexion internet",
+      "url": "https://www.data.gouv.fr/datasets/ma-connexion-internet/",
+      "description": "Couverture fibre et technologies d'accès internet fixe par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "qpv-sig-ville",
+      "name": "INSEE / SIG Ville — QPV 2024",
+      "url": "https://www.insee.fr/fr/statistiques/fichier/8186239/TAG_QPV2024_2025_csv.zip",
+      "description": "Quartiers prioritaires de la politique de la ville (table d'appartenance géographique 2025).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "rei",
+      "name": "REI — Fiscalité locale",
+      "url": "https://www.data.gouv.fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-4/",
+      "description": "Recensement des éléments d'imposition à la fiscalité directe locale (taux communaux).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "ofgl",
+      "name": "OFGL — Comptes des collectivités",
+      "url": "https://data.ofgl.fr/",
+      "description": "Encours de dette et recettes de fonctionnement des communes (budget principal).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "france-services",
+      "name": "France Services — Structures labellisées",
+      "url": "https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services/",
+      "description": "Points d'accueil France Services labellisés par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-tourism",
+      "name": "INSEE — Capacités touristiques",
+      "url": "https://www.insee.fr/fr/statistiques/fichier/2021703/DS_TOUR_CAP_CSV_2025_geo25.zip",
+      "description": "Places d'hébergement touristique par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "aav2020",
+      "name": "INSEE — Aires d'attraction 2020",
+      "url": "https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/",
+      "description": "Zonage en aires d'attraction des villes (AAV2020) par commune.",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-density-grid",
+      "name": "INSEE — Grille communale de densité (7 niveaux)",
+      "url": "https://www.insee.fr/fr/information/6439600",
+      "description": "Typologie communale de densité à 7 niveaux (millésime 2024, géographie au 1er janvier 2024).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "insee-urban-unit",
+      "name": "INSEE — Unités urbaines 2020",
+      "url": "https://www.insee.fr/fr/information/4802589",
+      "description": "Composition communale des unités urbaines 2020 (UU2020).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    },
+    {
+      "id": "dvf",
+      "name": "DVF — Indicateurs immobiliers",
+      "url": "https://www.data.gouv.fr/datasets/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/",
+      "description": "Prix et volumes de mutations immobilières agrégés par commune (hors Alsace-Moselle et Mayotte).",
+      "accessedAt": "2026-06-19T09:21:36.437Z"
+    }
+  ],
+  "enrichment": {
+    "populationHistory": {
+      "latestYear": 2022,
+      "latestPopulation": 227830,
+      "history": [
+        {
+          "year": 2010,
+          "population": 207178
+        },
+        {
+          "year": 2015,
+          "population": 215366
+        },
+        {
+          "year": 2020,
+          "population": 222485
+        },
+        {
+          "year": 2021,
+          "population": 225081
+        },
+        {
+          "year": 2022,
+          "population": 227830
+        }
+      ],
+      "available": true,
+      "note": "Populations municipales INSEE (DS_POPULATIONS_HISTORIQUES). La population légale affichée en tête de fiche provient de l'API Géo."
+    },
+    "sociodemographics": {
+      "year": 2022,
+      "incomeYear": 2023,
+      "ageBands": [
+        {
+          "label": "0-14 ans",
+          "population": 32394,
+          "sharePercent": 14.2
+        },
+        {
+          "label": "15-29 ans",
+          "population": 77772,
+          "sharePercent": 34.1
+        },
+        {
+          "label": "30-44 ans",
+          "population": 42949,
+          "sharePercent": 18.9
+        },
+        {
+          "label": "45-59 ans",
+          "population": 32397,
+          "sharePercent": 14.2
+        },
+        {
+          "label": "60-74 ans",
+          "population": 24968,
+          "sharePercent": 11
+        },
+        {
+          "label": "75-89 ans",
+          "population": 14577,
+          "sharePercent": 6.4
+        },
+        {
+          "label": "90 ans ou plus",
+          "population": 2773,
+          "sharePercent": 1.2
+        }
+      ],
+      "unemploymentRate": 14,
+      "medianDisposableIncome": 25100,
+      "available": true,
+      "note": "Recensement 2022 (structure par âge, chômage) et FILOSOFI 2023 (niveau de vie médian)."
+    },
+    "enterprises": {
+      "legalUnitsWithEstablishment": 10000,
+      "legalUnitsIsCapped": true,
+      "essCount": 7873,
+      "rgeCount": 130,
+      "inseeLegalUnits": 20259,
+      "inseeEstablishments": 23974,
+      "inseeSideYear": 2022,
+      "millesime": "2022 (SIDE) / 2024-2025 (SIRENE)",
+      "divergenceWarning": "Écart notable entre le répertoire SIRENE (10 000 entreprises) et SIDE INSEE (20 259) : périmètres et méthodes distincts. Privilégier SIDE pour décrire l'activité économique ; SIRENE sert de répertoire administratif complémentaire.",
+      "note": "Référence statistique : stocks INSEE SIDE (2022) — unités légales et établissements actifs sur la commune. Complément administratif : unités légales avec ≥ 1 établissement actif (API SIRENE) ; ne pas en déduire un dynamisme économique. Comptages ESS et RGE issus de l'API SIRENE (filtres dédiés). Le total SIRENE est plafonné à 10 000 par l'API : la commune peut en compter davantage."
+    },
+    "employmentSectors": {
+      "year": 2024,
+      "totalEstablishments": 8482,
+      "totalSalariedPosts": 146203,
+      "sectors": [
+        {
+          "code": "OQ",
+          "label": "Administration publique, enseignement, santé, action sociale",
+          "establishments": 1054,
+          "salariedPosts": 76655
+        },
+        {
+          "code": "MN",
+          "label": "Activités spécialisées, scientifiques et techniques",
+          "establishments": 1917,
+          "salariedPosts": 14791
+        },
+        {
+          "code": "GZ",
+          "label": "Commerce et réparation automobile",
+          "establishments": 1377,
+          "salariedPosts": 10008
+        },
+        {
+          "code": "JZ",
+          "label": "Information et communication",
+          "establishments": 458,
+          "salariedPosts": 9018
+        },
+        {
+          "code": "RU",
+          "label": "Autres activités de services",
+          "establishments": 1293,
+          "salariedPosts": 7875
+        },
+        {
+          "code": "IZ",
+          "label": "Hébergement et restauration",
+          "establishments": 896,
+          "salariedPosts": 6791
+        },
+        {
+          "code": "HZ",
+          "label": "Transports et entreposage",
+          "establishments": 115,
+          "salariedPosts": 6029
+        },
+        {
+          "code": "KZ",
+          "label": "Activités financières et d'assurance",
+          "establishments": 471,
+          "salariedPosts": 5241
+        },
+        {
+          "code": "LZ",
+          "label": "Activités immobilières",
+          "establishments": 270,
+          "salariedPosts": 2960
+        },
+        {
+          "code": "FZ",
+          "label": "Construction",
+          "establishments": 379,
+          "salariedPosts": 2245
+        },
+        {
+          "code": "C1",
+          "label": "Industries agro-alimentaires",
+          "establishments": 109,
+          "salariedPosts": 1569
+        },
+        {
+          "code": "DE",
+          "label": "Production et distribution d'énergie",
+          "establishments": 39,
+          "salariedPosts": 1344
+        },
+        {
+          "code": "C5",
+          "label": "Autres industries manufacturières",
+          "establishments": 78,
+          "salariedPosts": 810
+        },
+        {
+          "code": "C3",
+          "label": "Industries électriques, électroniques, informatiques",
+          "establishments": 11,
+          "salariedPosts": 396
+        },
+        {
+          "code": "C4",
+          "label": "Fabrication de machines et équipements",
+          "establishments": 4,
+          "salariedPosts": 281
+        },
+        {
+          "code": "AZ",
+          "label": "Agriculture, sylviculture et pêche",
+          "establishments": 11,
+          "salariedPosts": 190
+        }
+      ],
+      "available": true,
+      "note": "FLORES INSEE — postes salariés fin d'année et établissements actifs par secteur A17. Les résultats FLORES ne doivent pas faire l'objet d'analyses comparatives dans le temps."
+    },
+    "equipments": {
+      "year": 2024,
+      "totalEquipments": 7570,
+      "byDomain": [
+        {
+          "code": "A",
+          "label": "Services pour les particuliers",
+          "count": 1734
+        },
+        {
+          "code": "B",
+          "label": "Commerces",
+          "count": 890
+        },
+        {
+          "code": "F",
+          "label": "Sports, loisirs et culture",
+          "count": 218
+        },
+        {
+          "code": "G",
+          "label": "Tourisme",
+          "count": 118
+        },
+        {
+          "code": "E",
+          "label": "Transports et déplacements",
+          "count": 110
+        },
+        {
+          "code": "D",
+          "label": "Santé et action sociale",
+          "count": 99
+        },
+        {
+          "code": "C",
+          "label": "Enseignement",
+          "count": 26
+        }
+      ],
+      "byType": [
+        {
+          "code": "A504",
+          "label": "Restaurant- restauration rapide",
+          "count": 845
+        },
+        {
+          "code": "D279",
+          "label": "Masseur kinésithérapeute",
+          "count": 427
+        },
+        {
+          "code": "D250",
+          "label": "Psychologue",
+          "count": 391
+        },
+        {
+          "code": "A505",
+          "label": "Agence immobilière",
+          "count": 361
+        },
+        {
+          "code": "B302",
+          "label": "Magasin de vêtements",
+          "count": 253
+        },
+        {
+          "code": "D265",
+          "label": "Médecin généraliste",
+          "count": 243
+        },
+        {
+          "code": "A501",
+          "label": "Coiffure",
+          "count": 229
+        },
+        {
+          "code": "D281",
+          "label": "Infirmier",
+          "count": 228
+        }
+      ],
+      "transport": {
+        "totalEquipments": 110,
+        "byType": [
+          {
+            "code": "E101",
+            "label": "Taxi-vtc",
+            "count": 107
+          },
+          {
+            "code": "E107",
+            "label": "Gare de voyageurs d’intérêt national",
+            "count": 1
+          },
+          {
+            "code": "E109",
+            "label": "Gare de voyageurs d’intérêt local",
+            "count": 1
+          },
+          {
+            "code": "E108",
+            "label": "Gare de voyageurs d’intérêt régional",
+            "count": 1
+          }
+        ],
+        "available": true,
+        "note": "Équipements de transport recensés dans la BPE (occurrences par type) ; l'offre réelle de transport collectif (lignes, horaires, fréquence) n'est pas analysée."
+      },
+      "available": true,
+      "note": "Dénombrement INSEE BPE 2024 : le total correspond aux occurrences recensées. Les domaines indiquent le nombre de types par domaine (décomposition partielle, ne recompose pas le total). Les principaux types (top 8) sont une liste partielle, non exhaustive.",
+      "domainBreakdownLabel": "Nombre de types d'équipements par domaine",
+      "topTypesLabel": "Principaux types d'équipements (top 8, liste partielle)",
+      "qualitativeSummary": "7570 équipements recensés, avec une diversité de services de proximité, commerces, équipements de loisirs, tourisme, transports, santé et action sociale et enseignement.",
+      "domainCountsAreTypeCounts": true
+    },
+    "education": {
+      "year": 2026,
+      "totalOpen": 199,
+      "byType": [
+        {
+          "code": "Ecole",
+          "label": "Ecole",
+          "count": 100
+        },
+        {
+          "code": "Service Administratif",
+          "label": "Service Administratif",
+          "count": 33
+        },
+        {
+          "code": "Lycée",
+          "label": "Lycée",
+          "count": 29
+        },
+        {
+          "code": "Collège",
+          "label": "Collège",
+          "count": 25
+        },
+        {
+          "code": "Médico-social",
+          "label": "Médico-social",
+          "count": 6
+        },
+        {
+          "code": "Type non renseigné",
+          "label": "Type non renseigné",
+          "count": 4
+        },
+        {
+          "code": "EREA",
+          "label": "EREA",
+          "count": 1
+        },
+        {
+          "code": "Information et orientation",
+          "label": "Information et orientation",
+          "count": 1
+        }
+      ],
+      "bySector": [
+        {
+          "code": "Public",
+          "label": "Public",
+          "count": 113
+        },
+        {
+          "code": "Privé",
+          "label": "Privé",
+          "count": 53
+        },
+        {
+          "code": "Non renseigné",
+          "label": "Non renseigné",
+          "count": 33
+        }
+      ],
+      "byLevel": [
+        {
+          "code": "ECOLE DE NIVEAU ELEMENTAIRE",
+          "label": "ECOLE DE NIVEAU ELEMENTAIRE",
+          "count": 63
+        },
+        {
+          "code": "ECOLE MATERNELLE",
+          "label": "ECOLE MATERNELLE",
+          "count": 35
+        },
+        {
+          "code": "COLLEGE",
+          "label": "COLLEGE",
+          "count": 20
+        },
+        {
+          "code": "SERVICE DE LA DSDEN",
+          "label": "SERVICE DE LA DSDEN",
+          "count": 16
+        },
+        {
+          "code": "CIRCONSCRIPTIONS INSPECTION EDUC NAT",
+          "label": "CIRCONSCRIPTIONS INSPECTION EDUC NAT",
+          "count": 14
+        },
+        {
+          "code": "LYCEE PROFESSIONNEL",
+          "label": "LYCEE PROFESSIONNEL",
+          "count": 10
+        },
+        {
+          "code": "LYCEE ENSEIGNT GENERAL ET TECHNOLOGIQUE",
+          "label": "LYCEE ENSEIGNT GENERAL ET TECHNOLOGIQUE",
+          "count": 7
+        },
+        {
+          "code": "LYCEE D ENSEIGNEMENT GENERAL",
+          "label": "LYCEE D ENSEIGNEMENT GENERAL",
+          "count": 5
+        },
+        {
+          "code": "SECTION ENSEIGNT GEN. ET PROF. ADAPTE",
+          "label": "SECTION ENSEIGNT GEN. ET PROF. ADAPTE",
+          "count": 5
+        },
+        {
+          "code": "ECOLES COMPOSEES UNIQT DE STS ET OU CPGE",
+          "label": "ECOLES COMPOSEES UNIQT DE STS ET OU CPGE",
+          "count": 4
+        },
+        {
+          "code": "LYCEE POLYVALENT",
+          "label": "LYCEE POLYVALENT",
+          "count": 4
+        },
+        {
+          "code": "SECTION D ENSEIGNEMENT PROFESSIONNEL",
+          "label": "SECTION D ENSEIGNEMENT PROFESSIONNEL",
+          "count": 3
+        },
+        {
+          "code": "INSTITUT MEDICO-EDUCATIF",
+          "label": "INSTITUT MEDICO-EDUCATIF",
+          "count": 2
+        },
+        {
+          "code": "IES POUR DEFICIENTS VISUELS",
+          "label": "IES POUR DEFICIENTS VISUELS",
+          "count": 2
+        },
+        {
+          "code": "ECOLE SANS EFFECTIFS PERMANENTS",
+          "label": "ECOLE SANS EFFECTIFS PERMANENTS",
+          "count": 2
+        },
+        {
+          "code": "ETAB REGIONAL/LYCEE ENSEIGNEMENT ADAPTE",
+          "label": "ETAB REGIONAL/LYCEE ENSEIGNEMENT ADAPTE",
+          "count": 1
+        },
+        {
+          "code": "IES POUR DEFICIENTS AUDITIFS",
+          "label": "IES POUR DEFICIENTS AUDITIFS",
+          "count": 1
+        },
+        {
+          "code": "CENTRE D INFORMATION ET D ORIENTATION",
+          "label": "CENTRE D INFORMATION ET D ORIENTATION",
+          "count": 1
+        },
+        {
+          "code": "SERVICE RECTORAL",
+          "label": "SERVICE RECTORAL",
+          "count": 1
+        },
+        {
+          "code": "DIRECTION SERVICES DEPARTEMENTAUX EN",
+          "label": "DIRECTION SERVICES DEPARTEMENTAUX EN",
+          "count": 1
+        },
+        {
+          "code": "INSTITUT THERAPEUT. EDUCATIF PEDAGOGIQUE",
+          "label": "INSTITUT THERAPEUT. EDUCATIF PEDAGOGIQUE",
+          "count": 1
+        },
+        {
+          "code": "RECTORAT",
+          "label": "RECTORAT",
+          "count": 1
+        }
+      ],
+      "available": true,
+      "note": "Annuaire de l'Éducation — établissements ouverts ; complémentaire au dénombrement BPE (domaine C)."
+    },
+    "health": {
+      "year": 2026,
+      "totalEstablishments": 422,
+      "totalCapacity": null,
+      "byCategory": [
+        {
+          "code": "Pharmacie d'Officine",
+          "label": "Pharmacie d'Officine",
+          "count": 56
+        },
+        {
+          "code": "Service autonomie aide (SAA)",
+          "label": "Service autonomie aide (SAA)",
+          "count": 34
+        },
+        {
+          "code": "Maison d'Enfants à Caractère Social",
+          "label": "Maison d'Enfants à Caractère Social",
+          "count": 25
+        },
+        {
+          "code": "Centre Hospitalier Spécialisé lutte Maladies Mentales",
+          "label": "Centre Hospitalier Spécialisé lutte Maladies Mentales",
+          "count": 21
+        },
+        {
+          "code": "Etablissement d'hébergement pour personnes âgées dépendantes",
+          "label": "Etablissement d'hébergement pour personnes âgées dépendantes",
+          "count": 20
+        },
+        {
+          "code": "Laboratoire de Biologie Médicale",
+          "label": "Laboratoire de Biologie Médicale",
+          "count": 18
+        },
+        {
+          "code": "Centre de Santé",
+          "label": "Centre de Santé",
+          "count": 17
+        },
+        {
+          "code": "Foyer de Jeunes Travailleurs (résidence sociale ou non)",
+          "label": "Foyer de Jeunes Travailleurs (résidence sociale ou non)",
+          "count": 16
+        },
+        {
+          "code": "Groupement de coopération sanitaire de moyens",
+          "label": "Groupement de coopération sanitaire de moyens",
+          "count": 13
+        },
+        {
+          "code": "Service d'Accompagnement à la Vie Sociale (S.A.V.S.)",
+          "label": "Service d'Accompagnement à la Vie Sociale (S.A.V.S.)",
+          "count": 9
+        },
+        {
+          "code": "Etab.Accueil Non Médicalisé pour personnes handicapées",
+          "label": "Etab.Accueil Non Médicalisé pour personnes handicapées",
+          "count": 8
+        },
+        {
+          "code": "Maisons Relais - Pensions de Famille",
+          "label": "Maisons Relais - Pensions de Famille",
+          "count": 8
+        },
+        {
+          "code": "Maison de santé (L.6223-3)",
+          "label": "Maison de santé (L.6223-3)",
+          "count": 8
+        },
+        {
+          "code": "Centre Hospitalier Régional (C.H.R.)",
+          "label": "Centre Hospitalier Régional (C.H.R.)",
+          "count": 7
+        },
+        {
+          "code": "Service d'Éducation Spéciale et de Soins à Domicile",
+          "label": "Service d'Éducation Spéciale et de Soins à Domicile",
+          "count": 7
+        },
+        {
+          "code": "Autre Centre d'Accueil",
+          "label": "Autre Centre d'Accueil",
+          "count": 7
+        },
+        {
+          "code": "Autre Résidence Sociale (hors Maison Relais, Pension de Fami",
+          "label": "Autre Résidence Sociale (hors Maison Relais, Pension de Fami",
+          "count": 7
+        },
+        {
+          "code": "Centre de santé sexuelle",
+          "label": "Centre de santé sexuelle",
+          "count": 5
+        },
+        {
+          "code": "Ecoles Formant aux Professions Sanitaires",
+          "label": "Ecoles Formant aux Professions Sanitaires",
+          "count": 5
+        },
+        {
+          "code": "Centre Hébergement & Réinsertion Sociale (C.H.R.S.)",
+          "label": "Centre Hébergement & Réinsertion Sociale (C.H.R.S.)",
+          "count": 5
+        },
+        {
+          "code": "Centre Accueil Demandeurs Asile (C.A.D.A.)",
+          "label": "Centre Accueil Demandeurs Asile (C.A.D.A.)",
+          "count": 5
+        },
+        {
+          "code": "Centre de vaccination",
+          "label": "Centre de vaccination",
+          "count": 5
+        },
+        {
+          "code": "Centre Médico-Psycho-Pédagogique (C.M.P.P.)",
+          "label": "Centre Médico-Psycho-Pédagogique (C.M.P.P.)",
+          "count": 4
+        },
+        {
+          "code": "Etablissement et Service d'Aide par le Travail (E.S.A.T.)",
+          "label": "Etablissement et Service d'Aide par le Travail (E.S.A.T.)",
+          "count": 4
+        },
+        {
+          "code": "Centre Action Médico-Sociale Précoce (C.A.M.S.P.)",
+          "label": "Centre Action Médico-Sociale Précoce (C.A.M.S.P.)",
+          "count": 4
+        },
+        {
+          "code": "Communautés professionnelles territoriales de santé (CPTS)",
+          "label": "Communautés professionnelles territoriales de santé (CPTS)",
+          "count": 4
+        },
+        {
+          "code": "Services de Prévention et de Santé au Travail (SPST)",
+          "label": "Services de Prévention et de Santé au Travail (SPST)",
+          "count": 4
+        },
+        {
+          "code": "Etablissement de Soins Pluridisciplinaire",
+          "label": "Etablissement de Soins Pluridisciplinaire",
+          "count": 3
+        },
+        {
+          "code": "Institut Médico-Educatif (I.M.E.)",
+          "label": "Institut Médico-Educatif (I.M.E.)",
+          "count": 3
+        },
+        {
+          "code": "Résidences autonomie",
+          "label": "Résidences autonomie",
+          "count": 3
+        },
+        {
+          "code": "Centre Parents-Enfants de moins de 3 ans",
+          "label": "Centre Parents-Enfants de moins de 3 ans",
+          "count": 3
+        },
+        {
+          "code": "Ecoles Formant aux Professions Sociales",
+          "label": "Ecoles Formant aux Professions Sociales",
+          "count": 3
+        },
+        {
+          "code": "Autre Etablissement Loi Hospitalière",
+          "label": "Autre Etablissement Loi Hospitalière",
+          "count": 3
+        },
+        {
+          "code": "Service d'accompagnement médico-social adultes handicapés",
+          "label": "Service d'accompagnement médico-social adultes handicapés",
+          "count": 3
+        },
+        {
+          "code": "Appartement de Coordination Thérapeutique (A.C.T.)",
+          "label": "Appartement de Coordination Thérapeutique (A.C.T.)",
+          "count": 3
+        },
+        {
+          "code": "Centre de soins et de prévention",
+          "label": "Centre de soins et de prévention",
+          "count": 3
+        },
+        {
+          "code": "Equipes de Soins Spécialisées",
+          "label": "Equipes de Soins Spécialisées",
+          "count": 3
+        },
+        {
+          "code": "Etablissement de santé privé autorisé en SSR",
+          "label": "Etablissement de santé privé autorisé en SSR",
+          "count": 2
+        },
+        {
+          "code": "Etablissement et Service de Réadaptation Professionnelle",
+          "label": "Etablissement et Service de Réadaptation Professionnelle",
+          "count": 2
+        },
+        {
+          "code": "Etablissement de Soins Longue Durée",
+          "label": "Etablissement de Soins Longue Durée",
+          "count": 2
+        },
+        {
+          "code": "Protection Maternelle et Infantile (P.M.I.)",
+          "label": "Protection Maternelle et Infantile (P.M.I.)",
+          "count": 2
+        },
+        {
+          "code": "Service autonomie aide et soins (SAAS)",
+          "label": "Service autonomie aide et soins (SAAS)",
+          "count": 2
+        },
+        {
+          "code": "Etablissement de Transfusion Sanguine",
+          "label": "Etablissement de Transfusion Sanguine",
+          "count": 2
+        },
+        {
+          "code": "Centre soins accompagnement prévention addictologie (CSAPA)",
+          "label": "Centre soins accompagnement prévention addictologie (CSAPA)",
+          "count": 2
+        },
+        {
+          "code": "Etablissement de Placement",
+          "label": "Etablissement de Placement",
+          "count": 2
+        },
+        {
+          "code": "Centre d'Examens de Santé",
+          "label": "Centre d'Examens de Santé",
+          "count": 2
+        },
+        {
+          "code": "Entité Ayant Autorisation",
+          "label": "Entité Ayant Autorisation",
+          "count": 2
+        },
+        {
+          "code": "Etab.Acc.Médicalisé en tout ou partie personnes handicapées",
+          "label": "Etab.Acc.Médicalisé en tout ou partie personnes handicapées",
+          "count": 2
+        },
+        {
+          "code": "Centre Provisoire Hébergement (C.P.H.)",
+          "label": "Centre Provisoire Hébergement (C.P.H.)",
+          "count": 2
+        },
+        {
+          "code": "Lits Halte Soins Santé (L.H.S.S.)",
+          "label": "Lits Halte Soins Santé (L.H.S.S.)",
+          "count": 2
+        },
+        {
+          "code": "Maisons d'accueil hospitalières (M.A.H.)",
+          "label": "Maisons d'accueil hospitalières (M.A.H.)",
+          "count": 2
+        },
+        {
+          "code": "Service d'aide et d'accompagnement à domicile aux familles",
+          "label": "Service d'aide et d'accompagnement à domicile aux familles",
+          "count": 2
+        },
+        {
+          "code": "Lieux de soins non programmés",
+          "label": "Lieux de soins non programmés",
+          "count": 2
+        },
+        {
+          "code": "Maison de Santé pour Maladies Mentales",
+          "label": "Maison de Santé pour Maladies Mentales",
+          "count": 1
+        },
+        {
+          "code": "Bureau d'Aide Psychologique Universitaire (B.A.P.U.)",
+          "label": "Bureau d'Aide Psychologique Universitaire (B.A.P.U.)",
+          "count": 1
+        },
+        {
+          "code": "Centre Postcure Malades Mentaux",
+          "label": "Centre Postcure Malades Mentaux",
+          "count": 1
+        },
+        {
+          "code": "Institut Thérapeutique Éducatif et Pédagogique (I.T.E.P.)",
+          "label": "Institut Thérapeutique Éducatif et Pédagogique (I.T.E.P.)",
+          "count": 1
+        },
+        {
+          "code": "Centre de Lutte Contre Cancer",
+          "label": "Centre de Lutte Contre Cancer",
+          "count": 1
+        },
+        {
+          "code": "Ecole des Hautes Etudes en Santé Publique (E.H.E.S.P.)",
+          "label": "Ecole des Hautes Etudes en Santé Publique (E.H.E.S.P.)",
+          "count": 1
+        },
+        {
+          "code": "Institut pour Déficients Auditifs",
+          "label": "Institut pour Déficients Auditifs",
+          "count": 1
+        },
+        {
+          "code": "Service mandataire judiciaire à la protection des majeurs",
+          "label": "Service mandataire judiciaire à la protection des majeurs",
+          "count": 1
+        },
+        {
+          "code": "Institut pour Déficients Visuels",
+          "label": "Institut pour Déficients Visuels",
+          "count": 1
+        },
+        {
+          "code": "Foyer Travailleurs Migrants non transformé en Résidence Soc.",
+          "label": "Foyer Travailleurs Migrants non transformé en Résidence Soc.",
+          "count": 1
+        },
+        {
+          "code": "Etablissement et Service de Préorientation",
+          "label": "Etablissement et Service de Préorientation",
+          "count": 1
+        },
+        {
+          "code": "Centre de dialyse",
+          "label": "Centre de dialyse",
+          "count": 1
+        },
+        {
+          "code": "Service d'Intervention Educative en Milieu Ouvert",
+          "label": "Service d'Intervention Educative en Milieu Ouvert",
+          "count": 1
+        },
+        {
+          "code": "Services AEMO et AED",
+          "label": "Services AEMO et AED",
+          "count": 1
+        },
+        {
+          "code": "Entreprise adaptée",
+          "label": "Entreprise adaptée",
+          "count": 1
+        },
+        {
+          "code": "Unités Evaluation Réentraînement et d'Orient. Soc. et Pro.",
+          "label": "Unités Evaluation Réentraînement et d'Orient. Soc. et Pro.",
+          "count": 1
+        },
+        {
+          "code": "Hospitalisation à Domicile",
+          "label": "Hospitalisation à Domicile",
+          "count": 1
+        },
+        {
+          "code": "Appartement Thérapeutique",
+          "label": "Appartement Thérapeutique",
+          "count": 1
+        },
+        {
+          "code": "Ctre.Accueil/ Accomp.Réduc.Risq.Usag. Drogues (C.A.A.R.U.D.)",
+          "label": "Ctre.Accueil/ Accomp.Réduc.Risq.Usag. Drogues (C.A.A.R.U.D.)",
+          "count": 1
+        },
+        {
+          "code": "Centre de Jour pour Personnes Agées",
+          "label": "Centre de Jour pour Personnes Agées",
+          "count": 1
+        },
+        {
+          "code": "Ecoles Formant aux Professions Sanitaires et Sociales",
+          "label": "Ecoles Formant aux Professions Sanitaires et Sociales",
+          "count": 1
+        },
+        {
+          "code": "Etablissement Consultation Protection Infantile",
+          "label": "Etablissement Consultation Protection Infantile",
+          "count": 1
+        },
+        {
+          "code": "Centres Locaux Information Coordination P.A .(C.L.I.C.)",
+          "label": "Centres Locaux Information Coordination P.A .(C.L.I.C.)",
+          "count": 1
+        },
+        {
+          "code": "Centres de Ressources S.A.I. (Sans Aucune Indication)",
+          "label": "Centres de Ressources S.A.I. (Sans Aucune Indication)",
+          "count": 1
+        },
+        {
+          "code": "Structure Dispensatrice à domicile d'Oxygène à usage médical",
+          "label": "Structure Dispensatrice à domicile d'Oxygène à usage médical",
+          "count": 1
+        },
+        {
+          "code": "Groupement de coopération sanitaire de moyens - Exploitant",
+          "label": "Groupement de coopération sanitaire de moyens - Exploitant",
+          "count": 1
+        },
+        {
+          "code": "Structure Expérimentale en Santé",
+          "label": "Structure Expérimentale en Santé",
+          "count": 1
+        },
+        {
+          "code": "Lits d'Accueil Médicalisés (L.A.M.)",
+          "label": "Lits d'Accueil Médicalisés (L.A.M.)",
+          "count": 1
+        },
+        {
+          "code": "Equipe Mobile Médico-Sociale Précarité",
+          "label": "Equipe Mobile Médico-Sociale Précarité",
+          "count": 1
+        },
+        {
+          "code": "Dispositif d'appui à la coordination",
+          "label": "Dispositif d'appui à la coordination",
+          "count": 1
+        },
+        {
+          "code": "Maisons Départementales des Personnes Handicapées",
+          "label": "Maisons Départementales des Personnes Handicapées",
+          "count": 1
+        },
+        {
+          "code": "Dispositif Spécifique Régional du Cancer",
+          "label": "Dispositif Spécifique Régional du Cancer",
+          "count": 1
+        },
+        {
+          "code": "Groupement Régional d'Appui au Développement de la e-Santé",
+          "label": "Groupement Régional d'Appui au Développement de la e-Santé",
+          "count": 1
+        },
+        {
+          "code": "Services départementaux d'incendie et de secours",
+          "label": "Services départementaux d'incendie et de secours",
+          "count": 1
+        }
+      ],
+      "byType": [
+        {
+          "code": "Commerce de Biens à Usage Médicaux",
+          "label": "Commerce de Biens à Usage Médicaux",
+          "count": 57
+        },
+        {
+          "code": "Etablissements et services multi-clientèles",
+          "label": "Etablissements et services multi-clientèles",
+          "count": 36
+        },
+        {
+          "code": "Etablissements de l'Aide Sociale à l'Enfance",
+          "label": "Etablissements de l'Aide Sociale à l'Enfance",
+          "count": 28
+        },
+        {
+          "code": "Etablissements d'Hébergement pour Personnes Âgées",
+          "label": "Etablissements d'Hébergement pour Personnes Âgées",
+          "count": 23
+        },
+        {
+          "code": "Centres Hospitaliers Spécialisés Lutte Maladies Mentales",
+          "label": "Centres Hospitaliers Spécialisés Lutte Maladies Mentales",
+          "count": 21
+        },
+        {
+          "code": "Etablissements pour Adultes et Familles en Difficulté",
+          "label": "Etablissements pour Adultes et Familles en Difficulté",
+          "count": 21
+        },
+        {
+          "code": "Centres de Santé",
+          "label": "Centres de Santé",
+          "count": 20
+        },
+        {
+          "code": "Autres Etablissements Sociaux d'Hébergement et d'Accueil",
+          "label": "Autres Etablissements Sociaux d'Hébergement et d'Accueil",
+          "count": 19
+        },
+        {
+          "code": "Autres Etablissements Relevant de la Loi Hospitalière",
+          "label": "Autres Etablissements Relevant de la Loi Hospitalière",
+          "count": 19
+        },
+        {
+          "code": "Laboratoires de Biologie Médicale",
+          "label": "Laboratoires de Biologie Médicale",
+          "count": 18
+        },
+        {
+          "code": "Autres structures d'exercice libéral",
+          "label": "Autres structures d'exercice libéral",
+          "count": 17
+        },
+        {
+          "code": "Services à Domicile ou Ambulatoires pour Handicapés",
+          "label": "Services à Domicile ou Ambulatoires pour Handicapés",
+          "count": 16
+        },
+        {
+          "code": "Logements en Structure Collective",
+          "label": "Logements en Structure Collective",
+          "count": 15
+        },
+        {
+          "code": "Services de Maintien à Domicile pour Handicapés",
+          "label": "Services de Maintien à Domicile pour Handicapés",
+          "count": 12
+        },
+        {
+          "code": "Etab. et Services d'Hébergement pour Adultes Handicapés",
+          "label": "Etab. et Services d'Hébergement pour Adultes Handicapés",
+          "count": 10
+        },
+        {
+          "code": "Autres Etablissements médico-sociaux",
+          "label": "Autres Etablissements médico-sociaux",
+          "count": 10
+        },
+        {
+          "code": "Etablissements de PMI et de Planification Familiale",
+          "label": "Etablissements de PMI et de Planification Familiale",
+          "count": 8
+        },
+        {
+          "code": "Centres Hospitaliers Régionaux",
+          "label": "Centres Hospitaliers Régionaux",
+          "count": 7
+        },
+        {
+          "code": "Dispensaires ou Centres de Soins",
+          "label": "Dispensaires ou Centres de Soins",
+          "count": 7
+        },
+        {
+          "code": "Etablissements de Formation des Personnels Sanitaires",
+          "label": "Etablissements de Formation des Personnels Sanitaires",
+          "count": 5
+        },
+        {
+          "code": "Etab.et Services de Travail Protégé pour Adultes Handicapés",
+          "label": "Etab.et Services de Travail Protégé pour Adultes Handicapés",
+          "count": 5
+        },
+        {
+          "code": "Services de Prévention et de Sante au Travail (SPST)",
+          "label": "Services de Prévention et de Sante au Travail (SPST)",
+          "count": 4
+        },
+        {
+          "code": "Etablissements de Soins de Courte Durée",
+          "label": "Etablissements de Soins de Courte Durée",
+          "count": 3
+        },
+        {
+          "code": "Autres Etablissements de Lutte contre les Maladies Mentales",
+          "label": "Autres Etablissements de Lutte contre les Maladies Mentales",
+          "count": 3
+        },
+        {
+          "code": "Etab.et Services de Réinsertion Prof pour Adultes Handicapés",
+          "label": "Etab.et Services de Réinsertion Prof pour Adultes Handicapés",
+          "count": 3
+        },
+        {
+          "code": "Etab.Educ.Spéciale pour Déficients Mentaux et Handicapés",
+          "label": "Etab.Educ.Spéciale pour Déficients Mentaux et Handicapés",
+          "count": 3
+        },
+        {
+          "code": "Etablissements de Formation des Personnels Sociaux",
+          "label": "Etablissements de Formation des Personnels Sociaux",
+          "count": 3
+        },
+        {
+          "code": "Etab.et Services du Ministère de la Justice pour Mineurs",
+          "label": "Etab.et Services du Ministère de la Justice pour Mineurs",
+          "count": 3
+        },
+        {
+          "code": "Centres de ressources",
+          "label": "Centres de ressources",
+          "count": 3
+        },
+        {
+          "code": "Centre de ressources transverse",
+          "label": "Centre de ressources transverse",
+          "count": 3
+        },
+        {
+          "code": "Etablissements de santé privé autorisés en SSR",
+          "label": "Etablissements de santé privé autorisés en SSR",
+          "count": 2
+        },
+        {
+          "code": "Etablissements de Formation Polyvalente",
+          "label": "Etablissements de Formation Polyvalente",
+          "count": 2
+        },
+        {
+          "code": "Etab.Education Spéciale pour Déficients Sensoriels",
+          "label": "Etab.Education Spéciale pour Déficients Sensoriels",
+          "count": 2
+        },
+        {
+          "code": "Etablissements de Soins de Longue Durée",
+          "label": "Etablissements de Soins de Longue Durée",
+          "count": 2
+        },
+        {
+          "code": "Transfusion Sanguine",
+          "label": "Transfusion Sanguine",
+          "count": 2
+        },
+        {
+          "code": "Etab.Educ Spéciale pour Enfants Trouble Conduite et Comport",
+          "label": "Etab.Educ Spéciale pour Enfants Trouble Conduite et Comport",
+          "count": 1
+        },
+        {
+          "code": "Centres de Lutte contre le Cancer",
+          "label": "Centres de Lutte contre le Cancer",
+          "count": 1
+        },
+        {
+          "code": "Protection des majeurs",
+          "label": "Protection des majeurs",
+          "count": 1
+        },
+        {
+          "code": "Dialyse Ambulatoire",
+          "label": "Dialyse Ambulatoire",
+          "count": 1
+        },
+        {
+          "code": "Services Concourant à la Protection de l'Enfance",
+          "label": "Services Concourant à la Protection de l'Enfance",
+          "count": 1
+        },
+        {
+          "code": "Centres prestataires de services pr personnes cérébro-lésées",
+          "label": "Centres prestataires de services pr personnes cérébro-lésées",
+          "count": 1
+        },
+        {
+          "code": "Traitements et Soins à Domicile",
+          "label": "Traitements et Soins à Domicile",
+          "count": 1
+        },
+        {
+          "code": "Services de Maintien à Domicile pour Personnes Âgées",
+          "label": "Services de Maintien à Domicile pour Personnes Âgées",
+          "count": 1
+        },
+        {
+          "code": "Etablissements Expérimentaux en Santé",
+          "label": "Etablissements Expérimentaux en Santé",
+          "count": 1
+        },
+        {
+          "code": "Services d'incendie et de secours",
+          "label": "Services d'incendie et de secours",
+          "count": 1
+        }
+      ],
+      "available": true,
+      "note": "Référentiel FINESS (établissements ouverts) — complète le dénombrement BPE sans mesurer l'accessibilité spatiale."
+    },
+    "risks": {
+      "radon": {
+        "potentialClass": "3",
+        "label": "Potentiel radon élevé"
+      },
+      "flood": {
+        "zones": [
+          "AZI PHEC 95 — Inondation"
+        ],
+        "count": 1
+      },
+      "catNatEvents": [
+        {
+          "label": "Inondations et/ou Coulées de Boue",
+          "startDate": "12/11/2000"
+        },
+        {
+          "label": "Inondations et/ou Coulées de Boue",
+          "startDate": "05/01/2001"
+        },
+        {
+          "label": "Inondations et/ou Coulées de Boue",
+          "startDate": "24/03/2001"
+        },
+        {
+          "label": "Inondations et/ou Coulées de Boue",
+          "startDate": "13/08/2020"
+        },
+        {
+          "label": "Inondations et/ou Coulées de Boue",
+          "startDate": "23/01/2025"
+        }
+      ],
+      "available": true,
+      "note": "Radon, atlas des zones inondables (AZI) et CATNAT via l'API Géorisques."
+    },
+    "security": {
+      "year": 2024,
+      "indicators": [
+        {
+          "id": "burglaries",
+          "label": "Cambriolages de logement",
+          "count": 528,
+          "ratePer1000": 3.8911082,
+          "departmentRatePer1000": 5.5779707,
+          "diffused": true
+        },
+        {
+          "id": "violent_theft",
+          "label": "Vols violents sans arme",
+          "count": 419,
+          "ratePer1000": 1.814717,
+          "departmentRatePer1000": 0.4979182,
+          "diffused": true
+        },
+        {
+          "id": "physical_violence",
+          "label": "Violences physiques hors cadre familial",
+          "count": 926,
+          "ratePer1000": 4.0105678,
+          "departmentRatePer1000": 2.2022619,
+          "diffused": true
+        },
+        {
+          "id": "vandalism",
+          "label": "Destructions et dégradations volontaires",
+          "count": 2329,
+          "ratePer1000": 10.0870544,
+          "departmentRatePer1000": 6.6888796,
+          "diffused": true
+        },
+        {
+          "id": "fraud",
+          "label": "Escroqueries et fraudes aux moyens de paiement",
+          "count": 1524,
+          "ratePer1000": 6.6005457,
+          "departmentRatePer1000": 5.5636559,
+          "diffused": true
+        },
+        {
+          "id": "vehicle_theft",
+          "label": "Vols de véhicule",
+          "count": 603,
+          "ratePer1000": 2.6116332,
+          "departmentRatePer1000": 1.7534216,
+          "diffused": true
+        }
+      ],
+      "diffusedIndicatorCount": 6,
+      "available": true,
+      "note": "Faits enregistrés par la police et la gendarmerie (lieu de commission, SSMSI). Ne mesure pas le ressenti d'insécurité ni les faits non déclarés. Taux pour 1 000 habitants lorsque diffusé ; une seule année — pas de tendance interannuelle."
+    },
+    "housing": {
+      "year": 2021,
+      "totalUnits": 29510,
+      "occupiedUnits": 23488,
+      "vacantUnits": 688,
+      "totalDwellings": 135694,
+      "rpVacantDwellings": 9011,
+      "rpVacancyRatePercent": 6.6,
+      "socialHousingSharePercent": 21.7,
+      "vacancyRatePercent": 2.3,
+      "available": true,
+      "note": "Parc locatif social (RPLS 2021) et vacance générale du parc (RP logement 2022) — périmètres distincts."
+    },
+    "mobility": {
+      "irve": {
+        "year": 2026,
+        "chargingPoints": 9820,
+        "stations": 44,
+        "available": true,
+        "note": "Fichier consolidé national IRVE — points de charge recensés par commune."
+      },
+      "commute": {
+        "year": 2022,
+        "employedCount": 46555,
+        "carSharePercent": 36.6,
+        "publicTransportSharePercent": 32.3,
+        "available": true,
+        "note": "Recensement 2022 — part des actifs occupés de 15 ans ou plus selon le mode de transport principal domicile-travail."
+      },
+      "connectivity": {
+        "vintage": "2026-03-31",
+        "fiberEligibleSharePercent": 96.5,
+        "totalPremises": 161187,
+        "fiberEligiblePremises": 155612,
+        "technologies": [
+          "Fibre (FTTH)",
+          "Câble (coaxial)",
+          "4G fixe",
+          "Satellite"
+        ],
+        "available": true,
+        "note": "ARCEP — part estimée de locaux raccordables fibre (agrégat IPE opérateurs vs stock locaux). Ne mesure pas la mobilité physique."
+      }
+    },
+    "urbanPolicy": {
+      "year": 2025,
+      "hasQpv": true,
+      "qpvCount": 5,
+      "qpvLabels": [
+        "Villejean",
+        "Bréquigny - Champs-Manceaux - Les Clôteaux",
+        "Maurepas",
+        "Le Blosne",
+        "Cleunay"
+      ],
+      "available": true,
+      "note": "Quartiers prioritaires de la politique de la ville (QPV 2024, table INSEE TAG 2025)."
+    },
+    "fiscal": {
+      "year": 2024,
+      "propertyTaxBuiltRate": 39.33,
+      "propertyTaxUnbuiltRate": 0,
+      "habitationTaxRate": null,
+      "available": true,
+      "note": "Taux d'imposition communaux issus du fichier REI (impôts locaux, DGFiP)."
+    },
+    "publicAccounts": {
+      "year": 2024,
+      "operatingRevenueEur": 350523750.37,
+      "operatingRevenuePerCapitaEur": 1529.4825435687544,
+      "debtOutstandingEur": 282053660.48,
+      "debtPerCapitaEur": 1230.7187447311696,
+      "available": true,
+      "note": "Encours de dette et recettes de fonctionnement (budget principal), source OFGL — dernier exercice disponible."
+    },
+    "proximityServices": {
+      "year": 2025,
+      "franceServicesCount": 1,
+      "structureLabels": [
+        "France services Pimms Médiation Rennes"
+      ],
+      "available": true,
+      "note": "Structures labellisées France Services recensées sur la commune."
+    },
+    "tourism": {
+      "year": 2025,
+      "accommodationPlaces": 3819,
+      "available": true,
+      "note": "Capacités d'hébergement touristique (hôtels, campings, etc.) — INSEE, toutes catégories confondues. Pas de données de fréquentation : potentiel à approfondir, pas de conclusion sur sous-exploitation."
+    },
+    "geography": {
+      "attractionArea": {
+        "code": "013",
+        "label": "Rennes",
+        "categoryCode": "11",
+        "categoryLabel": "Pôles AAV < 50 000 hab.",
+        "available": true,
+        "note": "Aire d'attraction des villes 2020 (AAV2020)."
+      },
+      "epciComparison": {
+        "epciName": "Rennes Métropole",
+        "communeCount": 43,
+        "communeRankByPopulation": 1,
+        "communeRankByDensity": 1,
+        "epciAveragePopulation": 11167,
+        "epciAverageDensity": 519,
+        "available": true,
+        "note": "Comparatif calculé à partir des communes de l'EPCI (API Géo) — rangs par population et densité."
+      }
+    },
+    "property": {
+      "year": 2024,
+      "averagePricePerM2": 3831,
+      "averageTransactionPrice": 239906,
+      "mutationCount": 2951,
+      "houseMutations": 398,
+      "apartmentMutations": 2553,
+      "houseSharePercent": 87,
+      "apartmentSharePercent": 13,
+      "priceHistory": [
+        {
+          "year": 2014,
+          "averagePricePerM2": 2574.23847316704,
+          "mutationCount": 2646
+        },
+        {
+          "year": 2015,
+          "averagePricePerM2": 2624.80214578731,
+          "mutationCount": 3169
+        },
+        {
+          "year": 2016,
+          "averagePricePerM2": 2655.3941089838,
+          "mutationCount": 3395
+        },
+        {
+          "year": 2017,
+          "averagePricePerM2": 2792.61040189125,
+          "mutationCount": 2115
+        },
+        {
+          "year": 2018,
+          "averagePricePerM2": 2956.63506431634,
+          "mutationCount": 2099
+        },
+        {
+          "year": 2019,
+          "averagePricePerM2": 3136.69026999491,
+          "mutationCount": 3926
+        },
+        {
+          "year": 2020,
+          "averagePricePerM2": 3557.14146341463,
+          "mutationCount": 3485
+        },
+        {
+          "year": 2021,
+          "averagePricePerM2": 3908.42394330549,
+          "mutationCount": 3951
+        },
+        {
+          "year": 2022,
+          "averagePricePerM2": 4118.93901209677,
+          "mutationCount": 3968
+        },
+        {
+          "year": 2023,
+          "averagePricePerM2": 4061.46385542169,
+          "mutationCount": 3154
+        },
+        {
+          "year": 2024,
+          "averagePricePerM2": 3831,
+          "mutationCount": 2951
+        }
+      ],
+      "departmentCode": "35",
+      "departmentAveragePricePerM2": 3013,
+      "available": true,
+      "note": "Prix DVF : moyennes agrégées sur les mutations enregistrées (série 2014-2024). Pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus ; comparatif départemental indicatif."
+    },
+    "derived": {
+      "populationGrowthPercent": 10,
+      "populationGrowthFromYear": 2010,
+      "populationGrowthToYear": 2022,
+      "irvePointsPer1000Residents": 42.5,
+      "socialHousingVacancyRatePercent": 2.3,
+      "equipmentsPer1000Residents": 32.8,
+      "available": true,
+      "note": "Indicateurs dérivés calculés à partir des données disponibles (population, IRVE, RPLS, BPE)."
+    },
+    "territoryTypology": {
+      "densityGrid": {
+        "levelCode": "1",
+        "levelLabel": "Grand centre urbain",
+        "simplifiedLabel": "commune très dense",
+        "source": "INSEE",
+        "vintage": 2024,
+        "available": true,
+        "note": "Grille communale de densité à 7 niveaux (INSEE, millésime 2024)."
+      },
+      "attractionArea": {
+        "areaCode": "013",
+        "areaLabel": "Rennes",
+        "categoryCode": "11",
+        "categoryLabel": "Pôles AAV < 50 000 hab.",
+        "role": "pole",
+        "source": "INSEE",
+        "vintage": 2020,
+        "available": true,
+        "note": "Aire d'attraction des villes 2020 (AAV2020)."
+      },
+      "urbanUnit": {
+        "unitCode": "35701",
+        "unitLabel": "Rennes",
+        "belongsToUrbanUnit": true,
+        "role": "ville_centre",
+        "sizeClass": "7",
+        "source": "INSEE",
+        "vintage": 2020,
+        "available": true,
+        "note": "Composition communale des unités urbaines 2020 (INSEE)."
+      },
+      "publicPolicyTypologies": {
+        "source": "ANCT",
+        "available": false,
+        "note": "Dispositifs publics nationaux absents. Exécutez « npm run ingest:typology »."
+      },
+      "summaryLabel": "commune dense de grande agglomération",
+      "comparisonProfile": "metropole",
+      "availableFamilies": [
+        "density_grid",
+        "attraction_area",
+        "urban_unit"
+      ],
+      "missingFamilies": [
+        "public_policy"
+      ]
+    },
+    "sources": [
+      {
+        "id": "insee-population-history",
+        "name": "INSEE — Populations historiques",
+        "url": "https://api.insee.fr/melodi/file/DS_POPULATIONS_HISTORIQUES/DS_POPULATIONS_HISTORIQUES_CSV_FR",
+        "description": "Séries historiques de population municipale par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-rp-population",
+        "name": "INSEE — Recensement 2022 (structure par âge)",
+        "url": "https://www.insee.fr/fr/statistiques/8581696",
+        "description": "Structure par tranches d'âge de la population communale (RP 2022).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-rp-employment",
+        "name": "INSEE — Recensement 2022 (emploi)",
+        "url": "https://www.insee.fr/fr/statistiques/8581444",
+        "description": "Population active et chômage au recensement 2022.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-filosofi",
+        "name": "INSEE — FILOSOFI 2023 (revenus)",
+        "url": "https://www.insee.fr/fr/statistiques/8984752",
+        "description": "Niveau de vie médian des ménages (Filosofi 2, millésime 2023). Non comparable aux millésimes 2012-2021.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "recherche-entreprises",
+        "name": "API Recherche Entreprises (SIRENE)",
+        "url": "https://recherche-entreprises.api.gouv.fr",
+        "description": "Entreprises et établissements recensés via la base SIRENE (data.gouv.fr).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-side",
+        "name": "INSEE — SIDE (stocks d'entreprises)",
+        "url": "https://www.insee.fr/fr/statistiques/2011101",
+        "description": "Stocks d'unités légales et d'étabissements actifs par commune (SIDE).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-flores",
+        "name": "INSEE — FLORES (emploi salarié A17)",
+        "url": "https://www.data.gouv.fr/datasets/nombre-detablissements-et-effectifs-salaries-en-17-grands-secteurs/",
+        "description": "Établissements actifs et postes salariés fin d'année par secteur A17 (commune).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-bpe",
+        "name": "INSEE — Base permanente des équipements (BPE 2024)",
+        "url": "https://www.data.gouv.fr/datasets/denombrement-des-equipements-commerce-sport-services-sante/",
+        "description": "Dénombrement des équipements et services accessibles à la population par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "education-directory",
+        "name": "Annuaire de l'Éducation",
+        "url": "https://www.data.gouv.fr/datasets/annuaire-de-leducation/",
+        "description": "Établissements scolaires ouverts par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "finess",
+        "name": "FINESS — Établissements sanitaires et sociaux",
+        "url": "https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess/",
+        "description": "Référentiel national des établissements sanitaires, sociaux et médico-sociaux.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "georisques",
+        "name": "Géorisques",
+        "url": "https://georisques.gouv.fr/",
+        "description": "Radon, inondations (AZI) et reconnaissances CATNAT par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "ssmsi",
+        "name": "SSMSI — Délinquance enregistrée",
+        "url": "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales",
+        "description": "Principaux indicateurs de crimes et délits enregistrés par la police et la gendarmerie (lieu de commission).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "rpls",
+        "name": "RPLS — Parc locatif social",
+        "url": "https://www.data.gouv.fr/datasets/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/",
+        "description": "Répertoire des logements locatifs des bailleurs sociaux agrégé par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-rp-housing",
+        "name": "INSEE — RP 2022 logement",
+        "url": "https://www.insee.fr/fr/statistiques/8581474",
+        "description": "Parc de logements et vacance générale au recensement 2022.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "irve",
+        "name": "IRVE — Bornes de recharge",
+        "url": "https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/",
+        "description": "Fichier consolidé national des bornes de recharge pour véhicules électriques.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-rp-commute",
+        "name": "INSEE — RP 2022 mobilité domicile-travail",
+        "url": "https://www.insee.fr/fr/statistiques/8581610",
+        "description": "Modes de transport principal des actifs occupés de 15 ans ou plus (recensement 2022).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "arcep-fibre",
+        "name": "ARCEP — Ma connexion internet",
+        "url": "https://www.data.gouv.fr/datasets/ma-connexion-internet/",
+        "description": "Couverture fibre et technologies d'accès internet fixe par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "qpv-sig-ville",
+        "name": "INSEE / SIG Ville — QPV 2024",
+        "url": "https://www.insee.fr/fr/statistiques/fichier/8186239/TAG_QPV2024_2025_csv.zip",
+        "description": "Quartiers prioritaires de la politique de la ville (table d'appartenance géographique 2025).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "rei",
+        "name": "REI — Fiscalité locale",
+        "url": "https://www.data.gouv.fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-4/",
+        "description": "Recensement des éléments d'imposition à la fiscalité directe locale (taux communaux).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "ofgl",
+        "name": "OFGL — Comptes des collectivités",
+        "url": "https://data.ofgl.fr/",
+        "description": "Encours de dette et recettes de fonctionnement des communes (budget principal).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "france-services",
+        "name": "France Services — Structures labellisées",
+        "url": "https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services/",
+        "description": "Points d'accueil France Services labellisés par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-tourism",
+        "name": "INSEE — Capacités touristiques",
+        "url": "https://www.insee.fr/fr/statistiques/fichier/2021703/DS_TOUR_CAP_CSV_2025_geo25.zip",
+        "description": "Places d'hébergement touristique par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "aav2020",
+        "name": "INSEE — Aires d'attraction 2020",
+        "url": "https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/",
+        "description": "Zonage en aires d'attraction des villes (AAV2020) par commune.",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-density-grid",
+        "name": "INSEE — Grille communale de densité (7 niveaux)",
+        "url": "https://www.insee.fr/fr/information/6439600",
+        "description": "Typologie communale de densité à 7 niveaux (millésime 2024, géographie au 1er janvier 2024).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "insee-urban-unit",
+        "name": "INSEE — Unités urbaines 2020",
+        "url": "https://www.insee.fr/fr/information/4802589",
+        "description": "Composition communale des unités urbaines 2020 (UU2020).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      },
+      {
+        "id": "dvf",
+        "name": "DVF — Indicateurs immobiliers",
+        "url": "https://www.data.gouv.fr/datasets/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/",
+        "description": "Prix et volumes de mutations immobilières agrégés par commune (hors Alsace-Moselle et Mayotte).",
+        "accessedAt": "2026-06-19T09:21:36.437Z"
+      }
+    ]
+  }
+}
