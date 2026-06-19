@@ -109,6 +109,13 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
     return -20;
   }
 
+  if (fact.theme === "ess_rge") {
+    const rgeCount = territory.enrichment?.enterprises?.rgeCount ?? 0;
+    if (rgeCount > 0 && rgeCount < 10) {
+      return -30;
+    }
+  }
+
   if (fact.theme === "connectivity" && connectivity?.fiberEligibleSharePercent != null) {
     const territoryContext = buildTerritoryContext(territory);
     if (

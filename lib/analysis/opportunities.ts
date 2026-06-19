@@ -128,27 +128,36 @@ function isTourismEligible(
     return false;
   }
 
-  if (territoryContext.requiresPerCapitaCaution === true) {
-    return (
-      hasTourismStrength ||
-      countTourismContextSignals(territory, hasTourismStrength) >= 2
-    );
-  }
-
-  const places = territory.enrichment?.tourism?.accommodationPlaces ?? 0;
-  if (places >= TOURISM_MIN_ACCOMMODATION_PLACES) {
-    return true;
-  }
-
-  return countTourismContextSignals(territory, hasTourismStrength) >= 2;
+  return (
+    hasTourismStrength ||
+    countTourismContextSignals(territory, hasTourismStrength) >= 2
+  );
 }
 
-function isEssRgeEligible(territory: TerritoryProfile): boolean {
+function isEssRgeEligible(
+  territory: TerritoryProfile,
+  watchThemes: Set<AnalysisFactTheme>,
+  relatedWatchPointThemes: AnalysisFactTheme[],
+): boolean {
   const enterprises = territory.enrichment?.enterprises;
   const essCount = enterprises?.essCount ?? 0;
   const rgeCount = enterprises?.rgeCount ?? 0;
 
-  return essCount >= ESS_MIN_SIGNIFICANT_COUNT || rgeCount >= RGE_MIN_SIGNIFICANT_COUNT;
+  const linkedIssue =
+    relatedWatchPointThemes.length > 0 ||
+    watchThemes.has("employment") ||
+    watchThemes.has("housing") ||
+    watchThemes.has("energy");
+
+  if (!linkedIssue) {
+    return false;
+  }
+
+  if (rgeCount >= RGE_MIN_SIGNIFICANT_COUNT) {
+    return true;
+  }
+
+  return essCount >= ESS_MIN_SIGNIFICANT_COUNT;
 }
 
 function isFiberEligible(
@@ -275,7 +284,7 @@ function isCandidateEligible(
       }
       break;
     case "ess_rge":
-      themeEligible = isEssRgeEligible(territory);
+      themeEligible = isEssRgeEligible(territory, watchThemes, relatedWatchPointThemes);
       break;
     case "connectivity":
       themeEligible = isFiberEligible(territory, context.selectedStrengths);

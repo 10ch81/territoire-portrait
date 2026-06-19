@@ -130,7 +130,7 @@ describe("progressive-qualification", () => {
   });
 
   describe("applyProgressiveCaution", () => {
-    it("ajoute une limitation pour denominatorRisk tourist_population", () => {
+    it("ne modifie pas la phrase source", () => {
       const fact: AnalysisFact = {
         id: "tourism-1",
         theme: "tourism",
@@ -156,9 +156,8 @@ describe("progressive-qualification", () => {
       };
 
       const cautioned = applyProgressiveCaution(fact, qualified);
-      assert.ok(cautioned.limitations?.some((item) => item.includes("Interprétation prudente")));
-      assert.ok(cautioned.limitations?.some((item) => item.includes("fréquentation touristique")));
-      assert.match(renderFactSentenceForOutput(cautioned), /Interprétation prudente/);
+      assert.equal(cautioned.sentence, fact.sentence);
+      assert.equal(renderFactSentenceForOutput(cautioned), fact.sentence);
     });
   });
 
@@ -177,32 +176,15 @@ describe("progressive-qualification", () => {
       assert.equal(ageingWatch.length, 0);
     });
 
-    it("Chamonix — prudence sur faits sélectionnés à denominatorRisk", () => {
-      const { selectedFacts } = buildFinalTerritorialAnalysis(chamonixProfile);
-      const context = buildTerritoryContext(chamonixProfile);
-
-      if (context.requiresPerCapitaCaution) {
-        const qualified = qualifyAnalysisFacts(selectedFacts, { territory: chamonixProfile });
-        const withRisk = qualified.filter(
-          (f) => f.denominatorRisk !== "none" || f.requiresCaution,
-        );
-
-        for (const q of withRisk) {
-          const selected = selectedFacts.find((f) => f.id === q.id);
-          if (!selected) continue;
-          if (q.denominatorRisk === "tourist_population" || q.requiresCaution) {
-            const hasCaution =
-              renderFactSentenceForOutput(selected).includes("Interprétation prudente") ||
-              (selected.limitations ?? []).some((item) =>
-                item.includes("Interprétation prudente"),
-              );
-            assert.ok(
-              hasCaution,
-              `Attendu prudence sur ${q.theme} (${q.id})`,
-            );
-          }
-        }
-      }
+    it("Chamonix — pas de suffixe mécanique de prudence en sortie", () => {
+      const { analysis } = buildFinalTerritorialAnalysis(chamonixProfile);
+      const outputTexts = [
+        analysis.summary,
+        ...analysis.strengths,
+        ...analysis.watchPoints,
+        ...analysis.opportunities,
+      ].join("\n");
+      assert.doesNotMatch(outputTexts, / — Interprétation prudente/i);
     });
 
     it("Chamonix — opportunités sélectionnées sous le seuil de généricité", () => {

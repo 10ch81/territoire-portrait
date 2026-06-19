@@ -58,11 +58,17 @@ const PROGRESSIVE_THEMES: AnalysisFactTheme[] = [
   "education",
 ];
 
+function sentenceUsesResidentDenominator(sentence: string): boolean {
+  return /par habitant|pour\s+(?:1[\s\u00a0]000|100)\s+habitants?|\/\s*hab|pour 100 habitants/i.test(
+    sentence,
+  );
+}
+
 function defaultProgressiveQualification(
   fact: AnalysisFact,
   territoryContext: TerritoryContext,
 ): FactProgressiveQualification {
-  const denominatorRisk = resolveDenominatorRisk(fact.theme, territoryContext);
+  const denominatorRisk = resolveDenominatorRisk(fact, territoryContext);
   const hasEvidence =
     fact.evidence.length > 0 || (fact.numericBindings?.length ?? 0) > 0;
 
@@ -78,21 +84,34 @@ function defaultProgressiveQualification(
 }
 
 function resolveDenominatorRisk(
-  theme: AnalysisFactTheme,
+  fact: AnalysisFact,
   territoryContext: TerritoryContext,
 ): FactDenominatorRisk {
-  if (territoryContext.requiresPerCapitaCaution === true) {
+  const perCapitaSentence = sentenceUsesResidentDenominator(fact.sentence);
+
+  if (territoryContext.requiresPerCapitaCaution === true && perCapitaSentence) {
     if (
-      theme === "tourism" ||
-      theme === "employment_sectors" ||
-      theme === "equipments"
+      fact.theme === "tourism" ||
+      fact.theme === "employment_sectors" ||
+      fact.theme === "equipments" ||
+      fact.theme === "finances" ||
+      fact.theme === "connectivity" ||
+      fact.theme === "employment"
     ) {
       return "tourist_population";
     }
   }
 
-  if (territoryContext.isSmallPopulation === true) {
-    return "small_population";
+  if (territoryContext.isSmallPopulation === true && perCapitaSentence) {
+    if (
+      fact.theme === "finances" ||
+      fact.theme === "employment" ||
+      fact.theme === "income" ||
+      fact.theme === "equipments" ||
+      fact.theme === "employment_sectors"
+    ) {
+      return "small_population";
+    }
   }
 
   return "none";
@@ -182,7 +201,7 @@ function qualifyFinancesProgressive(
       benchmarkStatus: "not_required",
       genericityScore: 0,
       actionabilityScore: 30,
-      denominatorRisk: resolveDenominatorRisk("finances", territoryContext),
+      denominatorRisk: resolveDenominatorRisk(fact, territoryContext),
       requiresCaution: false,
     };
   }
@@ -200,8 +219,8 @@ function qualifyFinancesProgressive(
     benchmarkStatus: hasRevenue ? "available" : "missing",
     genericityScore: hasRevenue ? 5 : 15,
     actionabilityScore: 35,
-    denominatorRisk: resolveDenominatorRisk("finances", territoryContext),
-    requiresCaution: !hasRevenue,
+    denominatorRisk: resolveDenominatorRisk(fact, territoryContext),
+    requiresCaution: !hasRevenue && sentenceUsesResidentDenominator(fact.sentence),
   };
 }
 
@@ -265,7 +284,7 @@ function qualifyOpportunityProgressive(
 ): FactProgressiveQualification {
   const genericityScore = computeOpportunityGenericityScore(fact, territory);
   const quality = computeOpportunityQuality(fact, { territory });
-  const denominatorRisk = resolveDenominatorRisk(fact.theme, territoryContext);
+  const denominatorRisk = resolveDenominatorRisk(fact, territoryContext);
 
   let evidenceLevel: FactEvidenceLevel = "contextual";
   if (fact.evidence.length >= 2 && hasOpportunityTraceability(fact)) {
@@ -281,9 +300,7 @@ function qualifyOpportunityProgressive(
     genericityScore,
     actionabilityScore: Math.max(0, 100 - genericityScore),
     denominatorRisk,
-    requiresCaution:
-      denominatorRisk !== "none" ||
-      territoryContext.requiresPerCapitaCaution === true,
+    requiresCaution: denominatorRisk !== "none",
   };
 }
 
@@ -356,52 +373,14 @@ export function isProgressiveOpportunityEligible(
 
 export function applyProgressiveCaution(
   fact: AnalysisFact,
-  qualified: QualifiedAnalysisFact | undefined,
+  _qualified: QualifiedAnalysisFact | undefined,
 ): AnalysisFact {
-  if (!qualified?.requiresCaution && qualified?.denominatorRisk === "none") {
-    return fact;
-  }
-
-  const cautionByRisk: Record<FactDenominatorRisk, string | null> = {
-    none: qualified?.requiresCaution
-      ? "Interprétation prudente : signal à contextualiser."
-      : null,
-    tourist_population:
-      "Interprétation prudente : ratios par habitant sensibles (population résidente, fréquentation touristique absente).",
-    small_population:
-      "Interprétation prudente : commune de petite taille, volumes par habitant sensibles.",
-    other: "Interprétation prudente : signal à contextualiser.",
-  };
-
-  const caution =
-    cautionByRisk[qualified?.denominatorRisk ?? "none"] ??
-    cautionByRisk.other;
-
-  if (!caution) {
-    return fact;
-  }
-
-  const limitations = fact.limitations ?? [];
-  if (limitations.some((item) => item.includes("Interprétation prudente"))) {
-    return fact;
-  }
-
-  return {
-    ...fact,
-    limitations: [...limitations, caution],
-  };
+  return fact;
 }
 
-/** Matérialise la prudence progressive dans la phrase affichée (listes verbatim). */
+/** Phrase affichée dans les listes verbatim — sans suffixe mécanique de prudence. */
 export function renderFactSentenceForOutput(fact: AnalysisFact): string {
-  const prudence = fact.limitations?.find((item) =>
-    item.includes("Interprétation prudente"),
-  );
-  if (!prudence || fact.sentence.includes("Interprétation prudente")) {
-    return fact.sentence;
-  }
-
-  return `${fact.sentence.replace(/\.\s*$/, "")} — ${prudence}.`;
+  return fact.sentence;
 }
 
 export function indexQualifiedFacts(

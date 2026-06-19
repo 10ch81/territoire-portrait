@@ -58,7 +58,21 @@ export const rennesLikeProfile: TerritoryProfile = {
       note: "",
     },
     mobility: {
-      ...urbanDenseBase.enrichment!.mobility!,
+      irve: {
+        year: 2024,
+        chargingPoints: 48,
+        stations: 16,
+        available: true,
+        note: "",
+      },
+      commute: {
+        year: 2022,
+        employedCount: 95_000,
+        carSharePercent: 52.4,
+        publicTransportSharePercent: 22.1,
+        available: true,
+        note: "",
+      },
       connectivity: {
         vintage: "2025_T4",
         fiberEligibleSharePercent: 98.2,
@@ -68,6 +82,12 @@ export const rennesLikeProfile: TerritoryProfile = {
         available: true,
         note: "",
       },
+    },
+    tourism: {
+      year: 2025,
+      accommodationPlaces: 3_819,
+      available: true,
+      note: "",
     },
     security: {
       year: 2024,

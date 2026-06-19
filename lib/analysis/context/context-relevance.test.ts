@@ -100,7 +100,7 @@ describe("context-relevance — communes de référence", () => {
       );
     });
 
-    it("expose la prudence progressive dans la sortie finale", () => {
+    it("Chamonix — prudence ciblée sans suffixe mécanique", () => {
       const { analysis } = buildFinalTerritorialAnalysis(chamonixProfile);
       const outputTexts = [
         analysis.summary,
@@ -108,11 +108,7 @@ describe("context-relevance — communes de référence", () => {
         ...analysis.watchPoints,
         ...analysis.opportunities,
       ].join("\n");
-
-      assert.match(
-        outputTexts,
-        /Interprétation prudente|population résidente|fréquentation touristique/i,
-      );
+      assert.doesNotMatch(outputTexts, / — Interprétation prudente/i);
     });
 
     it("summary ne se limite pas à petite centralité rurale", () => {

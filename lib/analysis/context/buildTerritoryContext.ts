@@ -2,6 +2,7 @@ import { computePopulationGrowthFromHistory } from "../../demographic-indicators
 import type { TerritoryProfile } from "../../types";
 import { aavRoleFromCategoryCode } from "../../typology/labels";
 import { resolveComparisonProfile } from "../../typology/thresholds";
+import { resolveStrictTouristCommune } from "./tourism-classification";
 
 /** Flag déductible ; `null` si les données nécessaires sont absentes. */
 export type TerritoryContextFlag = boolean | null;
@@ -26,13 +27,10 @@ export type TerritoryContext = {
 
 export const STRONG_POPULATION_GROWTH_THRESHOLD_PERCENT = 10;
 export const HIGH_TOURISM_CAPACITY_PER_RESIDENT_RATIO = 0.4;
-export const TOURIST_COMMUNE_MIN_ACCOMMODATION_PLACES = 200;
 export const DENSE_URBAN_DENSITY_THRESHOLD_PER_KM2 = 500;
 export const HIGH_EMPLOYMENT_BASE_POSTS_PER_RESIDENT = 0.35;
 export const HIGH_REAL_ESTATE_PREMIUM_RATIO = 1.15;
 export const EPCI_CENTRALITY_MAX_RANK = 3;
-export const PER_CAPITA_CAUTION_TOURISM_RATIO = 0.15;
-export const PER_CAPITA_CAUTION_MIN_ACCOMMODATION_PLACES = 500;
 export const CONTEXT_SMALL_POPULATION_THRESHOLD = 5_000;
 export const LARGE_CITY_POPULATION_THRESHOLD = 50_000;
 export const SECURITY_MIN_DIFFUSED_INDICATORS = 6;
@@ -122,6 +120,12 @@ function resolveHasTourismEmploymentProfile(
   }
 
   const share = hospitality.salariedPosts / sectors.totalSalariedPosts;
+  const population = territory.population ?? 0;
+
+  if (population >= LARGE_CITY_POPULATION_THRESHOLD) {
+    return share >= HOSPITALITY_EMPLOYMENT_SHARE_THRESHOLD;
+  }
+
   return (
     share >= HOSPITALITY_EMPLOYMENT_SHARE_THRESHOLD ||
     hospitality.salariedPosts >= HOSPITALITY_EMPLOYMENT_MIN_POSTS
@@ -129,33 +133,7 @@ function resolveHasTourismEmploymentProfile(
 }
 
 function resolveIsTouristCommune(territory: TerritoryProfile): TerritoryContextFlag {
-  const highCapacity = resolveHasHighTourismCapacityPerResident(territory);
-  const employmentProfile = resolveHasTourismEmploymentProfile(territory);
-
-  if (highCapacity === true || employmentProfile === true) {
-    return true;
-  }
-
-  const tourism = territory.enrichment?.tourism;
-  if (!tourism?.available) {
-    return highCapacity === false && employmentProfile === false ? false : null;
-  }
-
-  const places = tourism.accommodationPlaces ?? 0;
-  if (places <= 0) {
-    return employmentProfile === false ? false : null;
-  }
-
-  if (places >= TOURIST_COMMUNE_MIN_ACCOMMODATION_PLACES) {
-    return true;
-  }
-
-  const ratio = tourismAccommodationRatio(territory);
-  if (ratio == null) {
-    return null;
-  }
-
-  return ratio >= PER_CAPITA_CAUTION_TOURISM_RATIO;
+  return resolveStrictTouristCommune(territory);
 }
 
 function resolveIsMountainOrNaturalRiskProfile(
@@ -221,38 +199,15 @@ function resolveHasHighEmploymentBase(territory: TerritoryProfile): TerritoryCon
 }
 
 function resolveRequiresPerCapitaCaution(
-  territory: TerritoryProfile,
+  _territory: TerritoryProfile,
   isTouristCommune: TerritoryContextFlag,
   hasHighTourismCapacityPerResident: TerritoryContextFlag,
 ): TerritoryContextFlag {
-  if (isTouristCommune === true || hasHighTourismCapacityPerResident === true) {
+  if (hasHighTourismCapacityPerResident === true || isTouristCommune === true) {
     return true;
   }
 
   if (hasHighTourismCapacityPerResident === false && isTouristCommune === false) {
-    return false;
-  }
-
-  const tourism = territory.enrichment?.tourism;
-  if (!tourism?.available) {
-    return isTouristCommune;
-  }
-
-  const places = tourism.accommodationPlaces ?? 0;
-  const ratio = tourismAccommodationRatio(territory);
-
-  if (ratio == null) {
-    return null;
-  }
-
-  if (
-    places >= PER_CAPITA_CAUTION_MIN_ACCOMMODATION_PLACES &&
-    ratio >= PER_CAPITA_CAUTION_TOURISM_RATIO
-  ) {
-    return true;
-  }
-
-  if (ratio < PER_CAPITA_CAUTION_TOURISM_RATIO) {
     return false;
   }
 

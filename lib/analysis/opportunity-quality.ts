@@ -5,8 +5,8 @@ import type { AnalysisFact, AnalysisFactTheme } from "./types";
 /** Volume ESS considéré comme significatif pour mobilisation. */
 export const ESS_MIN_SIGNIFICANT_COUNT = 40;
 
-/** Volume RGE considéré comme significatif pour mobilisation. */
-export const RGE_MIN_SIGNIFICANT_COUNT = 15;
+/** Seuil minimal RGE pour mobilisation comme levier prioritaire. */
+export const RGE_MIN_SIGNIFICANT_COUNT = 10;
 
 export type OpportunityQualityContext = {
   territory: TerritoryProfile;

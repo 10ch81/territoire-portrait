@@ -18,14 +18,14 @@ describe("buildTerritoryContext — Palaiseau (91477)", () => {
     assert.equal(context.hasPopulationDecline, false);
   });
 
-  it("tourisme présent mais sans ratio élevé par habitant", () => {
-    assert.equal(context.isTouristCommune, true);
+  it("n'est pas classée touristique (ratio faible)", () => {
+    assert.equal(context.isTouristCommune, false);
 
     const ratio = tourismAccommodationRatio(palaiseauProfile);
     assert.ok(ratio !== null && ratio < HIGH_TOURISM_CAPACITY_PER_RESIDENT_RATIO);
 
     assert.equal(context.hasHighTourismCapacityPerResident, false);
-    assert.equal(context.requiresPerCapitaCaution, true);
+    assert.equal(context.requiresPerCapitaCaution, false);
   });
 
   it("pression immobilière et base emploi élevées", () => {

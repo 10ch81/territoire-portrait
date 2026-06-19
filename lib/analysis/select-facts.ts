@@ -177,6 +177,17 @@ function canAddToTarget(
   }
 
   if (
+    target === "strengths" &&
+    candidate.theme === "ess_rge" &&
+    context?.territory
+  ) {
+    const rgeCount = context.territory.enrichment?.enterprises?.rgeCount ?? 0;
+    if (rgeCount < 10) {
+      return false;
+    }
+  }
+
+  if (
     context?.territory &&
     (target === "strengths" || target === "opportunities")
   ) {

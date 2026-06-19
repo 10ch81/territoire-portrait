@@ -95,8 +95,8 @@ export function resolveSecurityWatchPointFormulation(
 const SSMSI_PRUDENCE = (year: number) =>
   `, à interpréter avec prudence (SSMSI ${year}).`;
 
-const SSMSI_SMALL_NUMBERS_PRUDENCE =
-  ", compte tenu du faible volume de faits ou de la diffusion partielle des indicateurs";
+const SSMSI_SMALL_NUMBERS_PRUDENCE = (year: number) =>
+  ` ; compte tenu du faible volume de faits et de la diffusion partielle des indicateurs, ce signal doit être interprété avec prudence (SSMSI ${year}).`;
 
 export function buildSecurityWatchPointSentence(
   security: SecuritySnapshot,
@@ -105,8 +105,9 @@ export function buildSecurityWatchPointSentence(
 ): string | null {
   const { formulation, aboveReference } = resolveSecurityWatchPointFormulation(assessments);
   const prudence =
-    SSMSI_PRUDENCE(security.year) +
-    (options?.securitySmallNumbersRisk === true ? SSMSI_SMALL_NUMBERS_PRUDENCE : "");
+    options?.securitySmallNumbersRisk === true
+      ? SSMSI_SMALL_NUMBERS_PRUDENCE(security.year)
+      : SSMSI_PRUDENCE(security.year);
 
   switch (formulation) {
     case "none":
