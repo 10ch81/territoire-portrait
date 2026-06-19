@@ -25,7 +25,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci --omit=optional
+        run: npm install --no-audit --no-fund
 
       - name: Phase 1 — discover newer source vintages
         run: npm run check:source-vintages

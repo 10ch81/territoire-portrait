@@ -26,7 +26,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci --omit=optional
+        run: npm install --no-audit --no-fund
 
       - name: Typecheck
         run: npm run typecheck
