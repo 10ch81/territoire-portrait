@@ -5,6 +5,7 @@ import {
 } from "./progressive-qualification";
 import { formatEuro, formatPercent } from "./format";
 import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
+import { passesWatchPointSelectionGates } from "./watch-point-selection-gates";
 import {
   DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR,
   debtWatchPointThresholdEur,
@@ -877,7 +878,13 @@ export function isFactEligibleForWatchPoint(
   fact: AnalysisFact,
   context: TerritoryAnalysisContext,
 ): boolean {
-  return isEligibleForWatchPoint(qualifyAnalysisFact(fact, context));
+  if (!isEligibleForWatchPoint(qualifyAnalysisFact(fact, context))) {
+    return false;
+  }
+
+  const territoryContext =
+    context.territoryContext ?? buildTerritoryContext(context.territory);
+  return passesWatchPointSelectionGates(fact, context.territory, territoryContext);
 }
 
 /** @deprecated Préférer isFactEligibleForWatchPoint via qualifyAnalysisFact. */

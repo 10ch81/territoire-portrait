@@ -35,9 +35,9 @@ function editorialV2SnapshotHash(profile: TerritoryProfile): string {
 
 /** Golden hashes — régénérer via `npx tsx scripts/gen-editorial-v2-snapshot-hashes.ts`. */
 const EDITORIAL_V2_SNAPSHOT_HASHES: Record<string, string> = {
-  rennes: "1111b105de7c166c",
-  palaiseau: "2ee142b15d5ca514",
-  chamonix: "6ab265418df46e83",
+  rennes: "0f90e102aebecd84",
+  palaiseau: "7589f44fd6fd2823",
+  chamonix: "ba53ff8d38edfeb9",
   bousse: "d1c2e61c98f8b27a",
 };
 

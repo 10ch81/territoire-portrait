@@ -10,7 +10,9 @@ import {
   isStudyOnlyOpportunity,
 } from "./opportunity-quality";
 import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
+import { riskWatchSubtypeScoreBonus } from "./risk-watch-subtypes";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
+import { qpvDenseUrbanScoreBonus } from "./watch-point-selection-gates";
 import {
   qualifiesAsDebtWatchPoint,
   qualifiesAsIncomeWatchPoint,
@@ -133,6 +135,15 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
 
   if (fact.theme === "ageing" && fact.sentence.includes("60 ans")) {
     return 8;
+  }
+
+  if (fact.theme === "risks") {
+    return riskWatchSubtypeScoreBonus(fact);
+  }
+
+  if (fact.theme === "policy_city") {
+    const territoryContext = buildTerritoryContext(territory);
+    return qpvDenseUrbanScoreBonus(fact, territory, territoryContext);
   }
 
   return 0;

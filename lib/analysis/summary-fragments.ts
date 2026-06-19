@@ -217,6 +217,10 @@ function fragmentsForFact(
 
     case "policy_city":
       if (fact.target === "watchPoints") {
+        const qpvMatch = fact.sentence.match(/(\d+)\s+quartiers prioritaires/i);
+        if (qpvMatch) {
+          return withIssueFragments(`la présence de ${qpvMatch[1]} quartiers prioritaires`);
+        }
         return withIssueFragments("la présence de quartiers prioritaires");
       }
       return {};
@@ -237,11 +241,14 @@ function fragmentsForFact(
 
     case "risks":
       if (fact.target === "watchPoints") {
+        if (/zones à risque d'inondation|risque d'inondation.*recens/i.test(fact.sentence)) {
+          return withIssueFragments("l'exposition aux risques d'inondation");
+        }
+        if (/sécheresse/i.test(fact.sentence)) {
+          return withIssueFragments("les reconnaissances CATNAT liées à la sécheresse");
+        }
         if (/catastrophe naturelle/i.test(fact.sentence)) {
           return withIssueFragments("les catastrophes naturelles");
-        }
-        if (/inondation/i.test(fact.sentence)) {
-          return withIssueFragments("l'exposition aux risques d'inondation");
         }
         if (/radon/i.test(fact.sentence)) {
           return withIssueFragments("le potentiel radon recensé");

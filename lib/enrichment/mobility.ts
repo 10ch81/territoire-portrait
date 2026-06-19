@@ -136,12 +136,6 @@ export function loadMobilitySnapshot(inseeCode: string): MobilitySnapshot {
   };
 }
 
-export function isMobilityAvailable(snapshot: MobilitySnapshot): boolean {
-  return snapshot.irve.available || snapshot.commute.available;
-}
-
-export function isConnectivityAvailable(snapshot: MobilitySnapshot): boolean {
-  return snapshot.connectivity.available;
-}
+export { isConnectivityAvailable, isMobilityAvailable } from "./mobility-snapshot";
 
 export { createCommuteSource, createIrveSource, createArcepSource };

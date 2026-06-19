@@ -1,7 +1,7 @@
 import {
   isConnectivityAvailable,
   isMobilityAvailable,
-} from "@/lib/enrichment/mobility";
+} from "@/lib/enrichment/mobility-snapshot";
 import type { TerritoryProfile } from "@/lib/types";
 
 export interface CompletenessResult {

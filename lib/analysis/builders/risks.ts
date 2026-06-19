@@ -1,6 +1,6 @@
 import type { TerritoryProfile } from "../../types";
 import { renderCountedLabel } from "../render-text";
-import { createFact } from "./utils";
+import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
 export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
@@ -9,19 +9,17 @@ export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
 
   if (!risks?.available) return facts;
 
-  const catNatLabels = [...new Set(risks.catNatEvents.map((e) => e.label))];
+  const catNatLabels = [...new Set(risks.catNatEvents.map((event) => event.label))];
 
-  if (catNatLabels.length > 0) {
-    const labelText =
-      catNatLabels.length <= 3
-        ? catNatLabels.join(", ")
-        : `${catNatLabels.slice(0, 2).join(", ")} et autres événements`;
-
+  for (const label of catNatLabels) {
+    const events = risks.catNatEvents.filter((event) => event.label === label);
+    const occurrenceLabel =
+      events.length === 1 ? "une fois" : `${events.length} fois`;
     facts.push(
       createFact({
         theme: "risks",
         target: "watchPoints",
-        sentence: `La commune a été reconnue à plusieurs reprises en état de catastrophe naturelle pour ${labelText.toLowerCase()} (CATNAT).`,
+        sentence: `La commune a été reconnue ${occurrenceLabel} en état de catastrophe naturelle pour ${label.toLowerCase()} (CATNAT).`,
         sourceKeys: ["georisques"],
         confidence: "high",
         limitations: [
@@ -29,10 +27,10 @@ export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
         ],
         evidence: [
           `${renderCountedLabel(
-            risks.catNatEvents.length,
+            events.length,
             "reconnaissance CATNAT recensée",
             "reconnaissances CATNAT recensées",
-          )}.`,
+          )} pour ${label.toLowerCase()}.`,
         ],
       }),
     );
@@ -47,6 +45,14 @@ export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
         sourceKeys: ["georisques"],
         confidence: "high",
         limitations: ["Données Géorisques ; distinct de la sécurité enregistrée SSMSI."],
+        numericBindings: [
+          binding(
+            risks.flood.count,
+            "zones à risque d'inondation",
+            "risks",
+            ["inondation", "zones", "Géorisques"],
+          ),
+        ],
       }),
     );
   }

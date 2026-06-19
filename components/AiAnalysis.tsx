@@ -1,4 +1,6 @@
 import type { AnalysisResult, TerritoryAnalysis } from "@/lib/types";
+import { resolveDataLimitSectionLink } from "@/lib/ux/data-limit-links";
+import { ANALYSIS_LIMITS_SECTION_ID } from "@/lib/ux/source-guides";
 import { ErrorBox } from "./ErrorBox";
 import { EmptyState } from "./EmptyState";
 
@@ -150,7 +152,10 @@ export function AiAnalysis({ result }: AiAnalysisProps) {
         </div>
       )}
 
-      <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+      <div
+        id={ANALYSIS_LIMITS_SECTION_ID}
+        className="mt-6 scroll-mt-16 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3"
+      >
         <h3 className="text-sm font-semibold text-amber-900">
           Limites de l&apos;analyse
         </h3>
@@ -160,10 +165,24 @@ export function AiAnalysis({ result }: AiAnalysisProps) {
           chargées pour cette commune.
         </p>
         {result.analysis?.dataLimits.length ? (
-          <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-amber-800">
-            {result.analysis.dataLimits.map((limit) => (
-              <li key={limit}>{limit}</li>
-            ))}
+          <ul className="mt-2 space-y-2 text-sm text-amber-800">
+            {result.analysis.dataLimits.map((limit) => {
+              const sectionLink = resolveDataLimitSectionLink(limit);
+
+              return (
+                <li key={limit} className="flex flex-col gap-1 sm:flex-row sm:gap-2">
+                  <span className="min-w-0 flex-1">{limit}</span>
+                  {sectionLink ? (
+                    <a
+                      href={`#${sectionLink.sectionId}`}
+                      className="shrink-0 text-xs font-medium text-amber-900 underline decoration-amber-400 underline-offset-2 hover:text-amber-950"
+                    >
+                      Voir {sectionLink.sectionLabel}
+                    </a>
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="mt-2 text-sm text-amber-800">

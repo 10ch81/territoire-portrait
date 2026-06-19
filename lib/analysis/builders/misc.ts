@@ -50,6 +50,14 @@ export function buildPolicyCityFacts(territory: TerritoryProfile): AnalysisFact[
         limitations: [
           "QPV concerne des quartiers localisés ; ne pas généraliser à toute la commune.",
         ],
+        numericBindings: [
+          binding(
+            urbanPolicy.qpvCount,
+            "quartiers prioritaires QPV",
+            "policy_city",
+            ["QPV", "quartiers prioritaires", "politique de la ville"],
+          ),
+        ],
       }),
     );
   }
