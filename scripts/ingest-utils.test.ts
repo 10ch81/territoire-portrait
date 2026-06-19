@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { detectCsvEncoding } from "./ingest-utils";
+import { detectCsvEncoding, assertFileUnderMaxBytes } from "./ingest-utils";
 
 function withTempCsv(content: Buffer, run: (path: string) => void): void {
   const dir = mkdtempSync(join(tmpdir(), "csv-encoding-"));
@@ -51,5 +51,20 @@ test("detectCsvEncoding reste UTF-8 malgré un octet invalide isolé (FINESS)", 
   ]);
   withTempCsv(content, (path) => {
     assert.equal(detectCsvEncoding(path), "utf-8");
+  });
+});
+
+test("assertFileUnderMaxBytes accepte un fichier sous le seuil", () => {
+  withTempCsv(Buffer.from("a;b\n1;2", "utf-8"), (path) => {
+    assert.doesNotThrow(() => assertFileUnderMaxBytes(path, 1024));
+  });
+});
+
+test("assertFileUnderMaxBytes rejette un fichier au-dessus du seuil", () => {
+  withTempCsv(Buffer.alloc(2048, "x"), (path) => {
+    assert.throws(
+      () => assertFileUnderMaxBytes(path, 1024),
+      /Fichier trop lourd/,
+    );
   });
 });

@@ -335,6 +335,14 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
       limits,
       "Données RPLS limitées au parc locatif social ; la vacance générale (RP logement) couvre l'ensemble du parc.",
     );
+    if (enrichment.housing.privateVacantDwellings !== null) {
+      pushUnique(
+        limits,
+        "LOVAC : vacance du parc privé (sources fiscales Cerema/DGFiP) — distincte du recensement RP ; surestimation possible (logements fiscalement vacants).",
+      );
+    } else if (enrichment.housing.lovacNote) {
+      pushUnique(limits, enrichment.housing.lovacNote);
+    }
   } else {
     appendUnavailable(
       limits,

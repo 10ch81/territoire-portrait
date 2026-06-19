@@ -22,7 +22,7 @@ import {
   createArcepSource,
 } from "./mobility";
 import { loadQpvSnapshot, createQpvSource } from "./urban-policy";
-import { loadSocialHousingSnapshot, createRplsSource } from "./housing";
+import { loadSocialHousingSnapshot, createRplsSource, createLovacSource } from "./housing";
 import { loadLocalTaxSnapshot, createReiSource } from "./fiscal";
 import {
   fetchPublicAccountsSnapshot,
@@ -99,6 +99,12 @@ function collectEnrichmentSources(
     sources.push(createRplsSource(accessedAt));
     if (enrichment.housing.rpVacancyRatePercent !== null) {
       sources.push(createRpHousingSource(accessedAt));
+    }
+    if (
+      enrichment.housing.privateVacantDwellings !== null ||
+      enrichment.housing.privateVacancyRatePercent !== null
+    ) {
+      sources.push(createLovacSource(accessedAt));
     }
   }
   if (enrichment.mobility && isMobilityAvailable(enrichment.mobility)) {

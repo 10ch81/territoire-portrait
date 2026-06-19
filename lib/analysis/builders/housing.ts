@@ -34,31 +34,86 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
     );
   }
 
-  if (housing.rpVacancyRatePercent === null) {
-    return facts;
+  if (housing.rpVacancyRatePercent !== null) {
+    const isHigh = qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent);
+
+    facts.push(
+      createFact({
+        theme: "housing",
+        target: isHigh ? "watchPoints" : "summary",
+        sentence: `Les logements vacants représentent ${formatPercent(housing.rpVacancyRatePercent)} de l'ensemble des logements en ${housing.year} (INSEE).`,
+        sourceKeys: ["insee-rp-logement"],
+        year: housing.year,
+        confidence: "high",
+        limitations: [
+          "Logements vacants du parc global INSEE ; distinct du parc locatif social (RPLS).",
+        ],
+        numericBindings: [
+          binding(
+            housing.rpVacancyRatePercent,
+            "part logements vacants",
+            "housing",
+            ["logements vacants", "vacance", "ensemble des logements", "logements"],
+          ),
+        ],
+      }),
+    );
   }
 
-  const isHigh = qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent);
+  if (
+    housing.privateVacancyRatePercent != null &&
+    housing.lovacVintage != null
+  ) {
+    facts.push(
+      createFact({
+        theme: "housing",
+        target: "summary",
+        sentence: `Le parc privé compte ${formatPercent(housing.privateVacancyRatePercent)} de logements vacants au 1er janvier ${housing.lovacVintage} (LOVAC).`,
+        sourceKeys: ["cerema-lovac"],
+        year: housing.lovacVintage,
+        confidence: "medium",
+        limitations: [
+          "Parc privé vacant (sources fiscales) — distinct de la vacance générale RP.",
+          housing.lovacNote ?? "Surestimation possible vs recensement.",
+        ],
+        numericBindings: [
+          binding(
+            housing.privateVacancyRatePercent,
+            "taux vacance parc privé LOVAC",
+            "housing",
+            ["LOVAC", "parc privé", "vacance", "logements vacants"],
+          ),
+        ],
+      }),
+    );
+  }
 
-  facts.push(
-    createFact({
-      theme: "housing",
-      target: isHigh ? "watchPoints" : "summary",
-      sentence: `Les logements vacants représentent ${formatPercent(housing.rpVacancyRatePercent)} de l'ensemble des logements en ${housing.year} (INSEE).`,
-      sourceKeys: ["insee-rp-logement"],
-      year: housing.year,
-      confidence: "high",
-      limitations: ["Logements vacants du parc global INSEE ; distinct du parc locatif social (RPLS)."],
-      numericBindings: [
-        binding(
-          housing.rpVacancyRatePercent,
-          "part logements vacants",
-          "housing",
-          ["logements vacants", "vacance", "ensemble des logements", "logements"],
-        ),
-      ],
-    }),
-  );
+  if (
+    housing.privateVacantStructural != null &&
+    housing.lovacVintage != null
+  ) {
+    facts.push(
+      createFact({
+        theme: "housing",
+        target: "summary",
+        sentence: `${housing.privateVacantStructural.toLocaleString("fr-FR")} logements du parc privé sont vacants depuis au moins deux ans au 1er janvier ${housing.lovacVintage} (LOVAC).`,
+        sourceKeys: ["cerema-lovac"],
+        year: housing.lovacVintage,
+        confidence: "medium",
+        limitations: [
+          "Vacance structurelle du parc privé — cible du plan national de lutte contre les logements vacants.",
+        ],
+        numericBindings: [
+          binding(
+            housing.privateVacantStructural,
+            "logements privés vacants structurels LOVAC",
+            "housing",
+            ["LOVAC", "vacance structurelle", "deux ans", "parc privé"],
+          ),
+        ],
+      }),
+    );
+  }
 
   return facts;
 }

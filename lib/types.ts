@@ -148,6 +148,11 @@ export interface SocialHousingSnapshot {
   rpVacancyRatePercent: number | null;
   socialHousingSharePercent: number | null;
   vacancyRatePercent: number | null;
+  lovacVintage: number | null;
+  privateVacantDwellings: number | null;
+  privateVacancyRatePercent: number | null;
+  privateVacantStructural: number | null;
+  lovacNote: string | null;
   available: boolean;
   note: string;
 }
@@ -516,6 +521,17 @@ export interface QpvCommuneCacheEntry {
 export type QpvCommuneCache = Record<string, QpvCommuneCacheEntry>;
 
 export type HousingCommuneCache = Record<string, HousingCommuneCacheEntry>;
+
+export interface LovacCommuneCacheEntry {
+  vintage: number;
+  privateTotalDwellings: number | null;
+  privateVacantDwellings: number | null;
+  privateVacantStructural: number | null;
+  privateVacancyRatePercent: number | null;
+  suppressed: boolean;
+}
+
+export type LovacCommuneCache = Record<string, LovacCommuneCacheEntry>;
 
 export interface IrveCommuneCacheEntry {
   year: number;

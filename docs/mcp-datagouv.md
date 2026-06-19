@@ -115,6 +115,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | [Annuaire de l'Éducation](https://www.data.gouv.fr/datasets/annuaire-de-leducation) | Établissements scolaires ouverts | C | ✅ | `ingest-education.ts` → `education.ts` | Agrégats communaux (sans liste nominative) |
 | [France Services](https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services) | Accueil public de proximité | C | ✅ | `ingest-services.ts` → `proximity-services.ts` | |
 | [DREES — APL santé](https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl) | Accessibilité aux soins | C | ❌ 📋 P2 | — | **Écarté** (xlsx, pas bulk communal) |
+| [Cerema — LOVAC](https://www.data.gouv.fr/datasets/logements-vacants-du-parc-prive-par-commune-departement-region-france) | Vacance parc privé structurelle | R | ✅ | `ingest-lovac.ts` → `housing.ts` | Secret statistique < 11 logements ; distinct RP/RPLS |
 | [FINESS — réexposition data.gouv](https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess) | Établissements sanitaires et sociaux | C | ✅ | `ingest-finess.ts` → `health.ts` | Agrégats par catégorie ; pas d'accessibilité spatiale |
 | [CartoSanté / AtlaSanté](https://cartosante.atlasante.fr/) | Offre et accès PS | C | ❌ | — | Portail carto ; pas de bulk simple ; APL prioritaire |
 

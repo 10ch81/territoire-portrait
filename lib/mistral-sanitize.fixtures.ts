@@ -413,6 +413,7 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
     tauxVacanceRp: 5.6,
     partDuParcGlobal: 0,
     tauxVacanceRpls: null,
+    lovac: null,
     note: "RPLS",
   },
   tourisme: {

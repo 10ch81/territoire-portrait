@@ -5,6 +5,7 @@ import type {
   FiscalCommuneCache,
   FloresCommuneCache,
   HousingCommuneCache,
+  LovacCommuneCache,
   IrveCommuneCache,
   PopulationCommuneCache,
   PropertyCommuneCache,
@@ -414,6 +415,59 @@ function validateFloresCache(findings: QualityFinding[]): void {
   }
 }
 
+function validateLovacCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<LovacCommuneCache>("lovac-by-commune.json");
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/lovac-by-commune.json",
+      message: "Cache LOVAC absent — exécutez npm run ingest:lovac",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    if (
+      entry.privateVacantDwellings !== null &&
+      entry.privateVacantDwellings < 0
+    ) {
+      findings.push({
+        ruleId: "lovac-negative",
+        severity: "critical",
+        location: `lovac-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message: "Valeur LOVAC négative (logements vacants parc privé)",
+      });
+    }
+
+    const percentFinding = isPercentInRange(
+      entry.privateVacancyRatePercent,
+      "taux vacance parc privé LOVAC",
+      inseeCode,
+    );
+    if (percentFinding) {
+      findings.push(percentFinding);
+    }
+
+    if (
+      entry.privateVacantStructural !== null &&
+      entry.privateVacantDwellings !== null &&
+      entry.privateVacantStructural > entry.privateVacantDwellings + COUNT_TOLERANCE
+    ) {
+      findings.push({
+        ruleId: "lovac-structural-exceeds-total",
+        severity: "warning",
+        location: `lovac-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message:
+          "Vacance structurelle LOVAC supérieure au total des vacants parc privé",
+      });
+    }
+  }
+}
+
 function validateArcepCache(findings: QualityFinding[]): void {
   const cache = loadJsonCache<ArcepCommuneCache>("arcep-by-commune.json");
 
@@ -444,6 +498,7 @@ export function validateInternalCache(): QualityFinding[] {
 
   validateBpeCache(findings);
   validateHousingCache(findings);
+  validateLovacCache(findings);
   validatePopulationCache(findings);
   validateIrveCache(findings);
   validatePropertyCache(findings);

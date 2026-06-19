@@ -11,6 +11,10 @@ const POPULATION_HISTORY_URL =
 const GEORISQUES_URL = "https://georisques.gouv.fr/";
 const RPLS_URL =
   "https://www.data.gouv.fr/datasets/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/";
+const LOVAC_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/logements-vacants-du-parc-prive-par-commune-departement-region-france/";
+export const LOVAC_FILE_URL =
+  "https://static.data.gouv.fr/resources/logements-vacants-du-parc-prive-lovac-par-commune-departement-region-et-france/20250528-090420/lovac-opendata-communes.csv";
 const IRVE_URL =
   "https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/";
 const REI_URL =
@@ -36,6 +40,9 @@ export const RP_VINTAGE = 2022;
 
 /** Millésime du fichier RPLS (logements sociaux) — distinct du RP communale. */
 export const RPLS_VINTAGE = 2021;
+
+/** Millésime LOVAC (vacance parc privé, au 1er janvier). */
+export const LOVAC_VINTAGE = 2025;
 
 /** Millésime FILOSOFI (Filosofi 2 à partir de 2023). */
 export const FILOSOFI_VINTAGE = 2023;
@@ -92,6 +99,7 @@ export const SOURCE_IDS = {
   INSEE_FILOSOFI: "insee-filosofi",
   GEORISQUES: "georisques",
   RPLS: "rpls",
+  CEREMA_LOVAC: "cerema-lovac",
   IRVE: "irve",
   QPV: "qpv-sig-ville",
   REI: "rei",
@@ -214,6 +222,17 @@ export function createRplsSource(accessedAt: string): DataSource {
     name: "RPLS — Parc locatif social",
     url: RPLS_URL,
     description: "Répertoire des logements locatifs des bailleurs sociaux agrégé par commune.",
+    accessedAt,
+  };
+}
+
+export function createLovacSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.CEREMA_LOVAC,
+    name: `Cerema — LOVAC ${LOVAC_VINTAGE} (parc privé vacants)`,
+    url: LOVAC_DATASET_URL,
+    description:
+      "Logements vacants du parc privé par commune (croisement DGFiP / Fichiers fonciers) — vacance structurelle distincte du recensement.",
     accessedAt,
   };
 }

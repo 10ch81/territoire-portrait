@@ -24,6 +24,7 @@ const steps = [
   { name: "ARCEP (couverture fibre)", script: "scripts/ingest-fibre.ts" },
   { name: "FINESS (santé & social)", script: "scripts/ingest-finess.ts" },
   { name: "Annuaire Éducation", script: "scripts/ingest-education.ts" },
+  { name: "LOVAC (vacance parc privé)", script: "scripts/ingest-lovac.ts" },
 ];
 
 for (const step of steps) {
