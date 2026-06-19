@@ -3,7 +3,9 @@ import { DataSection } from "@/components/DataSection";
 import { SectionUnavailable } from "@/components/SectionUnavailable";
 import { PropertyPriceChart } from "@/components/charts/PropertyPriceChart";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
+import { SourceGuide } from "@/components/SourceGuide";
 import { formatCurrency, formatPropertyPrice } from "@/lib/enrichment";
+import { buildDvfContextAlerts } from "@/lib/ux/source-guides";
 import type { TerritoryProfile } from "@/lib/types";
 
 interface PropertySectionProps {
@@ -26,11 +28,13 @@ export function PropertySection({ territory }: PropertySectionProps) {
     >
       {property?.available ? (
         <>
-          <p className="mb-3 text-xs text-slate-500">
-            Prix agrégés sur les mutations enregistrées (moyennes communales). Pas de
-            distinction neuf/ancien, standing, biens atypiques, lots multiples,
-            dépendances ni terrains nus.
-          </p>
+          <div className="mb-3">
+            <SourceGuide
+              guideId="dvf"
+              vintage={property.year}
+              contextAlerts={buildDvfContextAlerts(property.mutationCount)}
+            />
+          </div>
           <PropertyPriceChart history={property.priceHistory} />
           <dl className="mt-3 space-y-3">
             <DataRow

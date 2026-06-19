@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { AnalysisResult } from "@/lib/types";
+import { ANALYSIS_LIMITS_SECTION_ID } from "@/lib/ux/source-guides";
 import { useAnalysisReady } from "./AnalysisReadyProvider";
 import { AiAnalysis } from "./AiAnalysis";
 
@@ -23,6 +24,18 @@ function AnalysisSkeleton() {
         <div className="h-4 w-5/6 rounded bg-slate-100" />
         <div className="h-4 w-4/6 rounded bg-slate-100" />
         <p className="text-sm text-slate-500">Génération de l&apos;analyse…</p>
+      </div>
+      <div
+        id={ANALYSIS_LIMITS_SECTION_ID}
+        className="mt-6 scroll-mt-16 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3"
+      >
+        <h3 className="text-sm font-semibold text-amber-900">
+          Limites de l&apos;analyse
+        </h3>
+        <p className="mt-1 text-sm text-amber-800">
+          Synthèse en cours de génération. Les limites calculées à partir des
+          sources chargées s&apos;afficheront ici.
+        </p>
       </div>
     </section>
   );

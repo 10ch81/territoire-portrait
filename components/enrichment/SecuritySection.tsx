@@ -1,6 +1,7 @@
 import { DataRow } from "@/components/DataRow";
 import { DataSection } from "@/components/DataSection";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
+import { SourceGuide } from "@/components/SourceGuide";
 import { formatRatePer1000 } from "@/lib/enrichment/security-format";
 import type { TerritoryProfile } from "@/lib/types";
 
@@ -24,11 +25,7 @@ export function SecuritySection({ territory }: SecuritySectionProps) {
     >
       {security?.available ? (
         <div className="space-y-4">
-          <p className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-            Faits enregistrés par la police et la gendarmerie (lieu de commission).
-            Ne mesure pas le ressenti d&apos;insécurité ni les faits non déclarés.
-            Une seule année chargée — pas d&apos;analyse de tendance.
-          </p>
+          <SourceGuide guideId="ssmsi" vintage={security.year} />
           <p className="text-xs text-slate-500">
             {security.diffusedIndicatorCount}/{security.indicators.length} indicateurs
             diffusés pour cette commune (règles de secret statistique SSMSI).
