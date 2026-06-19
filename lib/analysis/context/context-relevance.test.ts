@@ -1,14 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildAnalysisFacts } from "../build-analysis-facts";
-import { buildDeterministicSummary } from "../build-canonical-output";
+import { buildFinalTerritorialAnalysis } from "../evaluation-helpers";
 import { resolveDisplayTypologyLabel } from "./displayTypologyLabel";
 import {
-  isMechanicalLargeCityOpportunity,
   isMechanicalLargeCityStrength,
 } from "./context-relevance";
 import { buildTerritoryContext } from "./buildTerritoryContext";
-import { buildFinalTerritorialAnalysis } from "../evaluation-helpers";
 import { selectAnalysisFactsForPrompt } from "../select-facts";
 import { ANALYSIS_OUTPUT_LIMITS } from "../prompt-limits";
 import {
@@ -80,6 +78,43 @@ describe("context-relevance — communes de référence", () => {
       assert.doesNotMatch(label!, /^petite centralité rurale$/);
     });
 
+    it("n'inclut pas France Services ni fibre générique dans forces et opportunités", () => {
+      const { analysis, selectedFacts } = buildFinalTerritorialAnalysis(chamonixProfile);
+      const strengths = selectedFacts.filter((f) => f.target === "strengths");
+
+      assert.ok(!strengths.some((f) => f.theme === "public_services"));
+      assert.ok(
+        !strengths.some(
+          (f) => f.theme === "connectivity" && /fibre|raccordables/i.test(f.sentence),
+        ),
+      );
+      assert.ok(
+        !analysis.opportunities.some(
+          (sentence) => /France Services/i.test(sentence),
+        ),
+      );
+      assert.ok(
+        !analysis.opportunities.some(
+          (sentence) => /fibre|numérique/i.test(sentence),
+        ),
+      );
+    });
+
+    it("expose la prudence progressive dans la sortie finale", () => {
+      const { analysis } = buildFinalTerritorialAnalysis(chamonixProfile);
+      const outputTexts = [
+        analysis.summary,
+        ...analysis.strengths,
+        ...analysis.watchPoints,
+        ...analysis.opportunities,
+      ].join("\n");
+
+      assert.match(
+        outputTexts,
+        /Interprétation prudente|population résidente|fréquentation touristique/i,
+      );
+    });
+
     it("summary ne se limite pas à petite centralité rurale", () => {
       const { analysis } = buildFinalTerritorialAnalysis(chamonixProfile);
       assert.doesNotMatch(analysis.summary, /petite centralité rurale de/i);
@@ -128,6 +163,17 @@ describe("context-relevance — communes de référence", () => {
   });
 
   describe("Palaiseau (91477) — non-régression", () => {
+    it("n'inclut pas la fibre générique dans les forces", () => {
+      const { selectedFacts } = buildFinalTerritorialAnalysis(palaiseauProfile);
+      const strengths = selectedFacts.filter((f) => f.target === "strengths");
+
+      assert.ok(
+        !strengths.some(
+          (f) => f.theme === "connectivity" && /fibre|raccordables/i.test(f.sentence),
+        ),
+      );
+    });
+
     it("conserve une formulation sécurité singulière", () => {
       const { analysis } = buildFinalTerritorialAnalysis(palaiseauProfile);
       const securityTexts = [analysis.summary, ...analysis.watchPoints].join("\n");

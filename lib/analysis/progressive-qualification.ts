@@ -392,6 +392,18 @@ export function applyProgressiveCaution(
   };
 }
 
+/** Matérialise la prudence progressive dans la phrase affichée (listes verbatim). */
+export function renderFactSentenceForOutput(fact: AnalysisFact): string {
+  const prudence = fact.limitations?.find((item) =>
+    item.includes("Interprétation prudente"),
+  );
+  if (!prudence || fact.sentence.includes("Interprétation prudente")) {
+    return fact.sentence;
+  }
+
+  return `${fact.sentence.replace(/\.\s*$/, "")} — ${prudence}.`;
+}
+
 export function indexQualifiedFacts(
   qualifiedFacts: QualifiedAnalysisFact[],
 ): Map<string, QualifiedAnalysisFact> {

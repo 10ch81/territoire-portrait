@@ -8,6 +8,8 @@ import { selectAnalysisFactsForPrompt } from "./select-facts";
 import { containsOptionalPluralMarker } from "./render-text";
 import { hasForbiddenDerivedRatio } from "./verify-numeric-claims";
 import { validateAnalysisOutput } from "./validate-output";
+import { renderFactSentenceForOutput } from "./progressive-qualification";
+import { polishRenderedSentence } from "./render-text";
 
 function collectOutputText(
   output: ReturnType<typeof validateAnalysisOutput>,
@@ -69,7 +71,12 @@ describe("render-output", () => {
       0,
     );
     assert.ok(
-      result.watchPoints.every((item) => selected.some((fact) => fact.sentence === item)),
+      result.watchPoints.every((item) =>
+        selected.some(
+          (fact) =>
+            polishRenderedSentence(renderFactSentenceForOutput(fact)) === item,
+        ),
+      ),
     );
   });
 

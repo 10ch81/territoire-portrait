@@ -6,6 +6,7 @@ import {
   isDemographicEvolutionContext,
 } from "../demographic-indicators";
 import { ANALYSIS_OUTPUT_LIMITS, watchPointRetentionRank } from "./prompt-limits";
+import { renderFactSentenceForOutput } from "./progressive-qualification";
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
 
 const COVERAGE_SENTENCE_OVERLAP = 0.32;
@@ -195,13 +196,13 @@ export function ensureListCoverage(
     if (isSelectedFactCovered(fact, result)) continue;
 
     if (result.length < max) {
-      result.push(fact.sentence);
+      result.push(renderFactSentenceForOutput(fact));
       continue;
     }
 
     const replaceIndex = findReplaceableIndex(result, fact, requiredFacts, field);
     if (replaceIndex >= 0) {
-      result[replaceIndex] = fact.sentence;
+      result[replaceIndex] = renderFactSentenceForOutput(fact);
     }
   }
 
@@ -336,7 +337,7 @@ function snapListToSourceSentences(
     const best = [...sources].sort(
       (a, b) => tokenOverlap(item, b.sentence) - tokenOverlap(item, a.sentence),
     )[0]!;
-    return best.sentence;
+    return renderFactSentenceForOutput(best);
   });
 }
 
@@ -370,7 +371,7 @@ function backfillWatchPoints(
     if (skipDemographyInSummary && fact.theme === "demography") continue;
     if (requiredFacts.some((required) => required.id === fact.id)) continue;
     if (isSelectedFactCovered(fact, result)) continue;
-    result.push(fact.sentence);
+    result.push(renderFactSentenceForOutput(fact));
   }
 
   return result.slice(0, max);
@@ -387,7 +388,7 @@ export function normalizeOpportunityTone(
       (fact) => tokenOverlap(item, fact.sentence) >= 0.3,
     );
     if (matched && /\bpourrait\b/i.test(item)) {
-      return matched.sentence;
+      return renderFactSentenceForOutput(matched);
     }
     return item.replace(/\bpourrait\b/gi, "").replace(/\s{2,}/g, " ").trim();
   });

@@ -5,6 +5,7 @@ import { buildFinalTerritorialAnalysis } from "./evaluation-helpers";
 import {
   OPPORTUNITY_MAX_GENERICITY_SCORE,
   applyProgressiveCaution,
+  renderFactSentenceForOutput,
   isProgressiveOpportunityEligible,
   isProgressiveWatchPointEligible,
   qualifyProgressiveDimensions,
@@ -157,6 +158,7 @@ describe("progressive-qualification", () => {
       const cautioned = applyProgressiveCaution(fact, qualified);
       assert.ok(cautioned.limitations?.some((item) => item.includes("Interprétation prudente")));
       assert.ok(cautioned.limitations?.some((item) => item.includes("fréquentation touristique")));
+      assert.match(renderFactSentenceForOutput(cautioned), /Interprétation prudente/);
     });
   });
 
@@ -190,6 +192,7 @@ describe("progressive-qualification", () => {
           if (!selected) continue;
           if (q.denominatorRisk === "tourist_population" || q.requiresCaution) {
             const hasCaution =
+              renderFactSentenceForOutput(selected).includes("Interprétation prudente") ||
               (selected.limitations ?? []).some((item) =>
                 item.includes("Interprétation prudente"),
               );

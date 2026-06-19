@@ -18,6 +18,8 @@ import {
   stripUnsourcedClaims,
 } from "./unsourced-claims";
 import { validateAnalysisOutput } from "./validate-output";
+import { renderFactSentenceForOutput } from "./progressive-qualification";
+import { polishRenderedSentence } from "./render-text";
 
 describe("ensure-output-coverage", () => {
   it("détecte une formulation vague sans chiffre démographique", () => {
@@ -161,7 +163,14 @@ describe("ensure-output-coverage", () => {
     assert.match(result.summary, /recul de population de 5,7\s*% entre 2010 et 2022/);
     assert.doesNotMatch(result.summary, /pôle structurant/i);
     assert.ok(result.watchPoints.length <= ANALYSIS_OUTPUT_LIMITS.watchPoints.max);
-    assert.ok(result.watchPoints.every((item) => selected.some((fact) => fact.sentence === item)));
+    assert.ok(
+      result.watchPoints.every((item) =>
+        selected.some(
+          (fact) =>
+            polishRenderedSentence(renderFactSentenceForOutput(fact)) === item,
+        ),
+      ),
+    );
   });
 
   it("normalise le conditionnel des opportunités", () => {

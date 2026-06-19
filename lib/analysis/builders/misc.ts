@@ -87,10 +87,22 @@ export function buildFinancesFacts(territory: TerritoryProfile): AnalysisFact[] 
   }
 
   if (accounts?.available && accounts.debtPerCapitaEur !== null) {
+    const population = territory.population ?? null;
+    const debtOutstanding =
+      accounts.debtOutstandingEur ??
+      (population != null && population > 0
+        ? accounts.debtPerCapitaEur * population
+        : null);
+    const operatingRevenue =
+      accounts.operatingRevenueEur ??
+      (population != null &&
+      population > 0 &&
+      accounts.operatingRevenuePerCapitaEur != null
+        ? accounts.operatingRevenuePerCapitaEur * population
+        : null);
     const hasRevenue =
-      accounts.operatingRevenueEur != null || accounts.operatingRevenuePerCapitaEur != null;
-    const debtOutstanding = accounts.debtOutstandingEur;
-    const operatingRevenue = accounts.operatingRevenueEur;
+      accounts.operatingRevenueEur != null ||
+      accounts.operatingRevenuePerCapitaEur != null;
 
     if (hasRevenue && debtOutstanding != null && operatingRevenue != null && operatingRevenue > 0) {
       const debtToRevenueRatio = debtOutstanding / operatingRevenue;

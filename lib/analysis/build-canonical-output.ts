@@ -3,6 +3,7 @@ import type { TerritoryProfile } from "../types";
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
 import { formatCount } from "./format";
 import { resolveDisplayTypologyLabel } from "./context/displayTypologyLabel";
+import { renderFactSentenceForOutput } from "./progressive-qualification";
 import { isSelectedFactCovered } from "./ensure-output-coverage";
 import {
   buildSummaryPhrase2,
@@ -163,13 +164,13 @@ export function buildVerbatimLists(selectedFacts: AnalysisFact[]): {
   return {
     strengths: selectedFacts
       .filter((fact) => fact.target === "strengths")
-      .map((fact) => fact.sentence),
+      .map((fact) => renderFactSentenceForOutput(fact)),
     watchPoints: selectedFacts
       .filter((fact) => fact.target === "watchPoints")
-      .map((fact) => fact.sentence),
+      .map((fact) => renderFactSentenceForOutput(fact)),
     opportunities: selectedFacts
       .filter((fact) => fact.target === "opportunities")
-      .map((fact) => fact.sentence),
+      .map((fact) => renderFactSentenceForOutput(fact)),
   };
 }
 
@@ -205,7 +206,9 @@ export function resolveVerbatimList(
   const required = selectedFacts.filter((fact) => fact.target === target);
   if (required.length === 0) return [];
 
-  return inferFactOrder(mistralItems, required).map((fact) => fact.sentence);
+  return inferFactOrder(mistralItems, required).map((fact) =>
+    renderFactSentenceForOutput(fact),
+  );
 }
 
 export function buildCanonicalAnalysisOutput(

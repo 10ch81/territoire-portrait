@@ -181,12 +181,16 @@ function canAddToTarget(
     (target === "strengths" || target === "opportunities")
   ) {
     const territoryContext = buildTerritoryContext(context.territory);
+    const relatedWatchPointThemes = selected
+      .filter((f) => f.target === "watchPoints")
+      .map((f) => f.theme);
     if (
       !isContextuallySelectableForTarget(
         candidate,
         target,
         context.territory,
         territoryContext,
+        relatedWatchPointThemes,
       )
     ) {
       return false;

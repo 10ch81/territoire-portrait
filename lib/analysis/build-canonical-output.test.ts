@@ -8,9 +8,18 @@ import {
   resolveVerbatimList,
 } from "./build-canonical-output";
 import { saintGironsProfile } from "./fixtures";
+import type { AnalysisFact } from "./types";
 import { selectAnalysisFactsForPrompt } from "./select-facts";
 import { hasForbiddenDerivedRatio } from "./verify-numeric-claims";
 import { validateAnalysisOutput } from "./validate-output";
+import { renderFactSentenceForOutput } from "./progressive-qualification";
+import { polishRenderedSentence } from "./render-text";
+
+function matchesRenderedOutputItem(item: string, selected: AnalysisFact[]): boolean {
+  return selected.some(
+    (fact) => polishRenderedSentence(renderFactSentenceForOutput(fact)) === item,
+  );
+}
 
 describe("build-canonical-output", () => {
   it("compose un résumé déterministe en deux phrases", () => {
@@ -47,7 +56,7 @@ describe("build-canonical-output", () => {
 
     assert.ok(lists.strengths.length >= 3);
     assert.ok(lists.watchPoints.length >= 4);
-    assert.ok(lists.strengths.every((item) => selected.some((fact) => fact.sentence === item)));
+    assert.ok(lists.strengths.every((item) => matchesRenderedOutputItem(item, selected)));
     assert.ok(
       lists.watchPoints.some((item) => /16,2\s*%/.test(item) || /18,8\s*%/.test(item)),
     );
@@ -106,7 +115,7 @@ describe("build-canonical-output", () => {
 
     assert.equal(result.summary, canonical.summary);
     assert.deepEqual(result.strengths, canonical.strengths);
-    assert.ok(result.watchPoints.every((item) => selected.some((fact) => fact.sentence === item)));
+    assert.ok(result.watchPoints.every((item) => matchesRenderedOutputItem(item, selected)));
     assert.doesNotMatch(result.summary, /pôle structurant/i);
     assert.doesNotMatch(result.strengths.join(" "), /50 postes pour 100 habitants/i);
   });

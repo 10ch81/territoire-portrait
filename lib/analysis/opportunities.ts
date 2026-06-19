@@ -16,7 +16,7 @@ import {
   buildTerritoryContext,
   countTourismContextSignals,
 } from "./context/buildTerritoryContext";
-import { isMechanicalLargeCityOpportunity } from "./context/context-relevance";
+import { isMechanicalContextOpportunity } from "./context/context-relevance";
 import type { ScoreContext } from "./score-facts";
 import type { ComparisonProfile, TerritoryTypology } from "../typology/types";
 import { resolveComparisonProfile } from "../typology/thresholds";
@@ -266,6 +266,13 @@ function isCandidateEligible(
       break;
     case "tourism":
       themeEligible = isTourismEligible(territory, context.selectedStrengths);
+      if (
+        themeEligible &&
+        buildTerritoryContext(territory).requiresPerCapitaCaution === true
+      ) {
+        themeEligible =
+          relatedWatchPointThemes.length > 0 || relatedStrengthThemes.length > 0;
+      }
       break;
     case "ess_rge":
       themeEligible = isEssRgeEligible(territory);
@@ -280,8 +287,17 @@ function isCandidateEligible(
       themeEligible = isMobilityOpportunityEligible(territory);
       break;
     case "risks":
-      themeEligible =
-        watchThemes.has("risks") || (territory.enrichment?.risks?.available ?? false);
+      themeEligible = watchThemes.has("risks");
+      break;
+    case "public_services":
+      if (/France Services/i.test(fact.sentence)) {
+        themeEligible = !isMechanicalContextOpportunity(
+          fact,
+          territory,
+          buildTerritoryContext(territory),
+          relatedWatchPointThemes,
+        );
+      }
       break;
     case "employment":
     case "security":
@@ -296,7 +312,14 @@ function isCandidateEligible(
   }
 
   const territoryContext = buildTerritoryContext(territory);
-  if (isMechanicalLargeCityOpportunity(fact, territory, territoryContext)) {
+  if (
+    isMechanicalContextOpportunity(
+      fact,
+      territory,
+      territoryContext,
+      relatedWatchPointThemes,
+    )
+  ) {
     return false;
   }
 

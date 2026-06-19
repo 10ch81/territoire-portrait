@@ -3,6 +3,7 @@ import { DataSection } from "@/components/DataSection";
 import { SectionUnavailable } from "@/components/SectionUnavailable";
 import { EpciComparisonBar } from "@/components/charts/EpciComparisonBar";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
+import { resolveDisplayTypologyLabel } from "@/lib/analysis/context/displayTypologyLabel";
 import { formatDensity } from "@/lib/enrichment";
 import { formatPopulation } from "@/lib/territory";
 import type { TerritoryProfile } from "@/lib/types";
@@ -46,6 +47,7 @@ function PolicyBadges({ labels }: { labels: string[] }) {
 export function GeographySection({ territory }: GeographySectionProps) {
   const geography = territory.enrichment?.geography;
   const typology = territory.enrichment?.territoryTypology;
+  const displayTypologyLabel = resolveDisplayTypologyLabel(territory);
 
   return (
     <DataSection
@@ -60,8 +62,8 @@ export function GeographySection({ territory }: GeographySectionProps) {
       <dl className="space-y-3">
         {hasTypologyContent(typology) ? (
           <>
-            {typology?.summaryLabel ? (
-              <DataRow label="Contexte territorial" value={typology.summaryLabel} />
+            {displayTypologyLabel ? (
+              <DataRow label="Contexte territorial" value={displayTypologyLabel} />
             ) : null}
             <DataRow
               label="Profil de comparaison"

@@ -1,6 +1,9 @@
 import type { TerritoryProfile } from "../types";
 import { buildTerritoryContext } from "./context/buildTerritoryContext";
-import { contextSelectionScorePenalty } from "./context/context-relevance";
+import {
+  contextSelectionScorePenalty,
+  isMechanicalContextStrength,
+} from "./context/context-relevance";
 import {
   hasOpportunityTraceability,
   isStudyOnlyOpportunity,
@@ -107,7 +110,17 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
   }
 
   if (fact.theme === "connectivity" && connectivity?.fiberEligibleSharePercent != null) {
-    if (connectivity.fiberEligibleSharePercent >= 80) return 10;
+    const territoryContext = buildTerritoryContext(territory);
+    if (
+      !isMechanicalContextStrength(
+        { ...fact, theme: "connectivity" },
+        territory,
+        territoryContext,
+      ) &&
+      connectivity.fiberEligibleSharePercent >= 80
+    ) {
+      return 10;
+    }
   }
 
   if (fact.theme === "ageing" && fact.sentence.includes("60 ans")) {

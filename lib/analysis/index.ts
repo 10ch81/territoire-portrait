@@ -47,6 +47,7 @@ export {
 } from "./qualify-facts";
 export {
   applyProgressiveCaution,
+  renderFactSentenceForOutput,
   applyProgressiveQualification,
   indexQualifiedFacts,
   isProgressiveOpportunityEligible,
@@ -102,7 +103,10 @@ export {
 export { resolveDisplayTypologyLabel } from "./context/displayTypologyLabel";
 export {
   contextSelectionScorePenalty,
+  GENERIC_FIBER_THRESHOLD_PERCENT,
   isContextuallySelectableForTarget,
+  isMechanicalContextOpportunity,
+  isMechanicalContextStrength,
   isMechanicalLargeCityOpportunity,
   isMechanicalLargeCityStrength,
 } from "./context/context-relevance";

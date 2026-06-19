@@ -64,13 +64,23 @@ describe("opportunities — communes de référence", () => {
     const facts = buildAnalysisFacts(palaiseauProfile);
     const selected = selectAnalysisFactsForPrompt(facts, palaiseauProfile);
     const opportunities = selected.filter((fact) => fact.target === "opportunities");
+    const relatedWatchPointThemes = selected
+      .filter((fact) => fact.target === "watchPoints")
+      .map((fact) => fact.theme);
+    const relatedStrengthThemes = selected
+      .filter((fact) => fact.target === "strengths")
+      .map((fact) => fact.theme);
 
     assert.ok(opportunities.length >= 1);
     for (const opportunity of opportunities) {
       assert.ok(opportunity.sourceKeys.length > 0, opportunity.sentence);
       assert.ok(opportunity.evidence.length > 0, opportunity.sentence);
       assert.equal(
-        isGenericOpportunity(opportunity, { territory: palaiseauProfile }),
+        isGenericOpportunity(opportunity, {
+          territory: palaiseauProfile,
+          relatedWatchPointThemes,
+          relatedStrengthThemes,
+        }),
         false,
         opportunity.sentence,
       );

@@ -516,7 +516,8 @@ function qualifyFinancesFact(fact: AnalysisFact, territory: TerritoryProfile): Q
   }
 
   if (
-    accounts?.operatingRevenueEur != null &&
+    (accounts?.operatingRevenueEur != null ||
+      accounts?.operatingRevenuePerCapitaEur != null) &&
     /€ par habitant/i.test(fact.sentence)
   ) {
     return withTargets(fact, {
