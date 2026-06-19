@@ -25,6 +25,8 @@ export const ACRONYMS: Record<string, string> = {
   UU: "Unité urbaine — agglomération au sens INSEE (UU2020)",
   LOVAC: "Logements vacants du parc privé — base Cerema croisant fichiers fiscaux et fonciers",
   IPS: "Indice de position sociale — contexte socio-économique des écoles (DEPP)",
+  RSA: "Revenu de solidarité active — prestation minimale versée par la CAF",
+  CAF: "Caisse d'allocations familiales — organisme de prestations sociales",
 };
 
 export function getAcronymDefinition(term: string): string | undefined {

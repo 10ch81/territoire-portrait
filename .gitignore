@@ -61,6 +61,7 @@ yarn-error.log*
 !/data/cache/lovac-by-commune.json
 !/data/cache/france-travail-by-commune.json
 !/data/cache/ips-by-commune.json
+!/data/cache/caf-by-commune.json
 
 # vercel
 .vercel

@@ -56,6 +56,10 @@ import {
   loadLabourMarketSnapshot,
   createFranceTravailSource,
 } from "./labour-market";
+import {
+  loadSocialBenefitsSnapshot,
+  createCafSource,
+} from "./social-benefits";
 
 function collectEnrichmentSources(
   accessedAt: string,
@@ -82,6 +86,9 @@ function collectEnrichmentSources(
         enrichment.labourMarket.quarter ?? undefined,
       ),
     );
+  }
+  if (enrichment.socialBenefits?.available) {
+    sources.push(createCafSource(accessedAt));
   }
   if (enrichment.enterprises) {
     sources.push(createEnterpriseSource(accessedAt));
@@ -199,6 +206,7 @@ export async function enrichTerritory(
   const populationHistory = loadPopulationHistorySnapshot(territory.inseeCode);
   const sociodemographics = loadSociodemographicsSnapshot(territory.inseeCode);
   const labourMarket = loadLabourMarketSnapshot(territory.inseeCode);
+  const socialBenefits = loadSocialBenefitsSnapshot(territory.inseeCode);
   const employmentSectors = loadEmploymentSectorsSnapshot(territory.inseeCode);
   const equipments = loadEquipmentSnapshot(territory.inseeCode);
   const education = loadEducationSnapshot(territory.inseeCode);
@@ -216,6 +224,7 @@ export async function enrichTerritory(
     populationHistory,
     sociodemographics,
     labourMarket,
+    socialBenefits,
     enterprises,
     employmentSectors,
     equipments,

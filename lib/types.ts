@@ -118,6 +118,13 @@ export interface LabourMarketSnapshot {
   note: string;
 }
 
+export interface SocialBenefitsSnapshot {
+  rsaVintage: number | null;
+  rsaShareAmongHouseholdsPercent: number | null;
+  available: boolean;
+  note: string;
+}
+
 export interface PopulationHistorySnapshot {
   latestYear: number | null;
   latestPopulation: number | null;
@@ -377,6 +384,7 @@ export interface TerritoryEnrichment {
   populationHistory: PopulationHistorySnapshot | null;
   sociodemographics: SociodemographicsSnapshot | null;
   labourMarket: LabourMarketSnapshot | null;
+  socialBenefits: SocialBenefitsSnapshot | null;
   enterprises: EnterpriseSnapshot | null;
   employmentSectors: EmploymentSectorsSnapshot | null;
   equipments: EquipmentSnapshot | null;
@@ -564,6 +572,13 @@ export type FranceTravailCommuneCache = Record<
   string,
   FranceTravailCommuneCacheEntry
 >;
+
+export interface CafCommuneCacheEntry {
+  rsaShareAmongHouseholdsPercent: number | null;
+  vintage: number;
+}
+
+export type CafCommuneCache = Record<string, CafCommuneCacheEntry>;
 
 export interface IrveCommuneCacheEntry {
   year: number;

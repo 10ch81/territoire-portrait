@@ -155,3 +155,40 @@ export function buildLabourMarketFacts(territory: TerritoryProfile): AnalysisFac
 
   return facts;
 }
+
+export function buildSocialBenefitsFacts(territory: TerritoryProfile): AnalysisFact[] {
+  const facts: AnalysisFact[] = [];
+  const socialBenefits = territory.enrichment?.socialBenefits;
+
+  if (
+    !socialBenefits?.available ||
+    socialBenefits.rsaShareAmongHouseholdsPercent == null
+  ) {
+    return facts;
+  }
+
+  facts.push(
+    createFact({
+      theme: "employment",
+      target: "summary",
+      sentence: `${formatPercent(socialBenefits.rsaShareAmongHouseholdsPercent)} des ménages sont allocataires du RSA (CNAF ${socialBenefits.rsaVintage ?? ""}).`,
+      sourceKeys: ["cnaf-precarite"],
+      year: socialBenefits.rsaVintage ?? undefined,
+      confidence: "medium",
+      limitations: [
+        socialBenefits.note,
+        "Indicateur partiel : ne remplace pas un diagnostic complet des prestations sociales communales.",
+      ],
+      numericBindings: [
+        binding(
+          socialBenefits.rsaShareAmongHouseholdsPercent,
+          "part allocataires RSA parmi les ménages",
+          "employment",
+          ["RSA", "CNAF", "allocataires", "ménages", "précarité"],
+        ),
+      ],
+    }),
+  );
+
+  return facts;
+}

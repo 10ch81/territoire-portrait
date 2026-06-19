@@ -2,6 +2,7 @@ import { loadJsonCache } from "../enrichment/cache";
 import type {
   ArcepCommuneCache,
   BpeCommuneCache,
+  CafCommuneCache,
   FiscalCommuneCache,
   FloresCommuneCache,
   HousingCommuneCache,
@@ -498,6 +499,31 @@ function validateFranceTravailCache(findings: QualityFinding[]): void {
   }
 }
 
+function validateCafCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<CafCommuneCache>("caf-by-commune.json");
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/caf-by-commune.json",
+      message: "Cache CNAF absent — exécutez npm run ingest:caf",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    const percentFinding = isPercentInRange(
+      entry.rsaShareAmongHouseholdsPercent,
+      "rsaShareAmongHouseholdsPercent",
+      inseeCode,
+    );
+    if (percentFinding) {
+      findings.push(percentFinding);
+    }
+  }
+}
+
 function validateIpsCache(findings: QualityFinding[]): void {
   const cache = loadJsonCache<IpsCommuneCache>("ips-by-commune.json");
 
@@ -556,6 +582,7 @@ export function validateInternalCache(): QualityFinding[] {
   validateHousingCache(findings);
   validateLovacCache(findings);
   validateFranceTravailCache(findings);
+  validateCafCache(findings);
   validateIpsCache(findings);
   validatePopulationCache(findings);
   validateIrveCache(findings);
