@@ -1,3 +1,7 @@
+import {
+  isConnectivityAvailable,
+  isMobilityAvailable,
+} from "@/lib/enrichment/mobility";
 import type { TerritoryProfile } from "@/lib/types";
 
 export interface CompletenessResult {
@@ -29,7 +33,10 @@ const ENRICHMENT_CHECKS: Array<{
   },
   {
     id: "equipments",
-    isAvailable: (t) => t.enrichment?.equipments?.available === true,
+    isAvailable: (t) =>
+      t.enrichment?.equipments?.available === true ||
+      (t.enrichment?.mobility != null &&
+        isConnectivityAvailable(t.enrichment.mobility)),
   },
   {
     id: "risks",
@@ -45,14 +52,9 @@ const ENRICHMENT_CHECKS: Array<{
   },
   {
     id: "mobility",
-    isAvailable: (t) => {
-      const mobility = t.enrichment?.mobility;
-      return (
-        mobility !== undefined &&
-        mobility !== null &&
-        (mobility.irve.available || mobility.commute.available)
-      );
-    },
+    isAvailable: (t) =>
+      t.enrichment?.mobility != null &&
+      isMobilityAvailable(t.enrichment.mobility),
   },
   {
     id: "urban-policy",

@@ -3,6 +3,7 @@ import { DataSection } from "@/components/DataSection";
 import { SectionUnavailable } from "@/components/SectionUnavailable";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
 import { formatPercent } from "@/lib/enrichment";
+import { isMobilityAvailable } from "@/lib/enrichment/mobility";
 import { RP_VINTAGE } from "@/lib/sources";
 import type { TerritoryProfile } from "@/lib/types";
 
@@ -13,10 +14,7 @@ interface MobilitySectionProps {
 export function MobilitySection({ territory }: MobilitySectionProps) {
   const mobility = territory.enrichment?.mobility;
   const derived = territory.enrichment?.derived;
-  const hasContent =
-    mobility?.irve.available ||
-    mobility?.commute.available ||
-    mobility?.connectivity.available;
+  const hasContent = mobility != null && isMobilityAvailable(mobility);
 
   return (
     <DataSection
@@ -31,7 +29,7 @@ export function MobilitySection({ territory }: MobilitySectionProps) {
     >
       {hasContent ? (
         <dl className="space-y-3">
-          {mobility?.commute.available ? (
+          {mobility.commute.available ? (
             <>
               <DataRow
                 label="Actifs occupés (domicile-travail)"
@@ -49,7 +47,7 @@ export function MobilitySection({ territory }: MobilitySectionProps) {
               />
             </>
           ) : null}
-          {mobility?.irve.available ? (
+          {mobility.irve.available ? (
             <>
               <DataRow
                 label="Points de charge"
@@ -69,35 +67,8 @@ export function MobilitySection({ territory }: MobilitySectionProps) {
               ) : null}
             </>
           ) : null}
-          {mobility?.connectivity.available ? (
-            <>
-              <h3 className="pt-2 text-sm font-semibold text-slate-900">
-                Accès internet fixe (ARCEP)
-              </h3>
-              <DataRow
-                label="Part de locaux raccordables fibre"
-                value={formatPercent(mobility.connectivity.fiberEligibleSharePercent)}
-              />
-              {mobility.connectivity.technologies.length > 0 ? (
-                <div>
-                  <dt className="text-sm font-medium text-slate-500">
-                    Technologies disponibles
-                  </dt>
-                  <dd className="mt-1 text-sm text-slate-900">
-                    {mobility.connectivity.technologies.join(" · ")}
-                  </dd>
-                </div>
-              ) : null}
-            </>
-          ) : null}
           <p className="text-xs text-slate-500">
-            {[
-              mobility?.commute.note,
-              mobility?.irve.note,
-              mobility?.connectivity.note,
-            ]
-              .filter(Boolean)
-              .join(" ")}
+            {[mobility.commute.note, mobility.irve.note].filter(Boolean).join(" ")}
           </p>
         </dl>
       ) : (

@@ -16,6 +16,7 @@ import {
 import { fetchRisksSnapshot, createGeorisquesSource } from "./risks";
 import {
   loadMobilitySnapshot,
+  isConnectivityAvailable,
   isMobilityAvailable,
   createCommuteSource,
   createIrveSource,
@@ -136,9 +137,9 @@ function collectEnrichmentSources(
     if (enrichment.mobility.commute.available) {
       sources.push(createCommuteSource(accessedAt));
     }
-    if (enrichment.mobility.connectivity.available) {
-      sources.push(createArcepSource(accessedAt));
-    }
+  }
+  if (enrichment.mobility && isConnectivityAvailable(enrichment.mobility)) {
+    sources.push(createArcepSource(accessedAt));
   }
   if (enrichment.urbanPolicy?.available) {
     sources.push(createQpvSource(accessedAt));

@@ -1,6 +1,8 @@
 import { DataRow } from "@/components/DataRow";
 import { DataSection } from "@/components/DataSection";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
+import { formatCurrency, formatRate } from "@/lib/enrichment";
+import { FILOSOFI_VINTAGE, RP_VINTAGE } from "@/lib/sources";
 import type { TerritoryProfile } from "@/lib/types";
 
 interface EconomySectionProps {
@@ -15,6 +17,11 @@ function formatEnterpriseCount(value: number, isCapped: boolean): string {
 export function EconomySection({ territory }: EconomySectionProps) {
   const enterprises = territory.enrichment?.enterprises;
   const employmentSectors = territory.enrichment?.employmentSectors;
+  const sociodemographics = territory.enrichment?.sociodemographics;
+  const hasIncomeEmploymentData =
+    sociodemographics?.available === true &&
+    (sociodemographics.unemploymentRate !== null ||
+      sociodemographics.medianDisposableIncome !== null);
 
   return (
     <DataSection
@@ -24,6 +31,12 @@ export function EconomySection({ territory }: EconomySectionProps) {
         <>
           <AcronymTooltip term="SIDE" /> (référence statistique) ·{" "}
           <AcronymTooltip term="SIRENE" /> (complément administratif)
+          {hasIncomeEmploymentData ? (
+            <>
+              {" "}
+              · RP {RP_VINTAGE} · FILOSOFI {FILOSOFI_VINTAGE}
+            </>
+          ) : null}
           {employmentSectors?.available ? (
             <>
               {" "}
@@ -34,6 +47,29 @@ export function EconomySection({ territory }: EconomySectionProps) {
       }
       vintage={employmentSectors?.year ?? enterprises?.millesime}
     >
+      {hasIncomeEmploymentData ? (
+        <div className="mb-6 border-b border-slate-100 pb-6">
+          <h3 className="text-base font-semibold text-slate-900">
+            Revenus & emploi (RP {sociodemographics?.year ?? RP_VINTAGE} / FILOSOFI)
+          </h3>
+          <dl className="mt-3 space-y-3">
+            {sociodemographics?.unemploymentRate !== null ? (
+              <DataRow
+                label="Taux de chômage (15-64 ans)"
+                value={formatRate(sociodemographics.unemploymentRate)}
+              />
+            ) : null}
+            {sociodemographics?.medianDisposableIncome !== null ? (
+              <DataRow
+                label={`Niveau de vie médian (FILOSOFI ${sociodemographics.incomeYear ?? FILOSOFI_VINTAGE})`}
+                value={formatCurrency(sociodemographics.medianDisposableIncome)}
+              />
+            ) : null}
+            <p className="text-xs text-slate-500">{sociodemographics?.note}</p>
+          </dl>
+        </div>
+      ) : null}
+
       {enterprises ? (
         <dl className="space-y-3">
           {enterprises.inseeLegalUnits !== null ? (

@@ -4,7 +4,6 @@ import { SectionUnavailable } from "@/components/SectionUnavailable";
 import { AgePyramidChart } from "@/components/charts/AgePyramidChart";
 import { PopulationChart } from "@/components/charts/PopulationChart";
 import {
-  formatCurrency,
   formatPercent,
   formatRate,
 } from "@/lib/enrichment";
@@ -141,20 +140,6 @@ export function DemographicsSection({ territory }: DemographicsSectionProps) {
                     }
                   />
                 ))}
-                {sociodemographics.unemploymentRate !== null ? (
-                  <DataRow
-                    label="Taux de chômage (15-64 ans)"
-                    value={formatRate(sociodemographics.unemploymentRate)}
-                  />
-                ) : null}
-                {sociodemographics.medianDisposableIncome !== null ? (
-                  <DataRow
-                    label="Niveau de vie médian (FILOSOFI)"
-                    value={formatCurrency(
-                      sociodemographics.medianDisposableIncome,
-                    )}
-                  />
-                ) : null}
                 <p className="text-xs text-slate-500">{sociodemographics.note}</p>
               </dl>
             </>

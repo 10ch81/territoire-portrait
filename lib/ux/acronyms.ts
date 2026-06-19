@@ -2,6 +2,7 @@ export const ACRONYMS: Record<string, string> = {
   BPE: "Base permanente des équipements — recensement INSEE des équipements et services",
   RPLS: "Répertoire des logements locatifs des bailleurs sociaux",
   IRVE: "Infrastructure de recharge pour véhicules électriques",
+  ARCEP: "Autorité de régulation des communications électroniques — couverture internet fixe",
   DVF: "Demandes de valeurs foncières — transactions immobilières",
   AAV: "Aire d'attraction des villes — zonage INSEE",
   REI: "Relevé des éléments d'imposition — fiscalité locale",

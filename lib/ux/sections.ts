@@ -1,4 +1,25 @@
+import {
+  isConnectivityAvailable,
+  isMobilityAvailable,
+} from "@/lib/enrichment/mobility";
 import type { TerritoryProfile } from "@/lib/types";
+
+export function isEquipmentsSectionAvailable(
+  territory: TerritoryProfile,
+): boolean {
+  const enrichment = territory.enrichment;
+  if (!enrichment) {
+    return false;
+  }
+
+  return (
+    enrichment.equipments?.available === true ||
+    (enrichment.mobility != null &&
+      isConnectivityAvailable(enrichment.mobility)) ||
+    enrichment.education?.available === true ||
+    enrichment.education?.averageIps !== null
+  );
+}
 
 export interface NavSection {
   id: string;
@@ -23,7 +44,7 @@ export const ENRICHMENT_SECTIONS: SectionDef[] = [
   {
     id: "equipements",
     label: "Équipements",
-    isAvailable: (t) => t.enrichment?.equipments?.available === true,
+    isAvailable: isEquipmentsSectionAvailable,
   },
   {
     id: "sante",
@@ -48,14 +69,9 @@ export const ENRICHMENT_SECTIONS: SectionDef[] = [
   {
     id: "mobilite",
     label: "Mobilité",
-    isAvailable: (t) => {
-      const mobility = t.enrichment?.mobility;
-      return (
-        mobility !== undefined &&
-        mobility !== null &&
-        (mobility.irve.available || mobility.commute.available)
-      );
-    },
+    isAvailable: (t) =>
+      t.enrichment?.mobility != null &&
+      isMobilityAvailable(t.enrichment.mobility),
   },
   {
     id: "politique-ville",
