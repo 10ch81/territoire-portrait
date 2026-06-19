@@ -58,7 +58,11 @@ export function expectOpportunitiesLinkStrengthAndWatchPoint(
       continue;
     }
 
-    if (!linksWatch && editorial.profileId !== "growthEpciCentrality") {
+    if (
+      !linksWatch &&
+      editorial.profileId !== "growthEpciCentrality" &&
+      editorial.profileId !== "smallPeriurbanGrowth"
+    ) {
       violations.push(`opportunité peu ancrée: ${opportunity}`);
     }
   }

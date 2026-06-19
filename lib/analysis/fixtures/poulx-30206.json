@@ -1,0 +1,1054 @@
+{
+  "name": "Poulx",
+  "inseeCode": "30206",
+  "postalCodes": [
+    "30320"
+  ],
+  "department": {
+    "code": "30",
+    "name": "Gard"
+  },
+  "region": {
+    "code": "76",
+    "name": "Occitanie"
+  },
+  "epci": {
+    "code": "243000643",
+    "name": "CA de Nîmes Métropole"
+  },
+  "population": 4348,
+  "densityPerKm2": 362.7081317361273,
+  "coordinates": {
+    "latitude": 43.9142,
+    "longitude": 4.422
+  },
+  "surfaceKm2": 11.9876,
+  "sources": [
+    {
+      "id": "geo-api-communes",
+      "name": "API Géo — Communes",
+      "url": "https://geo.api.gouv.fr/communes",
+      "description": "Référentiel officiel des communes françaises (nom, code INSEE, population, EPCI, coordonnées).",
+      "accessedAt": "2026-06-19T10:00:45.728Z"
+    },
+    {
+      "id": "insee-population",
+      "name": "INSEE — Populations légales (via API Géo)",
+      "url": "https://www.data.gouv.fr/fr/datasets/populations-legales/",
+      "description": "Population municipale diffusée via l'API Géo (millésime populations légales).",
+      "accessedAt": "2026-06-19T10:00:45.728Z"
+    },
+    {
+      "id": "insee-population-history",
+      "name": "INSEE — Populations historiques",
+      "url": "https://api.insee.fr/melodi/file/DS_POPULATIONS_HISTORIQUES/DS_POPULATIONS_HISTORIQUES_CSV_FR",
+      "description": "Séries historiques de population municipale par commune.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-rp-population",
+      "name": "INSEE — Recensement 2022 (structure par âge)",
+      "url": "https://www.insee.fr/fr/statistiques/8581696",
+      "description": "Structure par tranches d'âge de la population communale (RP 2022).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-rp-employment",
+      "name": "INSEE — Recensement 2022 (emploi)",
+      "url": "https://www.insee.fr/fr/statistiques/8581444",
+      "description": "Population active et chômage au recensement 2022.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-filosofi",
+      "name": "INSEE — FILOSOFI 2023 (revenus)",
+      "url": "https://www.insee.fr/fr/statistiques/8984752",
+      "description": "Niveau de vie médian des ménages (Filosofi 2, millésime 2023). Non comparable aux millésimes 2012-2021.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "recherche-entreprises",
+      "name": "API Recherche Entreprises (SIRENE)",
+      "url": "https://recherche-entreprises.api.gouv.fr",
+      "description": "Entreprises et établissements recensés via la base SIRENE (data.gouv.fr).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-side",
+      "name": "INSEE — SIDE (stocks d'entreprises)",
+      "url": "https://www.insee.fr/fr/statistiques/2011101",
+      "description": "Stocks d'unités légales et d'étabissements actifs par commune (SIDE).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-flores",
+      "name": "INSEE — FLORES (emploi salarié A17)",
+      "url": "https://www.data.gouv.fr/datasets/nombre-detablissements-et-effectifs-salaries-en-17-grands-secteurs/",
+      "description": "Établissements actifs et postes salariés fin d'année par secteur A17 (commune).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-bpe",
+      "name": "INSEE — Base permanente des équipements (BPE 2024)",
+      "url": "https://www.data.gouv.fr/datasets/denombrement-des-equipements-commerce-sport-services-sante/",
+      "description": "Dénombrement des équipements et services accessibles à la population par commune.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "education-directory",
+      "name": "Annuaire de l'Éducation",
+      "url": "https://www.data.gouv.fr/datasets/annuaire-de-leducation/",
+      "description": "Établissements scolaires ouverts par commune.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "finess",
+      "name": "FINESS — Établissements sanitaires et sociaux",
+      "url": "https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess/",
+      "description": "Référentiel national des établissements sanitaires, sociaux et médico-sociaux.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "georisques",
+      "name": "Géorisques",
+      "url": "https://georisques.gouv.fr/",
+      "description": "Radon, inondations (AZI) et reconnaissances CATNAT par commune.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "ssmsi",
+      "name": "SSMSI — Délinquance enregistrée",
+      "url": "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales",
+      "description": "Principaux indicateurs de crimes et délits enregistrés par la police et la gendarmerie (lieu de commission).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "rpls",
+      "name": "RPLS — Parc locatif social",
+      "url": "https://www.data.gouv.fr/datasets/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/",
+      "description": "Répertoire des logements locatifs des bailleurs sociaux agrégé par commune.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-rp-housing",
+      "name": "INSEE — RP 2022 logement",
+      "url": "https://www.insee.fr/fr/statistiques/8581474",
+      "description": "Parc de logements et vacance générale au recensement 2022.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "irve",
+      "name": "IRVE — Bornes de recharge",
+      "url": "https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/",
+      "description": "Fichier consolidé national des bornes de recharge pour véhicules électriques.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-rp-commute",
+      "name": "INSEE — RP 2022 mobilité domicile-travail",
+      "url": "https://www.insee.fr/fr/statistiques/8581610",
+      "description": "Modes de transport principal des actifs occupés de 15 ans ou plus (recensement 2022).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "arcep-fibre",
+      "name": "ARCEP — Ma connexion internet",
+      "url": "https://www.data.gouv.fr/datasets/ma-connexion-internet/",
+      "description": "Couverture fibre et technologies d'accès internet fixe par commune.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "qpv-sig-ville",
+      "name": "INSEE / SIG Ville — QPV 2024",
+      "url": "https://www.insee.fr/fr/statistiques/fichier/8186239/TAG_QPV2024_2025_csv.zip",
+      "description": "Quartiers prioritaires de la politique de la ville (table d'appartenance géographique 2025).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "rei",
+      "name": "REI — Fiscalité locale",
+      "url": "https://www.data.gouv.fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-4/",
+      "description": "Recensement des éléments d'imposition à la fiscalité directe locale (taux communaux).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "ofgl",
+      "name": "OFGL — Comptes des collectivités",
+      "url": "https://data.ofgl.fr/",
+      "description": "Encours de dette et recettes de fonctionnement des communes (budget principal).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "aav2020",
+      "name": "INSEE — Aires d'attraction 2020",
+      "url": "https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/",
+      "description": "Zonage en aires d'attraction des villes (AAV2020) par commune.",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-density-grid",
+      "name": "INSEE — Grille communale de densité (7 niveaux)",
+      "url": "https://www.insee.fr/fr/information/6439600",
+      "description": "Typologie communale de densité à 7 niveaux (millésime 2024, géographie au 1er janvier 2024).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "insee-urban-unit",
+      "name": "INSEE — Unités urbaines 2020",
+      "url": "https://www.insee.fr/fr/information/4802589",
+      "description": "Composition communale des unités urbaines 2020 (UU2020).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    },
+    {
+      "id": "dvf",
+      "name": "DVF — Indicateurs immobiliers",
+      "url": "https://www.data.gouv.fr/datasets/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/",
+      "description": "Prix et volumes de mutations immobilières agrégés par commune (hors Alsace-Moselle et Mayotte).",
+      "accessedAt": "2026-06-19T10:00:45.729Z"
+    }
+  ],
+  "enrichment": {
+    "populationHistory": {
+      "latestYear": 2022,
+      "latestPopulation": 4265,
+      "history": [
+        {
+          "year": 2010,
+          "population": 4032
+        },
+        {
+          "year": 2015,
+          "population": 3878
+        },
+        {
+          "year": 2020,
+          "population": 4171
+        },
+        {
+          "year": 2021,
+          "population": 4237
+        },
+        {
+          "year": 2022,
+          "population": 4265
+        }
+      ],
+      "available": true,
+      "note": "Populations municipales INSEE (DS_POPULATIONS_HISTORIQUES). La population légale affichée en tête de fiche provient de l'API Géo."
+    },
+    "sociodemographics": {
+      "year": 2022,
+      "incomeYear": 2023,
+      "ageBands": [
+        {
+          "label": "0-14 ans",
+          "population": 666,
+          "sharePercent": 15.6
+        },
+        {
+          "label": "15-29 ans",
+          "population": 592,
+          "sharePercent": 13.9
+        },
+        {
+          "label": "30-44 ans",
+          "population": 629,
+          "sharePercent": 14.7
+        },
+        {
+          "label": "45-59 ans",
+          "population": 1146,
+          "sharePercent": 26.9
+        },
+        {
+          "label": "60-74 ans",
+          "population": 923,
+          "sharePercent": 21.6
+        },
+        {
+          "label": "75-89 ans",
+          "population": 269,
+          "sharePercent": 6.3
+        },
+        {
+          "label": "90 ans ou plus",
+          "population": 40,
+          "sharePercent": 0.9
+        }
+      ],
+      "unemploymentRate": 10.2,
+      "medianDisposableIncome": 30290,
+      "available": true,
+      "note": "Recensement 2022 (structure par âge, chômage) et FILOSOFI 2023 (niveau de vie médian)."
+    },
+    "enterprises": {
+      "legalUnitsWithEstablishment": 1002,
+      "legalUnitsIsCapped": false,
+      "essCount": 55,
+      "rgeCount": 1,
+      "inseeLegalUnits": 343,
+      "inseeEstablishments": 364,
+      "inseeSideYear": 2022,
+      "millesime": "2022 (SIDE) / 2024-2025 (SIRENE)",
+      "divergenceWarning": "Écart notable entre le répertoire SIRENE (1 002 entreprises) et SIDE INSEE (343) : périmètres et méthodes distincts. Privilégier SIDE pour décrire l'activité économique ; SIRENE sert de répertoire administratif complémentaire.",
+      "note": "Référence statistique : stocks INSEE SIDE (2022) — unités légales et établissements actifs sur la commune. Complément administratif : unités légales avec ≥ 1 établissement actif (API SIRENE) ; ne pas en déduire un dynamisme économique. Comptages ESS et RGE issus de l'API SIRENE (filtres dédiés)."
+    },
+    "employmentSectors": {
+      "year": 2024,
+      "totalEstablishments": 71,
+      "totalSalariedPosts": 278,
+      "sectors": [
+        {
+          "code": "OQ",
+          "label": "Administration publique, enseignement, santé, action sociale",
+          "establishments": 8,
+          "salariedPosts": 123
+        },
+        {
+          "code": "MN",
+          "label": "Activités spécialisées, scientifiques et techniques",
+          "establishments": 12,
+          "salariedPosts": 41
+        },
+        {
+          "code": "GZ",
+          "label": "Commerce et réparation automobile",
+          "establishments": 15,
+          "salariedPosts": 39
+        },
+        {
+          "code": "FZ",
+          "label": "Construction",
+          "establishments": 9,
+          "salariedPosts": 15
+        },
+        {
+          "code": "C1",
+          "label": "Industries agro-alimentaires",
+          "establishments": 4,
+          "salariedPosts": 13
+        },
+        {
+          "code": "IZ",
+          "label": "Hébergement et restauration",
+          "establishments": 4,
+          "salariedPosts": 10
+        },
+        {
+          "code": "AZ",
+          "label": "Agriculture, sylviculture et pêche",
+          "establishments": 2,
+          "salariedPosts": 10
+        },
+        {
+          "code": "RU",
+          "label": "Autres activités de services",
+          "establishments": 5,
+          "salariedPosts": 9
+        },
+        {
+          "code": "C5",
+          "label": "Autres industries manufacturières",
+          "establishments": 2,
+          "salariedPosts": 7
+        },
+        {
+          "code": "KZ",
+          "label": "Activités financières et d'assurance",
+          "establishments": 5,
+          "salariedPosts": 5
+        },
+        {
+          "code": "HZ",
+          "label": "Transports et entreposage",
+          "establishments": 2,
+          "salariedPosts": 4
+        },
+        {
+          "code": "LZ",
+          "label": "Activités immobilières",
+          "establishments": 1,
+          "salariedPosts": 1
+        },
+        {
+          "code": "JZ",
+          "label": "Information et communication",
+          "establishments": 2,
+          "salariedPosts": 1
+        }
+      ],
+      "available": true,
+      "note": "FLORES INSEE — postes salariés fin d'année et établissements actifs par secteur A17. Les résultats FLORES ne doivent pas faire l'objet d'analyses comparatives dans le temps."
+    },
+    "equipments": {
+      "year": 2024,
+      "totalEquipments": 129,
+      "byDomain": [
+        {
+          "code": "B",
+          "label": "Commerces",
+          "count": 7
+        },
+        {
+          "code": "E",
+          "label": "Transports et déplacements",
+          "count": 4
+        },
+        {
+          "code": "A",
+          "label": "Services pour les particuliers",
+          "count": 2
+        },
+        {
+          "code": "C",
+          "label": "Enseignement",
+          "count": 2
+        },
+        {
+          "code": "G",
+          "label": "Tourisme",
+          "count": 1
+        },
+        {
+          "code": "F",
+          "label": "Sports, loisirs et culture",
+          "count": 1
+        },
+        {
+          "code": "D",
+          "label": "Santé et action sociale",
+          "count": 1
+        }
+      ],
+      "byType": [
+        {
+          "code": "D281",
+          "label": "Infirmier",
+          "count": 12
+        },
+        {
+          "code": "D279",
+          "label": "Masseur kinésithérapeute",
+          "count": 10
+        },
+        {
+          "code": "A401",
+          "label": "Maçon",
+          "count": 9
+        },
+        {
+          "code": "A402",
+          "label": "Plâtrier peintre",
+          "count": 8
+        },
+        {
+          "code": "A507",
+          "label": "Institut de beauté-onglerie",
+          "count": 8
+        },
+        {
+          "code": "A403",
+          "label": "Menuisier charpentier serrurier",
+          "count": 8
+        },
+        {
+          "code": "A405",
+          "label": "Électricien",
+          "count": 7
+        },
+        {
+          "code": "A504",
+          "label": "Restaurant- restauration rapide",
+          "count": 6
+        }
+      ],
+      "transport": {
+        "totalEquipments": 4,
+        "byType": [
+          {
+            "code": "E101",
+            "label": "Taxi-vtc",
+            "count": 4
+          }
+        ],
+        "available": true,
+        "note": "Équipements de transport recensés dans la BPE (occurrences par type) ; l'offre réelle de transport collectif (lignes, horaires, fréquence) n'est pas analysée."
+      },
+      "available": true,
+      "note": "Dénombrement INSEE BPE 2024 : le total correspond aux occurrences recensées. Les domaines indiquent le nombre de types par domaine (décomposition partielle, ne recompose pas le total). Les principaux types (top 8) sont une liste partielle, non exhaustive.",
+      "domainBreakdownLabel": "Nombre de types d'équipements par domaine",
+      "topTypesLabel": "Principaux types d'équipements (top 8, liste partielle)",
+      "qualitativeSummary": "129 équipements recensés, avec une diversité de commerces, transports, services de proximité, enseignement, tourisme, équipements de loisirs et santé et action sociale.",
+      "domainCountsAreTypeCounts": true
+    },
+    "education": {
+      "year": 2026,
+      "totalOpen": 2,
+      "byType": [
+        {
+          "code": "Ecole",
+          "label": "Ecole",
+          "count": 2
+        }
+      ],
+      "bySector": [
+        {
+          "code": "Public",
+          "label": "Public",
+          "count": 2
+        }
+      ],
+      "byLevel": [
+        {
+          "code": "ECOLE DE NIVEAU ELEMENTAIRE",
+          "label": "ECOLE DE NIVEAU ELEMENTAIRE",
+          "count": 1
+        },
+        {
+          "code": "ECOLE MATERNELLE",
+          "label": "ECOLE MATERNELLE",
+          "count": 1
+        }
+      ],
+      "available": true,
+      "note": "Annuaire de l'Éducation — établissements ouverts ; complémentaire au dénombrement BPE (domaine C)."
+    },
+    "health": {
+      "year": 2026,
+      "totalEstablishments": 3,
+      "totalCapacity": null,
+      "byCategory": [
+        {
+          "code": "Pharmacie d'Officine",
+          "label": "Pharmacie d'Officine",
+          "count": 1
+        },
+        {
+          "code": "Service autonomie aide (SAA)",
+          "label": "Service autonomie aide (SAA)",
+          "count": 1
+        },
+        {
+          "code": "Etablissement d'hébergement pour personnes âgées dépendantes",
+          "label": "Etablissement d'hébergement pour personnes âgées dépendantes",
+          "count": 1
+        }
+      ],
+      "byType": [
+        {
+          "code": "Commerce de Biens à Usage Médicaux",
+          "label": "Commerce de Biens à Usage Médicaux",
+          "count": 1
+        },
+        {
+          "code": "Etablissements et services multi-clientèles",
+          "label": "Etablissements et services multi-clientèles",
+          "count": 1
+        },
+        {
+          "code": "Etablissements d'Hébergement pour Personnes Âgées",
+          "label": "Etablissements d'Hébergement pour Personnes Âgées",
+          "count": 1
+        }
+      ],
+      "available": true,
+      "note": "Référentiel FINESS (établissements ouverts) — complète le dénombrement BPE sans mesurer l'accessibilité spatiale."
+    },
+    "risks": {
+      "radon": {
+        "potentialClass": "1",
+        "label": "Potentiel radon faible"
+      },
+      "flood": {
+        "zones": [
+          "Bassin versant des Gardons — Inondation",
+          "Bassin versant des Gardons — Par une crue torrentielle ou à montée rapide de cours d'eau",
+          "Atlas des zones inondables du bassin versant du Vidourle — Inondation",
+          "Atlas des zones inondables du bassin versant des Gardons — Inondation"
+        ],
+        "count": 4
+      },
+      "catNatEvents": [
+        {
+          "label": "Inondations et/ou Coulées de Boue",
+          "startDate": "08/09/2002"
+        },
+        {
+          "label": "Inondations et/ou Coulées de Boue",
+          "startDate": "06/09/2005"
+        },
+        {
+          "label": "Sécheresse",
+          "startDate": "01/01/2012"
+        },
+        {
+          "label": "Inondations et/ou Coulées de Boue",
+          "startDate": "09/10/2014"
+        },
+        {
+          "label": "Sécheresse",
+          "startDate": "01/07/2017"
+        }
+      ],
+      "available": true,
+      "note": "Radon, atlas des zones inondables (AZI) et CATNAT via l'API Géorisques."
+    },
+    "security": {
+      "year": 2024,
+      "indicators": [
+        {
+          "id": "burglaries",
+          "label": "Cambriolages de logement",
+          "count": 15,
+          "ratePer1000": 7.879507,
+          "departmentRatePer1000": 6.6969812,
+          "diffused": true
+        },
+        {
+          "id": "violent_theft",
+          "label": "Vols violents sans arme",
+          "count": null,
+          "ratePer1000": null,
+          "departmentRatePer1000": 0.4760422,
+          "diffused": false
+        },
+        {
+          "id": "physical_violence",
+          "label": "Violences physiques hors cadre familial",
+          "count": null,
+          "ratePer1000": null,
+          "departmentRatePer1000": 3.1455107,
+          "diffused": false
+        },
+        {
+          "id": "vandalism",
+          "label": "Destructions et dégradations volontaires",
+          "count": 12,
+          "ratePer1000": 2.7598896,
+          "departmentRatePer1000": 8.0641814,
+          "diffused": true
+        },
+        {
+          "id": "fraud",
+          "label": "Escroqueries et fraudes aux moyens de paiement",
+          "count": 30,
+          "ratePer1000": 6.899724,
+          "departmentRatePer1000": 6.1496355,
+          "diffused": true
+        },
+        {
+          "id": "vehicle_theft",
+          "label": "Vols de véhicule",
+          "count": null,
+          "ratePer1000": null,
+          "departmentRatePer1000": 1.9742133,
+          "diffused": false
+        }
+      ],
+      "diffusedIndicatorCount": 3,
+      "available": true,
+      "note": "Faits enregistrés par la police et la gendarmerie (lieu de commission, SSMSI). Ne mesure pas le ressenti d'insécurité ni les faits non déclarés. Taux pour 1 000 habitants lorsque diffusé ; une seule année — pas de tendance interannuelle."
+    },
+    "housing": {
+      "year": 2021,
+      "totalUnits": 60,
+      "occupiedUnits": 55,
+      "vacantUnits": 5,
+      "totalDwellings": 1904,
+      "rpVacantDwellings": 73,
+      "rpVacancyRatePercent": 3.8,
+      "socialHousingSharePercent": 3.2,
+      "vacancyRatePercent": 8.3,
+      "available": true,
+      "note": "Parc locatif social (RPLS 2021) et vacance générale du parc (RP logement 2022) — périmètres distincts."
+    },
+    "mobility": {
+      "irve": {
+        "year": 2026,
+        "chargingPoints": 4,
+        "stations": 1,
+        "available": true,
+        "note": "Fichier consolidé national IRVE — points de charge recensés par commune."
+      },
+      "commute": {
+        "year": 2022,
+        "employedCount": 914,
+        "carSharePercent": 91.2,
+        "publicTransportSharePercent": 4.4,
+        "available": true,
+        "note": "Recensement 2022 — part des actifs occupés de 15 ans ou plus selon le mode de transport principal domicile-travail."
+      },
+      "connectivity": {
+        "vintage": "2026-03-31",
+        "fiberEligibleSharePercent": 97.2,
+        "totalPremises": 2204,
+        "fiberEligiblePremises": 2142,
+        "technologies": [
+          "Fibre (FTTH)",
+          "Cuivre (DSL)",
+          "4G fixe",
+          "Satellite"
+        ],
+        "available": true,
+        "note": "ARCEP — part estimée de locaux raccordables fibre (agrégat IPE opérateurs vs stock locaux). Ne mesure pas la mobilité physique."
+      }
+    },
+    "urbanPolicy": {
+      "year": 2025,
+      "hasQpv": false,
+      "qpvCount": 0,
+      "qpvLabels": [],
+      "available": true,
+      "note": "Quartiers prioritaires de la politique de la ville (QPV 2024, table INSEE TAG 2025)."
+    },
+    "fiscal": {
+      "year": 2024,
+      "propertyTaxBuiltRate": 92.63,
+      "propertyTaxUnbuiltRate": 0,
+      "habitationTaxRate": null,
+      "available": true,
+      "note": "Taux d'imposition communaux issus du fichier REI (impôts locaux, DGFiP)."
+    },
+    "publicAccounts": {
+      "year": 2024,
+      "operatingRevenueEur": 4223186.64,
+      "operatingRevenuePerCapitaEur": 967.5112577319587,
+      "debtOutstandingEur": 3026894.86,
+      "debtPerCapitaEur": 693.4467033218785,
+      "available": true,
+      "note": "Encours de dette et recettes de fonctionnement (budget principal), source OFGL — dernier exercice disponible."
+    },
+    "proximityServices": {
+      "year": 2025,
+      "franceServicesCount": 0,
+      "structureLabels": [],
+      "available": false,
+      "note": "Aucune structure France Services labellisée sur cette commune."
+    },
+    "tourism": {
+      "year": 2025,
+      "accommodationPlaces": 0,
+      "available": false,
+      "note": "Capacités d'hébergement touristique (hôtels, campings, etc.) — INSEE, toutes catégories confondues. Pas de données de fréquentation : potentiel à approfondir, pas de conclusion sur sous-exploitation."
+    },
+    "geography": {
+      "attractionArea": {
+        "code": "037",
+        "label": "Nîmes",
+        "categoryCode": "20",
+        "categoryLabel": "20",
+        "available": true,
+        "note": "Aire d'attraction des villes 2020 (AAV2020)."
+      },
+      "epciComparison": {
+        "epciName": "CA de Nîmes Métropole",
+        "communeCount": 39,
+        "communeRankByPopulation": 10,
+        "communeRankByDensity": 6,
+        "epciAveragePopulation": 6770,
+        "epciAverageDensity": 226,
+        "available": true,
+        "note": "Comparatif calculé à partir des communes de l'EPCI (API Géo) — rangs par population et densité."
+      }
+    },
+    "property": {
+      "year": 2024,
+      "averagePricePerM2": 3756,
+      "averageTransactionPrice": 357852,
+      "mutationCount": 26,
+      "houseMutations": 25,
+      "apartmentMutations": 1,
+      "houseSharePercent": 4,
+      "apartmentSharePercent": 96,
+      "priceHistory": [
+        {
+          "year": 2014,
+          "averagePricePerM2": 2405.71875,
+          "mutationCount": 32
+        },
+        {
+          "year": 2015,
+          "averagePricePerM2": 2451.11764705882,
+          "mutationCount": 34
+        },
+        {
+          "year": 2016,
+          "averagePricePerM2": 2194.28571428571,
+          "mutationCount": 56
+        },
+        {
+          "year": 2017,
+          "averagePricePerM2": 2188.47368421053,
+          "mutationCount": 19
+        },
+        {
+          "year": 2018,
+          "averagePricePerM2": 2310.71428571429,
+          "mutationCount": 21
+        },
+        {
+          "year": 2019,
+          "averagePricePerM2": 2434.3,
+          "mutationCount": 50
+        },
+        {
+          "year": 2020,
+          "averagePricePerM2": 2720.64,
+          "mutationCount": 50
+        },
+        {
+          "year": 2021,
+          "averagePricePerM2": 2735.04615384615,
+          "mutationCount": 65
+        },
+        {
+          "year": 2022,
+          "averagePricePerM2": 2955.27692307692,
+          "mutationCount": 65
+        },
+        {
+          "year": 2023,
+          "averagePricePerM2": 3319.9,
+          "mutationCount": 50
+        },
+        {
+          "year": 2024,
+          "averagePricePerM2": 3756,
+          "mutationCount": 26
+        }
+      ],
+      "departmentCode": "30",
+      "departmentAveragePricePerM2": 2709,
+      "available": true,
+      "note": "Prix DVF : moyennes agrégées sur les mutations enregistrées (série 2014-2024). Pas de distinction neuf/ancien, standing, biens atypiques, lots multiples, dépendances ni terrains nus ; comparatif départemental indicatif."
+    },
+    "derived": {
+      "populationGrowthPercent": 5.8,
+      "populationGrowthFromYear": 2010,
+      "populationGrowthToYear": 2022,
+      "irvePointsPer1000Residents": 0.9,
+      "socialHousingVacancyRatePercent": 8.3,
+      "equipmentsPer1000Residents": 29.7,
+      "available": true,
+      "note": "Indicateurs dérivés calculés à partir des données disponibles (population, IRVE, RPLS, BPE)."
+    },
+    "territoryTypology": {
+      "densityGrid": {
+        "levelCode": "5",
+        "levelLabel": "Bourg rural",
+        "simplifiedLabel": "commune rurale semi-dense",
+        "source": "INSEE",
+        "vintage": 2024,
+        "available": true,
+        "note": "Grille communale de densité à 7 niveaux (INSEE, millésime 2024)."
+      },
+      "attractionArea": {
+        "areaCode": "037",
+        "areaLabel": "Nîmes",
+        "categoryCode": "20",
+        "categoryLabel": "20",
+        "role": "couronne",
+        "source": "INSEE",
+        "vintage": 2020,
+        "available": true,
+        "note": "Aire d'attraction des villes 2020 (AAV2020)."
+      },
+      "urbanUnit": {
+        "unitCode": "30113",
+        "unitLabel": "Poulx",
+        "belongsToUrbanUnit": true,
+        "role": "banlieue",
+        "sizeClass": "1",
+        "source": "INSEE",
+        "vintage": 2020,
+        "available": true,
+        "note": "Composition communale des unités urbaines 2020 (INSEE)."
+      },
+      "publicPolicyTypologies": {
+        "source": "ANCT",
+        "available": false,
+        "note": "Dispositifs publics nationaux absents. Exécutez « npm run ingest:typology »."
+      },
+      "summaryLabel": "commune de couronne périurbaine",
+      "comparisonProfile": "periurbain",
+      "availableFamilies": [
+        "density_grid",
+        "attraction_area",
+        "urban_unit"
+      ],
+      "missingFamilies": [
+        "public_policy"
+      ]
+    },
+    "sources": [
+      {
+        "id": "insee-population-history",
+        "name": "INSEE — Populations historiques",
+        "url": "https://api.insee.fr/melodi/file/DS_POPULATIONS_HISTORIQUES/DS_POPULATIONS_HISTORIQUES_CSV_FR",
+        "description": "Séries historiques de population municipale par commune.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-rp-population",
+        "name": "INSEE — Recensement 2022 (structure par âge)",
+        "url": "https://www.insee.fr/fr/statistiques/8581696",
+        "description": "Structure par tranches d'âge de la population communale (RP 2022).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-rp-employment",
+        "name": "INSEE — Recensement 2022 (emploi)",
+        "url": "https://www.insee.fr/fr/statistiques/8581444",
+        "description": "Population active et chômage au recensement 2022.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-filosofi",
+        "name": "INSEE — FILOSOFI 2023 (revenus)",
+        "url": "https://www.insee.fr/fr/statistiques/8984752",
+        "description": "Niveau de vie médian des ménages (Filosofi 2, millésime 2023). Non comparable aux millésimes 2012-2021.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "recherche-entreprises",
+        "name": "API Recherche Entreprises (SIRENE)",
+        "url": "https://recherche-entreprises.api.gouv.fr",
+        "description": "Entreprises et établissements recensés via la base SIRENE (data.gouv.fr).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-side",
+        "name": "INSEE — SIDE (stocks d'entreprises)",
+        "url": "https://www.insee.fr/fr/statistiques/2011101",
+        "description": "Stocks d'unités légales et d'étabissements actifs par commune (SIDE).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-flores",
+        "name": "INSEE — FLORES (emploi salarié A17)",
+        "url": "https://www.data.gouv.fr/datasets/nombre-detablissements-et-effectifs-salaries-en-17-grands-secteurs/",
+        "description": "Établissements actifs et postes salariés fin d'année par secteur A17 (commune).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-bpe",
+        "name": "INSEE — Base permanente des équipements (BPE 2024)",
+        "url": "https://www.data.gouv.fr/datasets/denombrement-des-equipements-commerce-sport-services-sante/",
+        "description": "Dénombrement des équipements et services accessibles à la population par commune.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "education-directory",
+        "name": "Annuaire de l'Éducation",
+        "url": "https://www.data.gouv.fr/datasets/annuaire-de-leducation/",
+        "description": "Établissements scolaires ouverts par commune.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "finess",
+        "name": "FINESS — Établissements sanitaires et sociaux",
+        "url": "https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess/",
+        "description": "Référentiel national des établissements sanitaires, sociaux et médico-sociaux.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "georisques",
+        "name": "Géorisques",
+        "url": "https://georisques.gouv.fr/",
+        "description": "Radon, inondations (AZI) et reconnaissances CATNAT par commune.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "ssmsi",
+        "name": "SSMSI — Délinquance enregistrée",
+        "url": "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales",
+        "description": "Principaux indicateurs de crimes et délits enregistrés par la police et la gendarmerie (lieu de commission).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "rpls",
+        "name": "RPLS — Parc locatif social",
+        "url": "https://www.data.gouv.fr/datasets/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/",
+        "description": "Répertoire des logements locatifs des bailleurs sociaux agrégé par commune.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-rp-housing",
+        "name": "INSEE — RP 2022 logement",
+        "url": "https://www.insee.fr/fr/statistiques/8581474",
+        "description": "Parc de logements et vacance générale au recensement 2022.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "irve",
+        "name": "IRVE — Bornes de recharge",
+        "url": "https://www.data.gouv.fr/datasets/base-nationale-des-irve-infrastructures-de-recharge-pour-vehicules-electriques/",
+        "description": "Fichier consolidé national des bornes de recharge pour véhicules électriques.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-rp-commute",
+        "name": "INSEE — RP 2022 mobilité domicile-travail",
+        "url": "https://www.insee.fr/fr/statistiques/8581610",
+        "description": "Modes de transport principal des actifs occupés de 15 ans ou plus (recensement 2022).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "arcep-fibre",
+        "name": "ARCEP — Ma connexion internet",
+        "url": "https://www.data.gouv.fr/datasets/ma-connexion-internet/",
+        "description": "Couverture fibre et technologies d'accès internet fixe par commune.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "qpv-sig-ville",
+        "name": "INSEE / SIG Ville — QPV 2024",
+        "url": "https://www.insee.fr/fr/statistiques/fichier/8186239/TAG_QPV2024_2025_csv.zip",
+        "description": "Quartiers prioritaires de la politique de la ville (table d'appartenance géographique 2025).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "rei",
+        "name": "REI — Fiscalité locale",
+        "url": "https://www.data.gouv.fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-4/",
+        "description": "Recensement des éléments d'imposition à la fiscalité directe locale (taux communaux).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "ofgl",
+        "name": "OFGL — Comptes des collectivités",
+        "url": "https://data.ofgl.fr/",
+        "description": "Encours de dette et recettes de fonctionnement des communes (budget principal).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "aav2020",
+        "name": "INSEE — Aires d'attraction 2020",
+        "url": "https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/",
+        "description": "Zonage en aires d'attraction des villes (AAV2020) par commune.",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-density-grid",
+        "name": "INSEE — Grille communale de densité (7 niveaux)",
+        "url": "https://www.insee.fr/fr/information/6439600",
+        "description": "Typologie communale de densité à 7 niveaux (millésime 2024, géographie au 1er janvier 2024).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "insee-urban-unit",
+        "name": "INSEE — Unités urbaines 2020",
+        "url": "https://www.insee.fr/fr/information/4802589",
+        "description": "Composition communale des unités urbaines 2020 (UU2020).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      },
+      {
+        "id": "dvf",
+        "name": "DVF — Indicateurs immobiliers",
+        "url": "https://www.data.gouv.fr/datasets/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/",
+        "description": "Prix et volumes de mutations immobilières agrégés par commune (hors Alsace-Moselle et Mayotte).",
+        "accessedAt": "2026-06-19T10:00:45.729Z"
+      }
+    ]
+  }
+}

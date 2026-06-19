@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T09:32:02.648Z",
+  "generatedAt": "2026-06-19T10:01:11.991Z",
   "passed": true,
   "results": [
     {
@@ -17,9 +17,30 @@
       "violations": []
     },
     {
+      "profileId": "largeUrbanCenter",
+      "commune": "Angers",
+      "inseeCode": "49007",
+      "passed": true,
+      "violations": []
+    },
+    {
       "profileId": "growthEpciCentrality",
       "commune": "Palaiseau",
       "inseeCode": "91477",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "profileId": "growthEpciCentrality",
+      "commune": "Tournefeuille",
+      "inseeCode": "31557",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "profileId": "smallPeriurbanGrowth",
+      "commune": "Poulx",
+      "inseeCode": "30206",
       "passed": true,
       "violations": []
     },

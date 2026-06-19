@@ -3,9 +3,12 @@ import { describe, it } from "node:test";
 import { buildFinalTerritorialAnalysis } from "../evaluation-helpers";
 import { bousseLikeProfile } from "../contextual-reference-profiles";
 import {
+  angersProfile,
   chamonixProfile,
   palaiseauProfile,
+  poulxProfile,
   rennesProfile,
+  tournefeuilleProfile,
 } from "../reference-communes";
 import {
   expectAtLeastOneProfileSpecificFact,
@@ -19,9 +22,16 @@ import {
 describe("editorialEvals — profils de référence", () => {
   const profiles = [
     { label: "Rennes", profile: rennesProfile, expected: "largeUrbanCenter" as const },
+    { label: "Angers", profile: angersProfile, expected: "largeUrbanCenter" as const },
     { label: "Palaiseau", profile: palaiseauProfile, expected: "growthEpciCentrality" as const },
+    {
+      label: "Tournefeuille",
+      profile: tournefeuilleProfile,
+      expected: "growthEpciCentrality" as const,
+    },
     { label: "Chamonix", profile: chamonixProfile, expected: "mountainTourismCenter" as const },
     { label: "Bousse", profile: bousseLikeProfile, expected: "smallPeriurbanGrowth" as const },
+    { label: "Poulx", profile: poulxProfile, expected: "smallPeriurbanGrowth" as const },
   ];
 
   for (const { label, profile, expected } of profiles) {

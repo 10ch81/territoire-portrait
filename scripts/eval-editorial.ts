@@ -3,17 +3,23 @@ import { resolve } from "node:path";
 import { buildFinalTerritorialAnalysis } from "../lib/analysis/evaluation-helpers";
 import { bousseLikeProfile } from "../lib/analysis/contextual-reference-profiles";
 import {
+  angersProfile,
   chamonixProfile,
   nantesProfile,
   palaiseauProfile,
+  poulxProfile,
   rennesProfile,
+  tournefeuilleProfile,
 } from "../lib/analysis/reference-communes";
 import { runEditorialEval } from "../lib/analysis/editorial/editorialEvals";
 
 const profiles = [
   rennesProfile,
   nantesProfile,
+  angersProfile,
   palaiseauProfile,
+  tournefeuilleProfile,
+  poulxProfile,
   chamonixProfile,
   bousseLikeProfile,
 ];

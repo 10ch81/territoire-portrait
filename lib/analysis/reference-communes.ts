@@ -21,6 +21,9 @@ import type { TerritoryProfile } from "../types";
  *   await exportFixture('74056', 'chamonix-74056.json');
  *   await exportFixture('35238', 'rennes-35238.json');
  *   await exportFixture('44109', 'nantes-44109.json');
+ *   await exportFixture('49007', 'angers-49007.json');
+ *   await exportFixture('31557', 'tournefeuille-31557.json');
+ *   await exportFixture('30206', 'poulx-30206.json');
  * "
  * ```
  */
@@ -28,6 +31,9 @@ export const PALAISEAU_INSEE = "91477";
 export const CHAMONIX_INSEE = "74056";
 export const RENNES_INSEE = "35238";
 export const NANTES_INSEE = "44109";
+export const ANGERS_INSEE = "49007";
+export const TOURNEFEUILLE_INSEE = "31557";
+export const POULX_INSEE = "30206";
 
 const FIXTURES_DIR = resolve(import.meta.dirname, "fixtures");
 
@@ -47,3 +53,12 @@ export const rennesProfile: TerritoryProfile = loadFixture("rennes-35238.json");
 
 /** Nantes (44109) — métropole ligérienne, golden commune analyse + analyze:sample. */
 export const nantesProfile: TerritoryProfile = loadFixture("nantes-44109.json");
+
+/** Angers (49007) — préfecture du Maine-et-Loire, grande centralité urbaine. */
+export const angersProfile: TerritoryProfile = loadFixture("angers-49007.json");
+
+/** Tournefeuille (31557) — commune dynamique de la couronne toulousaine, centralité EPCI. */
+export const tournefeuilleProfile: TerritoryProfile = loadFixture("tournefeuille-31557.json");
+
+/** Poulx (30206) — petite commune périurbaine du Gard, croissance et centralité locale. */
+export const poulxProfile: TerritoryProfile = loadFixture("poulx-30206.json");
