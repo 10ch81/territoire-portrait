@@ -179,6 +179,33 @@ describe("évaluation métier — communes de référence", () => {
       }
     });
 
+    it("formulation plurielle si plusieurs indicateurs SSMSI dépassent la référence", () => {
+      const security = chamonixProfile.enrichment!.security!;
+      const aboveCount = countSecurityIndicatorsAboveDepartment(chamonixProfile);
+
+      assert.ok(
+        aboveCount >= 2,
+        `Précondition fixture : au moins deux indicateurs SSMSI au-dessus de la référence (obtenu ${aboveCount}).`,
+      );
+
+      const { facts, analysis } = buildFinalTerritorialAnalysis(chamonixProfile);
+      const securityFact = facts.find((fact) => fact.theme === "security");
+
+      assert.ok(securityFact);
+      assert.match(
+        securityFact!.sentence,
+        /Plusieurs indicateurs|Certains indicateurs/,
+      );
+      assert.doesNotMatch(securityFact!.sentence, /^Un indicateur de sécurité —/);
+
+      const securityTexts = [
+        analysis.summary,
+        ...analysis.watchPoints,
+        ...analysis.strengths,
+      ].join("\n");
+      assert.match(securityTexts, /Plusieurs indicateurs|Certains indicateurs/);
+    });
+
     it("ne privilégie pas une opportunité RGE si le nombre RGE est très faible", () => {
       const rgeCount = chamonixProfile.enrichment?.enterprises?.rgeCount ?? 0;
       assert.ok(

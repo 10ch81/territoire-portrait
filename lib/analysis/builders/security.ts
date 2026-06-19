@@ -1,4 +1,9 @@
 import type { TerritoryProfile } from "../../types";
+import {
+  assessSecurityIndicators,
+  buildSecuritySummaryIssueFragments,
+  buildSecurityWatchPointSentence,
+} from "../security-indicators";
 import { createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 
@@ -16,14 +21,11 @@ export function buildSecurityFacts(territory: TerritoryProfile): AnalysisFact[] 
     return facts;
   }
 
-  const hasHigherThanDepartment = security.indicators.some(
-    (i) =>
-      i.departmentRatePer1000 !== null &&
-      i.ratePer1000 !== null &&
-      i.ratePer1000 > i.departmentRatePer1000,
-  );
+  const assessments = assessSecurityIndicators(security.indicators);
+  const sentence = buildSecurityWatchPointSentence(security, assessments);
+  const summaryFragments = buildSecuritySummaryIssueFragments(assessments);
 
-  if (!hasHigherThanDepartment) {
+  if (!sentence) {
     return facts;
   }
 
@@ -31,11 +33,12 @@ export function buildSecurityFacts(territory: TerritoryProfile): AnalysisFact[] 
     createFact({
       theme: "security",
       target: "watchPoints",
-      sentence: `Certains indicateurs de sécurité enregistrée dépassent les références départementales disponibles, à interpréter avec prudence (SSMSI ${security.year}).`,
+      sentence,
       sourceKeys: ["ssmsi"],
       year: security.year,
       confidence: "medium",
       limitations: SECURITY_LIMITATIONS,
+      ...summaryFragments,
     }),
   );
 

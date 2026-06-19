@@ -4,6 +4,10 @@ import {
 } from "../demographic-indicators";
 import { formatFrenchPercentOneDecimal } from "../age-aggregates";
 import type { TerritoryProfile } from "../types";
+import {
+  assessSecurityIndicators,
+  buildSecuritySummaryIssueFragments,
+} from "./security-indicators";
 import type { AnalysisFact, AnalysisFactSummaryFragments } from "./types";
 import { frenchAfterA } from "./render-text";
 
@@ -211,7 +215,15 @@ function fragmentsForFact(
 
     case "security":
       if (fact.target === "watchPoints") {
-        return withIssueFragments("certains indicateurs de sécurité");
+        if (hasSummaryIssuePhrase(fact)) {
+          return {};
+        }
+        const security = territory.enrichment?.security;
+        if (security?.available) {
+          return buildSecuritySummaryIssueFragments(
+            assessSecurityIndicators(security.indicators),
+          );
+        }
       }
       return {};
 

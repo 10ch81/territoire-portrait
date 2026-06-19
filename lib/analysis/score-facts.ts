@@ -1,4 +1,5 @@
 import type { TerritoryProfile } from "../types";
+import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 import {
   qualifiesAsDebtWatchPoint,
@@ -85,15 +86,9 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
   }
 
   if (fact.theme === "security") {
-    const security = territory.enrichment?.security;
-    const unfavorable = security?.indicators.some(
-      (indicator) =>
-        indicator.diffused &&
-        indicator.departmentRatePer1000 !== null &&
-        indicator.ratePer1000 !== null &&
-        indicator.ratePer1000 > indicator.departmentRatePer1000,
-    );
-    if (unfavorable) return 10;
+    if (hasSecurityIndicatorsAboveReference(territory.enrichment?.security)) {
+      return 10;
+    }
     return -20;
   }
 
@@ -119,7 +114,7 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
 function hasPrevalidatedComparison(fact: AnalysisFact): boolean {
   return (
     fact.theme === "security" &&
-    fact.sentence.includes("références départementales")
+    /référence(?:s)? départementale(?:s)?/i.test(fact.sentence)
   );
 }
 

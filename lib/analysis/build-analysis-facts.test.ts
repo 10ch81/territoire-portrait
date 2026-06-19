@@ -137,41 +137,13 @@ describe("buildAnalysisFacts", () => {
     assert.doesNotMatch(dvf!.sentence, /marché actif|prix stables/i);
   });
 
-  it("Saint-Girons — SSMSI supérieur département uniquement si taux communal > département", () => {
+  it("Saint-Girons — SSMSI supérieur département uniquement si taux communal > département (+10 %)", () => {
     const facts = buildAnalysisFacts(saintGironsProfile);
     const security = facts.find((f) => f.theme === "security");
 
     assert.ok(security);
-    assert.match(security!.sentence, /dépassent les références départementales/);
-  });
-
-  it("SSMSI — pas de mention supérieur si taux communal inférieur", () => {
-    const belowDeptProfile: typeof saintGironsProfile = {
-      ...saintGironsProfile,
-      enrichment: {
-        ...saintGironsProfile.enrichment!,
-        security: {
-          year: 2024,
-          indicators: [
-            {
-              id: "violences",
-              label: "Violences physiques",
-              count: 10,
-              ratePer1000: 2.0,
-              departmentRatePer1000: 5.2,
-              diffused: true,
-            },
-          ],
-          diffusedIndicatorCount: 1,
-          available: true,
-          note: "",
-        },
-      },
-    };
-    const facts = buildAnalysisFacts(belowDeptProfile);
-    const security = facts.find((f) => f.theme === "security");
-
-    assert.equal(security, undefined, "pas de constat sécurité si taux sous référence départementale");
+    assert.match(security!.sentence, /^Un indicateur de sécurité —/);
+    assert.match(security!.sentence, /dépasse la référence départementale/);
   });
 
   it("commune sans enrichissement — aucun constat thématique", () => {

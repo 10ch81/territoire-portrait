@@ -1,5 +1,6 @@
 import type { TerritoryProfile } from "../types";
 import { formatEuro } from "./format";
+import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
 import {
   DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR,
   debtWatchPointThresholdEur,
@@ -306,18 +307,7 @@ export function isDescriptiveIncomeWatchPointSentence(sentence: string): boolean
 }
 
 function hasUnfavorableSecuritySignal(territory: TerritoryProfile): boolean {
-  const security = territory.enrichment?.security;
-  if (!security?.available || security.diffusedIndicatorCount === 0) {
-    return false;
-  }
-
-  return security.indicators.some(
-    (indicator) =>
-      indicator.diffused &&
-      indicator.departmentRatePer1000 !== null &&
-      indicator.ratePer1000 !== null &&
-      indicator.ratePer1000 > indicator.departmentRatePer1000,
-  );
+  return hasSecurityIndicatorsAboveReference(territory.enrichment?.security);
 }
 
 function vacancyIntensity(rate: number, territory: TerritoryProfile): FactIntensity {

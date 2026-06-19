@@ -8,6 +8,10 @@ import { ANALYSIS_OUTPUT_LIMITS } from "./prompt-limits";
 import { selectAnalysisFactsForPrompt } from "./select-facts";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 import { enforceFinalAnalysisInvariants } from "./enforce-final-invariants";
+import {
+  assessSecurityIndicators,
+  countSecurityIndicatorsAboveReference,
+} from "./security-indicators";
 import { validateAnalysisOutput } from "./validate-output";
 
 /** Reproduit la sortie finale serveur (sans appel Mistral : entrée = sortie canonique). */
@@ -100,13 +104,8 @@ export function countSecurityIndicatorsAboveDepartment(
   territory: TerritoryProfile,
 ): number {
   const indicators = territory.enrichment?.security?.indicators ?? [];
-
-  return indicators.filter(
-    (indicator) =>
-      indicator.departmentRatePer1000 !== null &&
-      indicator.ratePer1000 !== null &&
-      indicator.ratePer1000 > indicator.departmentRatePer1000,
-  ).length;
+  const assessments = assessSecurityIndicators(indicators);
+  return countSecurityIndicatorsAboveReference(assessments);
 }
 
 export const GLOBAL_SECURITY_FORMULATION =
