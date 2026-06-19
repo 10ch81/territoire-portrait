@@ -70,29 +70,5 @@ export function buildEducationFacts(territory: TerritoryProfile): AnalysisFact[]
     );
   }
 
-  if (education.averageIps != null && education.ipsSchoolYear) {
-    facts.push(
-      createFact({
-        theme: "education",
-        target: "summary",
-        sentence: `L'IPS moyen des écoles recensées s'élève à ${education.averageIps.toLocaleString("fr-FR")} pour la rentrée ${education.ipsSchoolYear} (${education.schoolsWithIps ?? 0} école(s) éligible(s), DEPP).`,
-        sourceKeys: ["depp-ips-ecoles"],
-        confidence: "medium",
-        limitations: [
-          education.ipsNote ??
-            "IPS agrégé par commune ; ne pas confondre avec un indicateur communal exhaustif.",
-        ],
-        numericBindings: [
-          binding(
-            education.averageIps,
-            "IPS moyen communal écoles",
-            "education",
-            ["IPS", "position sociale", "écoles", "DEPP"],
-          ),
-        ],
-      }),
-    );
-  }
-
   return facts;
 }

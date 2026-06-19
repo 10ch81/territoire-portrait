@@ -63,6 +63,21 @@ export function qualifiesAsProfileAwareVacancyWatchPoint(
   return vacancyRatePercent >= vacancyWatchPointThresholdPercent(profile);
 }
 
+/** Seuil LOVAC parc privé — mêmes repères typologiques que la vacance RP. */
+export function lovacWatchPointThresholdPercent(profile: ComparisonProfile): number {
+  return vacancyWatchPointThresholdPercent(profile);
+}
+
+export function qualifiesAsProfileAwareLovacWatchPoint(
+  privateVacancyRatePercent: number | null | undefined,
+  profile: ComparisonProfile,
+): boolean {
+  if (privateVacancyRatePercent === null || privateVacancyRatePercent === undefined) {
+    return false;
+  }
+  return privateVacancyRatePercent >= lovacWatchPointThresholdPercent(profile);
+}
+
 export function qualifiesAsLowPublicTransportShare(
   sharePercent: number | null | undefined,
   profile: ComparisonProfile,

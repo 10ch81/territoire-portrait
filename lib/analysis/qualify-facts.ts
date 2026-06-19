@@ -3,12 +3,13 @@ import { buildTerritoryContext } from "./context/buildTerritoryContext";
 import {
   applyProgressiveQualification,
 } from "./progressive-qualification";
-import { formatEuro } from "./format";
+import { formatEuro, formatPercent } from "./format";
 import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
 import {
   DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR,
   debtWatchPointThresholdEur,
   qualifiesAsProfileAwareDebtWatchPoint,
+  qualifiesAsProfileAwareLovacWatchPoint,
   qualifiesAsProfileAwareVacancyWatchPoint,
   qualifiesAsLowPublicTransportShare,
   resolveComparisonProfile,
@@ -41,6 +42,9 @@ export const MEDIAN_INCOME_MODERATE_WATCH_POINT_THRESHOLD_EUR = 19_000;
 
 /** Vacance pour score composite logement / socio-économique (%). */
 export const VACANCY_FRAGILITY_THRESHOLD_PERCENT = 10;
+
+/** Part RSA parmi les ménages — signal de fragilité socio-économique (%). */
+export const RSA_SHARE_FRAGILITY_THRESHOLD_PERCENT = 8;
 
 const DESCRIPTIVE_INCOME_SENTENCE_PATTERN =
   /Le revenu médian des ménages s'élève à/i;
@@ -195,6 +199,26 @@ function hasUnfavorableIncomeComparison(territory: TerritoryProfile): boolean {
   return income < reference;
 }
 
+export function isRpUnemploymentDocumented(territory: TerritoryProfile): boolean {
+  const sociodemographics = territory.enrichment?.sociodemographics;
+  return (
+    sociodemographics?.available === true && sociodemographics.unemploymentRate !== null
+  );
+}
+
+export function qualifiesAsRsaFragilitySignal(territory: TerritoryProfile): boolean {
+  const socialBenefits = territory.enrichment?.socialBenefits;
+  const rsaShare = socialBenefits?.rsaShareAmongHouseholdsPercent;
+  if (
+    !socialBenefits?.available ||
+    rsaShare === null ||
+    rsaShare === undefined
+  ) {
+    return false;
+  }
+  return rsaShare >= RSA_SHARE_FRAGILITY_THRESHOLD_PERCENT;
+}
+
 export function countSocioEconomicFragilitySignals(
   territory: TerritoryProfile,
 ): number {
@@ -207,6 +231,9 @@ export function countSocioEconomicFragilitySignals(
     count += 1;
   }
   if (qualifiesAsUnemploymentWatchPoint(sociodemographics?.unemploymentRate)) {
+    count += 1;
+  }
+  if (qualifiesAsRsaFragilitySignal(territory)) {
     count += 1;
   }
   if (urbanPolicy?.hasQpv === true) {
@@ -295,9 +322,18 @@ export function buildIncomeWatchPointSentence(territory: TerritoryProfile): stri
   const year = sociodemographics.incomeYear ?? sociodemographics.year;
 
   if (usesCompositeIncomeWatchPointRationale(territory)) {
+    const socialBenefits = territory.enrichment?.socialBenefits;
+    const rsaShare = socialBenefits?.rsaShareAmongHouseholdsPercent;
+    const rsaClause =
+      qualifiesAsRsaFragilitySignal(territory) &&
+      rsaShare !== null &&
+      rsaShare !== undefined
+        ? ` et une part d'allocataires RSA élevée (${formatPercent(rsaShare)} des ménages, CNAF ${socialBenefits?.rsaVintage ?? ""})`
+        : "";
+
     return (
       `Les indicateurs socio-économiques disponibles signalent une fragilité relative, ` +
-      `dont un niveau de vie médian de ${formatEuro(income)} (FILOSOFI ${year}).`
+      `dont un niveau de vie médian de ${formatEuro(income)} (FILOSOFI ${year})${rsaClause}.`
     );
   }
 
@@ -350,6 +386,31 @@ function debtIntensity(debtPerCapita: number, territory: TerritoryProfile): Fact
 
 function qualifyHousingFact(fact: AnalysisFact, territory: TerritoryProfile): QualificationCore {
   const housing = territory.enrichment?.housing;
+
+  if (fact.sourceKeys.includes("cerema-lovac")) {
+    const lovacRate = housing?.privateVacancyRatePercent;
+    if (
+      lovacRate != null &&
+      qualifiesAsProfileAwareLovacWatchPoint(
+        lovacRate,
+        resolveComparisonProfile(territory),
+      )
+    ) {
+      return withTargets(fact, {
+        polarity: "negative",
+        intensity: vacancyIntensity(lovacRate, territory),
+        qualificationReason: "vacance_parc_prive_lovac_elevee",
+      });
+    }
+
+    return withTargets(fact, {
+      polarity: "neutral",
+      intensity: "low",
+      qualificationReason: "lovac_sous_seuil",
+      eligibleTargets: [],
+    });
+  }
+
   const vacancy = housing?.rpVacancyRatePercent;
 
   if (/logements vacants|vacance/i.test(fact.sentence) && vacancy != null) {
@@ -407,6 +468,23 @@ function qualifySocialHousingFact(fact: AnalysisFact, territory: TerritoryProfil
 }
 
 function qualifyEmploymentFact(fact: AnalysisFact, territory: TerritoryProfile): QualificationCore {
+  if (fact.sourceKeys.includes("france-travail-defm")) {
+    if (isRpUnemploymentDocumented(territory)) {
+      return withTargets(fact, {
+        polarity: "unknown",
+        intensity: "low",
+        qualificationReason: "france_travail_kpi_uniquement",
+        eligibleTargets: [],
+      });
+    }
+
+    return withTargets(fact, {
+      polarity: "negative",
+      intensity: "medium",
+      qualificationReason: "demande_emploi_france_travail",
+    });
+  }
+
   const rate = territory.enrichment?.sociodemographics?.unemploymentRate;
 
   if (rate == null) {

@@ -4,6 +4,7 @@ import {
   buildIncomeWatchPointSentence,
   qualifiesAsIncomeWatchPoint,
   qualifiesAsUnemploymentWatchPoint,
+  isRpUnemploymentDocumented,
 } from "../socio-economic-watch-points";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
@@ -107,10 +108,14 @@ export function buildLabourMarketFacts(territory: TerritoryProfile): AnalysisFac
     return facts;
   }
 
+  if (isRpUnemploymentDocumented(territory)) {
+    return facts;
+  }
+
   facts.push(
     createFact({
       theme: "employment",
-      target: "summary",
+      target: "watchPoints",
       sentence: `${labourMarket.totalJobSeekers.toLocaleString("fr-FR")} inscrits à France Travail en moyenne sur le trimestre ${labourMarket.quarter ?? ""} (catégorie ABC).`,
       sourceKeys: ["france-travail-defm"],
       year: labourMarket.quarter
@@ -119,7 +124,7 @@ export function buildLabourMarketFacts(territory: TerritoryProfile): AnalysisFac
       confidence: "medium",
       limitations: [
         labourMarket.note,
-        "Ne pas confondre avec le taux de chômage RP (BIT recensement).",
+        "Chômage RP INSEE indisponible sur cette commune ; ne pas confondre inscrits ABC et taux BIT.",
       ],
       numericBindings: [
         binding(
@@ -132,63 +137,9 @@ export function buildLabourMarketFacts(territory: TerritoryProfile): AnalysisFac
     }),
   );
 
-  if (labourMarket.under25 != null) {
-    facts.push(
-      createFact({
-        theme: "employment",
-        target: "summary",
-        sentence: `${labourMarket.under25.toLocaleString("fr-FR")} inscrits de moins de 25 ans sur le trimestre ${labourMarket.quarter ?? ""} (France Travail).`,
-        sourceKeys: ["france-travail-defm"],
-        confidence: "medium",
-        limitations: ["Effectifs arrondis au multiple de 5."],
-        numericBindings: [
-          binding(
-            labourMarket.under25,
-            "inscrits France Travail moins de 25 ans",
-            "employment",
-            ["moins de 25 ans", "jeunes", "France Travail"],
-          ),
-        ],
-      }),
-    );
-  }
-
   return facts;
 }
 
-export function buildSocialBenefitsFacts(territory: TerritoryProfile): AnalysisFact[] {
-  const facts: AnalysisFact[] = [];
-  const socialBenefits = territory.enrichment?.socialBenefits;
-
-  if (
-    !socialBenefits?.available ||
-    socialBenefits.rsaShareAmongHouseholdsPercent == null
-  ) {
-    return facts;
-  }
-
-  facts.push(
-    createFact({
-      theme: "employment",
-      target: "summary",
-      sentence: `${formatPercent(socialBenefits.rsaShareAmongHouseholdsPercent)} des ménages sont allocataires du RSA (CNAF ${socialBenefits.rsaVintage ?? ""}).`,
-      sourceKeys: ["cnaf-precarite"],
-      year: socialBenefits.rsaVintage ?? undefined,
-      confidence: "medium",
-      limitations: [
-        socialBenefits.note,
-        "Indicateur partiel : ne remplace pas un diagnostic complet des prestations sociales communales.",
-      ],
-      numericBindings: [
-        binding(
-          socialBenefits.rsaShareAmongHouseholdsPercent,
-          "part allocataires RSA parmi les ménages",
-          "employment",
-          ["RSA", "CNAF", "allocataires", "ménages", "précarité"],
-        ),
-      ],
-    }),
-  );
-
-  return facts;
+export function buildSocialBenefitsFacts(_territory: TerritoryProfile): AnalysisFact[] {
+  return [];
 }

@@ -191,13 +191,21 @@ function fragmentsForFact(
 
     case "employment":
       if (fact.target === "watchPoints") {
+        if (fact.sourceKeys.includes("france-travail-defm")) {
+          return withIssueFragments("la demande d'emploi recensée par France Travail");
+        }
         return withIssueFragments("le chômage des 15-64 ans");
       }
       return {};
 
     case "housing":
-      if (fact.target === "watchPoints" && /logements vacants/i.test(fact.sentence)) {
-        return withIssueFragments("la vacance résidentielle");
+      if (fact.target === "watchPoints") {
+        if (fact.sourceKeys.includes("cerema-lovac")) {
+          return withIssueFragments("la vacance du parc privé");
+        }
+        if (/logements vacants/i.test(fact.sentence)) {
+          return withIssueFragments("la vacance résidentielle");
+        }
       }
       return {};
 

@@ -43,6 +43,25 @@ export function extractHeroKpis(territory: TerritoryProfile): KpiItem[] {
     });
   }
 
+  const sociodemographics = enrichment?.sociodemographics;
+  const labourMarket = enrichment?.labourMarket;
+  const rpUnemploymentDocumented =
+    sociodemographics?.available === true &&
+    sociodemographics.unemploymentRate !== null;
+
+  if (
+    labourMarket?.available &&
+    labourMarket.totalJobSeekers != null &&
+    rpUnemploymentDocumented
+  ) {
+    kpis.push({
+      id: "france-travail",
+      label: `Inscrits France Travail (${labourMarket.quarter ?? "T"})`,
+      value: labourMarket.totalJobSeekers.toLocaleString("fr-FR"),
+      hint: "Catégorie ABC — distinct du chômage RP INSEE",
+    });
+  }
+
   if (property?.available && property.averagePricePerM2 != null) {
     kpis.push({
       id: "property",

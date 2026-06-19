@@ -1,4 +1,8 @@
 import type { TerritoryProfile } from "../../types";
+import {
+  qualifiesAsProfileAwareLovacWatchPoint,
+  resolveComparisonProfile,
+} from "../../typology/thresholds";
 import { formatPercent } from "../format";
 import { qualifiesAsVacancyWatchPoint } from "../qualify-facts";
 import { binding, createFact } from "./utils";
@@ -62,13 +66,22 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
 
   if (
     housing.privateVacancyRatePercent != null &&
-    housing.lovacVintage != null
+    housing.lovacVintage != null &&
+    qualifiesAsProfileAwareLovacWatchPoint(
+      housing.privateVacancyRatePercent,
+      resolveComparisonProfile(territory),
+    )
   ) {
+    const structuralPart =
+      housing.privateVacantStructural != null
+        ? `, dont ${housing.privateVacantStructural.toLocaleString("fr-FR")} vacants depuis au moins deux ans`
+        : "";
+
     facts.push(
       createFact({
         theme: "housing",
-        target: "summary",
-        sentence: `Le parc privé compte ${formatPercent(housing.privateVacancyRatePercent)} de logements vacants au 1er janvier ${housing.lovacVintage} (LOVAC).`,
+        target: "watchPoints",
+        sentence: `Le parc privé compte ${formatPercent(housing.privateVacancyRatePercent)} de logements vacants au 1er janvier ${housing.lovacVintage} (LOVAC)${structuralPart}.`,
         sourceKeys: ["cerema-lovac"],
         year: housing.lovacVintage,
         confidence: "medium",
@@ -83,33 +96,16 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
             "housing",
             ["LOVAC", "parc privé", "vacance", "logements vacants"],
           ),
-        ],
-      }),
-    );
-  }
-
-  if (
-    housing.privateVacantStructural != null &&
-    housing.lovacVintage != null
-  ) {
-    facts.push(
-      createFact({
-        theme: "housing",
-        target: "summary",
-        sentence: `${housing.privateVacantStructural.toLocaleString("fr-FR")} logements du parc privé sont vacants depuis au moins deux ans au 1er janvier ${housing.lovacVintage} (LOVAC).`,
-        sourceKeys: ["cerema-lovac"],
-        year: housing.lovacVintage,
-        confidence: "medium",
-        limitations: [
-          "Vacance structurelle du parc privé — cible du plan national de lutte contre les logements vacants.",
-        ],
-        numericBindings: [
-          binding(
-            housing.privateVacantStructural,
-            "logements privés vacants structurels LOVAC",
-            "housing",
-            ["LOVAC", "vacance structurelle", "deux ans", "parc privé"],
-          ),
+          ...(housing.privateVacantStructural != null
+            ? [
+                binding(
+                  housing.privateVacantStructural,
+                  "logements privés vacants structurels LOVAC",
+                  "housing",
+                  ["LOVAC", "vacance structurelle", "deux ans", "parc privé"],
+                ),
+              ]
+            : []),
         ],
       }),
     );
