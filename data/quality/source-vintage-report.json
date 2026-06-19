@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-06-19T06:05:55.947Z",
+  "adoptionWorkflow": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:<script> && npm run quality:all.",
+  "checks": [
+    {
+      "id": "rp-population",
+      "label": "INSEE — RP structure par âge",
+      "supportedVintage": 2022,
+      "discoveredVintage": 2022,
+      "discoveryMethod": "sonde URL fichier INSEE (-YYYY_csv)",
+      "referenceUrl": "https://www.insee.fr/fr/statistiques/fichier/8581696/base-cc-evol-struct-pop-2022_csv.zip",
+      "ingestScript": "ingest-social.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:social && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "rp-employment",
+      "label": "INSEE — RP emploi / chômage",
+      "supportedVintage": 2022,
+      "discoveredVintage": 2022,
+      "discoveryMethod": "sonde URL fichier INSEE (-YYYY_csv)",
+      "referenceUrl": "https://www.insee.fr/fr/statistiques/fichier/8581444/base-cc-emploi-pop-active-2022_csv.zip",
+      "ingestScript": "ingest-social.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:social && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "rp-housing",
+      "label": "INSEE — RP logement",
+      "supportedVintage": 2022,
+      "discoveredVintage": 2022,
+      "discoveryMethod": "sonde URL fichier INSEE (-YYYY_csv)",
+      "referenceUrl": "https://www.insee.fr/fr/statistiques/fichier/8581474/base-cc-logement-2022_csv.zip",
+      "ingestScript": "ingest-housing.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:housing && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "rp-commute",
+      "label": "INSEE — RP mobilité domicile-travail",
+      "supportedVintage": 2022,
+      "discoveredVintage": 2022,
+      "discoveryMethod": "sonde URL fichier INSEE (-YYYY_csv)",
+      "referenceUrl": "https://www.insee.fr/fr/statistiques/fichier/8581610/TD_NAV2A_2022_csv.zip",
+      "ingestScript": "ingest-commute.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:commute && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "filosofi",
+      "label": "INSEE — FILOSOFI (revenus)",
+      "supportedVintage": 2023,
+      "discoveredVintage": 2023,
+      "discoveryMethod": "page série INSEE + sonde URL fichier",
+      "referenceUrl": "https://www.insee.fr/fr/statistiques/fichier/8984752/FILOSOFI_CC_csv.zip",
+      "ingestScript": "ingest-social.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:social && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "bpe",
+      "label": "INSEE — BPE",
+      "supportedVintage": 2024,
+      "discoveredVintage": 2024,
+      "discoveryMethod": "sonde URL Melodi (_YYYY_)",
+      "referenceUrl": "https://api.insee.fr/melodi/file/DS_BPE/DS_BPE_2024_CSV_FR",
+      "ingestScript": "ingest-bpe.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:bpe && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "flores",
+      "label": "INSEE — FLORES A17",
+      "supportedVintage": 2024,
+      "discoveredVintage": 2024,
+      "discoveryMethod": "sonde URL Melodi (_YYYY_)",
+      "referenceUrl": "https://api.insee.fr/melodi/file/DS_FLORES_A17/DS_FLORES_A17_2024_CSV_FR",
+      "ingestScript": "ingest-flores.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:flores && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "tourism",
+      "label": "INSEE — capacités touristiques",
+      "supportedVintage": 2025,
+      "discoveredVintage": 2026,
+      "discoveryMethod": "sonde URL Melodi (_YYYY_)",
+      "referenceUrl": "https://www.insee.fr/fr/statistiques/fichier/2021703/DS_TOUR_CAP_CSV_2025_geo25.zip",
+      "ingestScript": "ingest-tourism.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:tourism && npm run quality:all.",
+      "status": "update_available"
+    },
+    {
+      "id": "rpls",
+      "label": "RPLS — logements sociaux",
+      "supportedVintage": 2021,
+      "discoveredVintage": 2021,
+      "discoveryMethod": "sonde URL data.gouv (rpls-YYYY.csv)",
+      "referenceUrl": "https://static.data.gouv.fr/resources/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/20230309-150841/rpls-2021.csv",
+      "ingestScript": "ingest-housing.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:housing && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "rei",
+      "label": "REI — fiscalité locale",
+      "supportedVintage": 2024,
+      "discoveredVintage": 2024,
+      "discoveryMethod": "sonde URL DGFiP (rei_YYYY_)",
+      "referenceUrl": "https://data.economie.gouv.fr/api/v2/catalog/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-dir/attachments/rei_2024_fichier_notice_trace_zip",
+      "ingestScript": "ingest-rei.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:rei && npm run quality:all.",
+      "status": "current"
+    },
+    {
+      "id": "dvf",
+      "label": "DVF — indicateurs agrégés commune",
+      "supportedVintage": 2024,
+      "discoveredVintage": 2024,
+      "discoveryMethod": "sonde URL data.gouv (communesdvfYYYY.csv)",
+      "referenceUrl": "https://static.data.gouv.fr/resources/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/20250707-085855/communesdvf2024.csv",
+      "ingestScript": "ingest-property.ts",
+      "adoptionHint": "Phase 2 : mettre à jour *_VINTAGE et URLs dans lib/sources.ts, adapter le parser si le schéma change, puis npm run ingest:property && npm run quality:all.",
+      "status": "current"
+    }
+  ],
+  "summary": {
+    "current": 10,
+    "updateAvailable": 1,
+    "discoveryFailed": 0
+  }
+}
