@@ -1,6 +1,12 @@
 import type { TerritoryProfile } from "../types";
 import { areSemanticallySimilar, indicatorKeys } from "./dedupe-facts";
 import {
+  ESS_MIN_SIGNIFICANT_COUNT,
+  RGE_MIN_SIGNIFICANT_COUNT,
+  isAcceptableOpportunity,
+  isStudyOnlyOpportunity,
+} from "./opportunity-quality";
+import {
   qualifiesAsUnemploymentWatchPoint,
   qualifiesAsVacancyWatchPoint,
 } from "./qualify-facts";
@@ -66,14 +72,13 @@ export const FIBER_OPPORTUNITY_THRESHOLD_PERCENT = 80;
 /** Capacité d'hébergement touristique significative (places). */
 export const TOURISM_MIN_ACCOMMODATION_PLACES = 200;
 
-/** Volume ESS considéré comme significatif pour mobilisation. */
-export const ESS_MIN_SIGNIFICANT_COUNT = 40;
-
-/** Volume RGE considéré comme significatif pour mobilisation. */
-export const RGE_MIN_SIGNIFICANT_COUNT = 15;
-
 /** Score minimal pour considérer une opportunité comme solide. */
 export const SOLID_OPPORTUNITY_MIN_SCORE = 5;
+
+export {
+  ESS_MIN_SIGNIFICANT_COUNT,
+  RGE_MIN_SIGNIFICANT_COUNT,
+} from "./opportunity-quality";
 
 const DEFAULT_OPPORTUNITY_TARGET = 3;
 const MAX_OPPORTUNITY_COUNT = 4;
@@ -140,24 +145,12 @@ function isTourismEligible(
   return countTourismSignals(territory, selectedStrengths) >= 2;
 }
 
-function isEssRgeEligible(territory: TerritoryProfile, watchThemes: Set<AnalysisFactTheme>): boolean {
+function isEssRgeEligible(territory: TerritoryProfile): boolean {
   const enterprises = territory.enrichment?.enterprises;
   const essCount = enterprises?.essCount ?? 0;
   const rgeCount = enterprises?.rgeCount ?? 0;
 
-  if (essCount >= ESS_MIN_SIGNIFICANT_COUNT || rgeCount >= RGE_MIN_SIGNIFICANT_COUNT) {
-    return true;
-  }
-
-  if (
-    watchThemes.has("employment") ||
-    watchThemes.has("housing") ||
-    watchThemes.has("income")
-  ) {
-    return essCount + rgeCount > 0;
-  }
-
-  return false;
+  return essCount >= ESS_MIN_SIGNIFICANT_COUNT || rgeCount >= RGE_MIN_SIGNIFICANT_COUNT;
 }
 
 function isFiberEligible(
@@ -258,32 +251,57 @@ function isCandidateEligible(
   context: OpportunitySelectionContext,
 ): boolean {
   if (fact.target !== "opportunities") return false;
-  if (STUDY_ONLY_PATTERN.test(fact.sentence)) return false;
+  if (STUDY_ONLY_PATTERN.test(fact.sentence) || isStudyOnlyOpportunity(fact.sentence)) {
+    return false;
+  }
 
   const watchThemes = watchPointThemes(context.selectedWatchPoints);
   const { territory } = context;
+  const relatedWatchPointThemes = alignedWatchThemes(fact, context.selectedWatchPoints);
+  const relatedStrengthThemes = alignedStrengthThemes(fact, context.selectedStrengths);
+
+  let themeEligible = true;
 
   switch (fact.theme) {
     case "housing":
-      return isHousingOpportunityEligible(territory, watchThemes);
+      themeEligible = isHousingOpportunityEligible(territory, watchThemes);
+      break;
     case "tourism":
-      return isTourismEligible(territory, context.selectedStrengths);
+      themeEligible = isTourismEligible(territory, context.selectedStrengths);
+      break;
     case "ess_rge":
-      return isEssRgeEligible(territory, watchThemes);
+      themeEligible = isEssRgeEligible(territory);
+      break;
     case "connectivity":
-      return isFiberEligible(territory, context.selectedStrengths);
+      themeEligible = isFiberEligible(territory, context.selectedStrengths);
+      break;
     case "policy_city":
-      return isQpvOpportunityEligible(territory, watchThemes);
+      themeEligible = isQpvOpportunityEligible(territory, watchThemes);
+      break;
     case "mobility":
-      return isMobilityOpportunityEligible(territory);
+      themeEligible = isMobilityOpportunityEligible(territory);
+      break;
     case "risks":
-      return watchThemes.has("risks") || (territory.enrichment?.risks?.available ?? false);
+      themeEligible =
+        watchThemes.has("risks") || (territory.enrichment?.risks?.available ?? false);
+      break;
     case "employment":
     case "security":
-      return watchThemes.has(fact.theme);
+      themeEligible = watchThemes.has(fact.theme);
+      break;
     default:
-      return true;
+      themeEligible = true;
   }
+
+  if (!themeEligible) {
+    return false;
+  }
+
+  return isAcceptableOpportunity(fact, {
+    territory,
+    relatedWatchPointThemes,
+    relatedStrengthThemes,
+  });
 }
 
 function alignedWatchThemes(
@@ -571,6 +589,9 @@ function buildSupplementalOpportunityFacts(
         target: "opportunities",
         sentence:
           "Appuyer les actions d'insertion et d'accès à l'emploi sur les ressources économiques et associatives identifiées.",
+        evidence: [
+          `Taux de chômage : ${territory.enrichment?.sociodemographics?.unemploymentRate} %`,
+        ],
         sourceKeys: ["insee-rp", "sirene"],
         year: territory.enrichment?.sociodemographics?.year,
         confidence: "medium",
@@ -582,28 +603,6 @@ function buildSupplementalOpportunityFacts(
               "Piste d'action territoriale ; ne préjuge pas de dispositifs ni de financements.",
               "Ressources économiques ou associatives locales limitées dans les données disponibles.",
             ],
-      }),
-    );
-  }
-
-  if (
-    watchThemes.has("security") &&
-    !context.allFacts.some(
-      (fact) => fact.target === "opportunities" && fact.theme === "security",
-    )
-  ) {
-    facts.push(
-      createFact({
-        theme: "security",
-        target: "opportunities",
-        sentence:
-          "Approfondir l'observation locale des faits enregistrés et renforcer les actions de prévention partenariale.",
-        sourceKeys: ["ssmsi"],
-        year: territory.enrichment?.security?.year,
-        confidence: "medium",
-        limitations: [
-          "Faits enregistrés SSMSI ; ne mesure pas le ressenti ni les faits non déclarés.",
-        ],
       }),
     );
   }

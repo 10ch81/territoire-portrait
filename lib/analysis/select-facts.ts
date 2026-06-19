@@ -10,8 +10,11 @@ import {
 } from "./prompt-limits";
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
 import {
+  hasOpportunityTraceability,
+  isStudyOnlyOpportunity,
+} from "./opportunity-quality";
+import {
   isActionableOpportunity,
-  isStudyOnlyFact,
   scoreAnalysisFact,
   type ScoreContext,
 } from "./score-facts";
@@ -158,8 +161,9 @@ function canAddToTarget(
   }
 
   if (target === "opportunities") {
-    if (isStudyOnlyFact(candidate)) return false;
+    if (isStudyOnlyOpportunity(candidate.sentence)) return false;
     if (!isActionableOpportunity(candidate)) return false;
+    if (!hasOpportunityTraceability(candidate)) return false;
   }
 
   if (

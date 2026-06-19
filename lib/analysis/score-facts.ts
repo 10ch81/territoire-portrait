@@ -1,4 +1,8 @@
 import type { TerritoryProfile } from "../types";
+import {
+  hasOpportunityTraceability,
+  isStudyOnlyOpportunity,
+} from "./opportunity-quality";
 import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 import {
@@ -155,11 +159,11 @@ export function scoreAnalysisFact(
 }
 
 export function isStudyOnlyFact(fact: AnalysisFact): boolean {
-  return STUDY_ONLY_PATTERN.test(fact.sentence);
+  return isStudyOnlyOpportunity(fact.sentence);
 }
 
 export function isActionableOpportunity(fact: AnalysisFact): boolean {
   if (fact.target !== "opportunities") return false;
-  if (isStudyOnlyFact(fact)) return false;
-  return true;
+  if (isStudyOnlyOpportunity(fact.sentence)) return false;
+  return hasOpportunityTraceability(fact);
 }
