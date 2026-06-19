@@ -94,6 +94,7 @@ docs/data-quality.md              # Boucle qualité des données
 | IRVE national (cache) | Bornes de recharge par commune |
 | REI (cache) | Taux de fiscalité locale |
 | AAV 2020 (cache) | Aire d'attraction des villes |
+| Typologie communale (cache) | Densité INSEE, unité urbaine, PVD, ACV, FRR, Villages d'avenir |
 | DVF (cache) | Prix immobilier au m² |
 | RP + FILOSOFI (cache) | Structure par âge, chômage, revenus |
 | INSEE FLORES A17 (cache) | Emploi salarié par secteur (établissements, postes) |
@@ -111,6 +112,7 @@ npm run ingest:housing    # logements sociaux (RPLS)
 npm run ingest:irve       # bornes de recharge (~150 Mo)
 npm run ingest:rei        # fiscalité locale (~17 Mo)
 npm run ingest:geography  # aires d'attraction 2020
+npm run ingest:typology   # densité, UU, dispositifs publics (PVD, ACV, FRR…)
 npm run ingest:property   # indicateurs DVF (série 2014-2024)
 npm run ingest:social     # structure par âge, chômage, revenus
 npm run ingest:flores     # emploi salarié A17 (~15 Mo cache JSON)
@@ -119,7 +121,7 @@ npm run ingest:finess     # établissements sanitaires et sociaux
 npm run ingest:education  # annuaire scolaire (agrégats communaux)
 ```
 
-Les caches agrégés sont stockés dans `data/cache/*-by-commune.json` (versionnés pour Vercel, dont `property-by-commune.json` et `social-by-commune.json`).
+Les caches agrégés sont stockés dans `data/cache/*-by-commune.json` (versionnés pour Vercel, dont `typology-by-commune.json`, `geography-by-commune.json`, `property-by-commune.json` et `social-by-commune.json`).
 
 ### Rafraîchissement automatique (CI)
 

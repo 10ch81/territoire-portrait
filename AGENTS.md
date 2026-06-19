@@ -9,7 +9,7 @@ Construire un système réutilisable pour produire des portraits territoriaux de
 1. **Ne jamais inventer de données** — afficher « Donnée non disponible » si absent.
 2. **Sources traçables** — chaque fiche liste les APIs et jeux de données consultés.
 3. **Sécurité** — clés API uniquement côté serveur (`process.env`), jamais exposées au client.
-4. **Millésimes récents** — utiliser la dernière version publiée de chaque source (`*_VINTAGE` dans `lib/sources.ts`).
+4. **Millésimes récents** — modèle en deux temps : découverte (`npm run check:source-vintages`) puis adoption explicite dans `lib/sources.ts`.
 5. **Extensibilité** — architecture prête pour ingestion data.gouv.fr via scripts et MCP.
 
 ## Structure
@@ -18,7 +18,8 @@ Construire un système réutilisable pour produire des portraits territoriaux de
 | ------------------------ | ------------------------------------------------- |
 | `app/`                   | Interface Next.js (App Router)                    |
 | `lib/territory.ts`       | Résolution commune + normalisation                |
-| `lib/enrichment/`        | SIRENE (API live) + BPE (cache INSEE)             |
+| `lib/enrichment/`        | SIRENE (API live) + caches thématiques + typologie |
+| `lib/typology/`          | Typologie territoriale (`territoryTypology`, profils de comparaison) |
 | `lib/mistral.ts`         | Client Mistral centralisé (serveur uniquement)    |
 | `lib/sources.ts`         | Métadonnées des sources                           |
 | `lib/quality/`           | Règles et vérification qualité données            |
@@ -56,10 +57,13 @@ npm run ingest:flores    # emploi salarié A17
 npm run ingest:fibre     # couverture fibre ARCEP
 npm run ingest:finess    # établissements sanitaires et sociaux
 npm run ingest:education # annuaire scolaire (agrégats)
+npm run ingest:geography # aires d'attraction 2020
+npm run ingest:typology  # densité INSEE, UU, PVD, ACV, FRR, Villages d'avenir
 npm run ingest:all       # toutes les ingestions
 npm run validate:internal   # cohérence interne cache
 npm run verify:reference    # golden communes vs APIs live
 npm run quality:all         # validate + verify
+npm run check:source-vintages  # phase 1 — millésimes producteurs vs lib/sources.ts
 npm run quality:sample      # validate + verify sur Rennes (35238)
 ```
 

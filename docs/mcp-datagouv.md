@@ -88,6 +88,12 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | Source | Thème | Niv. | Statut | Module / script | Notes |
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [INSEE — AAV 2020](https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/) | Centralité, bassin d'emploi | R | ✅ | `ingest-geography.ts` → `geography.ts` | Rang et population de l'aire |
+| [INSEE — Grille densité 7 niveaux](https://www.insee.fr/fr/information/6439600) | Typologie densité communale | R | ✅ | `ingest-typology.ts` → `lib/typology/` | GeoTerritoires `typodens7` ; niveau 1 = centre urbain |
+| [INSEE — Unités urbaines 2020](https://www.insee.fr/fr/information/4802589) | Rôle communal dans l'UU | R | ✅ | `ingest-typology.ts` | Composition communale (`STATUT_COM_UU`, `TUU2017`) |
+| [ANCT — Petites villes de demain](https://www.data.gouv.fr/datasets/programme-petites-villes-de-demain-liste-des-villes-beneficiaires) | Dispositif PVD | C | ✅ | `ingest-typology.ts` | Contexte d'ingénierie, pas verdict fragilité |
+| [ANCT — Action cœur de ville](https://www.data.gouv.fr/datasets/programme-action-coeur-de-ville) | Dispositif ACV | C | ✅ | `ingest-typology.ts` | |
+| [DGCL — FRR / FRR+](https://www.collectivites-locales.gouv.fr/animer-les-territoires/cohesion-territoriale-et-lamenagement-du-territoire/la-cohesion-territoriale/les-ruralites/le-plan-france-ruralites) | Zonage rural revitalisation | R | ✅ | `ingest-typology.ts` | Xlsx liste communes juillet 2025 |
+| [ANCT — Villages d'avenir](https://www.data.gouv.fr/datasets/dispositif-villages-davenir) | Dispositif rural | C | ✅ | `ingest-typology.ts` | |
 | [BANATIC](https://www.banatic.interieur.gouv.fr/) | EPCI, syndicats, PNR, rattachements | R | ⚠️ | `territory.ts` (EPCI via API Géo) | Syndicats mixtes et structures hors EPCI non ingérés |
 | [SIG Ville](https://sig.ville.gouv.fr/) | QPV, Cœur de ville, politique de la ville | R | ❌ 📋 P1 | — | Fort levier diagnostic territorial |
 
