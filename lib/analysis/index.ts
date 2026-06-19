@@ -79,3 +79,9 @@ export {
   hasForbiddenDerivedRatio,
 } from "./verify-numeric-claims";
 export { formatCount, formatPercent, formatPricePerM2, formatSignedPercent } from "./format";
+export {
+  buildTerritoryContext,
+  countTourismContextSignals,
+  tourismAccommodationRatio,
+} from "./context/buildTerritoryContext";
+export type { TerritoryContext, TerritoryContextFlag } from "./context/buildTerritoryContext";

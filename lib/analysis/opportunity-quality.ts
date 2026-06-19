@@ -1,4 +1,5 @@
 import type { TerritoryProfile } from "../types";
+import { buildTerritoryContext } from "./context/buildTerritoryContext";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 
 /** Volume ESS considéré comme significatif pour mobilisation. */
@@ -126,9 +127,16 @@ export function computeOpportunityQuality(
   const anchoredToIssue =
     relatedWatchPointThemes.length > 0 || relatedStrengthThemes.length > 0;
 
+  const territoryContext = buildTerritoryContext(context.territory);
+  const tourismPerCapitaWithoutAnchor =
+    fact.theme === "tourism" &&
+    territoryContext.requiresPerCapitaCaution === true &&
+    !anchoredToIssue;
+
   const isGeneric =
     isStudyOnly ||
     weakEssRge ||
+    tourismPerCapitaWithoutAnchor ||
     (genericPhrase &&
       lacksConcreteLever &&
       !anchoredToIssue &&
@@ -136,6 +144,9 @@ export function computeOpportunityQuality(
 
   if (isGeneric) {
     reasons.push("generic_formulation");
+  }
+  if (tourismPerCapitaWithoutAnchor) {
+    reasons.push("tourism_per_capita_without_anchor");
   }
 
   const acceptable =

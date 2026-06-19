@@ -12,9 +12,12 @@ import {
 } from "./qualify-facts";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 import { createFact } from "./builders/utils";
+import {
+  buildTerritoryContext,
+  countTourismContextSignals,
+} from "./context/buildTerritoryContext";
 import type { ScoreContext } from "./score-facts";
 import type { ComparisonProfile, TerritoryTypology } from "../typology/types";
-import { aavRoleFromCategoryCode } from "../typology/labels";
 import { resolveComparisonProfile } from "../typology/thresholds";
 
 export type OpportunityKind =
@@ -113,36 +116,30 @@ function actionFamilyForFact(fact: AnalysisFact): OpportunityActionFamily {
   return ACTION_FAMILY_BY_THEME[fact.theme] ?? "strategic_context";
 }
 
-function countTourismSignals(territory: TerritoryProfile, selectedStrengths: AnalysisFact[]): number {
-  let count = 0;
-  const tourism = territory.enrichment?.tourism;
-  const centrality = territory.enrichment?.geography?.attractionArea;
-
-  if (tourism?.available && (tourism.accommodationPlaces ?? 0) >= TOURISM_MIN_ACCOMMODATION_PLACES) {
-    count += 1;
-  }
-  if (selectedStrengths.some((fact) => fact.theme === "tourism")) {
-    count += 1;
-  }
-  if (centrality?.available && aavRoleFromCategoryCode(centrality.categoryCode) === "pole") {
-    count += 1;
-  }
-  if ((territory.enrichment?.equipments?.totalEquipments ?? 0) >= 100) {
-    count += 1;
-  }
-
-  return count;
-}
-
 function isTourismEligible(
   territory: TerritoryProfile,
   selectedStrengths: AnalysisFact[],
 ): boolean {
+  const territoryContext = buildTerritoryContext(territory);
+  const hasTourismStrength = selectedStrengths.some((fact) => fact.theme === "tourism");
+
+  if (territoryContext.isTouristCommune !== true) {
+    return false;
+  }
+
+  if (territoryContext.requiresPerCapitaCaution === true) {
+    return (
+      hasTourismStrength ||
+      countTourismContextSignals(territory, hasTourismStrength) >= 2
+    );
+  }
+
   const places = territory.enrichment?.tourism?.accommodationPlaces ?? 0;
   if (places >= TOURISM_MIN_ACCOMMODATION_PLACES) {
     return true;
   }
-  return countTourismSignals(territory, selectedStrengths) >= 2;
+
+  return countTourismContextSignals(territory, hasTourismStrength) >= 2;
 }
 
 function isEssRgeEligible(territory: TerritoryProfile): boolean {
@@ -411,13 +408,17 @@ function scoreLevelsForFact(
       break;
     }
     case "tourism": {
-      const signals = countTourismSignals(territory, context.selectedStrengths);
+      const territoryContext = buildTerritoryContext(territory);
       const hasTourismStrength = relatedStrengthThemes.includes("tourism");
+      const signals = countTourismContextSignals(territory, hasTourismStrength);
       actionability = signals >= 2 || hasTourismStrength ? "medium" : "low";
       evidenceStrength =
         signals >= 3 || (hasTourismStrength && signals >= 1) ? "medium" : "low";
       localSpecificity = signals >= 2 || hasTourismStrength ? "medium" : "low";
       genericPenalty = signals >= 2 || hasTourismStrength ? 0 : 4;
+      if (territoryContext.requiresPerCapitaCaution === true && !hasTourismStrength) {
+        genericPenalty += 2;
+      }
       if (/approfondir/i.test(fact.sentence)) {
         genericPenalty += 1;
       }

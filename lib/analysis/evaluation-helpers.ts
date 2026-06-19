@@ -114,17 +114,9 @@ export const GLOBAL_SECURITY_FORMULATION =
 export const AGEING_WATCH_POINT_PATTERN =
   /\b(?:60 ans et plus|vieillissement de la population|population âgée)\b/i;
 
-/** Ratio places d'hébergement / population résidente. */
-export function tourismAccommodationRatio(territory: TerritoryProfile): number | null {
-  const places = territory.enrichment?.tourism?.accommodationPlaces;
-  const population = territory.population;
+import { tourismAccommodationRatio as computeTourismAccommodationRatio } from "./context/buildTerritoryContext";
 
-  if (places == null || population == null || population <= 0) {
-    return null;
-  }
-
-  return places / population;
-}
+export { computeTourismAccommodationRatio as tourismAccommodationRatio };
 
 export const TOURISM_PER_CAPITA_RATIO_PATTERN =
   /\b(?:places?|hébergements?|capacit[ée]).{0,40}(?:par habitant|pour\s+100\s+habitants?|\/\s*hab)/i;
