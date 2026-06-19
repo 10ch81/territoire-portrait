@@ -8,6 +8,7 @@ import {
   applyEditorialQualityGuards,
   guardEditorialSummary,
 } from "./editorialQualityGuards";
+import { applyEditorialPolish } from "./editorialPolish";
 import { renderOpportunityByProfile } from "./renderOpportunityByProfile";
 import { renderStrengthsByProfile } from "./renderStrengthByProfile";
 import { renderSummaryByProfileWithFallback } from "./renderSummaryByProfile";
@@ -29,17 +30,23 @@ export function renderEditorialAnalysis(
   const strengths = renderStrengthsByProfile(selectedFacts, territory, profile);
   const verbatim = buildVerbatimLists(selectedFacts);
   const opportunities = renderOpportunityByProfile(profile, selectedFacts);
+  const mvpOpportunities = selectedFacts
+    .filter((fact) => fact.target === "opportunities")
+    .map((fact) => renderFactSentenceForOutput(fact));
 
-  const editorial: EditorialAnalysisOutput = {
-    profileId: profile.id,
-    summary,
-    strengths,
-    watchPoints: verbatim.watchPoints.map((sentence, index) => {
-      const fact = selectedFacts.filter((f) => f.target === "watchPoints")[index];
-      return fact ? renderFactSentenceForOutput(fact) : sentence;
-    }),
-    opportunities,
-  };
+  const editorial: EditorialAnalysisOutput = applyEditorialPolish(
+    {
+      profileId: profile.id,
+      summary,
+      strengths,
+      watchPoints: verbatim.watchPoints.map((sentence, index) => {
+        const fact = selectedFacts.filter((f) => f.target === "watchPoints")[index];
+        return fact ? renderFactSentenceForOutput(fact) : sentence;
+      }),
+      opportunities,
+    },
+    mvpOpportunities,
+  );
 
   return applyEditorialQualityGuards(editorial, mvpSummary, selectedFacts);
 }

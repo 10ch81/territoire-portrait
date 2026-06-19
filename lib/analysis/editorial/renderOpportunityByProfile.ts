@@ -2,6 +2,7 @@ import { renderFactSentenceForOutput } from "../progressive-qualification";
 import type { AnalysisFact, AnalysisFactTheme } from "../types";
 import type { EditorialProfile, EditorialProfileId } from "./editorialProfiles";
 import { guardEditorialOpportunity } from "./editorialQualityGuards";
+import { dedupeEditorialOpportunities } from "./editorialPolish";
 
 type OpportunityTemplate = {
   profileIds: EditorialProfileId[];
@@ -16,28 +17,28 @@ const OPPORTUNITY_TEMPLATES: OpportunityTemplate[] = [
     strengthThemes: ["centrality", "demography", "employment_sectors"],
     watchThemes: ["risks", "security", "housing"],
     render: () =>
-      "Accompagner la croissance démographique par une analyse des besoins en équipements et services, en s'appuyant sur la base d'emploi et le rang de centralité dans l'EPCI, tout en suivant les risques naturels et indicateurs de sécurité avec prudence.",
+      "Accompagner la croissance démographique par un suivi des besoins en équipements et services, en s'appuyant sur le rang de centralité et la base d'emploi locale.",
   },
   {
     profileIds: ["largeUrbanCenter", "socialFragilityUrban"],
     strengthThemes: ["employment_sectors", "economy", "equipments"],
     watchThemes: ["employment", "policy_city", "security"],
     render: () =>
-      "Articuler les politiques d'insertion, d'emploi et de proximité dans les quartiers prioritaires, compte tenu du chômage observé et du poids de la base économique locale.",
+      "Articuler insertion, emploi et services de proximité dans les quartiers prioritaires, en s'appuyant sur la base économique locale.",
   },
   {
     profileIds: ["mountainTourismCenter"],
     strengthThemes: ["tourism", "employment_sectors", "equipments"],
     watchThemes: ["risks", "housing", "finances", "demography"],
     render: () =>
-      "Croiser tourisme, logement, mobilité et risques naturels pour objectiver les tensions liées à la population présente et aux investissements locaux, sans extrapoler au-delà des données de fréquentation disponibles.",
+      "Croiser tourisme, logement et risques naturels pour objectiver les tensions liées à la population présente, sans extrapoler au-delà des données de fréquentation disponibles.",
   },
   {
     profileIds: ["smallPeriurbanGrowth"],
     strengthThemes: ["centrality", "demography", "connectivity"],
     watchThemes: ["security", "risks"],
     render: () =>
-      "Consolider l'attractivité résidentielle par un suivi des besoins de proximité et des équipements, en croisant dynamique démographique, centralité locale et prudence méthodologique sur la sécurité.",
+      "Consolider l'attractivité résidentielle par un suivi des besoins de proximité, en croisant dynamique démographique et centralité locale.",
   },
   {
     profileIds: ["employmentPole"],
@@ -90,13 +91,15 @@ export function renderOpportunityByProfile(
   );
 
   if (!template) {
-    return mvpOpportunities;
+    return dedupeEditorialOpportunities(mvpOpportunities, profile.id);
   }
 
-  return mvpOpportunities.map((fallback, index) => {
+  const rendered = mvpOpportunities.map((fallback, index) => {
     if (index > 0) {
       return fallback;
     }
     return guardEditorialOpportunity(template.render(), fallback, selectedFacts);
   });
+
+  return dedupeEditorialOpportunities(rendered, profile.id);
 }

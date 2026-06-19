@@ -2,10 +2,13 @@ import type { TerritoryProfile } from "../../types";
 import { resolveDisplayTypologyLabel } from "../context/displayTypologyLabel";
 import { buildDeterministicSummary } from "../build-canonical-output";
 import { formatCount } from "../format";
-import { extractDemographySnapshot } from "../summary-phrases";
-import { joinFrenchList, joinFrenchPrepositionalList } from "../render-text";
+import { joinFrenchList } from "../render-text";
 import type { AnalysisFact, AnalysisFactTheme } from "../types";
 import type { EditorialProfile, EditorialProfileId } from "./editorialProfiles";
+import {
+  formatVigilanceOnIssues,
+  shouldAppendTypologyHint,
+} from "./editorialPolish";
 
 function selectedThemes(facts: AnalysisFact[]): Set<AnalysisFactTheme> {
   return new Set(facts.map((fact) => fact.theme));
@@ -44,12 +47,15 @@ function assetClause(profileId: EditorialProfileId, facts: AnalysisFact[]): stri
       return joinFrenchList(parts);
     }
     case "growthEpciCentrality": {
-      const parts: string[] = ["un rang élevé dans son EPCI"];
+      const parts: string[] = [];
       if (themes.has("employment_sectors") || themes.has("economy")) {
         parts.push("une base d'emploi significative");
       }
-      if (themes.has("demography")) {
-        parts.push("une croissance démographique soutenue");
+      if (themes.has("equipments")) {
+        parts.push("une offre d'équipements cohérente avec cette dynamique");
+      }
+      if (parts.length === 0) {
+        parts.push("des atouts documentés dans les sources consultées");
       }
       return joinFrenchList(parts);
     }
@@ -132,7 +138,7 @@ function openingClause(
 function vigilanceClause(profileId: EditorialProfileId, facts: AnalysisFact[]): string {
   const issues = watchIssueLabels(facts);
   if (issues.length > 0) {
-    return `Les principaux points de vigilance portent ${joinFrenchPrepositionalList(issues)}.`;
+    return formatVigilanceOnIssues(issues);
   }
 
   const watchThemes = selectedThemes(facts.filter((f) => f.target === "watchPoints"));
@@ -162,23 +168,24 @@ export function renderSummaryByProfile(
   profile: EditorialProfile,
   selectedFacts: AnalysisFact[],
 ): string {
-  const demography = extractDemographySnapshot(territory, selectedFacts);
   const opening = openingClause(profile.id, territory, profile);
   const assets = assetClause(profile.id, selectedFacts);
   const vigilance = vigilanceClause(profile.id, selectedFacts);
 
   const density =
     territory.densityPerKm2 != null
-      ? `, avec une densité d'environ ${formatCount(Math.round(territory.densityPerKm2))} habitants/km²`
+      ? `, pour une densité d'environ ${formatCount(Math.round(territory.densityPerKm2))} habitants/km²`
       : "";
 
   const typology = resolveDisplayTypologyLabel(territory);
-  const typologyHint = typology ? ` (${typology})` : "";
+  const typologyHint =
+    typology && shouldAppendTypologyHint(opening, typology) ? ` (${typology})` : "";
 
-  let phrase1 = `${opening}${typologyHint}${density}, et combine ${assets}.`;
-
-  if (demography.trend === "growth" && profile.id === "growthEpciCentrality") {
-    phrase1 = `${opening}${typologyHint}${density}, avec ${assets}.`;
+  let phrase1: string;
+  if (profile.id === "growthEpciCentrality") {
+    phrase1 = `${opening}${typologyHint}${density}, complétée par ${assets}.`;
+  } else {
+    phrase1 = `${opening}${typologyHint}${density}, et combine ${assets}.`;
   }
 
   const phrase2 = vigilance;

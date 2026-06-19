@@ -10,6 +10,9 @@ type StrengthTemplate = {
   render: (fact: AnalysisFact, territory: TerritoryProfile) => string;
 };
 
+const SMALL_COMMUNE_MERGED_STRENGTH =
+  "La commune dispose d'une petite base d'emploi locale et d'un socle d'équipements de proximité cohérent avec son rôle dans l'intercommunalité.";
+
 const STRENGTH_TEMPLATES: StrengthTemplate[] = [
   {
     profileIds: ["largeUrbanCenter"],
@@ -71,6 +74,24 @@ const STRENGTH_TEMPLATES: StrengthTemplate[] = [
   },
   {
     profileIds: ["smallPeriurbanGrowth"],
+    theme: "economy",
+    render: () =>
+      "La commune s'appuie sur un tissu économique local modeste mais documenté, cohérent avec une commune de proximité.",
+  },
+  {
+    profileIds: ["smallPeriurbanGrowth"],
+    theme: "employment_sectors",
+    render: () =>
+      "La commune dispose d'une petite base d'emploi locale, complétée par un socle d'équipements de proximité cohérent avec son rôle dans l'intercommunalité.",
+  },
+  {
+    profileIds: ["smallPeriurbanGrowth"],
+    theme: "equipments",
+    render: () =>
+      "La commune dispose d'un socle d'équipements de proximité cohérent avec son rôle dans l'intercommunalité.",
+  },
+  {
+    profileIds: ["smallPeriurbanGrowth"],
     theme: "centrality",
     render: () =>
       "La commune affiche une centralité locale notable au sein de son territoire intercommunal.",
@@ -119,7 +140,30 @@ export function renderStrengthsByProfile(
   territory: TerritoryProfile,
   profile: EditorialProfile,
 ): string[] {
-  return facts
-    .filter((fact) => fact.target === "strengths")
-    .map((fact) => renderStrengthByProfile(fact, territory, profile));
+  const strengthFacts = facts.filter((fact) => fact.target === "strengths");
+  const rendered = strengthFacts.map((fact) =>
+    renderStrengthByProfile(fact, territory, profile),
+  );
+
+  if (profile.id !== "smallPeriurbanGrowth") {
+    return rendered;
+  }
+
+  const hasEmployment = strengthFacts.some(
+    (fact) => fact.theme === "employment_sectors" || fact.theme === "economy",
+  );
+  const hasEquipments = strengthFacts.some((fact) => fact.theme === "equipments");
+
+  if (hasEmployment && hasEquipments) {
+    const merged = [SMALL_COMMUNE_MERGED_STRENGTH];
+    for (const [index, sentence] of rendered.entries()) {
+      const fact = strengthFacts[index]!;
+      if (fact.theme === "connectivity" || fact.theme === "centrality") {
+        merged.push(sentence);
+      }
+    }
+    return merged.slice(0, rendered.length);
+  }
+
+  return rendered;
 }

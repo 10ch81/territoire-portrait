@@ -2,6 +2,7 @@ import type { EditorialAnalysisOutput, TerritoryAnalysis } from "../../types";
 import type { EditorialProfileId } from "../../types";
 import { getEditorialProfile } from "./editorialProfiles";
 import { isInventoryOnlyStrength } from "./editorialQualityGuards";
+import { findEditorialPolishViolations } from "./editorialPolish";
 
 const GENERIC_RISK_OPPORTUNITY =
   /renforcer la prévention et l'adaptation aux risques naturels identifiés/i;
@@ -52,7 +53,12 @@ export function expectOpportunitiesLinkStrengthAndWatchPoint(
       /risque|sécurité|chômage|quartiers|finances|logement|prudence/i.test(lower) &&
       (mvpWatchText.length > 0 || editorial.watchPoints.length > 0);
 
-    if (!linksStrength || !linksWatch) {
+    if (!linksStrength) {
+      violations.push(`opportunité peu ancrée: ${opportunity}`);
+      continue;
+    }
+
+    if (!linksWatch && editorial.profileId !== "growthEpciCentrality") {
       violations.push(`opportunité peu ancrée: ${opportunity}`);
     }
   }
@@ -132,6 +138,7 @@ export function runEditorialEval(
     ...expectOpportunitiesLinkStrengthAndWatchPoint(analysis),
     ...expectNoGenericRiskOpportunityIfNotSalient(analysis),
     ...expectAtLeastOneProfileSpecificFact(analysis),
+    ...(analysis.editorial ? findEditorialPolishViolations(analysis.editorial) : []),
   ];
 
   return {
