@@ -1,7 +1,6 @@
 import type { TerritoryProfile } from "../../types";
 import { resolveDisplayTypologyLabel } from "../context/displayTypologyLabel";
 import { buildDeterministicSummary } from "../build-canonical-output";
-import { formatCount } from "../format";
 import { joinFrenchList } from "../render-text";
 import type { AnalysisFact, AnalysisFactTheme } from "../types";
 import type { EditorialProfile, EditorialProfileId } from "./editorialProfiles";
@@ -172,20 +171,15 @@ export function renderSummaryByProfile(
   const assets = assetClause(profile.id, selectedFacts);
   const vigilance = vigilanceClause(profile.id, selectedFacts);
 
-  const density =
-    territory.densityPerKm2 != null
-      ? `, pour une densité d'environ ${formatCount(Math.round(territory.densityPerKm2))} habitants/km²`
-      : "";
-
   const typology = resolveDisplayTypologyLabel(territory);
   const typologyHint =
     typology && shouldAppendTypologyHint(opening, typology) ? ` (${typology})` : "";
 
   let phrase1: string;
   if (profile.id === "growthEpciCentrality") {
-    phrase1 = `${opening}${typologyHint}${density}, complétée par ${assets}.`;
+    phrase1 = `${opening}${typologyHint}, complétée par ${assets}.`;
   } else {
-    phrase1 = `${opening}${typologyHint}${density}, et combine ${assets}.`;
+    phrase1 = `${opening}${typologyHint}, et combine ${assets}.`;
   }
 
   const phrase2 = vigilance;

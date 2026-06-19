@@ -35,7 +35,7 @@ const STRENGTH_TEMPLATES: StrengthTemplate[] = [
     profileIds: ["growthEpciCentrality"],
     theme: "equipments",
     render: () =>
-      "L'offre d'équipements est cohérente avec le rôle de centralité locale et la croissance démographique observée.",
+      "L'offre d'équipements est cohérente avec la croissance démographique observée.",
   },
   {
     profileIds: ["growthEpciCentrality"],
@@ -47,7 +47,7 @@ const STRENGTH_TEMPLATES: StrengthTemplate[] = [
     profileIds: ["growthEpciCentrality", "employmentPole"],
     theme: "employment_sectors",
     render: () =>
-      "La commune présente une base d'emploi significative au regard de sa population, renforçant son rôle de centralité locale.",
+      "La commune présente une base d'emploi significative au regard de sa population.",
   },
   {
     profileIds: ["mountainTourismCenter"],
