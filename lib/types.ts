@@ -460,7 +460,7 @@ export interface TerritoryAnalysis {
   watchPoints: string[];
   opportunities: string[];
   dataLimits: string[];
-  /** Rendu v2 parallèle pour comparaison A/B — ne remplace pas le MVP. */
+  /** Couche éditoriale v2 — rendu principal côté UI lorsqu'elle est disponible. */
   editorial?: EditorialAnalysisOutput;
 }
 

@@ -1,9 +1,46 @@
-import type { AnalysisResult } from "@/lib/types";
+import type { AnalysisResult, TerritoryAnalysis } from "@/lib/types";
 import { ErrorBox } from "./ErrorBox";
 import { EmptyState } from "./EmptyState";
 
 interface AiAnalysisProps {
   result: AnalysisResult;
+}
+
+type DisplayAnalysis = Pick<
+  TerritoryAnalysis,
+  "summary" | "strengths" | "watchPoints" | "opportunities"
+>;
+
+function resolveDisplayAnalysis(analysis: TerritoryAnalysis): DisplayAnalysis {
+  const editorial = analysis.editorial;
+  if (editorial?.summary.trim()) {
+    return {
+      summary: editorial.summary,
+      strengths: editorial.strengths,
+      watchPoints:
+        editorial.watchPoints.length > 0
+          ? editorial.watchPoints
+          : analysis.watchPoints,
+      opportunities: editorial.opportunities,
+    };
+  }
+
+  return {
+    summary: analysis.summary,
+    strengths: analysis.strengths,
+    watchPoints: analysis.watchPoints,
+    opportunities: analysis.opportunities,
+  };
+}
+
+function hasDisplayContent(analysis: TerritoryAnalysis): boolean {
+  const display = resolveDisplayAnalysis(analysis);
+  return (
+    display.summary.trim().length > 0 ||
+    display.strengths.length > 0 ||
+    display.watchPoints.length > 0 ||
+    display.opportunities.length > 0
+  );
 }
 
 function AnalysisList({
@@ -32,12 +69,11 @@ function AnalysisList({
 }
 
 export function AiAnalysis({ result }: AiAnalysisProps) {
+  const display =
+    result.analysis !== null ? resolveDisplayAnalysis(result.analysis) : null;
+
   const hasAnalysisContent =
-    result.analysis !== null &&
-    (result.analysis.summary.trim().length > 0 ||
-      result.analysis.strengths.length > 0 ||
-      result.analysis.watchPoints.length > 0 ||
-      result.analysis.opportunities.length > 0);
+    result.analysis !== null && hasDisplayContent(result.analysis);
 
   const showDegradedNotice =
     hasAnalysisContent && (result.degraded === true || Boolean(result.error));
@@ -69,48 +105,25 @@ export function AiAnalysis({ result }: AiAnalysisProps) {
         </div>
       ) : null}
 
-      {hasAnalysisContent && result.analysis ? (
+      {hasAnalysisContent && display ? (
         <div className="mt-4 space-y-5">
           <p className="text-sm leading-relaxed text-slate-700">
-            {result.analysis.summary}
+            {display.summary}
           </p>
-
-          {result.analysis.editorial?.summary ? (
-            <div className="rounded-xl border border-indigo-200 bg-indigo-50/60 p-4">
-              <h3 className="text-sm font-semibold text-indigo-900">
-                Lecture éditoriale (v2)
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-indigo-950">
-                {result.analysis.editorial.summary}
-              </p>
-              <AnalysisList
-                title="Points forts (v2)"
-                items={result.analysis.editorial.strengths}
-                emptyLabel="Aucun point identifié."
-              />
-              <div className="mt-4">
-                <AnalysisList
-                  title="Opportunités (v2)"
-                  items={result.analysis.editorial.opportunities}
-                  emptyLabel="Aucune opportunité identifiée."
-                />
-              </div>
-            </div>
-          ) : null}
 
           <AnalysisList
             title="Points forts"
-            items={result.analysis.strengths}
+            items={display.strengths}
             emptyLabel="Aucun point identifié."
           />
           <AnalysisList
             title="Points d'attention"
-            items={result.analysis.watchPoints}
+            items={display.watchPoints}
             emptyLabel="Aucun point d'attention identifié."
           />
           <AnalysisList
             title="Opportunités possibles"
-            items={result.analysis.opportunities}
+            items={display.opportunities}
             emptyLabel="Aucune opportunité identifiée."
           />
         </div>
