@@ -99,6 +99,21 @@ export const FRANCE_TRAVAIL_API_BASE =
 /** Dernier trimestre ingéré — recalculé par `ingest-france-travail`. */
 export const FRANCE_TRAVAIL_QUARTER = "2024-T4";
 
+/**
+ * APL DREES — non intégrée (skipped: true).
+ * Gate MCP : export CSV data.drees vide ; jeux data.gouv en xlsx/7z sans bulk communal ≤ 20 Mo.
+ */
+export const APL_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl/";
+
+const CNAF_PRECARITE_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/indicateurs-territoriaux-de-precarite-par-commune-epci-departement-et-region/";
+export const CNAF_PRECARITE_FILE_URL =
+  "https://static.data.gouv.fr/resources/indicateurs-territoriaux-de-precarite-par-commune-epci-departement-et-region/20260306-112349/20260306-indicateurs-precarite.csv";
+
+/** Millésime de la part RSA (CNAF) dans les indicateurs territoriaux de précarité. */
+export const CNAF_RSA_VINTAGE = 2024;
+
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
   RECHERCHE_ENTREPRISES: "recherche-entreprises",
@@ -126,6 +141,7 @@ export const SOURCE_IDS = {
   FINESS: "finess",
   EDUCATION_DIRECTORY: "education-directory",
   DEPP_IPS_ECOLES: "depp-ips-ecoles",
+  CNAF_PRECARITE: "cnaf-precarite",
   AAV: "aav2020",
   INSEE_DENSITY_GRID: "insee-density-grid",
   INSEE_URBAN_UNIT: "insee-urban-unit",
@@ -262,6 +278,17 @@ export function createFranceTravailSource(
     url: FRANCE_TRAVAIL_DATASET_URL,
     description:
       "Demandeurs d'emploi inscrits à France Travail (catégorie ABC, moyenne trimestrielle communale, DARES).",
+    accessedAt,
+  };
+}
+
+export function createCafSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.CNAF_PRECARITE,
+    name: `CNAF — Part allocataires RSA (${CNAF_RSA_VINTAGE})`,
+    url: CNAF_PRECARITE_DATASET_URL,
+    description:
+      "Part des allocataires du RSA parmi les ménages (indicateurs territoriaux de précarité CNAF) — seul agrégat CAF en bulk communal ≤ 20 Mo.",
     accessedAt,
   };
 }

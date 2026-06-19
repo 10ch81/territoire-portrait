@@ -111,6 +111,22 @@ function appendLabourMarketLimits(
   }
 }
 
+function appendSocialBenefitsLimits(
+  limits: string[],
+  enrichment: TerritoryEnrichment,
+): void {
+  if (enrichment.socialBenefits?.available) {
+    pushUnique(
+      limits,
+      `CNAF (${enrichment.socialBenefits.rsaVintage ?? "millésime récent"}) : part des allocataires RSA parmi les ménages — indicateur partiel ; ne couvre pas l'ensemble des prestations CAF (AAH, prime d'activité, aides logement, etc.).`,
+    );
+  }
+
+  if (enrichment.socialBenefits?.note && !enrichment.socialBenefits.available) {
+    pushUnique(limits, enrichment.socialBenefits.note);
+  }
+}
+
 function appendPopulationLimits(
   limits: string[],
   territory: TerritoryProfile,
@@ -313,6 +329,8 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
 
   appendLabourMarketLimits(limits, enrichment);
 
+  appendSocialBenefitsLimits(limits, enrichment);
+
   appendEnterpriseLimits(limits, enrichment);
 
   appendEquipmentLimits(limits, enrichment);
@@ -341,6 +359,11 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
       enrichment.health?.note,
     );
   }
+
+  pushUnique(
+    limits,
+    "APL DREES (accessibilité aux soins) : non intégrée — pas de bulk communal CSV/JSON ≤ 20 Mo (export data.drees vide ; jeux data.gouv en xlsx/7z).",
+  );
 
   appendPropertyLimits(limits, enrichment);
 
