@@ -1,10 +1,14 @@
 import { computeDataLimits } from "../data-limits";
-import type { TerritoryAnalysis, TerritoryProfile } from "../types";
+import type { TerritoryAnalysis, TerritoryProfile, EditorialProfileId } from "../types";
 import { mergeSanitizedAnalysis } from "../mistral-sanitize";
 import { buildAnalysisFacts } from "./build-analysis-facts";
 import { buildCanonicalAnalysisOutput } from "./build-canonical-output";
+import { buildTerritoryContext } from "./context/buildTerritoryContext";
+import { renderEditorialAnalysis } from "./editorial/renderEditorialAnalysis";
+import { classifyEditorialProfile } from "./editorial/classifyEditorialProfile";
 import { isSelectedFactCovered } from "./ensure-output-coverage";
 import { ANALYSIS_OUTPUT_LIMITS } from "./prompt-limits";
+import { qualifyAnalysisFacts } from "./qualify-facts";
 import { selectAnalysisFactsForPrompt } from "./select-facts";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 import { enforceFinalAnalysisInvariants } from "./enforce-final-invariants";
@@ -14,23 +18,56 @@ import {
 } from "./security-indicators";
 import { validateAnalysisOutput } from "./validate-output";
 
+/** Couche éditoriale v2 parallèle au rendu MVP. */
+export function buildEditorialLayer(
+  territory: TerritoryProfile,
+  selectedFacts: AnalysisFact[],
+  mvpSummary: string,
+) {
+  const territoryContext = buildTerritoryContext(territory);
+  const qualifiedFacts = qualifyAnalysisFacts(buildAnalysisFacts(territory), {
+    territory,
+    territoryContext,
+  });
+  return renderEditorialAnalysis(
+    territory,
+    territoryContext,
+    selectedFacts,
+    mvpSummary,
+    qualifiedFacts,
+  );
+}
+
 /** Reproduit la sortie finale serveur (sans appel Mistral : entrée = sortie canonique). */
 export function buildFinalTerritorialAnalysis(territory: TerritoryProfile): {
   facts: AnalysisFact[];
   selectedFacts: AnalysisFact[];
+  editorialProfileId: EditorialProfileId;
   analysis: TerritoryAnalysis;
 } {
   const facts = buildAnalysisFacts(territory);
+  const territoryContext = buildTerritoryContext(territory);
+  const qualifiedFacts = qualifyAnalysisFacts(facts, { territory, territoryContext });
   const selectedFacts = selectAnalysisFactsForPrompt(facts, territory);
   const canonical = buildCanonicalAnalysisOutput(territory, selectedFacts);
   const validated = validateAnalysisOutput(canonical, selectedFacts, territory);
+  const editorialProfileId = classifyEditorialProfile(
+    territory,
+    territoryContext,
+    qualifiedFacts,
+  );
+  const editorial = buildEditorialLayer(territory, selectedFacts, validated.summary);
+
+  const merged = mergeSanitizedAnalysis(validated, computeDataLimits(territory));
 
   return {
     facts,
     selectedFacts,
-    analysis: enforceFinalAnalysisInvariants(
-      mergeSanitizedAnalysis(validated, computeDataLimits(territory)),
-    ),
+    editorialProfileId,
+    analysis: enforceFinalAnalysisInvariants({
+      ...merged,
+      editorial,
+    }),
   };
 }
 

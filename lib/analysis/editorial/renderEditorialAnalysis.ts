@@ -1,0 +1,45 @@
+import type { EditorialAnalysisOutput, TerritoryProfile } from "../../types";
+import { buildVerbatimLists } from "../build-canonical-output";
+import { renderFactSentenceForOutput } from "../progressive-qualification";
+import type { AnalysisFact, QualifiedAnalysisFact } from "../types";
+import type { TerritoryContext } from "../context/buildTerritoryContext";
+import { resolveClassifiedEditorialProfile } from "./classifyEditorialProfile";
+import {
+  applyEditorialQualityGuards,
+  guardEditorialSummary,
+} from "./editorialQualityGuards";
+import { renderOpportunityByProfile } from "./renderOpportunityByProfile";
+import { renderStrengthsByProfile } from "./renderStrengthByProfile";
+import { renderSummaryByProfileWithFallback } from "./renderSummaryByProfile";
+
+export function renderEditorialAnalysis(
+  territory: TerritoryProfile,
+  context: TerritoryContext,
+  selectedFacts: AnalysisFact[],
+  mvpSummary: string,
+  qualifiedFacts: QualifiedAnalysisFact[] = [],
+): EditorialAnalysisOutput {
+  const profile = resolveClassifiedEditorialProfile(territory, context, qualifiedFacts);
+  const summary = guardEditorialSummary(
+    renderSummaryByProfileWithFallback(territory, profile, selectedFacts),
+    mvpSummary,
+    selectedFacts,
+  );
+
+  const strengths = renderStrengthsByProfile(selectedFacts, territory, profile);
+  const verbatim = buildVerbatimLists(selectedFacts);
+  const opportunities = renderOpportunityByProfile(profile, selectedFacts);
+
+  const editorial: EditorialAnalysisOutput = {
+    profileId: profile.id,
+    summary,
+    strengths,
+    watchPoints: verbatim.watchPoints.map((sentence, index) => {
+      const fact = selectedFacts.filter((f) => f.target === "watchPoints")[index];
+      return fact ? renderFactSentenceForOutput(fact) : sentence;
+    }),
+    opportunities,
+  };
+
+  return applyEditorialQualityGuards(editorial, mvpSummary, selectedFacts);
+}

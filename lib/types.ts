@@ -405,12 +405,32 @@ export interface TerritoryProfile {
   enrichment: TerritoryEnrichment | null;
 }
 
+export type EditorialProfileId =
+  | "largeUrbanCenter"
+  | "growthEpciCentrality"
+  | "mountainTourismCenter"
+  | "smallPeriurbanGrowth"
+  | "employmentPole"
+  | "ruralDecline"
+  | "socialFragilityUrban"
+  | "genericCentralite";
+
+export interface EditorialAnalysisOutput {
+  profileId: EditorialProfileId;
+  summary: string;
+  strengths: string[];
+  watchPoints: string[];
+  opportunities: string[];
+}
+
 export interface TerritoryAnalysis {
   summary: string;
   strengths: string[];
   watchPoints: string[];
   opportunities: string[];
   dataLimits: string[];
+  /** Rendu v2 parallèle pour comparaison A/B — ne remplace pas le MVP. */
+  editorial?: EditorialAnalysisOutput;
 }
 
 export interface AnalysisResult {

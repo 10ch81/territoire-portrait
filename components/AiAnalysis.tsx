@@ -75,6 +75,29 @@ export function AiAnalysis({ result }: AiAnalysisProps) {
             {result.analysis.summary}
           </p>
 
+          {result.analysis.editorial?.summary ? (
+            <div className="rounded-xl border border-indigo-200 bg-indigo-50/60 p-4">
+              <h3 className="text-sm font-semibold text-indigo-900">
+                Lecture éditoriale (v2)
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-indigo-950">
+                {result.analysis.editorial.summary}
+              </p>
+              <AnalysisList
+                title="Points forts (v2)"
+                items={result.analysis.editorial.strengths}
+                emptyLabel="Aucun point identifié."
+              />
+              <div className="mt-4">
+                <AnalysisList
+                  title="Opportunités (v2)"
+                  items={result.analysis.editorial.opportunities}
+                  emptyLabel="Aucune opportunité identifiée."
+                />
+              </div>
+            </div>
+          ) : null}
+
           <AnalysisList
             title="Points forts"
             items={result.analysis.strengths}

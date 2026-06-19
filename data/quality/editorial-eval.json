@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-06-19T09:32:02.648Z",
+  "passed": true,
+  "results": [
+    {
+      "profileId": "largeUrbanCenter",
+      "commune": "Rennes",
+      "inseeCode": "35238",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "profileId": "largeUrbanCenter",
+      "commune": "Nantes",
+      "inseeCode": "44109",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "profileId": "growthEpciCentrality",
+      "commune": "Palaiseau",
+      "inseeCode": "91477",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "profileId": "mountainTourismCenter",
+      "commune": "Chamonix-Mont-Blanc",
+      "inseeCode": "74056",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "profileId": "smallPeriurbanGrowth",
+      "commune": "Bousse",
+      "inseeCode": "57190",
+      "passed": true,
+      "violations": []
+    }
+  ]
+}

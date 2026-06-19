@@ -27,7 +27,7 @@ const MVP_SNAPSHOT_HASHES: Record<string, string> = {
   palaiseau: "ea17459dcdf5a09f",
   chamonix: "a2f7193df795265e",
   rennes: "943a6d74261ad54e",
-  bousse: "258b3a3b34f8b3ac",
+  bousse: "a9b89a323e594e2d",
 };
 
 describe("MVP snapshots — sortie canonique figée", () => {

@@ -15,6 +15,7 @@ export {
   inferFactOrder,
   resolveVerbatimList,
 } from "./build-canonical-output";
+export { buildEditorialLayer, buildFinalTerritorialAnalysis } from "./evaluation-helpers";
 export {
   ANALYSIS_OUTPUT_LIMITS,
   buildExpectedOutputInstructions,
@@ -101,6 +102,14 @@ export {
   tourismAccommodationRatio,
 } from "./context/buildTerritoryContext";
 export { resolveDisplayTypologyLabel } from "./context/displayTypologyLabel";
+export {
+  classifyEditorialProfile,
+  resolveClassifiedEditorialProfile,
+} from "./editorial/classifyEditorialProfile";
+export { editorialProfiles, getEditorialProfile } from "./editorial/editorialProfiles";
+export type { EditorialProfile } from "./editorial/editorialProfiles";
+export { renderEditorialAnalysis } from "./editorial/renderEditorialAnalysis";
+export { runEditorialEval } from "./editorial/editorialEvals";
 export {
   contextSelectionScorePenalty,
   GENERIC_FIBER_THRESHOLD_PERCENT,
