@@ -4,22 +4,10 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import {
   EXAMPLE_COMMUNES,
-  loadRecentCommunes,
-  type RecentCommune,
+  getRecentCommunesServerSnapshot,
+  getRecentCommunesSnapshot,
+  subscribeRecentCommunes,
 } from "@/lib/ux/recent-communes";
-
-function subscribeRecentCommunes(onStoreChange: () => void): () => void {
-  window.addEventListener("storage", onStoreChange);
-  return () => window.removeEventListener("storage", onStoreChange);
-}
-
-function getRecentCommunesSnapshot(): RecentCommune[] {
-  return loadRecentCommunes();
-}
-
-function getRecentCommunesServerSnapshot(): RecentCommune[] {
-  return [];
-}
 
 export function SearchSuggestions() {
   const recent = useSyncExternalStore(

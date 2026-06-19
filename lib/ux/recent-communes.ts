@@ -8,21 +8,79 @@ export interface RecentCommune {
 const STORAGE_KEY = "territoire-portrait:recent-communes";
 const MAX_RECENT = 5;
 
-export function loadRecentCommunes(): RecentCommune[] {
+const EMPTY_RECENT: RecentCommune[] = [];
+
+const recentCommuneListeners = new Set<() => void>();
+
+let cachedRaw: string | null | undefined;
+let cachedSnapshot: RecentCommune[] = EMPTY_RECENT;
+
+function parseRecentCommunes(raw: string | null): RecentCommune[] {
+  if (!raw) {
+    return EMPTY_RECENT;
+  }
+  try {
+    const parsed = JSON.parse(raw) as RecentCommune[];
+    return Array.isArray(parsed) ? parsed.slice(0, MAX_RECENT) : EMPTY_RECENT;
+  } catch {
+    return EMPTY_RECENT;
+  }
+}
+
+function readRecentCommunesSnapshot(): RecentCommune[] {
   if (typeof window === "undefined") {
-    return [];
+    return EMPTY_RECENT;
   }
 
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return [];
-    }
-    const parsed = JSON.parse(raw) as RecentCommune[];
-    return Array.isArray(parsed) ? parsed.slice(0, MAX_RECENT) : [];
-  } catch {
-    return [];
+  const raw = window.localStorage.getItem(STORAGE_KEY);
+  if (raw === cachedRaw) {
+    return cachedSnapshot;
   }
+
+  cachedRaw = raw;
+  cachedSnapshot = parseRecentCommunes(raw);
+  return cachedSnapshot;
+}
+
+function invalidateRecentCommunesCache(): void {
+  cachedRaw = undefined;
+}
+
+function notifyRecentCommunesListeners(): void {
+  for (const listener of recentCommuneListeners) {
+    listener();
+  }
+}
+
+export function subscribeRecentCommunes(onStoreChange: () => void): () => void {
+  recentCommuneListeners.add(onStoreChange);
+
+  const onStorage = (event: StorageEvent) => {
+    if (event.key !== STORAGE_KEY && event.key !== null) {
+      return;
+    }
+    invalidateRecentCommunesCache();
+    onStoreChange();
+  };
+
+  window.addEventListener("storage", onStorage);
+
+  return () => {
+    recentCommuneListeners.delete(onStoreChange);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+export function getRecentCommunesSnapshot(): RecentCommune[] {
+  return readRecentCommunesSnapshot();
+}
+
+export function getRecentCommunesServerSnapshot(): RecentCommune[] {
+  return EMPTY_RECENT;
+}
+
+export function loadRecentCommunes(): RecentCommune[] {
+  return readRecentCommunesSnapshot();
 }
 
 export function saveRecentCommune(entry: Omit<RecentCommune, "visitedAt">): void {
@@ -30,7 +88,7 @@ export function saveRecentCommune(entry: Omit<RecentCommune, "visitedAt">): void
     return;
   }
 
-  const existing = loadRecentCommunes().filter(
+  const existing = readRecentCommunesSnapshot().filter(
     (c) => c.inseeCode !== entry.inseeCode,
   );
   const updated: RecentCommune[] = [
@@ -38,7 +96,11 @@ export function saveRecentCommune(entry: Omit<RecentCommune, "visitedAt">): void
     ...existing,
   ].slice(0, MAX_RECENT);
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  const serialized = JSON.stringify(updated);
+  window.localStorage.setItem(STORAGE_KEY, serialized);
+  cachedRaw = serialized;
+  cachedSnapshot = updated;
+  notifyRecentCommunesListeners();
 }
 
 export const EXAMPLE_COMMUNES: Array<{
