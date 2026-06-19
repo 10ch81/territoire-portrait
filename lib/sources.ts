@@ -45,6 +45,9 @@ const FILOSOFI_PAGE_URL = "https://www.insee.fr/fr/statistiques/8984752";
 export const FILOSOFI_FILE_URL =
   "https://www.insee.fr/fr/statistiques/fichier/8984752/FILOSOFI_CC_csv.zip";
 
+export const TOURISM_FILE_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/2021703/DS_TOUR_CAP_CSV_2025_geo25.zip";
+
 const RP_POPULATION_PAGE_URL = "https://www.insee.fr/fr/statistiques/8581696";
 const RP_EMPLOYMENT_PAGE_URL = "https://www.insee.fr/fr/statistiques/8581444";
 const RP_HOUSING_PAGE_URL = "https://www.insee.fr/fr/statistiques/8581474";
@@ -64,8 +67,7 @@ const FRANCE_SERVICES_DATASET_URL =
   "https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services/";
 const OFGL_URL = "https://data.ofgl.fr/";
 const SIDE_URL = "https://www.insee.fr/fr/statistiques/2011101";
-const TOURISM_URL =
-  "https://www.insee.fr/fr/statistiques/fichier/2021703/DS_TOUR_CAP_CSV_2025_geo25.zip";
+const TOURISM_URL = TOURISM_FILE_URL;
 const FLORES_URL =
   "https://www.data.gouv.fr/datasets/nombre-detablissements-et-effectifs-salaries-en-17-grands-secteurs/";
 const FLORES_FILE_URL =

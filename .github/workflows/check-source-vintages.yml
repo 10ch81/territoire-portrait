@@ -1,0 +1,38 @@
+name: Check source vintages
+
+on:
+  schedule:
+    # Chaque lundi à 05:00 UTC — phase 1 (découverte)
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Phase 1 — discover newer source vintages
+        run: npm run check:source-vintages
+
+      - name: Upload vintage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-vintage-report
+          path: data/quality/source-vintage-report.json

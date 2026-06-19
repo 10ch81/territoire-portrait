@@ -104,6 +104,19 @@ Module cible : `lib/quality/classify.ts`
 | `CACHE_STALE` | Snapshot plus ancien que seuil configuré | Re-ingest auto |
 | `SOURCE_UPDATED` | INSEE a publié un nouveau millésime | Ingest + commit si verify OK |
 
+## Millésimes sources — modèle en deux temps
+
+Le cache mensuel (`refresh-cache.yml`) **re-télécharge** les millésimes déjà codés dans `lib/sources.ts`. Il ne monte pas automatiquement de version.
+
+| Phase | Commande / CI | Rôle |
+| ----- | ------------- | ---- |
+| **1 — Découverte** | `npm run check:source-vintages` · workflow `check-source-vintages.yml` (hebdo) | Sonde les producteurs (INSEE, Melodi, data.gouv) et signale un millésime plus récent que le millésime **supporté** |
+| **2 — Adoption** | PR manuelle | Mettre à jour `*_VINTAGE` et URLs dans `lib/sources.ts`, adapter parsers/tests, `npm run ingest:*` + `npm run quality:all` |
+
+Registre : `lib/source-vintages.ts` · helpers : `lib/source-vintage-discovery.ts` · rapport : `data/quality/source-vintage-report.json`.
+
+La CI de découverte **échoue** si une mise à jour est disponible (alerte), sans modifier le cache.
+
 ## Pipeline CI (option 6)
 
 Extension de `.github/workflows/refresh-cache.yml` :

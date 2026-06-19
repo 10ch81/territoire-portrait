@@ -33,6 +33,7 @@
     "verify:reference": "tsx scripts/verify-reference.ts",
     "quality:all": "tsx scripts/quality-all.ts",
     "quality:sample": "tsx scripts/quality-sample.ts",
+    "check:source-vintages": "tsx scripts/check-source-vintages.ts",
     "test": "tsx --test lib/**/*.test.ts",
     "test:analysis": "tsx --test lib/analysis/**/*.test.ts",
     "test:mistral-sanitize": "tsx --test lib/mistral-sanitize.test.ts",

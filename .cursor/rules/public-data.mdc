@@ -7,7 +7,11 @@ alwaysApply: false
 # Données publiques
 
 - Ne jamais inventer de données — afficher « Donnée non disponible ».
-- Utiliser le **millésime le plus récent** publié pour chaque source (constantes `*_VINTAGE` et URLs dans `lib/sources.ts`) ; documenter toute impossibilité (ex. FILOSOFI 2022 non produit).
+- Utiliser le **millésime le plus récent publié** pour chaque source (`*_VINTAGE` et URLs dans `lib/sources.ts`).
+- **Modèle en deux temps** :
+  1. **Découverte** — `npm run check:source-vintages` (CI hebdomadaire) signale un millésime plus récent côté producteur.
+  2. **Adoption explicite** — bump des constantes, adaptation parser/tests si besoin, `ingest:*` + `quality:all` (jamais d'auto-bump silencieux).
+- Documenter toute impossibilité (ex. FILOSOFI 2022 non produit).
 - Documenter chaque source dans `lib/sources.ts` avec URL et description.
 - MVP : API Géo (geo.api.gouv.fr) pour la résolution commune.
 - Enrichissement via scripts d'ingestion + APIs live (SIRENE, Géorisques).
