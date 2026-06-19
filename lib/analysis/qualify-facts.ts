@@ -477,7 +477,7 @@ function qualifyIncomeFact(fact: AnalysisFact, territory: TerritoryProfile): Qua
 }
 
 function qualifyFinancesFact(fact: AnalysisFact, territory: TerritoryProfile): QualificationCore {
-  if (!/dette/i.test(fact.sentence)) {
+  if (!/dette|encours/i.test(fact.sentence)) {
     return withTargets(fact, {
       polarity: "neutral",
       intensity: "low",
@@ -486,7 +486,47 @@ function qualifyFinancesFact(fact: AnalysisFact, territory: TerritoryProfile): Q
     });
   }
 
-  const debt = territory.enrichment?.publicAccounts?.debtPerCapitaEur;
+  const accounts = territory.enrichment?.publicAccounts;
+  const debt = accounts?.debtPerCapitaEur;
+
+  if (/recettes de fonctionnement/i.test(fact.sentence)) {
+    if (debt == null) {
+      return withTargets(fact, {
+        polarity: "neutral",
+        intensity: "medium",
+        qualificationReason: "dette_ratio_recettes_descriptif",
+        eligibleTargets: ["summary", "watchPoints"],
+      });
+    }
+
+    if (qualifiesAsDebtWatchPoint(debt, territory)) {
+      return withTargets(fact, {
+        polarity: "negative",
+        intensity: debtIntensity(debt, territory),
+        qualificationReason: "dette_ratio_recettes",
+      });
+    }
+
+    return withTargets(fact, {
+      polarity: "neutral",
+      intensity: "medium",
+      qualificationReason: "dette_ratio_recettes_descriptif",
+      eligibleTargets: ["summary"],
+    });
+  }
+
+  if (
+    accounts?.operatingRevenueEur != null &&
+    /€ par habitant/i.test(fact.sentence)
+  ) {
+    return withTargets(fact, {
+      polarity: "neutral",
+      intensity: "low",
+      qualificationReason: "dette_hab_avec_recettes",
+      eligibleTargets: ["summary"],
+    });
+  }
+
   if (debt == null) {
     return withTargets(fact, {
       polarity: "unknown",

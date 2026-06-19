@@ -2,6 +2,7 @@ import { getPopulationDisplayMeta } from "../ux/population";
 import type { TerritoryProfile } from "../types";
 import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
 import { formatCount } from "./format";
+import { resolveDisplayTypologyLabel } from "./context/displayTypologyLabel";
 import { isSelectedFactCovered } from "./ensure-output-coverage";
 import {
   buildSummaryPhrase2,
@@ -123,7 +124,7 @@ export function buildDeterministicSummary(
       ? `${formatCount(territory.population)} habitants en ${populationMeta.vintage}`
       : "une population non documentée";
 
-  const typologyLabel = territory.enrichment?.territoryTypology?.summaryLabel;
+  const typologyLabel = resolveDisplayTypologyLabel(territory);
   const density =
     territory.densityPerKm2 !== null
       ? `${formatCount(Math.round(territory.densityPerKm2))} habitants/km²`

@@ -173,7 +173,7 @@ function qualifyFinancesProgressive(
   territoryContext: TerritoryContext,
 ): FactProgressiveQualification {
   const accounts = territory.enrichment?.publicAccounts;
-  const isDebtFact = /dette/i.test(fact.sentence);
+  const isDebtFact = /dette|encours/i.test(fact.sentence);
 
   if (!isDebtFact) {
     return {

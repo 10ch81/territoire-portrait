@@ -25,7 +25,7 @@ describe("buildTerritoryContext — Palaiseau (91477)", () => {
     assert.ok(ratio !== null && ratio < HIGH_TOURISM_CAPACITY_PER_RESIDENT_RATIO);
 
     assert.equal(context.hasHighTourismCapacityPerResident, false);
-    assert.equal(context.requiresPerCapitaCaution, false);
+    assert.equal(context.requiresPerCapitaCaution, true);
   });
 
   it("pression immobilière et base emploi élevées", () => {
@@ -34,7 +34,12 @@ describe("buildTerritoryContext — Palaiseau (91477)", () => {
   });
 
   it("pas de profil montagne ou risque alpin déductible", () => {
-    assert.equal(context.isMountainOrNaturalRiskCommune, false);
+    assert.equal(context.isMountainOrNaturalRiskProfile, false);
+  });
+
+  it("grande ville et pas de risque petits effectifs sécurité", () => {
+    assert.equal(context.isLargeCity, false);
+    assert.equal(context.population, palaiseauProfile.population);
   });
 });
 
@@ -44,8 +49,9 @@ describe("buildTerritoryContext — Chamonix (74056)", () => {
   it("commune touristique de montagne avec prudence par habitant", () => {
     assert.equal(context.isDenseUrban, false);
     assert.equal(context.isTouristCommune, true);
-    assert.equal(context.isMountainOrNaturalRiskCommune, true);
+    assert.equal(context.isMountainOrNaturalRiskProfile, true);
     assert.equal(context.hasHighTourismCapacityPerResident, true);
+    assert.equal(context.hasTourismEmploymentProfile, true);
     assert.equal(context.requiresPerCapitaCaution, true);
 
     const ratio = tourismAccommodationRatio(chamonixProfile);

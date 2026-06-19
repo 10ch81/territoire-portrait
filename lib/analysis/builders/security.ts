@@ -1,4 +1,5 @@
 import type { TerritoryProfile } from "../../types";
+import { buildTerritoryContext } from "../context/buildTerritoryContext";
 import {
   assessSecurityIndicators,
   buildSecuritySummaryIssueFragments,
@@ -22,7 +23,10 @@ export function buildSecurityFacts(territory: TerritoryProfile): AnalysisFact[] 
   }
 
   const assessments = assessSecurityIndicators(security.indicators);
-  const sentence = buildSecurityWatchPointSentence(security, assessments);
+  const territoryContext = buildTerritoryContext(territory);
+  const sentence = buildSecurityWatchPointSentence(security, assessments, {
+    securitySmallNumbersRisk: territoryContext.securitySmallNumbersRisk === true,
+  });
   const summaryFragments = buildSecuritySummaryIssueFragments(assessments);
 
   if (!sentence) {

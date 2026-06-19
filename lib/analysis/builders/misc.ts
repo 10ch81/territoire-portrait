@@ -87,24 +87,75 @@ export function buildFinancesFacts(territory: TerritoryProfile): AnalysisFact[] 
   }
 
   if (accounts?.available && accounts.debtPerCapitaEur !== null) {
-    const debtIsWatchPoint = qualifiesAsDebtWatchPoint(accounts.debtPerCapitaEur);
-    facts.push(
-      createFact({
-        theme: "finances",
-        target: debtIsWatchPoint ? "watchPoints" : "summary",
-        sentence: `La dette communale s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
-        sourceKeys: ["ofgl"],
-        year: accounts.year,
-        confidence: "medium",
-        limitations: debtIsWatchPoint
-          ? [
-              "Comptes publics OFGL ; budget principal ; lecture descriptive sans jugement de gestion.",
-            ]
-          : [
-              "Comptes publics OFGL ; budget principal ; niveau non interprétable comme tension sans comparaison ou série.",
-            ],
-      }),
-    );
+    const hasRevenue =
+      accounts.operatingRevenueEur != null || accounts.operatingRevenuePerCapitaEur != null;
+    const debtOutstanding = accounts.debtOutstandingEur;
+    const operatingRevenue = accounts.operatingRevenueEur;
+
+    if (hasRevenue && debtOutstanding != null && operatingRevenue != null && operatingRevenue > 0) {
+      const debtToRevenueRatio = debtOutstanding / operatingRevenue;
+      const ratioPercent = Math.round(debtToRevenueRatio * 100);
+      const ratioPhrase =
+        ratioPercent >= 85 && ratioPercent <= 115
+          ? " ; l'encours représente environ une année de recettes de fonctionnement"
+          : "";
+      const debtIsWatchPoint = qualifiesAsDebtWatchPoint(accounts.debtPerCapitaEur);
+
+      facts.push(
+        createFact({
+          theme: "finances",
+          target: debtIsWatchPoint ? "watchPoints" : "summary",
+          sentence: `L'encours de dette représente ${ratioPercent} % des recettes de fonctionnement annuelles (OFGL ${accounts.year})${ratioPhrase}, à contextualiser avec la capacité d'investissement.`,
+          sourceKeys: ["ofgl"],
+          year: accounts.year,
+          confidence: "medium",
+          limitations: [
+            "Comptes publics OFGL ; budget principal ; endettement à lire avec les recettes et la capacité d'investissement.",
+          ],
+          numericBindings: [
+            binding(
+              ratioPercent,
+              "ratio dette/recettes OFGL",
+              "finances",
+              ["dette", "recettes", "endettement", "OFGL"],
+            ),
+          ],
+        }),
+      );
+
+      facts.push(
+        createFact({
+          theme: "finances",
+          target: "summary",
+          sentence: `La dette communale s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
+          sourceKeys: ["ofgl"],
+          year: accounts.year,
+          confidence: "medium",
+          limitations: [
+            "Indicateur par habitant ; à lire avec le ratio dette/recettes et la population présente.",
+          ],
+        }),
+      );
+    } else {
+      const debtIsWatchPoint = qualifiesAsDebtWatchPoint(accounts.debtPerCapitaEur);
+      facts.push(
+        createFact({
+          theme: "finances",
+          target: debtIsWatchPoint ? "watchPoints" : "summary",
+          sentence: `La dette communale s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
+          sourceKeys: ["ofgl"],
+          year: accounts.year,
+          confidence: "medium",
+          limitations: debtIsWatchPoint
+            ? [
+                "Comptes publics OFGL ; budget principal ; lecture descriptive sans jugement de gestion.",
+              ]
+            : [
+                "Comptes publics OFGL ; budget principal ; niveau non interprétable comme tension sans comparaison ou série.",
+              ],
+        }),
+      );
+    }
   }
 
   if (accounts?.available) {

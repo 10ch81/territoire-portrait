@@ -1,4 +1,6 @@
 import type { TerritoryProfile } from "../types";
+import { buildTerritoryContext } from "./context/buildTerritoryContext";
+import { contextSelectionScorePenalty } from "./context/context-relevance";
 import {
   hasOpportunityTraceability,
   isStudyOnlyOpportunity,
@@ -154,6 +156,9 @@ export function scoreAnalysisFact(
   if ((fact.limitations?.length ?? 0) >= 2) {
     score += 5;
   }
+
+  const territoryContext = buildTerritoryContext(context.territory);
+  score += contextSelectionScorePenalty(fact, context.territory, territoryContext);
 
   return Math.max(0, score);
 }

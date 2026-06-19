@@ -16,6 +16,7 @@ import {
   buildTerritoryContext,
   countTourismContextSignals,
 } from "./context/buildTerritoryContext";
+import { isMechanicalLargeCityOpportunity } from "./context/context-relevance";
 import type { ScoreContext } from "./score-facts";
 import type { ComparisonProfile, TerritoryTypology } from "../typology/types";
 import { resolveComparisonProfile } from "../typology/thresholds";
@@ -291,6 +292,11 @@ function isCandidateEligible(
   }
 
   if (!themeEligible) {
+    return false;
+  }
+
+  const territoryContext = buildTerritoryContext(territory);
+  if (isMechanicalLargeCityOpportunity(fact, territory, territoryContext)) {
     return false;
   }
 

@@ -99,4 +99,11 @@ export {
   countTourismContextSignals,
   tourismAccommodationRatio,
 } from "./context/buildTerritoryContext";
+export { resolveDisplayTypologyLabel } from "./context/displayTypologyLabel";
+export {
+  contextSelectionScorePenalty,
+  isContextuallySelectableForTarget,
+  isMechanicalLargeCityOpportunity,
+  isMechanicalLargeCityStrength,
+} from "./context/context-relevance";
 export type { TerritoryContext, TerritoryContextFlag } from "./context/buildTerritoryContext";

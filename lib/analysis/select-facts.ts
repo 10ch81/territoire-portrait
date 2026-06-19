@@ -21,6 +21,8 @@ import {
   isProgressiveWatchPointEligible,
   resolveOpportunityGenericityScore,
 } from "./progressive-qualification";
+import { buildTerritoryContext } from "./context/buildTerritoryContext";
+import { isContextuallySelectableForTarget } from "./context/context-relevance";
 import {
   hasOpportunityTraceability,
   isStudyOnlyOpportunity,
@@ -172,6 +174,23 @@ function canAddToTarget(
 
   if (target === "summary" && SUMMARY_EXCLUDED_THEMES.includes(candidate.theme)) {
     return false;
+  }
+
+  if (
+    context?.territory &&
+    (target === "strengths" || target === "opportunities")
+  ) {
+    const territoryContext = buildTerritoryContext(context.territory);
+    if (
+      !isContextuallySelectableForTarget(
+        candidate,
+        target,
+        context.territory,
+        territoryContext,
+      )
+    ) {
+      return false;
+    }
   }
 
   if (target === "opportunities") {
