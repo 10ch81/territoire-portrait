@@ -8,7 +8,19 @@ import {
   TARGET_LIMITS,
   watchPointRetentionRank,
 } from "./prompt-limits";
-import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
+import type {
+  AnalysisFact,
+  AnalysisFactTarget,
+  AnalysisFactTheme,
+  QualifiedAnalysisFact,
+} from "./types";
+import {
+  applyProgressiveCaution,
+  indexQualifiedFacts,
+  isProgressiveOpportunityEligible,
+  isProgressiveWatchPointEligible,
+  resolveOpportunityGenericityScore,
+} from "./progressive-qualification";
 import {
   hasOpportunityTraceability,
   isStudyOnlyOpportunity,
@@ -26,6 +38,7 @@ import {
   isEligibleEmploymentWatchPoint,
   isFactEligibleForWatchPoint,
   qualifiedWatchPointCandidates,
+  qualifyAnalysisFacts,
 } from "./qualify-facts";
 
 import {
@@ -123,6 +136,7 @@ function canAddToTarget(
   selected: AnalysisFact[],
   target: AnalysisFactTarget,
   context?: ScoreContext,
+  qualificationById?: Map<string, QualifiedAnalysisFact>,
 ): boolean {
   if (selected.some((f) => f.id === candidate.id)) return false;
 
@@ -164,14 +178,36 @@ function canAddToTarget(
     if (isStudyOnlyOpportunity(candidate.sentence)) return false;
     if (!isActionableOpportunity(candidate)) return false;
     if (!hasOpportunityTraceability(candidate)) return false;
+
+    const qualified = qualificationById?.get(candidate.id);
+    if (qualified && context?.territory) {
+      const relatedWatchPointThemes = selected
+        .filter((f) => f.target === "watchPoints")
+        .map((f) => f.theme);
+      const liveGenericity = resolveOpportunityGenericityScore(
+        candidate,
+        context.territory,
+        relatedWatchPointThemes,
+      );
+      if (!isProgressiveOpportunityEligible(qualified, liveGenericity)) {
+        return false;
+      }
+    }
   }
 
   if (
     target === "watchPoints" &&
-    context?.territory &&
-    !isFactEligibleForWatchPoint(candidate, { territory: context.territory })
+    context?.territory
   ) {
-    return false;
+    const analysisContext = { territory: context.territory };
+    if (!isFactEligibleForWatchPoint(candidate, analysisContext)) {
+      return false;
+    }
+
+    const qualified = qualificationById?.get(candidate.id);
+    if (qualified && !isProgressiveWatchPointEligible(qualified)) {
+      return false;
+    }
   }
 
   return true;
@@ -183,13 +219,14 @@ function pickBestFromThemes(
   context: ScoreContext,
   selected: AnalysisFact[],
   target: AnalysisFactTarget,
+  qualificationById?: Map<string, QualifiedAnalysisFact>,
 ): AnalysisFact | null {
   const themed = candidates
     .filter((f) => themes.includes(f.theme))
     .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
   for (const candidate of themed) {
-    if (canAddToTarget(candidate, selected, target, context)) {
+    if (canAddToTarget(candidate, selected, target, context, qualificationById)) {
       return candidate;
     }
   }
@@ -202,6 +239,7 @@ function fillTargetFromSlots(
   context: ScoreContext,
   selected: AnalysisFact[],
   slots: AnalysisFactTheme[][],
+  qualificationById?: Map<string, QualifiedAnalysisFact>,
 ): void {
   const limit = TARGET_LIMITS[target];
   const candidates = facts
@@ -210,13 +248,20 @@ function fillTargetFromSlots(
 
   for (const slotThemes of slots) {
     if (selected.filter((f) => f.target === target).length >= limit.max) break;
-    const pick = pickBestFromThemes(candidates, slotThemes, context, selected, target);
+    const pick = pickBestFromThemes(
+      candidates,
+      slotThemes,
+      context,
+      selected,
+      target,
+      qualificationById,
+    );
     if (pick) selected.push(pick);
   }
 
   for (const candidate of candidates) {
     if (selected.filter((f) => f.target === target).length >= limit.max) break;
-    if (canAddToTarget(candidate, selected, target, context)) {
+    if (canAddToTarget(candidate, selected, target, context, qualificationById)) {
       selected.push(candidate);
     }
   }
@@ -227,6 +272,7 @@ function ensureMandatoryWatchThemes(
   selected: AnalysisFact[],
   context: ScoreContext,
   themes: AnalysisFactTheme[],
+  qualificationById?: Map<string, QualifiedAnalysisFact>,
 ): void {
   const limit = TARGET_LIMITS.watchPoints;
   const analysisContext = { territory: context.territory };
@@ -248,7 +294,7 @@ function ensureMandatoryWatchThemes(
       target: "watchPoints",
     };
 
-    if (canAddToTarget(watchCandidate, selected, "watchPoints", context)) {
+    if (canAddToTarget(watchCandidate, selected, "watchPoints", context, qualificationById)) {
       selected.push(watchCandidate);
       continue;
     }
@@ -268,7 +314,7 @@ function ensureMandatoryWatchThemes(
     }
 
     selected.splice(selected.indexOf(watchPoints[lowestPriorityIndex]), 1);
-    if (canAddToTarget(watchCandidate, selected, "watchPoints", context)) {
+    if (canAddToTarget(watchCandidate, selected, "watchPoints", context, qualificationById)) {
       selected.push(watchCandidate);
     }
   }
@@ -278,6 +324,7 @@ function reconcileSummaryDemographyWatchSlot(
   facts: AnalysisFact[],
   selected: AnalysisFact[],
   context: ScoreContext,
+  qualificationById?: Map<string, QualifiedAnalysisFact>,
 ): void {
   const hasSummaryDemography = selected.some(
     (fact) => fact.theme === "demography" && fact.target === "summary",
@@ -309,7 +356,7 @@ function reconcileSummaryDemographyWatchSlot(
   const limit = TARGET_LIMITS.watchPoints;
   const watchCount = selected.filter((fact) => fact.target === "watchPoints").length;
 
-  if (watchCount < limit.max && canAddToTarget(watchEmployment, selected, "watchPoints", context)) {
+  if (watchCount < limit.max && canAddToTarget(watchEmployment, selected, "watchPoints", context, qualificationById)) {
     selected.push(watchEmployment);
     return;
   }
@@ -330,7 +377,7 @@ function reconcileSummaryDemographyWatchSlot(
     );
 
   selected.splice(selected.indexOf(replaceFact), 1);
-  if (canAddToTarget(watchEmployment, selected, "watchPoints", context)) {
+  if (canAddToTarget(watchEmployment, selected, "watchPoints", context, qualificationById)) {
     selected.push(watchEmployment);
   }
 }
@@ -369,6 +416,7 @@ function ensureWatchPointsMinimum(
   facts: AnalysisFact[],
   selected: AnalysisFact[],
   context: ScoreContext,
+  qualificationById?: Map<string, QualifiedAnalysisFact>,
 ): void {
   const limit = TARGET_LIMITS.watchPoints;
   const analysisContext = { territory: context.territory };
@@ -394,12 +442,13 @@ function ensureWatchPointsMinimum(
       context,
       selected,
       "watchPoints",
+      qualificationById,
     );
 
     if (pick) {
       const watchPick =
         pick.target === "watchPoints" ? pick : { ...pick, target: "watchPoints" as const };
-      if (canAddToTarget(watchPick, selected, "watchPoints", context)) {
+      if (canAddToTarget(watchPick, selected, "watchPoints", context, qualificationById)) {
         selected.push(watchPick);
         watchCount += 1;
       }
@@ -411,7 +460,9 @@ function ensureWatchPointsMinimum(
       .filter((f) => f.target === "watchPoints")
       .sort((a, b) => scoreAnalysisFact(b, context) - scoreAnalysisFact(a, context));
 
-    const next = candidates.find((c) => canAddToTarget(c, selected, "watchPoints", context));
+    const next = candidates.find((c) =>
+      canAddToTarget(c, selected, "watchPoints", context, qualificationById),
+    );
     if (!next) break;
 
     selected.push(next);
@@ -457,16 +508,21 @@ export function selectAnalysisFactsForPrompt(
     },
   };
 
+  const analysisContext = { territory: context.territory };
+  const qualificationById = indexQualifiedFacts(
+    qualifyAnalysisFacts(facts, analysisContext),
+  );
+
   const selected: AnalysisFact[] = [];
 
   fillTargetFromSlots(facts, "summary", context, selected, [
     SUMMARY_THEMES,
     ["demography", "ageing"],
     ["housing", "employment_sectors"],
-  ]);
+  ], qualificationById);
 
-  fillTargetFromSlots(facts, "strengths", context, selected, STRENGTH_SLOTS);
-  fillTargetFromSlots(facts, "watchPoints", context, selected, WATCH_POINT_SLOTS);
+  fillTargetFromSlots(facts, "strengths", context, selected, STRENGTH_SLOTS, qualificationById);
+  fillTargetFromSlots(facts, "watchPoints", context, selected, WATCH_POINT_SLOTS, qualificationById);
 
   const hasIdentity = selected.some(
     (f) => f.target === "summary" && SUMMARY_THEMES.includes(f.theme),
@@ -479,15 +535,15 @@ export function selectAnalysisFactsForPrompt(
 
     if (candidate) {
       const summaryCandidate = { ...candidate, target: "summary" as const };
-      if (canAddToTarget(summaryCandidate, selected, "summary", context)) {
+      if (canAddToTarget(summaryCandidate, selected, "summary", context, qualificationById)) {
         selected.push(summaryCandidate);
       }
     }
   }
 
-  ensureWatchPointsMinimum(facts, selected, context);
-  ensureMandatoryWatchThemes(facts, selected, context, ["security", "risks"]);
-  reconcileSummaryDemographyWatchSlot(facts, selected, context);
+  ensureWatchPointsMinimum(facts, selected, context, qualificationById);
+  ensureMandatoryWatchThemes(facts, selected, context, ["security", "risks"], qualificationById);
+  reconcileSummaryDemographyWatchSlot(facts, selected, context, qualificationById);
 
   const selectedStrengths = selected.filter((fact) => fact.target === "strengths");
   const selectedWatchPoints = selected.filter((fact) => fact.target === "watchPoints");
@@ -497,7 +553,7 @@ export function selectAnalysisFactsForPrompt(
     selectedWatchPoints,
     context,
   )) {
-    if (canAddToTarget(opportunity, selected, "opportunities", context)) {
+    if (canAddToTarget(opportunity, selected, "opportunities", context, qualificationById)) {
       selected.push(opportunity);
     }
   }
@@ -507,5 +563,8 @@ export function selectAnalysisFactsForPrompt(
   trimTargetToLimit(selected, "opportunities", context);
   trimTargetToLimit(selected, "summary", context);
 
-  return dedupeSelectedFacts(selected, context);
+  const deduped = dedupeSelectedFacts(selected, context);
+  return deduped.map((fact) =>
+    applyProgressiveCaution(fact, qualificationById.get(fact.id)),
+  );
 }

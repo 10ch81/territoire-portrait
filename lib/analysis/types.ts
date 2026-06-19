@@ -36,8 +36,36 @@ export type AnalysisFactConfidence = "high" | "medium" | "low";
 export type FactPolarity = "positive" | "neutral" | "negative" | "unknown";
 export type FactIntensity = "low" | "medium" | "high";
 
+export type FactEvidenceLevel =
+  | "direct_strong"
+  | "direct_moderate"
+  | "single_indicator"
+  | "contextual"
+  | "weak_signal";
+
+export type FactSignificanceLevel = "high" | "medium" | "low";
+
+export type FactBenchmarkStatus = "available" | "missing" | "not_required";
+
+export type FactDenominatorRisk =
+  | "none"
+  | "tourist_population"
+  | "small_population"
+  | "other";
+
+export type FactProgressiveQualification = {
+  evidenceLevel: FactEvidenceLevel;
+  significanceLevel: FactSignificanceLevel;
+  benchmarkStatus: FactBenchmarkStatus;
+  genericityScore: number;
+  actionabilityScore: number;
+  denominatorRisk: FactDenominatorRisk;
+  requiresCaution: boolean;
+};
+
 export type TerritoryAnalysisContext = {
   territory: import("../types").TerritoryProfile;
+  territoryContext?: import("./context/buildTerritoryContext").TerritoryContext;
 };
 
 export type QualifiedAnalysisFact = AnalysisFact & {
@@ -45,7 +73,7 @@ export type QualifiedAnalysisFact = AnalysisFact & {
   intensity: FactIntensity;
   eligibleTargets: AnalysisFactTarget[];
   qualificationReason?: string;
-};
+} & FactProgressiveQualification;
 
 export type NumericBinding = {
   value: number | string;

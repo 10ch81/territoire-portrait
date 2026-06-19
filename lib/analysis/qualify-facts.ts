@@ -1,4 +1,8 @@
 import type { TerritoryProfile } from "../types";
+import { buildTerritoryContext } from "./context/buildTerritoryContext";
+import {
+  applyProgressiveQualification,
+} from "./progressive-qualification";
 import { formatEuro } from "./format";
 import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
 import {
@@ -88,6 +92,14 @@ function defaultEligibleTargets(
 }
 
 export function isEligibleForWatchPoint(qualified: QualifiedAnalysisFact): boolean {
+  if (qualified.evidenceLevel === "weak_signal") {
+    return false;
+  }
+
+  if (qualified.theme === "ageing" && qualified.benchmarkStatus === "missing") {
+    return false;
+  }
+
   return (
     qualified.eligibleTargets.includes("watchPoints") &&
     qualified.polarity === "negative" &&
@@ -718,18 +730,28 @@ export function qualifyAnalysisFact(
   fact: AnalysisFact,
   context: TerritoryAnalysisContext,
 ): QualifiedAnalysisFact {
+  const territoryContext =
+    context.territoryContext ?? buildTerritoryContext(context.territory);
   const core = qualifyByTheme(fact, context.territory);
-  return {
-    ...fact,
-    ...core,
-  };
+  return applyProgressiveQualification(
+    {
+      ...fact,
+      ...core,
+    },
+    context.territory,
+    territoryContext,
+  );
 }
 
 export function qualifyAnalysisFacts(
   facts: AnalysisFact[],
   context: TerritoryAnalysisContext,
 ): QualifiedAnalysisFact[] {
-  return facts.map((fact) => qualifyAnalysisFact(fact, context));
+  const territoryContext =
+    context.territoryContext ?? buildTerritoryContext(context.territory);
+  return facts.map((fact) =>
+    qualifyAnalysisFact(fact, { ...context, territoryContext }),
+  );
 }
 
 export function isFactEligibleForWatchPoint(

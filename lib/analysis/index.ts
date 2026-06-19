@@ -46,6 +46,16 @@ export {
   qualifiedWatchPointCandidates,
 } from "./qualify-facts";
 export {
+  applyProgressiveCaution,
+  applyProgressiveQualification,
+  indexQualifiedFacts,
+  isProgressiveOpportunityEligible,
+  isProgressiveWatchPointEligible,
+  OPPORTUNITY_MAX_GENERICITY_SCORE,
+  qualifyProgressiveDimensions,
+  resolveOpportunityGenericityScore,
+} from "./progressive-qualification";
+export {
   buildOpportunityCandidates,
   dedupeOpportunityCandidates,
   scoreOpportunityCandidate,
@@ -60,8 +70,13 @@ export type {
   OpportunitySelectionContext,
 } from "./opportunities";
 export type {
+  FactBenchmarkStatus,
+  FactDenominatorRisk,
+  FactEvidenceLevel,
   FactIntensity,
   FactPolarity,
+  FactProgressiveQualification,
+  FactSignificanceLevel,
   QualifiedAnalysisFact,
   TerritoryAnalysisContext,
 } from "./types";

@@ -63,7 +63,7 @@ describe("selectAnalysisFactsForPrompt", () => {
 
     assert.ok(watchThemes.size >= 3);
     assert.ok(watchThemes.has("employment") || watchThemes.has("housing"));
-    assert.ok(watchThemes.has("ageing"));
+    assert.ok(!watchThemes.has("ageing"), "Vieillissement sans benchmark exclu des watchPoints");
   });
 
   it("respecte la limite max de watchPoints", () => {
