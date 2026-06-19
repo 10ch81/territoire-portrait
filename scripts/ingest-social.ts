@@ -9,33 +9,37 @@ import {
   parseCsvLine,
   parseFrenchDecimal,
 } from "./ingest-utils";
+import {
+  FILOSOFI_FILE_URL,
+  FILOSOFI_VINTAGE,
+  RP_EMPLOYMENT_FILE_URL,
+  RP_POPULATION_FILE_URL,
+  RP_VINTAGE,
+} from "../lib/sources";
 import type { SociodemographicsCommuneCache } from "../lib/types";
 
 const OUTPUT_PATH = resolve(CACHE_DIR, "social-by-commune.json");
 
-const RP_POP_ZIP = resolve(CACHE_DIR, "rp-pop-2021.zip");
-const RP_POP_DIR = resolve(CACHE_DIR, "rp-pop-2021-extract");
-const RP_POP_URL =
-  "https://www.insee.fr/fr/statistiques/fichier/8201904/base-cc-evol-struct-pop-2021_csv.zip";
+const RP_POP_ZIP = resolve(CACHE_DIR, `rp-pop-${RP_VINTAGE}.zip`);
+const RP_POP_DIR = resolve(CACHE_DIR, `rp-pop-${RP_VINTAGE}-extract`);
+const RP_POP_URL = RP_POPULATION_FILE_URL;
 
-const RP_EMPLOI_ZIP = resolve(CACHE_DIR, "rp-emploi-2021.zip");
-const RP_EMPLOI_DIR = resolve(CACHE_DIR, "rp-emploi-2021-extract");
-const RP_EMPLOI_URL =
-  "https://www.insee.fr/fr/statistiques/fichier/8202916/base-cc-emploi-pop-active-2021_csv.zip";
+const RP_EMPLOI_ZIP = resolve(CACHE_DIR, `rp-emploi-${RP_VINTAGE}.zip`);
+const RP_EMPLOI_DIR = resolve(CACHE_DIR, `rp-emploi-${RP_VINTAGE}-extract`);
+const RP_EMPLOI_URL = RP_EMPLOYMENT_FILE_URL;
 
-const FILOSOFI_ZIP = resolve(CACHE_DIR, "filosofi-2020.zip");
-const FILOSOFI_DIR = resolve(CACHE_DIR, "filosofi-2020-extract");
-const FILOSOFI_URL =
-  "https://www.insee.fr/fr/statistiques/fichier/6692392/base-cc-filosofi-2020_CSV.zip";
+const FILOSOFI_ZIP = resolve(CACHE_DIR, `filosofi-${FILOSOFI_VINTAGE}.zip`);
+const FILOSOFI_DIR = resolve(CACHE_DIR, `filosofi-${FILOSOFI_VINTAGE}-extract`);
+const FILOSOFI_URL = FILOSOFI_FILE_URL;
 
 const AGE_COLUMNS: Record<string, string> = {
-  P21_POP0014: "0-14",
-  P21_POP1529: "15-29",
-  P21_POP3044: "30-44",
-  P21_POP4559: "45-59",
-  P21_POP6074: "60-74",
-  P21_POP7589: "75-89",
-  P21_POP90P: "90+",
+  P22_POP0014: "0-14",
+  P22_POP1529: "15-29",
+  P22_POP3044: "30-44",
+  P22_POP4559: "45-59",
+  P22_POP6074: "60-74",
+  P22_POP7589: "75-89",
+  P22_POP90P: "90+",
 };
 
 function findCsvFile(directory: string, prefix: string): string {
@@ -70,7 +74,7 @@ async function ingestAgeBands(
   }
   extractZip(RP_POP_ZIP, RP_POP_DIR);
 
-  const csvPath = findCsvFile(RP_POP_DIR, "base-cc-evol-struct-pop-2021");
+  const csvPath = findCsvFile(RP_POP_DIR, `base-cc-evol-struct-pop-${RP_VINTAGE}`);
   const stream = createInterface({
     input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
@@ -107,7 +111,8 @@ async function ingestAgeBands(
     }
 
     cache[inseeCode] = {
-      year: 2021,
+      year: RP_VINTAGE,
+      incomeYear: cache[inseeCode]?.incomeYear ?? null,
       ageBands,
       unemploymentRate: cache[inseeCode]?.unemploymentRate ?? null,
       medianDisposableIncome: cache[inseeCode]?.medianDisposableIncome ?? null,
@@ -123,15 +128,15 @@ async function ingestUnemployment(
   }
   extractZip(RP_EMPLOI_ZIP, RP_EMPLOI_DIR);
 
-  const csvPath = findCsvFile(RP_EMPLOI_DIR, "base-cc-emploi-pop-active-2021");
+  const csvPath = findCsvFile(RP_EMPLOI_DIR, `base-cc-emploi-pop-active-${RP_VINTAGE}`);
   const stream = createInterface({
     input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 
   let headerIndex: Map<string, number> | null = null;
-  const unemployedColumn = "P21_CHOM1564";
-  const activeColumn = "P21_ACT1564";
+  const unemployedColumn = "P22_CHOM1564";
+  const activeColumn = "P22_ACT1564";
 
   for await (const line of stream) {
     if (!line.trim()) {
@@ -159,7 +164,8 @@ async function ingestUnemployment(
         : null;
 
     const entry = cache[inseeCode] ?? {
-      year: 2021,
+      year: RP_VINTAGE,
+      incomeYear: null,
       ageBands: {},
       unemploymentRate: null,
       medianDisposableIncome: null,
@@ -176,14 +182,21 @@ async function ingestFilosofi(cache: SociodemographicsCommuneCache): Promise<voi
   }
   extractZip(FILOSOFI_ZIP, FILOSOFI_DIR);
 
-  const csvPath = findCsvFile(FILOSOFI_DIR, "cc_filosofi_2020_com");
+  const csvPath = findCsvFile(FILOSOFI_DIR, `DS_FILOSOFI_CC_${FILOSOFI_VINTAGE}_data`);
   const stream = createInterface({
     input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 
   let headerIndex: Map<string, number> | null = null;
-  const incomeColumn = "MED20";
+  const measureColumn = "FILOSOFI_MEASURE";
+  const geoColumn = "GEO";
+  const geoObjectColumn = "GEO_OBJECT";
+  const confStatusColumn = "CONF_STATUS";
+  const valueColumn = "OBS_VALUE";
+  const targetMeasure = "MED_SL";
+  const targetGeoObject = "COM";
+  const diffusableStatus = "F";
 
   for await (const line of stream) {
     if (!line.trim()) {
@@ -196,23 +209,43 @@ async function ingestFilosofi(cache: SociodemographicsCommuneCache): Promise<voi
     }
 
     const cells = parseCsvLine(line);
-    const inseeCode = cells[0];
+    const measure = cells[headerIndex.get(measureColumn) ?? -1] ?? "";
+    if (measure !== targetMeasure) {
+      continue;
+    }
+
+    const geoObject = cells[headerIndex.get(geoObjectColumn) ?? -1] ?? "";
+    if (geoObject !== targetGeoObject) {
+      continue;
+    }
+
+    const confStatus = cells[headerIndex.get(confStatusColumn) ?? -1] ?? "";
+    if (confStatus !== diffusableStatus) {
+      continue;
+    }
+
+    const inseeCode = cells[headerIndex.get(geoColumn) ?? -1] ?? "";
     if (!inseeCode) {
       continue;
     }
 
     const medianIncome = parseFrenchDecimal(
-      cells[headerIndex.get(incomeColumn) ?? -1] ?? "",
+      cells[headerIndex.get(valueColumn) ?? -1] ?? "",
     );
+    if (medianIncome === null) {
+      continue;
+    }
 
     const entry = cache[inseeCode] ?? {
-      year: 2021,
+      year: RP_VINTAGE,
+      incomeYear: null,
       ageBands: {},
       unemploymentRate: null,
       medianDisposableIncome: null,
     };
 
     entry.medianDisposableIncome = medianIncome;
+    entry.incomeYear = FILOSOFI_VINTAGE;
     cache[inseeCode] = entry;
   }
 }
@@ -220,13 +253,13 @@ async function ingestFilosofi(cache: SociodemographicsCommuneCache): Promise<voi
 async function main(): Promise<void> {
   const cache: SociodemographicsCommuneCache = {};
 
-  console.log("Ingestion structure par âge (RP 2021)…");
+  console.log(`Ingestion structure par âge (RP ${RP_VINTAGE})…`);
   await ingestAgeBands(cache);
 
-  console.log("Ingestion chômage (RP 2021)…");
+  console.log(`Ingestion chômage (RP ${RP_VINTAGE})…`);
   await ingestUnemployment(cache);
 
-  console.log("Ingestion revenus FILOSOFI 2020…");
+  console.log(`Ingestion revenus FILOSOFI ${FILOSOFI_VINTAGE}…`);
   await ingestFilosofi(cache);
 
   writeFileSync(OUTPUT_PATH, JSON.stringify(cache));

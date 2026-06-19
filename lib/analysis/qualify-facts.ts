@@ -1,5 +1,13 @@
 import type { TerritoryProfile } from "../types";
 import { formatEuro } from "./format";
+import {
+  DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR,
+  qualifiesAsProfileAwareDebtWatchPoint,
+  qualifiesAsProfileAwareVacancyWatchPoint,
+  qualifiesAsLowPublicTransportShare,
+  resolveComparisonProfile,
+  VACANCY_WATCH_POINT_THRESHOLD_PERCENT,
+} from "../typology/thresholds";
 import type {
   AnalysisFact,
   AnalysisFactTarget,
@@ -10,20 +18,20 @@ import type {
   TerritoryAnalysisContext,
 } from "./types";
 
+/** @deprecated Préférer les constantes dans lib/typology/thresholds.ts */
+export {
+  DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR,
+  VACANCY_WATCH_POINT_THRESHOLD_PERCENT,
+} from "../typology/thresholds";
+
 /** Seuil RP INSEE : taux de chômage 15-64 au-delà duquel un point d'attention est justifié. */
 export const UNEMPLOYMENT_WATCH_POINT_THRESHOLD_PERCENT = 10;
-
-/** Dette par habitant OFGL au-delà de laquelle un point d'attention est justifié (€). */
-export const DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR = 1_200;
 
 /** Revenu médian FILOSOFI en dessous duquel un point d'attention est justifié (€). */
 export const MEDIAN_INCOME_LOW_WATCH_POINT_THRESHOLD_EUR = 17_000;
 
 /** Revenu médian modéré — éligible au score composite de fragilité (€). */
 export const MEDIAN_INCOME_MODERATE_WATCH_POINT_THRESHOLD_EUR = 19_000;
-
-/** Vacance résidentielle élevée (%). */
-export const VACANCY_WATCH_POINT_THRESHOLD_PERCENT = 10;
 
 /** Vacance pour score composite logement / socio-économique (%). */
 export const VACANCY_FRAGILITY_THRESHOLD_PERCENT = 10;
@@ -96,19 +104,38 @@ export function qualifiesAsUnemploymentWatchPoint(
 
 export function qualifiesAsDebtWatchPoint(
   debtPerCapitaEur: number | null | undefined,
+  territory?: TerritoryProfile,
 ): boolean {
   if (debtPerCapitaEur === null || debtPerCapitaEur === undefined) {
     return false;
   }
+
+  if (territory) {
+    return qualifiesAsProfileAwareDebtWatchPoint(
+      debtPerCapitaEur,
+      resolveComparisonProfile(territory),
+      territory.population,
+    );
+  }
+
   return debtPerCapitaEur >= DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR;
 }
 
 export function qualifiesAsVacancyWatchPoint(
   vacancyRatePercent: number | null | undefined,
+  territory?: TerritoryProfile,
 ): boolean {
   if (vacancyRatePercent === null || vacancyRatePercent === undefined) {
     return false;
   }
+
+  if (territory) {
+    return qualifiesAsProfileAwareVacancyWatchPoint(
+      vacancyRatePercent,
+      resolveComparisonProfile(territory),
+    );
+  }
+
   return vacancyRatePercent >= VACANCY_WATCH_POINT_THRESHOLD_PERCENT;
 }
 
@@ -186,7 +213,7 @@ export function countHousingFragilitySignals(territory: TerritoryProfile): numbe
   const urbanPolicy = territory.enrichment?.urbanPolicy;
   let count = 0;
 
-  if (qualifiesAsVacancyWatchPoint(housing?.rpVacancyRatePercent)) {
+  if (qualifiesAsVacancyWatchPoint(housing?.rpVacancyRatePercent, territory)) {
     count += 1;
   }
   if (urbanPolicy?.hasQpv === true) {
@@ -251,24 +278,24 @@ export function usesCompositeIncomeWatchPointRationale(
 export function buildIncomeWatchPointSentence(territory: TerritoryProfile): string {
   const sociodemographics = territory.enrichment!.sociodemographics!;
   const income = sociodemographics.medianDisposableIncome!;
-  const year = sociodemographics.year;
+  const year = sociodemographics.incomeYear ?? sociodemographics.year;
 
   if (usesCompositeIncomeWatchPointRationale(territory)) {
     return (
       `Les indicateurs socio-économiques disponibles signalent une fragilité relative, ` +
-      `dont un revenu médian de ${formatEuro(income)} (FILOSOFI ${year}).`
+      `dont un niveau de vie médian de ${formatEuro(income)} (FILOSOFI ${year}).`
     );
   }
 
   if (hasUnfavorableIncomeComparison(territory)) {
     return (
-      `Le revenu médian disponible apparaît inférieur à la référence disponible, ` +
+      `Le niveau de vie médian apparaît inférieur à la référence disponible, ` +
       `à interpréter avec prudence (${formatEuro(income)}, FILOSOFI ${year}).`
     );
   }
 
   return (
-    `Le revenu médian disponible apparaît faible au regard des repères retenus, ` +
+    `Le niveau de vie médian apparaît faible au regard des repères retenus, ` +
     `à interpréter avec prudence (${formatEuro(income)}, FILOSOFI ${year}).`
   );
 }
@@ -292,9 +319,9 @@ function hasUnfavorableSecuritySignal(territory: TerritoryProfile): boolean {
   );
 }
 
-function vacancyIntensity(rate: number): FactIntensity {
+function vacancyIntensity(rate: number, territory: TerritoryProfile): FactIntensity {
   if (rate >= 15) return "high";
-  if (rate >= VACANCY_WATCH_POINT_THRESHOLD_PERCENT) return "medium";
+  if (qualifiesAsVacancyWatchPoint(rate, territory)) return "medium";
   return "low";
 }
 
@@ -315,10 +342,10 @@ function qualifyHousingFact(fact: AnalysisFact, territory: TerritoryProfile): Qu
   const vacancy = housing?.rpVacancyRatePercent;
 
   if (/logements vacants|vacance/i.test(fact.sentence) && vacancy != null) {
-    if (qualifiesAsVacancyWatchPoint(vacancy)) {
+    if (qualifiesAsVacancyWatchPoint(vacancy, territory)) {
       return withTargets(fact, {
         polarity: "negative",
-        intensity: vacancyIntensity(vacancy),
+        intensity: vacancyIntensity(vacancy, territory),
         qualificationReason: "vacance_residentielle_elevee",
       });
     }
@@ -458,7 +485,7 @@ function qualifyFinancesFact(fact: AnalysisFact, territory: TerritoryProfile): Q
     });
   }
 
-  if (qualifiesAsDebtWatchPoint(debt)) {
+  if (qualifiesAsDebtWatchPoint(debt, territory)) {
     return withTargets(fact, {
       polarity: "negative",
       intensity: debtIntensity(debt),
@@ -503,7 +530,23 @@ function qualifySecurityFact(fact: AnalysisFact, territory: TerritoryProfile): Q
 }
 
 function qualifyMobilityFact(fact: AnalysisFact, territory: TerritoryProfile): QualificationCore {
+  const profile = resolveComparisonProfile(territory);
+  const ptShare = territory.enrichment?.mobility?.commute?.publicTransportSharePercent;
+
   if (/transports en commun|TC/i.test(fact.sentence)) {
+    if (
+      ptShare != null &&
+      qualifiesAsLowPublicTransportShare(ptShare, profile) &&
+      (profile === "metropole" || profile === "grande_ville" || profile === "ville_moyenne")
+    ) {
+      return withTargets(fact, {
+        polarity: "negative",
+        intensity: "medium",
+        qualificationReason: "mobilite_tc_faible_pour_profil_urbain",
+        eligibleTargets: ["summary"],
+      });
+    }
+
     return withTargets(fact, {
       polarity: "neutral",
       intensity: "low",
@@ -516,6 +559,33 @@ function qualifyMobilityFact(fact: AnalysisFact, territory: TerritoryProfile): Q
     polarity: "neutral",
     intensity: "low",
     qualificationReason: "mobilite_descriptif",
+    eligibleTargets: ["summary"],
+  });
+}
+
+function qualifyGeographyFact(fact: AnalysisFact): QualificationCore {
+  return withTargets(fact, {
+    polarity: "neutral",
+    intensity: "low",
+    qualificationReason: "typologie_contexte",
+    eligibleTargets: ["summary"],
+  });
+}
+
+function qualifyEquipmentsFact(fact: AnalysisFact, _territory: TerritoryProfile): QualificationCore {
+  if (fact.target === "strengths") {
+    return withTargets(fact, {
+      polarity: "positive",
+      intensity: "medium",
+      qualificationReason: "equipements_atout",
+      eligibleTargets: ["strengths"],
+    });
+  }
+
+  return withTargets(fact, {
+    polarity: "neutral",
+    intensity: "low",
+    qualificationReason: "equipements_descriptif",
     eligibleTargets: ["summary"],
   });
 }
@@ -630,6 +700,10 @@ function qualifyByTheme(
       return qualifySecurityFact(fact, territory);
     case "mobility":
       return qualifyMobilityFact(fact, territory);
+    case "geography":
+      return qualifyGeographyFact(fact);
+    case "equipments":
+      return qualifyEquipmentsFact(fact, territory);
     case "risks":
       return qualifyRisksFact(fact);
     case "demography":

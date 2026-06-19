@@ -1,4 +1,5 @@
 import { computeAgeAggregates } from "./age-aggregates";
+import { RP_VINTAGE } from "./sources";
 import { getPopulationDisplayMeta } from "./ux/population";
 import type {
   AttractionAreaSnapshot,
@@ -39,6 +40,7 @@ export interface TerritorialFacts {
     } | null;
     tauxChomage1564: number | null;
     revenuMedianDisponible: number | null;
+    millesimeFilosofi: number | null;
     note: string;
   } | null;
   entreprises: {
@@ -253,12 +255,13 @@ export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialF
                 fiable: ageAggregates.reliable,
                 note:
                   ageAggregates.reliable
-                    ? "60 ans et plus = somme des parts 60-74, 75-89 et 90+ (recensement 2021)."
+                    ? `60 ans et plus = somme des parts 60-74, 75-89 et 90+ (recensement ${RP_VINTAGE}).`
                     : "Agrégat 60 ans et plus non fiable : tranches 60-74, 75-89 et 90+ incomplètes.",
               }
             : null,
           tauxChomage1564: sociodemographics.unemploymentRate,
           revenuMedianDisponible: sociodemographics.medianDisposableIncome,
+          millesimeFilosofi: sociodemographics.incomeYear,
           note: sociodemographics.note,
         }
       : null,

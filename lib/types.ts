@@ -98,6 +98,8 @@ export interface AgeBandCount {
 
 export interface SociodemographicsSnapshot {
   year: number;
+  /** Millésime FILOSOFI du revenu / niveau de vie médian (distinct du RP). */
+  incomeYear: number | null;
   ageBands: AgeBandCount[];
   unemploymentRate: number | null;
   medianDisposableIncome: number | null;
@@ -369,11 +371,13 @@ export interface TerritoryEnrichment {
   geography: GeographySnapshot | null;
   property: PropertyMarketSnapshot | null;
   derived: DerivedIndicatorsSnapshot | null;
+  territoryTypology: import("./typology/types").TerritoryTypology | null;
   sources: DataSource[];
 }
 
 export interface SociodemographicsCommuneCacheEntry {
   year: number;
+  incomeYear: number | null;
   ageBands: Record<string, number>;
   unemploymentRate: number | null;
   medianDisposableIncome: number | null;

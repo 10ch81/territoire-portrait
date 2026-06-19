@@ -1,3 +1,4 @@
+import { RP_VINTAGE } from "../sources";
 import type { TerritoryProfile } from "../types";
 
 /** Millésime des populations légales diffusées par l'API Géo (geo.api.gouv.fr). */
@@ -46,7 +47,7 @@ export function getPopulationDisplayMeta(
       Math.abs(rpTotal - territory.population) / territory.population > 0.02
     ) {
       consistencyNotes.push(
-        `Recensement 2021 (${formatCount(rpTotal)} hab.) et population légale ${LEGAL_POPULATION_VINTAGE} ` +
+        `Recensement ${RP_VINTAGE} (${formatCount(rpTotal)} hab.) et population légale ${LEGAL_POPULATION_VINTAGE} ` +
           `(${formatCount(territory.population)} hab.) : périmètres et dates différents, pas une contradiction.`,
       );
     }

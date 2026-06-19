@@ -27,12 +27,14 @@ import {
   buildPublicServicesFacts,
 } from "./builders/misc";
 import { buildOpportunityFacts } from "./builders/opportunities";
+import { buildTypologyFacts } from "./builders/typology";
 import { enrichFactsWithSummaryFragments } from "./summary-fragments";
 
 type FactBuilder = (territory: TerritoryProfile) => AnalysisFact[];
 
 const BUILDERS: FactBuilder[] = [
   buildIdentityFacts,
+  buildTypologyFacts,
   buildCentralityFacts,
   buildDemographyFacts,
   buildAgeingFacts,

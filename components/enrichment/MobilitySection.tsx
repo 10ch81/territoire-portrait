@@ -3,6 +3,7 @@ import { DataSection } from "@/components/DataSection";
 import { SectionUnavailable } from "@/components/SectionUnavailable";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
 import { formatPercent } from "@/lib/enrichment";
+import { RP_VINTAGE } from "@/lib/sources";
 import type { TerritoryProfile } from "@/lib/types";
 
 interface MobilitySectionProps {
@@ -23,7 +24,7 @@ export function MobilitySection({ territory }: MobilitySectionProps) {
       title="Mobilité"
       subtitle={
         <>
-          <AcronymTooltip term="IRVE" /> · RP 2021
+          <AcronymTooltip term="IRVE" /> · RP {RP_VINTAGE}
         </>
       }
       vintage={mobility?.commute.year ?? mobility?.irve.year}

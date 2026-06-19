@@ -1,4 +1,4 @@
-import { createRplsSource, createRpHousingSource } from "../sources";
+import { createRplsSource, createRpHousingSource, RP_VINTAGE } from "../sources";
 import { loadJsonCache } from "./cache";
 import type { HousingCommuneCache, SocialHousingSnapshot } from "../types";
 
@@ -16,7 +16,7 @@ export function loadSocialHousingSnapshot(
 
   if (!entry) {
     return {
-      year: 2021,
+      year: RP_VINTAGE,
       totalUnits: null,
       occupiedUnits: null,
       vacantUnits: null,
@@ -53,7 +53,7 @@ export function loadSocialHousingSnapshot(
     vacancyRatePercent,
     available: true,
     note:
-      "Parc locatif social (RPLS) et vacance générale du parc (RP logement 2021) — périmètres distincts.",
+      `Parc locatif social (RPLS) et vacance générale du parc (RP logement ${entry.year}) — périmètres distincts.`,
   };
 }
 

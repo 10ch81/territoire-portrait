@@ -1,4 +1,5 @@
 import type { TerritorialFacts } from "./mistral-facts";
+import { RP_VINTAGE } from "./sources";
 import type { TerritoryAnalysis } from "./types";
 import {
   AGE_AGGREGATE_ROUNDING_TOLERANCE,
@@ -102,7 +103,7 @@ export const INTERNAL_LEAK_MARKERS = [
 function getUnemploymentVintage(facts: TerritorialFacts): number {
   const note = facts.structureParAge?.note ?? "";
   const match = note.match(/20\d{2}/);
-  return match ? Number.parseInt(match[0], 10) : 2021;
+  return match ? Number.parseInt(match[0], 10) : RP_VINTAGE;
 }
 
 function unemploymentDescriptivePhrase(facts: TerritorialFacts, qualifier = "élevé"): string {

@@ -22,7 +22,8 @@ export type AnalysisFactTheme =
   | "education"
   | "tourism"
   | "real_estate"
-  | "finances";
+  | "finances"
+  | "geography";
 
 export type AnalysisFactTarget =
   | "summary"

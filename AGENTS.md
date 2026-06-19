@@ -9,7 +9,8 @@ Construire un système réutilisable pour produire des portraits territoriaux de
 1. **Ne jamais inventer de données** — afficher « Donnée non disponible » si absent.
 2. **Sources traçables** — chaque fiche liste les APIs et jeux de données consultés.
 3. **Sécurité** — clés API uniquement côté serveur (`process.env`), jamais exposées au client.
-4. **Extensibilité** — architecture prête pour ingestion data.gouv.fr via scripts et MCP.
+4. **Millésimes récents** — utiliser la dernière version publiée de chaque source (`*_VINTAGE` dans `lib/sources.ts`).
+5. **Extensibilité** — architecture prête pour ingestion data.gouv.fr via scripts et MCP.
 
 ## Structure
 

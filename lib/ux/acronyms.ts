@@ -19,6 +19,10 @@ export const ACRONYMS: Record<string, string> = {
   FLORES: "Fichier localisé des rémunérations et de l'emploi salarié — secteurs A17 INSEE",
   FINESS: "Fichier national des établissements sanitaires et sociaux",
   QPV: "Quartier prioritaire de la politique de la ville",
+  PVD: "Petites villes de demain — programme ANCT de revitalisation des centralités",
+  ACV: "Action cœur de ville — programme ANCT de revitalisation des centres-villes",
+  FRR: "France Ruralités Revitalisation — zonage de soutien aux territoires ruraux",
+  UU: "Unité urbaine — agglomération au sens INSEE (UU2020)",
 };
 
 export function getAcronymDefinition(term: string): string | undefined {

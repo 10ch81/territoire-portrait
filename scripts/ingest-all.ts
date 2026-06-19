@@ -12,6 +12,7 @@ const steps = [
   { name: "IRVE (bornes de recharge)", script: "scripts/ingest-irve.ts" },
   { name: "REI (fiscalité locale)", script: "scripts/ingest-rei.ts" },
   { name: "AAV (aires d'attraction)", script: "scripts/ingest-geography.ts" },
+  { name: "Typologies communales", script: "scripts/ingest-typology.ts" },
   { name: "DVF (prix immobiliers)", script: "scripts/ingest-property.ts" },
   { name: "SSMSI (sécurité / délinquance)", script: "scripts/ingest-security.ts" },
   { name: "Commute (RP domicile-travail)", script: "scripts/ingest-commute.ts" },

@@ -9,13 +9,13 @@ import {
   parseCsvLine,
   parseFrenchDecimal,
 } from "./ingest-utils";
+import { RP_COMMUTE_FILE_URL, RP_VINTAGE } from "../lib/sources";
 import type { CommuteCommuneCache } from "../lib/types";
 
 const OUTPUT_PATH = resolve(CACHE_DIR, "commute-by-commune.json");
-const ZIP = resolve(CACHE_DIR, "rp-nav2a-2021.zip");
-const EXTRACT_DIR = resolve(CACHE_DIR, "rp-nav2a-2021-extract");
-const URL =
-  "https://www.insee.fr/fr/statistiques/fichier/8200836/TD_NAV2A_2021_csv.zip";
+const ZIP = resolve(CACHE_DIR, `rp-nav2a-${RP_VINTAGE}.zip`);
+const EXTRACT_DIR = resolve(CACHE_DIR, `rp-nav2a-${RP_VINTAGE}-extract`);
+const URL = RP_COMMUTE_FILE_URL;
 
 const CAR_MODE = "5";
 const PUBLIC_TRANSPORT_MODE = "6";
@@ -109,7 +109,7 @@ async function main(): Promise<void> {
     }
 
     cache[inseeCode] = {
-      year: 2021,
+      year: RP_VINTAGE,
       employedCount: Math.round(entry.employed),
       carSharePercent: roundOneDecimal((entry.car / entry.employed) * 100),
       publicTransportSharePercent: roundOneDecimal(

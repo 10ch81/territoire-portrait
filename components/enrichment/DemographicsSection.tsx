@@ -11,6 +11,7 @@ import {
 import { formatDensity } from "@/lib/enrichment";
 import { formatPopulation } from "@/lib/territory";
 import { getPopulationDisplayMeta } from "@/lib/ux/population";
+import { RP_VINTAGE } from "@/lib/sources";
 import type { TerritoryProfile } from "@/lib/types";
 
 interface DemographicsSectionProps {
@@ -123,7 +124,7 @@ export function DemographicsSection({ territory }: DemographicsSectionProps) {
 
         <div>
           <h3 className="text-base font-semibold text-slate-900">
-            Structure par âge — Recensement 2021
+            Structure par âge — Recensement {sociodemographics?.year ?? RP_VINTAGE}
           </h3>
           {sociodemographics?.available ? (
             <>
@@ -148,7 +149,7 @@ export function DemographicsSection({ territory }: DemographicsSectionProps) {
                 ) : null}
                 {sociodemographics.medianDisposableIncome !== null ? (
                   <DataRow
-                    label="Revenu médian disponible (FILOSOFI)"
+                    label="Niveau de vie médian (FILOSOFI)"
                     value={formatCurrency(
                       sociodemographics.medianDisposableIncome,
                     )}

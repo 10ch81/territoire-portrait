@@ -1,4 +1,5 @@
 import type { TerritoryEnrichment, TerritoryProfile } from "./types";
+import { FILOSOFI_VINTAGE, RP_VINTAGE } from "./sources";
 import { getPopulationDisplayMeta } from "./ux/population";
 
 function isPresent(value: number | null | undefined): value is number {
@@ -57,19 +58,19 @@ function appendEmploymentLimits(
   if (!hasUnemployment && !hasIncome && !hasAgeBands) {
     pushUnique(
       limits,
-      "Données socio-démographiques (RP 2021 / FILOSOFI) absentes pour cette commune.",
+      `Données socio-démographiques (RP ${RP_VINTAGE} / FILOSOFI ${FILOSOFI_VINTAGE}) absentes pour cette commune.`,
     );
     return;
   }
 
   if (!hasUnemployment) {
-    pushUnique(limits, "Taux de chômage 15-64 (RP 2021) non disponible.");
+    pushUnique(limits, `Taux de chômage 15-64 (RP ${RP_VINTAGE}) non disponible.`);
   }
 
   if (!hasIncome) {
     pushUnique(
       limits,
-      "Revenu médian disponible (FILOSOFI) non disponible.",
+      "Niveau de vie médian (FILOSOFI) non disponible.",
     );
   }
 
@@ -286,7 +287,7 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
     appendUnavailable(
       limits,
       enrichment.sociodemographics?.available,
-      "Données socio-démographiques (RP 2021 / FILOSOFI) non disponibles.",
+      `Données socio-démographiques (RP ${RP_VINTAGE} / FILOSOFI ${FILOSOFI_VINTAGE}) non disponibles.`,
       enrichment.sociodemographics?.note,
     );
   } else {
@@ -380,7 +381,7 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
   if (enrichment.mobility?.commute.available) {
     pushUnique(
       limits,
-      "Mobilité domicile-travail (RP 2021) : mode principal déclaré ; l'offre horaire de transport collectif n'est pas intégrée (BPE domaine E pour les équipements).",
+      `Mobilité domicile-travail (RP ${RP_VINTAGE}) : mode principal déclaré ; l'offre horaire de transport collectif n'est pas intégrée (BPE domaine E pour les équipements).`,
     );
   }
 
@@ -405,6 +406,29 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
       "Zonage en aire d'attraction (AAV 2020) non disponible.",
       enrichment.geography?.attractionArea?.note,
     );
+  }
+
+  const typology = enrichment.territoryTypology;
+  if (typology) {
+    pushUnique(
+      limits,
+      "Les typologies communales fournissent un contexte de comparaison et d'interprétation. Elles ne constituent pas à elles seules un diagnostic territorial ni une qualification de fragilité.",
+    );
+
+    for (const family of typology.missingFamilies) {
+      const label =
+        family === "density_grid"
+          ? "Grille communale de densité INSEE"
+          : family === "attraction_area"
+            ? "Aire d'attraction des villes (AAV2020)"
+            : family === "urban_unit"
+              ? "Unité urbaine 2020"
+              : "Dispositifs publics nationaux";
+      pushUnique(
+        limits,
+        `La typologie ${label} n'a pas été trouvée ou n'est pas disponible pour cette commune.`,
+      );
+    }
   }
 
   if (enrichment.tourism?.available) {

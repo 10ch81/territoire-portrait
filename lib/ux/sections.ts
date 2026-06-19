@@ -84,7 +84,8 @@ export const ENRICHMENT_SECTIONS: SectionDef[] = [
     label: "Géographie",
     isAvailable: (t) =>
       t.enrichment?.geography?.attractionArea?.available === true ||
-      t.enrichment?.geography?.epciComparison?.available === true,
+      t.enrichment?.geography?.epciComparison?.available === true ||
+      (t.enrichment?.territoryTypology?.availableFamilies.length ?? 0) > 0,
   },
   {
     id: "immobilier",

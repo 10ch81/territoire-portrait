@@ -123,14 +123,19 @@ export function buildDeterministicSummary(
       ? `${formatCount(territory.population)} habitants en ${populationMeta.vintage}`
       : "une population non documentée";
 
+  const typologyLabel = territory.enrichment?.territoryTypology?.summaryLabel;
   const density =
     territory.densityPerKm2 !== null
       ? `${formatCount(Math.round(territory.densityPerKm2))} habitants/km²`
       : null;
 
+  const communeDescriptor = typologyLabel
+    ? `${name}, ${typologyLabel} de ${population}`
+    : `${name}, commune de ${population}`;
+
   const phrase1 = density
-    ? `${name}, commune de ${population}, appartient à ${affiliation} et présente une densité de ${density}.`
-    : `${name}, commune de ${population}, appartient à ${affiliation}.`;
+    ? `${communeDescriptor}, appartient à ${affiliation} et présente une densité de ${density}.`
+    : `${communeDescriptor}, appartient à ${affiliation}.`;
 
   const demography = extractDemographySnapshot(territory, selectedFacts);
   const assetFact = pickSummaryAtouts(selectedFacts, territory)[0];

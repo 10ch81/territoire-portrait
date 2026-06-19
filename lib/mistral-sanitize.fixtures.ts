@@ -95,7 +95,8 @@ export const urbanDenseFacts: TerritorialFacts = baseFacts({
     aggregatsAge: null,
     tauxChomage1564: 7.8,
     revenuMedianDisponible: 28_000,
-    note: "RP 2021",
+    millesimeFilosofi: 2023,
+    note: "RP 2022",
   },
   entreprises: {
     referenceStatistique: {
@@ -308,7 +309,8 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
     },
     tauxChomage1564: 11.2,
     revenuMedianDisponible: 19_500,
-    note: "RP 2021",
+    millesimeFilosofi: 2023,
+    note: "RP 2022",
   },
   entreprises: {
     referenceStatistique: {
@@ -347,7 +349,7 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
       partTransportsCommun: 4,
     },
     connectiviteFixe: null,
-    note: "Parts modales domicile-travail 2021",
+    note: "Parts modales domicile-travail 2022",
   },
   fiscalite: {
     annee: 2024,

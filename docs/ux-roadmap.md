@@ -75,7 +75,7 @@ Référence détaillée : [docs/mcp-datagouv.md](./mcp-datagouv.md) (matrice sou
 
 - [ ] GTFS transport collectif — **reporté** (ingestion nationale trop lourde ; RP domicile-travail + BPE domaine E)
 - [x] SIG Ville / QPV (politique de la ville)
-- [x] RP logement 2021 (vacance générale, parc total)
+- [x] RP logement 2022 (vacance générale, parc total)
 - [x] RP mobilité domicile-travail (modes de transport des actifs)
 
 ### P2 — Enrichissement

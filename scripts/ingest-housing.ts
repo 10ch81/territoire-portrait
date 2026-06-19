@@ -13,15 +13,15 @@ import {
   parseCsvLine,
   parseFrenchDecimal,
 } from "./ingest-utils";
+import { RP_HOUSING_FILE_URL, RP_VINTAGE } from "../lib/sources";
 import type { HousingCommuneCache } from "../lib/types";
 
 const OUTPUT_PATH = resolve(CACHE_DIR, "housing-by-commune.json");
 const RPLS_URL =
   "https://static.data.gouv.fr/resources/repertoire-des-logements-locatifs-des-bailleurs-sociaux-rpls-2021/20230309-150841/rpls-2021.csv";
-const LOGEMENT_ZIP = resolve(CACHE_DIR, "rp-logement-2021.zip");
-const LOGEMENT_DIR = resolve(CACHE_DIR, "rp-logement-2021-extract");
-const LOGEMENT_URL =
-  "https://www.insee.fr/fr/statistiques/fichier/8202349/base-cc-logement-2021_csv.zip";
+const LOGEMENT_ZIP = resolve(CACHE_DIR, `rp-logement-${RP_VINTAGE}.zip`);
+const LOGEMENT_DIR = resolve(CACHE_DIR, `rp-logement-${RP_VINTAGE}-extract`);
+const LOGEMENT_URL = RP_HOUSING_FILE_URL;
 
 function findCsvFile(directory: string, prefix: string): string {
   const match = readdirSync(directory, { recursive: true })
@@ -81,7 +81,7 @@ async function aggregateRpls(): Promise<HousingCommuneCache> {
     }
 
     cache[com] = {
-      year: 2021,
+      year: RP_VINTAGE,
       totalUnits,
       occupiedUnits: Number.parseInt(loueRaw, 10) || 0,
       vacantUnits: Number.parseInt(vacantRaw, 10) || 0,
@@ -102,15 +102,15 @@ async function enrichWithTotalDwellings(
   }
   extractZip(LOGEMENT_ZIP, LOGEMENT_DIR);
 
-  const csvPath = findCsvFile(LOGEMENT_DIR, "base-cc-logement-2021");
+  const csvPath = findCsvFile(LOGEMENT_DIR, `base-cc-logement-${RP_VINTAGE}`);
   const stream = createInterface({
     input: createCsvReadStream(csvPath),
     crlfDelay: Infinity,
   });
 
   let headerIndex: Map<string, number> | null = null;
-  const dwellingsColumn = "P21_LOG";
-  const vacantColumn = "P21_LOGVAC";
+  const dwellingsColumn = "P22_LOG";
+  const vacantColumn = "P22_LOGVAC";
 
   for await (const line of stream) {
     if (!line.trim()) {
@@ -154,7 +154,7 @@ async function enrichWithTotalDwellings(
       entry.rpVacancyRatePercent = vacancyRatePercent;
     } else {
       cache[inseeCode] = {
-        year: 2021,
+        year: RP_VINTAGE,
         totalUnits: 0,
         occupiedUnits: 0,
         vacantUnits: 0,
@@ -170,7 +170,7 @@ async function main(): Promise<void> {
   console.log("Ingestion RPLS…");
   const cache = await aggregateRpls();
 
-  console.log("Enrichissement parc de logements (RP 2021)…");
+  console.log(`Enrichissement parc de logements (RP ${RP_VINTAGE})…`);
   await enrichWithTotalDwellings(cache);
 
   writeFileSync(OUTPUT_PATH, JSON.stringify(cache));

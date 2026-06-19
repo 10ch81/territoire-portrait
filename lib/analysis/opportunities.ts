@@ -7,6 +7,9 @@ import {
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 import { createFact } from "./builders/utils";
 import type { ScoreContext } from "./score-facts";
+import type { ComparisonProfile, TerritoryTypology } from "../typology/types";
+import { aavRoleFromCategoryCode } from "../typology/labels";
+import { resolveComparisonProfile } from "../typology/thresholds";
 
 export type OpportunityKind =
   | "responds_to_watchpoint"
@@ -116,7 +119,7 @@ function countTourismSignals(territory: TerritoryProfile, selectedStrengths: Ana
   if (selectedStrengths.some((fact) => fact.theme === "tourism")) {
     count += 1;
   }
-  if (centrality?.available && Number(centrality.categoryCode) <= 3) {
+  if (centrality?.available && aavRoleFromCategoryCode(centrality.categoryCode) === "pole") {
     count += 1;
   }
   if ((territory.enrichment?.equipments?.totalEquipments ?? 0) >= 100) {
@@ -177,7 +180,7 @@ function isHousingOpportunityEligible(
   const vacancy = territory.enrichment?.housing?.rpVacancyRatePercent;
   return (
     watchThemes.has("housing") ||
-    (vacancy != null && qualifiesAsVacancyWatchPoint(vacancy))
+    (vacancy != null && qualifiesAsVacancyWatchPoint(vacancy, territory))
   );
 }
 
@@ -194,11 +197,60 @@ function isQpvOpportunityEligible(
 
 function isMobilityOpportunityEligible(territory: TerritoryProfile): boolean {
   const commute = territory.enrichment?.mobility?.commute;
+  const profile = resolveComparisonProfile(territory);
+  if (profile === "rural" || profile === "rural_isole") {
+    return commute?.available === true;
+  }
   return (
     commute?.available === true &&
     commute.publicTransportSharePercent != null &&
     commute.publicTransportSharePercent < 5
   );
+}
+
+function typologyOpportunityBoost(
+  fact: AnalysisFact,
+  typology: TerritoryTypology | null | undefined,
+  profile: ComparisonProfile,
+): number {
+  if (!typology) return 0;
+
+  const policy = typology.publicPolicyTypologies;
+  let boost = 0;
+
+  if (policy?.petitesVillesDeDemain || policy?.actionCoeurDeVille) {
+    if (fact.theme === "housing" || fact.theme === "public_services") {
+      boost += 2;
+    }
+  }
+
+  if (policy?.franceRuralitesRevitalisation || policy?.villagesAvenir) {
+    if (
+      fact.theme === "connectivity" ||
+      fact.theme === "public_services" ||
+      fact.theme === "mobility"
+    ) {
+      boost += 2;
+    }
+  }
+
+  if (profile === "metropole" || profile === "grande_ville") {
+    if (fact.theme === "housing" || fact.theme === "mobility" || fact.theme === "policy_city") {
+      boost += 1;
+    }
+  }
+
+  if (profile === "rural" || profile === "rural_isole") {
+    if (
+      fact.theme === "connectivity" ||
+      fact.theme === "mobility" ||
+      fact.theme === "public_services"
+    ) {
+      boost += 1;
+    }
+  }
+
+  return boost;
 }
 
 function isCandidateEligible(
@@ -475,6 +527,22 @@ export function scoreOpportunityCandidate(
   };
 }
 
+function applyTypologyBoost(
+  candidate: OpportunityCandidate,
+  context: OpportunitySelectionContext,
+): OpportunityCandidate {
+  const typology = context.territory.enrichment?.territoryTypology;
+  const profile = resolveComparisonProfile(context.territory);
+  const boost = typologyOpportunityBoost(candidate.fact, typology, profile);
+  if (boost === 0) {
+    return candidate;
+  }
+  return {
+    ...candidate,
+    opportunityScore: candidate.opportunityScore + boost,
+  };
+}
+
 function buildSupplementalOpportunityFacts(
   context: OpportunitySelectionContext,
 ): AnalysisFact[] {
@@ -573,13 +641,16 @@ export function buildOpportunityCandidates(
     );
 
     candidates.push(
-      scoreOpportunityCandidate({
-        fact,
-        actionFamily: actionFamilyForFact(fact),
-        relatedWatchPointThemes,
-        relatedStrengthThemes,
-        ...levels,
-      }),
+      applyTypologyBoost(
+        scoreOpportunityCandidate({
+          fact,
+          actionFamily: actionFamilyForFact(fact),
+          relatedWatchPointThemes,
+          relatedStrengthThemes,
+          ...levels,
+        }),
+        context,
+      ),
     );
   }
 

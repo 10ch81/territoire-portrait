@@ -19,6 +19,7 @@ export function nextFactId(theme: AnalysisFactTheme): string {
 }
 
 type CreateFactInput = {
+  id?: string;
   theme: AnalysisFactTheme;
   target: AnalysisFactTarget;
   sentence: string;
@@ -32,7 +33,7 @@ type CreateFactInput = {
 
 export function createFact(input: CreateFactInput): AnalysisFact {
   return {
-    id: nextFactId(input.theme),
+    id: input.id ?? nextFactId(input.theme),
     theme: input.theme,
     target: input.target,
     sentence: input.sentence,

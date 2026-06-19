@@ -37,6 +37,15 @@ import { loadGeographySnapshot, createAavSource } from "./geography";
 import { loadPropertyMarketSnapshot, createDvfSource } from "./property";
 import { loadSecuritySnapshot, createSsmsiSource } from "./security";
 import { computeDerivedIndicators } from "./derived";
+import { buildTerritoryTypology } from "../typology/build-territory-typology";
+import {
+  createAcvSource,
+  createDensityGridSource,
+  createFrrSource,
+  createPvdSource,
+  createUrbanUnitSource,
+  createVillagesAvenirSource,
+} from "../sources";
 import {
   loadSociodemographicsSnapshot,
   createFilosofiSource,
@@ -121,6 +130,27 @@ function collectEnrichmentSources(
   if (enrichment.geography?.attractionArea?.available) {
     sources.push(createAavSource(accessedAt));
   }
+  if (enrichment.territoryTypology?.densityGrid?.available) {
+    sources.push(createDensityGridSource(accessedAt));
+  }
+  if (enrichment.territoryTypology?.urbanUnit?.available) {
+    sources.push(createUrbanUnitSource(accessedAt));
+  }
+  const policy = enrichment.territoryTypology?.publicPolicyTypologies;
+  if (policy?.available) {
+    if (policy.petitesVillesDeDemain) {
+      sources.push(createPvdSource(accessedAt));
+    }
+    if (policy.actionCoeurDeVille) {
+      sources.push(createAcvSource(accessedAt));
+    }
+    if (policy.franceRuralitesRevitalisation) {
+      sources.push(createFrrSource(accessedAt));
+    }
+    if (policy.villagesAvenir) {
+      sources.push(createVillagesAvenirSource(accessedAt));
+    }
+  }
   if (enrichment.property?.available) {
     sources.push(createDvfSource(accessedAt));
   }
@@ -180,8 +210,14 @@ export async function enrichTerritory(
     geography,
     property,
     derived: null,
+    territoryTypology: null,
     sources: [],
   };
+
+  enrichment.territoryTypology = buildTerritoryTypology({
+    territory: { ...territory, enrichment },
+    geographyAav: geography.attractionArea,
+  });
 
   enrichment.derived = computeDerivedIndicators(territory, enrichment);
 

@@ -1,4 +1,4 @@
-import { createCommuteSource, createArcepSource, createIrveSource } from "../sources";
+import { createCommuteSource, createArcepSource, createIrveSource, RP_VINTAGE } from "../sources";
 import { isJsonCachePresent, loadJsonCache } from "./cache";
 import type {
   ArcepCommuneCache,
@@ -52,7 +52,7 @@ function loadIrvePart(inseeCode: string): IrveSnapshot {
 function loadCommutePart(inseeCode: string): CommuteSnapshot {
   if (!isJsonCachePresent(COMMUTE_CACHE_FILE)) {
     return {
-      year: 2021,
+      year: RP_VINTAGE,
       employedCount: null,
       carSharePercent: null,
       publicTransportSharePercent: null,
@@ -67,12 +67,12 @@ function loadCommutePart(inseeCode: string): CommuteSnapshot {
 
   if (!entry) {
     return {
-      year: 2021,
+      year: RP_VINTAGE,
       employedCount: null,
       carSharePercent: null,
       publicTransportSharePercent: null,
       available: false,
-      note: "Commune absente du cache mobilité domicile-travail (RP 2021).",
+      note: `Commune absente du cache mobilité domicile-travail (RP ${RP_VINTAGE}).`,
     };
   }
 
@@ -83,7 +83,7 @@ function loadCommutePart(inseeCode: string): CommuteSnapshot {
     publicTransportSharePercent: entry.publicTransportSharePercent,
     available: true,
     note:
-      "Recensement 2021 — part des actifs occupés de 15 ans ou plus selon le mode de transport principal domicile-travail.",
+      `Recensement ${entry.year} — part des actifs occupés de 15 ans ou plus selon le mode de transport principal domicile-travail.`,
   };
 }
 

@@ -17,10 +17,44 @@ const REI_URL =
   "https://www.data.gouv.fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-4/";
 const AAV_URL =
   "https://www.data.gouv.fr/datasets/zonage-en-aires-dattraction-des-villes-france-entiere-enrichi-zaav-2020/";
+const DENSITY_GRID_URL =
+  "https://www.insee.fr/fr/information/6439600";
+const URBAN_UNIT_URL =
+  "https://www.insee.fr/fr/information/4802589";
+const PVD_URL =
+  "https://www.data.gouv.fr/datasets/programme-petites-villes-de-demain-liste-des-villes-beneficiaires";
+const ACV_URL =
+  "https://www.data.gouv.fr/datasets/programme-action-coeur-de-ville";
+const FRR_URL =
+  "https://www.data.gouv.fr/datasets/communes-france-ruralite-revitalisation-frr";
+const VILLAGES_AVENIR_URL =
+  "https://www.data.gouv.fr/datasets/dispositif-villages-davenir";
 const DVF_URL =
   "https://www.data.gouv.fr/datasets/indicateurs-immobiliers-par-commune-et-par-annee-prix-et-volumes-sur-la-periode-2014-2024/";
-const COMMUTE_URL =
-  "https://www.insee.fr/fr/statistiques/fichier/8200836/TD_NAV2A_2021_csv.zip";
+/** Millésime du recensement de la population (bases communales INSEE). */
+export const RP_VINTAGE = 2022;
+
+/** Millésime FILOSOFI (Filosofi 2 à partir de 2023). */
+export const FILOSOFI_VINTAGE = 2023;
+
+const FILOSOFI_PAGE_URL = "https://www.insee.fr/fr/statistiques/8984752";
+
+export const FILOSOFI_FILE_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/8984752/FILOSOFI_CC_csv.zip";
+
+const RP_POPULATION_PAGE_URL = "https://www.insee.fr/fr/statistiques/8581696";
+const RP_EMPLOYMENT_PAGE_URL = "https://www.insee.fr/fr/statistiques/8581444";
+const RP_HOUSING_PAGE_URL = "https://www.insee.fr/fr/statistiques/8581474";
+const RP_COMMUTE_PAGE_URL = "https://www.insee.fr/fr/statistiques/8581610";
+
+export const RP_POPULATION_FILE_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/8581696/base-cc-evol-struct-pop-2022_csv.zip";
+export const RP_EMPLOYMENT_FILE_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/8581444/base-cc-emploi-pop-active-2022_csv.zip";
+export const RP_HOUSING_FILE_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/8581474/base-cc-logement-2022_csv.zip";
+export const RP_COMMUTE_FILE_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/8581610/TD_NAV2A_2022_csv.zip";
 const QPV_URL =
   "https://www.insee.fr/fr/statistiques/fichier/8186239/TAG_QPV2024_2025_csv.zip";
 const FRANCE_SERVICES_DATASET_URL =
@@ -65,6 +99,12 @@ export const SOURCE_IDS = {
   FINESS: "finess",
   EDUCATION_DIRECTORY: "education-directory",
   AAV: "aav2020",
+  INSEE_DENSITY_GRID: "insee-density-grid",
+  INSEE_URBAN_UNIT: "insee-urban-unit",
+  ANCT_PVD: "anct-pvd",
+  ANCT_ACV: "anct-acv",
+  DGCL_FRR: "dgcl-frr",
+  ANCT_VILLAGES_AVENIR: "anct-villages-avenir",
   DVF: "dvf",
   SSMSI: "ssmsi",
 } as const;
@@ -126,9 +166,9 @@ export function createPopulationHistorySource(accessedAt: string): DataSource {
 export function createRpPopulationSource(accessedAt: string): DataSource {
   return {
     id: SOURCE_IDS.INSEE_RP_POPULATION,
-    name: "INSEE — Recensement 2021 (structure par âge)",
-    url: "https://www.insee.fr/fr/statistiques/8201904",
-    description: "Structure par tranches d'âge de la population communale (RP 2021).",
+    name: `INSEE — Recensement ${RP_VINTAGE} (structure par âge)`,
+    url: RP_POPULATION_PAGE_URL,
+    description: `Structure par tranches d'âge de la population communale (RP ${RP_VINTAGE}).`,
     accessedAt,
   };
 }
@@ -136,9 +176,9 @@ export function createRpPopulationSource(accessedAt: string): DataSource {
 export function createRpEmploymentSource(accessedAt: string): DataSource {
   return {
     id: SOURCE_IDS.INSEE_RP_EMPLOYMENT,
-    name: "INSEE — Recensement 2021 (emploi)",
-    url: "https://www.insee.fr/fr/statistiques/8202916",
-    description: "Population active et chômage au recensement 2021.",
+    name: `INSEE — Recensement ${RP_VINTAGE} (emploi)`,
+    url: RP_EMPLOYMENT_PAGE_URL,
+    description: `Population active et chômage au recensement ${RP_VINTAGE}.`,
     accessedAt,
   };
 }
@@ -146,9 +186,9 @@ export function createRpEmploymentSource(accessedAt: string): DataSource {
 export function createFilosofiSource(accessedAt: string): DataSource {
   return {
     id: SOURCE_IDS.INSEE_FILOSOFI,
-    name: "INSEE — FILOSOFI (revenus)",
-    url: "https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation",
-    description: "Revenu médian disponible par unité de consommation (FILOSOFI).",
+    name: `INSEE — FILOSOFI ${FILOSOFI_VINTAGE} (revenus)`,
+    url: FILOSOFI_PAGE_URL,
+    description: `Niveau de vie médian des ménages (Filosofi 2, millésime ${FILOSOFI_VINTAGE}). Non comparable aux millésimes 2012-2021.`,
     accessedAt,
   };
 }
@@ -204,6 +244,68 @@ export function createAavSource(accessedAt: string): DataSource {
   };
 }
 
+export function createDensityGridSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_DENSITY_GRID,
+    name: "INSEE — Grille communale de densité (7 niveaux)",
+    url: DENSITY_GRID_URL,
+    description:
+      "Typologie communale de densité à 7 niveaux (millésime 2024, géographie au 1er janvier 2024).",
+    accessedAt,
+  };
+}
+
+export function createUrbanUnitSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.INSEE_URBAN_UNIT,
+    name: "INSEE — Unités urbaines 2020",
+    url: URBAN_UNIT_URL,
+    description: "Composition communale des unités urbaines 2020 (UU2020).",
+    accessedAt,
+  };
+}
+
+export function createPvdSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.ANCT_PVD,
+    name: "ANCT — Petites villes de demain",
+    url: PVD_URL,
+    description: "Liste des communes bénéficiaires du programme Petites villes de demain.",
+    accessedAt,
+  };
+}
+
+export function createAcvSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.ANCT_ACV,
+    name: "ANCT — Action cœur de ville",
+    url: ACV_URL,
+    description: "Liste des communes bénéficiaires du programme Action cœur de ville.",
+    accessedAt,
+  };
+}
+
+export function createFrrSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.DGCL_FRR,
+    name: "DGCL — France Ruralités Revitalisation",
+    url: FRR_URL,
+    description:
+      "Zonage France Ruralités Revitalisation (FRR et FRR+) par commune.",
+    accessedAt,
+  };
+}
+
+export function createVillagesAvenirSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.ANCT_VILLAGES_AVENIR,
+    name: "ANCT — Villages d'avenir",
+    url: VILLAGES_AVENIR_URL,
+    description: "Liste des communes labellisées Villages d'avenir.",
+    accessedAt,
+  };
+}
+
 export function createDvfSource(accessedAt: string): DataSource {
   return {
     id: SOURCE_IDS.DVF,
@@ -229,9 +331,9 @@ export function createSsmsiSource(accessedAt: string): DataSource {
 export function createRpHousingSource(accessedAt: string): DataSource {
   return {
     id: SOURCE_IDS.INSEE_RP_HOUSING,
-    name: "INSEE — RP 2021 logement",
-    url: "https://www.insee.fr/fr/statistiques/8202349",
-    description: "Parc de logements et vacance générale au recensement 2021.",
+    name: `INSEE — RP ${RP_VINTAGE} logement`,
+    url: RP_HOUSING_PAGE_URL,
+    description: `Parc de logements et vacance générale au recensement ${RP_VINTAGE}.`,
     accessedAt,
   };
 }
@@ -239,10 +341,10 @@ export function createRpHousingSource(accessedAt: string): DataSource {
 export function createCommuteSource(accessedAt: string): DataSource {
   return {
     id: SOURCE_IDS.INSEE_RP_COMMUTE,
-    name: "INSEE — RP 2021 mobilité domicile-travail",
-    url: COMMUTE_URL,
+    name: `INSEE — RP ${RP_VINTAGE} mobilité domicile-travail`,
+    url: RP_COMMUTE_PAGE_URL,
     description:
-      "Modes de transport principal des actifs occupés de 15 ans ou plus (recensement 2021).",
+      `Modes de transport principal des actifs occupés de 15 ans ou plus (recensement ${RP_VINTAGE}).`,
     accessedAt,
   };
 }

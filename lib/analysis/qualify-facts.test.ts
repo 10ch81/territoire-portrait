@@ -172,7 +172,7 @@ describe("qualifyAnalysisFact — watchPoints", () => {
       enrichment: {
         ...profile.enrichment!,
         housing: {
-          year: 2021,
+          year: 2022,
           totalUnits: 0,
           occupiedUnits: 0,
           vacantUnits: 0,

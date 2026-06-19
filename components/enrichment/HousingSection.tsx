@@ -3,6 +3,7 @@ import { DataSection } from "@/components/DataSection";
 import { SectionUnavailable } from "@/components/SectionUnavailable";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
 import { formatPercent } from "@/lib/enrichment";
+import { RP_VINTAGE } from "@/lib/sources";
 import { formatPopulation } from "@/lib/territory";
 import type { TerritoryProfile } from "@/lib/types";
 
@@ -19,7 +20,7 @@ export function HousingSection({ territory }: HousingSectionProps) {
       title="Logement"
       subtitle={
         <>
-          <AcronymTooltip term="RPLS" /> · RP 2021
+          <AcronymTooltip term="RPLS" /> · RP {RP_VINTAGE}
         </>
       }
       vintage={housing?.year}
@@ -40,7 +41,7 @@ export function HousingSection({ territory }: HousingSectionProps) {
           />
           {housing.totalDwellings !== null ? (
             <DataRow
-              label="Parc de logements (RP 2021)"
+              label={`Parc de logements (RP ${RP_VINTAGE})`}
               value={formatPopulation(housing.totalDwellings)}
             />
           ) : null}
@@ -52,13 +53,13 @@ export function HousingSection({ territory }: HousingSectionProps) {
           ) : null}
           {housing.rpVacantDwellings !== null ? (
             <DataRow
-              label="Logements vacants (RP 2021)"
+              label={`Logements vacants (RP ${RP_VINTAGE})`}
               value={formatPopulation(housing.rpVacantDwellings)}
             />
           ) : null}
           {housing.rpVacancyRatePercent !== null ? (
             <DataRow
-              label="Taux de vacance générale (RP 2021)"
+              label={`Taux de vacance générale (RP ${RP_VINTAGE})`}
               value={formatPercent(housing.rpVacancyRatePercent)}
             />
           ) : null}

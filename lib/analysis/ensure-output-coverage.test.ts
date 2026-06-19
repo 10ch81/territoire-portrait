@@ -51,7 +51,7 @@ describe("ensure-output-coverage", () => {
 
     const covered = ensureListCoverage(
       [
-        "Les 60 ans et plus représentent 38,1 % de la population en 2021.",
+        "Les 60 ans et plus représentent 38,1 % des habitants.",
         "Certains indicateurs de sécurité enregistrée dépassent les références départementales (SSMSI 2024).",
         "La commune a été reconnue à plusieurs reprises en état de catastrophe naturelle pour inondations (CATNAT).",
       ],
@@ -109,7 +109,7 @@ describe("ensure-output-coverage", () => {
         strengths: [],
         watchPoints: [
           "La population recule de -5,7 % entre 2010 et 2022.",
-          "Les 60 ans et plus représentent 38,1 % de la population en 2021.",
+          "Les 60 ans et plus représentent 38,1 % des habitants.",
           "Certains indicateurs de sécurité enregistrée dépassent les références départementales (SSMSI 2024).",
           "La commune a été reconnue en état de catastrophe naturelle pour inondations (CATNAT).",
         ],
@@ -145,7 +145,7 @@ describe("ensure-output-coverage", () => {
           "96,6 % des locaux sont raccordables à la fibre selon l'ARCEP.",
         ],
         watchPoints: [
-          "Les 60 ans et plus représentent 38,1 % de la population en 2021.",
+          "Les 60 ans et plus représentent 38,1 % des habitants.",
           "Certains indicateurs de sécurité enregistrée dépassent les références départementales (SSMSI 2024).",
           "La commune a été reconnue en état de catastrophe naturelle pour inondations (CATNAT).",
         ],

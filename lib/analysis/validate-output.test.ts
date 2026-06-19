@@ -190,7 +190,7 @@ describe("validateAnalysisOutput", () => {
       {
         summary: "",
         strengths: [],
-        watchPoints: ["Le taux de chômage atteint 25,0 % au recensement 2021."],
+        watchPoints: ["Le taux de chômage atteint 25,0 % au recensement 2022."],
         opportunities: [],
       },
       selectedFacts,
@@ -265,7 +265,7 @@ describe("validateAnalysisOutput", () => {
           "L'activité économique locale compte 658 entreprises et 749 établissements actifs en 2022 (SIDE INSEE).",
         ],
         watchPoints: [
-          "Les 60 ans et plus représentent 38,1 % de la population en 2021.",
+          "Les 60 ans et plus représentent 38,1 % de la population en 2022.",
         ],
         opportunities: ["Potentiel touristique à approfondir, faute de données de fréquentation."],
       },

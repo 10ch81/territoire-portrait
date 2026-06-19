@@ -1,4 +1,5 @@
 import type { TerritoryProfile, TerritoryEnrichment } from "../types";
+import type { ComparisonProfile, TerritoryTypology } from "../typology/types";
 
 function baseEnrichment(overrides: Partial<TerritoryEnrichment> = {}): TerritoryEnrichment {
   return {
@@ -21,6 +22,7 @@ function baseEnrichment(overrides: Partial<TerritoryEnrichment> = {}): Territory
     geography: null,
     property: null,
     derived: null,
+    territoryTypology: null,
     sources: [],
     ...overrides,
   };
@@ -51,7 +53,8 @@ export const saintGironsProfile: TerritoryProfile = {
       note: "",
     },
     sociodemographics: {
-      year: 2021,
+      year: 2022,
+      incomeYear: 2023,
       ageBands: [
         { label: "60-74 ans", population: 1_111, sharePercent: 18.5 },
         { label: "75-89 ans", population: 727, sharePercent: 12.1 },
@@ -60,7 +63,7 @@ export const saintGironsProfile: TerritoryProfile = {
       unemploymentRate: 11.2,
       medianDisposableIncome: 19_500,
       available: true,
-      note: "RP 2021",
+      note: "RP 2022",
     },
     derived: {
       populationGrowthPercent: -5.7,
@@ -123,7 +126,7 @@ export const saintGironsProfile: TerritoryProfile = {
       domainCountsAreTypeCounts: true,
     },
     housing: {
-      year: 2021,
+      year: 2022,
       totalUnits: 0,
       occupiedUnits: 0,
       vacantUnits: 0,
@@ -144,7 +147,7 @@ export const saintGironsProfile: TerritoryProfile = {
         note: "",
       },
       commute: {
-        year: 2021,
+        year: 2022,
         employedCount: 2_400,
         carSharePercent: 69.3,
         publicTransportSharePercent: 0.8,
@@ -369,7 +372,8 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
     case "urbanDense":
       return baseProfile("Commune urbaine dense", "99002", 85_000, 4_200, {
         sociodemographics: {
-          year: 2021,
+          year: 2022,
+          incomeYear: 2023,
           ageBands: [{ label: "60-74 ans", population: 12_000, sharePercent: 14.1 }],
           unemploymentRate: 12.5,
           medianDisposableIncome: 16_800,
@@ -416,7 +420,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           note: "",
         },
         housing: {
-          year: 2021,
+          year: 2022,
           totalUnits: 5_000,
           occupiedUnits: 4_800,
           vacantUnits: 200,
@@ -434,7 +438,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
         mobility: {
           irve: { year: 2024, chargingPoints: 8, stations: 3, available: true, note: "" },
           commute: {
-            year: 2021,
+            year: 2022,
             employedCount: 5_500,
             carSharePercent: 82.4,
             publicTransportSharePercent: 4.2,
@@ -513,7 +517,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
     case "residential":
       return baseProfile("Commune résidentielle", "99013", 28_000, 3_100, {
         housing: {
-          year: 2021,
+          year: 2022,
           totalUnits: 2_800,
           occupiedUnits: 2_700,
           vacantUnits: 100,
@@ -526,7 +530,8 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           note: "",
         },
         sociodemographics: {
-          year: 2021,
+          year: 2022,
+          incomeYear: 2023,
           ageBands: [{ label: "30-44 ans", population: 6_500, sharePercent: 23.2 }],
           unemploymentRate: 6.5,
           medianDisposableIncome: 24_500,
@@ -576,7 +581,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
         mobility: {
           irve: { year: 2024, chargingPoints: 0, stations: 0, available: false, note: "" },
           commute: {
-            year: 2021,
+            year: 2022,
             employedCount: 1_800,
             carSharePercent: 75.0,
             publicTransportSharePercent: 3.0,
@@ -692,7 +697,8 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           note: "",
         },
         sociodemographics: {
-          year: 2021,
+          year: 2022,
+          incomeYear: 2023,
           ageBands: [],
           unemploymentRate: 8.2,
           medianDisposableIncome: 19_500,
@@ -700,7 +706,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           note: "",
         },
         housing: {
-          year: 2021,
+          year: 2022,
           totalUnits: 1_200,
           occupiedUnits: 1_150,
           vacantUnits: 50,
@@ -716,7 +722,8 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
     case "moderateEmployment":
       return baseProfile("Commune emploi modéré", "99020", 10_000, 200, {
         sociodemographics: {
-          year: 2021,
+          year: 2022,
+          incomeYear: 2023,
           ageBands: [],
           unemploymentRate: 8.2,
           medianDisposableIncome: 19_500,
@@ -724,7 +731,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           note: "",
         },
         housing: {
-          year: 2021,
+          year: 2022,
           totalUnits: 800,
           occupiedUnits: 750,
           vacantUnits: 50,
@@ -765,7 +772,8 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
     case "lowMunicipalDebt":
       return baseProfile("Commune dette faible", "99021", 10_000, 200, {
         sociodemographics: {
-          year: 2021,
+          year: 2022,
+          incomeYear: 2023,
           ageBands: [],
           unemploymentRate: 8.2,
           medianDisposableIncome: 19_500,
@@ -810,7 +818,8 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
     case "highMunicipalDebt":
       return baseProfile("Commune dette élevée", "99022", 10_000, 200, {
         sociodemographics: {
-          year: 2021,
+          year: 2022,
+          incomeYear: 2023,
           ageBands: [],
           unemploymentRate: 8.2,
           medianDisposableIncome: 19_500,
@@ -855,7 +864,8 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
     case "compositeIncomeFragility":
       return baseProfile("Commune fragilité revenu composite", "99023", 12_000, 280, {
         sociodemographics: {
-          year: 2021,
+          year: 2022,
+          incomeYear: 2023,
           ageBands: [],
           unemploymentRate: 11.2,
           medianDisposableIncome: 18_500,
@@ -871,7 +881,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           note: "",
         },
         housing: {
-          year: 2021,
+          year: 2022,
           totalUnits: 900,
           occupiedUnits: 850,
           vacantUnits: 50,
@@ -912,7 +922,8 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
     case "twoNegativeEnjeux":
       return baseProfile("Commune deux enjeux défavorables", "99024", 8_000, 180, {
         sociodemographics: {
-          year: 2021,
+          year: 2022,
+          incomeYear: 2023,
           ageBands: [],
           unemploymentRate: 11.5,
           medianDisposableIncome: 20_500,
@@ -920,7 +931,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           note: "",
         },
         housing: {
-          year: 2021,
+          year: 2022,
           totalUnits: 120,
           occupiedUnits: 115,
           vacantUnits: 5,
@@ -1010,5 +1021,341 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
       return saintGironsProfile;
     default:
       return ruralProfileMinimal;
+  }
+}
+
+export function withTerritoryTypology(
+  profile: TerritoryProfile,
+  typology: TerritoryTypology,
+): TerritoryProfile {
+  if (!profile.enrichment) {
+    return profile;
+  }
+
+  return {
+    ...profile,
+    enrichment: {
+      ...profile.enrichment,
+      territoryTypology: typology,
+    },
+  };
+}
+
+function typologyBase(
+  comparisonProfile: ComparisonProfile,
+  partial: Partial<TerritoryTypology> = {},
+): TerritoryTypology {
+  const availableFamilies = partial.availableFamilies ?? [];
+  const missingFamilies = partial.missingFamilies ?? [
+    "density_grid",
+    "attraction_area",
+    "urban_unit",
+    "public_policy",
+  ].filter((family) => !availableFamilies.includes(family));
+
+  return {
+    comparisonProfile,
+    availableFamilies,
+    missingFamilies,
+    ...partial,
+  };
+}
+
+export function createTypologyProfile(
+  kind:
+    | "metroDense"
+    | "periurban"
+    | "smallCentrality"
+    | "ruralSparse"
+    | "horsAttraction"
+    | "pvd"
+    | "acv"
+    | "frr"
+    | "noPolicy"
+    | "partialMissing",
+): TerritoryProfile {
+  const base = baseProfile("Commune typologie test", "99099", 12_000, 450, {});
+
+  switch (kind) {
+    case "metroDense":
+      return withTerritoryTypology(
+        baseProfile("Commune métropolitaine dense", "99010", 250_000, 5_500, {
+          housing: {
+            year: 2022,
+            totalUnits: 10_000,
+            occupiedUnits: 9_700,
+            vacantUnits: 300,
+            totalDwellings: 120_000,
+            rpVacantDwellings: 8_500,
+            rpVacancyRatePercent: 7.1,
+            socialHousingSharePercent: 15,
+            vacancyRatePercent: null,
+            available: true,
+            note: "",
+          },
+        }),
+        typologyBase("metropole", {
+          summaryLabel: "commune dense de grande agglomération",
+          availableFamilies: ["density_grid", "attraction_area", "urban_unit"],
+          missingFamilies: ["public_policy"],
+          densityGrid: {
+            levelCode: "1",
+            levelLabel: "Grand centre urbain",
+            simplifiedLabel: "commune très dense",
+            source: "INSEE",
+            vintage: 2024,
+            available: true,
+            note: "",
+          },
+          attractionArea: {
+            areaCode: "001",
+            areaLabel: "Aire test",
+            role: "pole",
+            categoryCode: "11",
+            categoryLabel: "Commune-centre",
+            source: "INSEE",
+            vintage: 2020,
+            available: true,
+            note: "",
+          },
+          urbanUnit: {
+            unitCode: "12345",
+            unitLabel: "Unité test",
+            belongsToUrbanUnit: true,
+            role: "ville_centre",
+            sizeClass: "7",
+            source: "INSEE",
+            vintage: 2020,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "periurban":
+      return withTerritoryTypology(
+        baseProfile("Commune périurbaine test", "99011", 8_000, 320, {
+          mobility: {
+            irve: { year: 2024, chargingPoints: 4, stations: 2, available: true, note: "" },
+            commute: {
+              year: 2022,
+              employedCount: 3_500,
+              carSharePercent: 88,
+              publicTransportSharePercent: 2.5,
+              available: true,
+              note: "",
+            },
+            connectivity: {
+              vintage: "2025_T4",
+              fiberEligibleSharePercent: 60,
+              totalPremises: 3_500,
+              fiberEligiblePremises: 2_100,
+              technologies: ["Fibre"],
+              available: true,
+              note: "",
+            },
+          },
+        }),
+        typologyBase("periurbain", {
+          summaryLabel: "commune de couronne périurbaine",
+          availableFamilies: ["density_grid", "attraction_area"],
+          missingFamilies: ["urban_unit", "public_policy"],
+          densityGrid: {
+            levelCode: "4",
+            levelLabel: "Ceinture urbaine",
+            simplifiedLabel: "commune périurbaine",
+            source: "INSEE",
+            vintage: 2024,
+            available: true,
+            note: "",
+          },
+          attractionArea: {
+            role: "couronne",
+            categoryCode: "20",
+            categoryLabel: "Commune de la couronne",
+            source: "INSEE",
+            vintage: 2020,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "smallCentrality":
+      return withTerritoryTypology(
+        baseProfile("Petite centralité test", "99012", 6_500, 180, {}),
+        typologyBase("petite_centralite", {
+          summaryLabel: "petite centralité",
+          availableFamilies: ["density_grid", "attraction_area"],
+          missingFamilies: ["urban_unit", "public_policy"],
+          attractionArea: {
+            role: "pole",
+            categoryCode: "11",
+            categoryLabel: "Commune-centre",
+            source: "INSEE",
+            vintage: 2020,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "ruralSparse":
+      return withTerritoryTypology(
+        baseProfile("Commune rurale test", "99013", 420, 16, {
+          housing: {
+            year: 2022,
+            totalUnits: 120,
+            occupiedUnits: 112,
+            vacantUnits: 8,
+            totalDwellings: 520,
+            rpVacantDwellings: 45,
+            rpVacancyRatePercent: 8.7,
+            socialHousingSharePercent: 4,
+            vacancyRatePercent: null,
+            available: true,
+            note: "",
+          },
+        }),
+        typologyBase("rural_isole", {
+          summaryLabel: "commune rurale peu dense",
+          availableFamilies: ["density_grid", "urban_unit"],
+          missingFamilies: ["attraction_area", "public_policy"],
+          densityGrid: {
+            levelCode: "7",
+            levelLabel: "Rural à habitat très dispersé",
+            simplifiedLabel: "commune rurale très peu dense",
+            source: "INSEE",
+            vintage: 2024,
+            available: true,
+            note: "",
+          },
+          urbanUnit: {
+            belongsToUrbanUnit: false,
+            role: "commune_isolee",
+            source: "INSEE",
+            vintage: 2020,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "horsAttraction":
+      return withTerritoryTypology(
+        baseProfile("Commune hors attraction", "99014", 1_100, 22, {}),
+        typologyBase("rural", {
+          summaryLabel: "commune hors attraction des villes",
+          availableFamilies: ["attraction_area"],
+          missingFamilies: ["density_grid", "urban_unit", "public_policy"],
+          attractionArea: {
+            role: "hors_attraction",
+            categoryCode: "30",
+            categoryLabel: "Commune hors attraction des villes",
+            source: "INSEE",
+            vintage: 2020,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "pvd":
+      return withTerritoryTypology(
+        baseProfile("Commune PVD test", "99015", 7_000, 95, {}),
+        typologyBase("petite_centralite", {
+          summaryLabel: "petite centralité",
+          availableFamilies: ["public_policy"],
+          missingFamilies: ["density_grid", "attraction_area", "urban_unit"],
+          publicPolicyTypologies: {
+            petitesVillesDeDemain: true,
+            actionCoeurDeVille: false,
+            franceRuralitesRevitalisation: false,
+            franceRuralitesRevitalisationPlus: false,
+            villagesAvenir: false,
+            source: "ANCT",
+            vintage: 2024,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "acv":
+      return withTerritoryTypology(
+        baseProfile("Commune ACV test", "99016", 28_000, 900, {}),
+        typologyBase("ville_moyenne", {
+          summaryLabel: "ville moyenne de centralité",
+          availableFamilies: ["public_policy"],
+          missingFamilies: ["density_grid", "attraction_area", "urban_unit"],
+          publicPolicyTypologies: {
+            petitesVillesDeDemain: false,
+            actionCoeurDeVille: true,
+            franceRuralitesRevitalisation: false,
+            franceRuralitesRevitalisationPlus: false,
+            villagesAvenir: false,
+            source: "ANCT",
+            vintage: 2024,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "frr":
+      return withTerritoryTypology(
+        baseProfile("Commune FRR test", "99017", 900, 14, {}),
+        typologyBase("rural", {
+          summaryLabel: "commune rurale",
+          availableFamilies: ["public_policy"],
+          missingFamilies: ["density_grid", "attraction_area", "urban_unit"],
+          publicPolicyTypologies: {
+            petitesVillesDeDemain: false,
+            actionCoeurDeVille: false,
+            franceRuralitesRevitalisation: true,
+            franceRuralitesRevitalisationPlus: true,
+            source: "ANCT",
+            vintage: 2024,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "noPolicy":
+      return withTerritoryTypology(
+        base,
+        typologyBase("unknown", {
+          availableFamilies: [],
+          missingFamilies: [
+            "density_grid",
+            "attraction_area",
+            "urban_unit",
+            "public_policy",
+          ],
+          publicPolicyTypologies: {
+            petitesVillesDeDemain: false,
+            actionCoeurDeVille: false,
+            franceRuralitesRevitalisation: false,
+            franceRuralitesRevitalisationPlus: false,
+            villagesAvenir: false,
+            source: "ANCT",
+            vintage: 2024,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    case "partialMissing":
+      return withTerritoryTypology(
+        base,
+        typologyBase("unknown", {
+          availableFamilies: ["density_grid"],
+          missingFamilies: ["attraction_area", "urban_unit", "public_policy"],
+          densityGrid: {
+            levelCode: "2",
+            levelLabel: "Commune faiblement dense",
+            simplifiedLabel: "commune peu dense",
+            source: "INSEE",
+            vintage: 2024,
+            available: true,
+            note: "",
+          },
+        }),
+      );
+    default:
+      return base;
   }
 }

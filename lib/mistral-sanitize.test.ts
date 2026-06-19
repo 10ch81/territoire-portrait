@@ -123,7 +123,7 @@ describe("sanitizeTerritorialAnalysis", () => {
 
     assert.equal(analysis.summary.toLowerCase().includes("au taux national"), false);
     assert.match(analysis.summary, /taux de chômage des 15-64 ans/i);
-    assert.match(analysis.summary, /recensement 2021/i);
+    assert.match(analysis.summary, /recensement 2022/i);
     assert.equal(containsInternalLeakage(analysis.summary).length, 0);
   });
 
@@ -142,7 +142,7 @@ describe("sanitizeTerritorialAnalysis", () => {
     const text = collectText(analysis);
     assert.equal(text.toLowerCase().includes("à décrire sans comparaison"), false);
     assert.equal(text.toLowerCase().includes("comparaison homogène fournie"), false);
-    assert.match(analysis.summary, /taux de chômage des 15-64 ans élevé au recensement 2021/i);
+    assert.match(analysis.summary, /taux de chômage des 15-64 ans élevé au recensement 2022/i);
   });
 
   it("ne mélange pas chômage et sécurité dans une même phrase", () => {
@@ -151,7 +151,7 @@ describe("sanitizeTerritorialAnalysis", () => {
         summary: "",
         strengths: [],
         watchPoints: [
-          "Taux de chômage élevé au recensement 2021, avec un taux SSMSI de 12 pour 1000 habitants.",
+          "Taux de chômage élevé au recensement 2022, avec un taux SSMSI de 12 pour 1000 habitants.",
         ],
         opportunities: [],
       },

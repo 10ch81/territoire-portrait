@@ -50,7 +50,7 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
   const connectivity = territory.enrichment?.mobility?.connectivity;
 
   if (fact.theme === "housing" && housing?.rpVacancyRatePercent != null) {
-    if (qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent)) {
+    if (qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent, territory)) {
       return 12;
     }
     return -20;
@@ -63,7 +63,12 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
   }
 
   if (fact.theme === "finances" && /dette/i.test(fact.sentence)) {
-    if (qualifiesAsDebtWatchPoint(territory.enrichment?.publicAccounts?.debtPerCapitaEur)) {
+    if (
+      qualifiesAsDebtWatchPoint(
+        territory.enrichment?.publicAccounts?.debtPerCapitaEur,
+        territory,
+      )
+    ) {
       return 8;
     }
     return -20;

@@ -16,20 +16,22 @@ export function buildIncomeFacts(territory: TerritoryProfile): AnalysisFact[] {
     return facts;
   }
 
+  const incomeYear = sociodemographics.incomeYear ?? sociodemographics.year;
+
   facts.push(
     createFact({
       theme: "income",
       target: "summary",
-      sentence: `Le revenu médian des ménages s'élève à ${formatEuro(sociodemographics.medianDisposableIncome)} au recensement ${sociodemographics.year} (FILOSOFI).`,
+      sentence: `Le niveau de vie médian s'élève à ${formatEuro(sociodemographics.medianDisposableIncome)} (FILOSOFI ${incomeYear}).`,
       sourceKeys: ["insee-filosofi"],
-      year: sociodemographics.year,
+      year: incomeYear,
       confidence: "high",
       numericBindings: [
         binding(
           sociodemographics.medianDisposableIncome,
-          "revenu médian disponible",
+          "niveau de vie médian",
           "income",
-          ["revenu", "médian", "FILOSOFI", "disponible"],
+          ["niveau", "vie", "médian", "FILOSOFI"],
         ),
       ],
     }),
@@ -42,17 +44,17 @@ export function buildIncomeFacts(territory: TerritoryProfile): AnalysisFact[] {
         target: "watchPoints",
         sentence: buildIncomeWatchPointSentence(territory),
         sourceKeys: ["insee-filosofi"],
-        year: sociodemographics.year,
+        year: incomeYear,
         confidence: "medium",
         limitations: [
-          "Revenu FILOSOFI ; lecture prudente sans comparaison homogène systématique.",
+          "Niveau de vie médian FILOSOFI 2 ; non comparable aux millésimes 2012-2021.",
         ],
         numericBindings: [
           binding(
             sociodemographics.medianDisposableIncome,
-            "revenu médian disponible",
+            "niveau de vie médian",
             "income",
-            ["revenu", "médian", "FILOSOFI", "fragilité", "repères"],
+            ["niveau", "vie", "médian", "FILOSOFI", "fragilité", "repères"],
           ),
         ],
       }),

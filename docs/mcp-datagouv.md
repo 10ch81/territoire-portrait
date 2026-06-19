@@ -75,12 +75,12 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [API Géo — communes](https://geo.api.gouv.fr) | Identité, population légale, EPCI, surface | R | ✅ | `lib/territory.ts` | Socle de résolution commune |
 | [INSEE — Populations historiques](https://api.insee.fr/melodi/file/DS_POPULATIONS_HISTORIQUES/) | Évolution démographique | R | ✅ | `ingest-population.ts` → `population.ts` | Série historique par commune |
-| [INSEE — RP 2021 structure par âge](https://www.insee.fr/fr/statistiques/8201904) | Pyramide des âges | R | ✅ | `ingest-social.ts` → `sociodemographics.ts` | Millésime RP 2021 |
-| [INSEE — RP 2021 emploi / chômage](https://www.insee.fr/fr/statistiques/8202916) | Chômage 15-64 ans | R | ✅ | `ingest-social.ts` | Taux au recensement, pas au BIT |
-| [INSEE — FILOSOFI](https://www.insee.fr/fr/metadonnees/source/operation/s2146/presentation) | Revenu médian disponible | R | ✅ | `ingest-social.ts` | Millésime 2020 (revenus 2019) |
-| [INSEE — RP logement 2021](https://www.insee.fr/fr/statistiques/8202349) | Vacance, parc total, statut d'occupation | R | ✅ | `ingest-housing.ts` | Vacance générale (P21_LOGVAC) + RPLS |
+| [INSEE — RP 2022 structure par âge](https://www.insee.fr/fr/statistiques/8581696) | Pyramide des âges | R | ✅ | `ingest-social.ts` → `sociodemographics.ts` | Millésime RP 2022 |
+| [INSEE — RP 2022 emploi / chômage](https://www.insee.fr/fr/statistiques/8581444) | Chômage 15-64 ans | R | ✅ | `ingest-social.ts` | Taux au recensement, pas au BIT |
+| [INSEE — FILOSOFI](https://www.insee.fr/fr/statistiques/8984752) | Niveau de vie médian | R | ✅ | `ingest-social.ts` | Millésime 2023 (Filosofi 2) |
+| [INSEE — RP logement 2022](https://www.insee.fr/fr/statistiques/8581474) | Vacance, parc total, statut d'occupation | R | ✅ | `ingest-housing.ts` | Vacance générale (P22_LOGVAC) + RPLS |
 | [SIG Ville / INSEE TAG QPV](https://www.insee.fr/fr/information/8186239) | QPV, politique de la ville | R | ✅ | `ingest-qpv.ts` | Table d'appartenance QPV 2025 |
-| [INSEE — RP mobilité domicile-travail](https://www.insee.fr/fr/statistiques/8200836) | Modes de transport des actifs | R | ✅ | `ingest-commute.ts` | Tableau NAV2A 2021 (usage déclaré) |
+| [INSEE — RP mobilité domicile-travail](https://www.insee.fr/fr/statistiques/8581610) | Modes de transport des actifs | R | ✅ | `ingest-commute.ts` | Tableau NAV2A 2022 (usage déclaré) |
 | [INSEE — Dossier / comparateur territoires](https://www.insee.fr/fr/statistiques/2011101) | Référence croisée | R | ⚠️ | — | Pages web de référence ; données couvertes via Melodi/cache, pas de scrape |
 
 ### Géographie, centralité, institutions
@@ -177,9 +177,9 @@ Ordre recommandé pour les prochaines ingestions. Chaque item suit le workflow M
 
 | # | Source | Thème | Effort estimé | Justification |
 | - | ------ | ----- | ------------- | ------------- |
-| 1 | RP mobilité domicile-travail | Mobilité | ✅ Fait | NAV2A 2021 |
+| 1 | RP mobilité domicile-travail | Mobilité | ✅ Fait | NAV2A 2022 |
 | 2 | SIG Ville / QPV | Politique ville | ✅ Fait | Table INSEE TAG 2025 |
-| 3 | RP logement 2021 | Logement | ✅ Fait | Vacance générale dans `ingest-housing` |
+| 3 | RP logement 2022 | Logement | ✅ Fait | Vacance générale dans `ingest-housing` |
 | 4 | GTFS national | Mobilité | **Reporté P3** | Trop lourd en CI ; option régionale ultérieure |
 
 ### P2 — Enrichissement et alignement
@@ -231,7 +231,7 @@ Requêtes MCP orientées par les lacunes P1 :
 | ----- | -------------------- | -------- |
 | Mobilité | RP domicile-travail, IRVE, BPE transport | P3 (GTFS national reporté) |
 | Politique ville | SIG Ville, QPV, Cœur de ville | P1 |
-| Logement | RP logement 2021, vacance, statut occupation | P1 |
+| Logement | RP logement 2022, vacance, statut occupation | P1 |
 | Santé | APL, accessibilité localisée DREES | P2 |
 | Finances | OFGL, budgets locaux | P2 |
 | Économie | Démographie d'entreprises INSEE, SIRENE filtres | P2 |
@@ -243,7 +243,7 @@ Requêtes MCP orientées par les lacunes P1 :
 | `scripts/ingest-all.ts`        | **Actif**     | Lance toutes les ingestions              |
 | `scripts/ingest-bpe.ts`        | **Actif**     | BPE INSEE 2024 → `bpe-by-commune.json`   |
 | `scripts/ingest-population.ts` | **Actif**     | Populations historiques INSEE            |
-| `scripts/ingest-social.ts`     | **Actif**     | RP 2021 (âge, chômage) + FILOSOFI        |
+| `scripts/ingest-social.ts`     | **Actif**     | RP 2022 (âge, chômage) + FILOSOFI 2023   |
 | `scripts/ingest-housing.ts`    | **Actif**     | RPLS logements sociaux                   |
 | `scripts/ingest-irve.ts`       | **Actif**     | Bornes de recharge IRVE                  |
 | `scripts/ingest-rei.ts`        | **Actif**     | Taux fiscalité locale (REI)              |

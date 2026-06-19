@@ -80,6 +80,7 @@ const SUMMARY_EXCLUDED_THEMES: AnalysisFactTheme[] = [
   "energy",
   "real_estate",
   "finances",
+  "geography",
 ];
 
 function themesConflict(

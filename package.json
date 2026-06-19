@@ -15,6 +15,7 @@
     "ingest:irve": "tsx scripts/ingest-irve.ts",
     "ingest:rei": "tsx scripts/ingest-rei.ts",
     "ingest:geography": "tsx scripts/ingest-geography.ts",
+    "ingest:typology": "tsx scripts/ingest-typology.ts",
     "ingest:property": "tsx scripts/ingest-property.ts",
     "ingest:security": "tsx scripts/ingest-security.ts",
     "ingest:commute": "tsx scripts/ingest-commute.ts",
@@ -53,6 +54,7 @@
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "xlsx": "^0.18.5"
   }
 }

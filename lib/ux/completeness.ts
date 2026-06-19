@@ -75,7 +75,8 @@ const ENRICHMENT_CHECKS: Array<{
   {
     id: "geography",
     isAvailable: (t) =>
-      t.enrichment?.geography?.attractionArea?.available === true,
+      t.enrichment?.geography?.attractionArea?.available === true ||
+      (t.enrichment?.territoryTypology?.availableFamilies.length ?? 0) > 0,
   },
   {
     id: "property",

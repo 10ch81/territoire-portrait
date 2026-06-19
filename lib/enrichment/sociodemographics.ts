@@ -1,4 +1,10 @@
-import { createFilosofiSource, createRpEmploymentSource, createRpPopulationSource } from "../sources";
+import {
+  createFilosofiSource,
+  createRpEmploymentSource,
+  createRpPopulationSource,
+  FILOSOFI_VINTAGE,
+  RP_VINTAGE,
+} from "../sources";
 import { isJsonCachePresent, loadJsonCache } from "./cache";
 import type {
   AgeBandCount,
@@ -32,7 +38,8 @@ export function loadSociodemographicsSnapshot(
         : `Commune ${inseeCode} absente du cache socio-démographique.`;
 
     return {
-      year: 2021,
+      year: RP_VINTAGE,
+      incomeYear: null,
       ageBands: [],
       unemploymentRate: null,
       medianDisposableIncome: null,
@@ -58,12 +65,13 @@ export function loadSociodemographicsSnapshot(
 
   return {
     year: entry.year,
+    incomeYear: entry.incomeYear,
     ageBands,
     unemploymentRate: entry.unemploymentRate,
     medianDisposableIncome: entry.medianDisposableIncome,
     available: ageBands.length > 0,
     note:
-      "Recensement 2021 (structure par âge, chômage) et FILOSOFI (revenu médian disponible).",
+      `Recensement ${entry.year} (structure par âge, chômage) et FILOSOFI ${entry.incomeYear ?? FILOSOFI_VINTAGE} (niveau de vie médian).`,
   };
 }
 
