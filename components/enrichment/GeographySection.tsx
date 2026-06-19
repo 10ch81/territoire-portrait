@@ -114,7 +114,7 @@ export function GeographySection({ territory }: GeographySectionProps) {
           <SectionUnavailable message="Typologies communales non disponibles. Exécutez « npm run ingest:typology » et « npm run ingest:geography »." />
         )}
 
-        {typology?.missingFamilies.map((family) => (
+        {(typology?.missingFamilies ?? []).map((family) => (
           <SectionUnavailable
             key={family}
             message={`${formatTypologyFamilyLabel(family)} — non disponible pour cette commune.`}

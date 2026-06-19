@@ -34,6 +34,9 @@ const DVF_URL =
 /** Millésime du recensement de la population (bases communales INSEE). */
 export const RP_VINTAGE = 2022;
 
+/** Millésime du fichier RPLS (logements sociaux) — distinct du RP communale. */
+export const RPLS_VINTAGE = 2021;
+
 /** Millésime FILOSOFI (Filosofi 2 à partir de 2023). */
 export const FILOSOFI_VINTAGE = 2023;
 

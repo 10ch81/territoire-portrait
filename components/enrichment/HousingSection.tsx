@@ -3,7 +3,7 @@ import { DataSection } from "@/components/DataSection";
 import { SectionUnavailable } from "@/components/SectionUnavailable";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
 import { formatPercent } from "@/lib/enrichment";
-import { RP_VINTAGE } from "@/lib/sources";
+import { RP_VINTAGE, RPLS_VINTAGE } from "@/lib/sources";
 import { formatPopulation } from "@/lib/territory";
 import type { TerritoryProfile } from "@/lib/types";
 
@@ -20,7 +20,7 @@ export function HousingSection({ territory }: HousingSectionProps) {
       title="Logement"
       subtitle={
         <>
-          <AcronymTooltip term="RPLS" /> · RP {RP_VINTAGE}
+          <AcronymTooltip term="RPLS" /> {RPLS_VINTAGE} · RP {RP_VINTAGE}
         </>
       }
       vintage={housing?.year}
@@ -28,15 +28,15 @@ export function HousingSection({ territory }: HousingSectionProps) {
       {housing?.available ? (
         <dl className="space-y-3">
           <DataRow
-            label="Parc total"
+            label={`Parc locatif social (RPLS ${RPLS_VINTAGE})`}
             value={formatPopulation(housing.totalUnits)}
           />
           <DataRow
-            label="Logements loués"
+            label="Logements loués (RPLS)"
             value={formatPopulation(housing.occupiedUnits)}
           />
           <DataRow
-            label="Logements vacants"
+            label="Logements vacants (RPLS)"
             value={formatPopulation(housing.vacantUnits)}
           />
           {housing.totalDwellings !== null ? (

@@ -21,10 +21,10 @@ const OUTPUT_PATH = resolve(CACHE_DIR, "typology-by-commune.json");
 const DENSITY_CSV_URL =
   "https://geoterritoires.hautsdefrance.fr/api/v1/functions/GC_API_download.php?lang=fr&type=stat&dataset=grildens&indic=typodens7&nivgeo=com2024&filter=last&format=csv";
 
-const UU_ZIP_URL =
-  "https://www.insee.fr/fr/statistiques/fichier/7671844/table-appartenance-geo-communes-2024.zip";
-const UU_ZIP = resolve(CACHE_DIR, "cog-appartenance-geo-2024.zip");
-const UU_EXTRACT = resolve(CACHE_DIR, "cog-appartenance-geo-2024-extract");
+const UU_COMPOSITION_ZIP_URL =
+  "https://www.insee.fr/fr/statistiques/fichier/4802589/UU2020_au_01-01-2024.zip";
+const UU_COMPOSITION_ZIP = resolve(CACHE_DIR, "uu2020-composition-2024.zip");
+const UU_COMPOSITION_EXTRACT = resolve(CACHE_DIR, "uu2020-composition-2024-extract");
 
 const PVD_CSV_URL =
   "https://static.data.gouv.fr/resources/programme-petites-villes-de-demain/20240102-144402/liste-pvd-com2023-20240102.csv";
@@ -32,6 +32,8 @@ const ACV_CSV_URL =
   "https://static.data.gouv.fr/resources/programme-action-coeur-de-ville/20240205-160249/liste-acv-com2023-20240205.csv";
 const VILLAGES_CSV_URL =
   "https://static.data.gouv.fr/resources/dispositif-villages-davenir/20260604-090609/liste-va-com2025-20260602.csv";
+const FRR_XLSX_URL =
+  "https://www.collectivites-locales.gouv.fr/files/files/3.%20Animer%20les%20territoires/5.%20La%20coh%C3%A9sion%20territoriale%20et%20l'am%C3%A9nagement%20du%20territoire/Liste%20communes%20FRR_juillet2025.xlsx";
 
 const POLICY_SOURCES = [
   { key: "petitesVillesDeDemain" as const, url: PVD_CSV_URL, label: "PVD" },
@@ -145,56 +147,86 @@ function findXlsxFile(directory: string): string {
   return resolve(directory, match);
 }
 
-function deriveUrbanUnitRole(unitCode: string): string {
-  if (/^\d{2}000$/.test(unitCode) || unitCode === "00000") {
-    return "H";
+function findHeaderRow(matrix: string[][], marker: string, scanLimit = 20): number {
+  for (let index = 0; index < Math.min(scanLimit, matrix.length); index += 1) {
+    const row = matrix[index] as string[];
+    if (row.some((cell) => String(cell).trim() === marker)) {
+      return index;
+    }
   }
-  return "I";
+  return -1;
 }
 
-async function ingestUrbanUnits(cache: TypologyCommuneCache): Promise<number> {
-  if (!existsSync(UU_ZIP)) {
-    await downloadFile(UU_ZIP_URL, UU_ZIP);
+function loadUuSizeClasses(workbook: ReturnType<typeof read>): Map<string, string> {
+  const matrix = utils.sheet_to_json<string[]>(workbook.Sheets.UU2020, {
+    header: 1,
+    defval: "",
+  });
+  const headerRowIndex = findHeaderRow(matrix, "UU2020");
+  if (headerRowIndex < 0) {
+    return new Map();
   }
 
-  if (existsSync(UU_EXTRACT)) {
-    const hasData = readdirSync(UU_EXTRACT, { recursive: true })
-      .map(String)
-      .some((name) => name.toLowerCase().endsWith(".xlsx"));
-    if (!hasData) {
-      rmSync(UU_EXTRACT, { recursive: true, force: true });
+  const headers = (matrix[headerRowIndex] as string[]).map((cell) => String(cell).trim());
+  const headerIndex = new Map(headers.map((name, position) => [name, position]));
+  const unitCodeIndex = headerIndex.get("UU2020") ?? -1;
+  const sizeIndex = headerIndex.get("TUU2017") ?? -1;
+
+  const sizes = new Map<string, string>();
+  if (unitCodeIndex < 0 || sizeIndex < 0) {
+    return sizes;
+  }
+
+  for (let rowIndex = headerRowIndex + 1; rowIndex < matrix.length; rowIndex += 1) {
+    const cells = matrix[rowIndex] as string[];
+    const unitCode = String(cells[unitCodeIndex] ?? "").trim();
+    const sizeClass = String(cells[sizeIndex] ?? "").trim();
+    if (unitCode && sizeClass) {
+      sizes.set(unitCode, sizeClass);
     }
   }
 
-  extractZip(UU_ZIP, UU_EXTRACT);
+  return sizes;
+}
 
-  const xlsxPath = findXlsxFile(UU_EXTRACT);
+async function ingestUrbanUnits(cache: TypologyCommuneCache): Promise<number> {
+  if (!existsSync(UU_COMPOSITION_ZIP)) {
+    await downloadFile(UU_COMPOSITION_ZIP_URL, UU_COMPOSITION_ZIP);
+  }
+
+  if (existsSync(UU_COMPOSITION_EXTRACT)) {
+    const hasData = readdirSync(UU_COMPOSITION_EXTRACT, { recursive: true })
+      .map(String)
+      .some((name) => name.toLowerCase().endsWith(".xlsx"));
+    if (!hasData) {
+      rmSync(UU_COMPOSITION_EXTRACT, { recursive: true, force: true });
+    }
+  }
+
+  extractZip(UU_COMPOSITION_ZIP, UU_COMPOSITION_EXTRACT);
+
+  const xlsxPath = findXlsxFile(UU_COMPOSITION_EXTRACT);
   const workbook = read(readFileSync(xlsxPath), { type: "buffer", dense: true });
-  const matrix = utils.sheet_to_json<string[]>(workbook.Sheets.COM, {
+  const sizeByUnit = loadUuSizeClasses(workbook);
+  const matrix = utils.sheet_to_json<string[]>(workbook.Sheets.Composition_communale, {
     header: 1,
     defval: "",
   });
 
-  let headerRowIndex = -1;
-  for (let index = 0; index < Math.min(20, matrix.length); index += 1) {
-    const row = matrix[index] as string[];
-    if (row.some((cell) => String(cell).trim() === "CODGEO")) {
-      headerRowIndex = index;
-      break;
-    }
-  }
-
+  const headerRowIndex = findHeaderRow(matrix, "CODGEO");
   if (headerRowIndex < 0) {
-    throw new Error("En-tête CODGEO introuvable dans la feuille COM.");
+    throw new Error("En-tête CODGEO introuvable dans Composition_communale.");
   }
 
   const headers = (matrix[headerRowIndex] as string[]).map((cell) => String(cell).trim());
   const headerIndex = new Map(headers.map((name, position) => [name, position]));
   const inseeIndex = headerIndex.get("CODGEO") ?? -1;
   const uuCodeIndex = headerIndex.get("UU2020") ?? -1;
+  const uuLabelIndex = headerIndex.get("LIBUU2020") ?? -1;
+  const roleIndex = headerIndex.get("STATUT_COM_UU") ?? -1;
 
-  if (inseeIndex < 0 || uuCodeIndex < 0) {
-    throw new Error("Colonnes CODGEO ou UU2020 introuvables.");
+  if (inseeIndex < 0 || uuCodeIndex < 0 || roleIndex < 0) {
+    throw new Error("Colonnes CODGEO, UU2020 ou STATUT_COM_UU introuvables.");
   }
 
   let count = 0;
@@ -204,19 +236,72 @@ async function ingestUrbanUnits(cache: TypologyCommuneCache): Promise<number> {
     const unitCode = String(cells[uuCodeIndex] ?? "").trim();
     if (!inseeCode || !unitCode) continue;
 
-    const roleCode = deriveUrbanUnitRole(unitCode);
+    const roleCode = String(cells[roleIndex] ?? "H").trim().toUpperCase();
     cache[inseeCode] ??= {};
     cache[inseeCode].urbanUnit = {
       unitCode,
-      unitLabel: unitCode,
+      unitLabel: String(cells[uuLabelIndex] ?? unitCode).trim() || unitCode,
       roleCode,
-      sizeClass: "0",
+      sizeClass: sizeByUnit.get(unitCode) ?? "0",
       vintage: 2020,
     };
     count += 1;
   }
 
   console.log(`   Unités urbaines indexées : ${count} communes`);
+  return count;
+}
+
+function isFrrClassified(label: string): boolean {
+  const normalized = label.trim().toLowerCase();
+  return normalized !== "non classée" && normalized.includes("frr");
+}
+
+function isFrrPlusClassified(label: string): boolean {
+  return label.trim().toLowerCase().includes("frr+");
+}
+
+async function ingestFrr(cache: TypologyCommuneCache): Promise<number> {
+  const destination = resolve(CACHE_DIR, "liste-communes-frr-juillet2025.xlsx");
+  if (!existsSync(destination)) {
+    await downloadFile(FRR_XLSX_URL, destination);
+  }
+
+  const workbook = read(readFileSync(destination), { type: "buffer" });
+  const sheetName =
+    workbook.SheetNames.find((name) => /frr/i.test(name)) ?? workbook.SheetNames[0];
+  const rows = utils.sheet_to_json<Record<string, string>>(workbook.Sheets[sheetName], {
+    defval: "",
+  });
+
+  let count = 0;
+  for (const row of rows) {
+    const inseeCode = normalizeInseeCode(row.Code_insee ?? row.CODGEO ?? "");
+    const classification =
+      row["Classement FRR et FRR+ au 10 juillet 2025"] ?? row.Classement ?? "";
+    if (!inseeCode || !classification) continue;
+
+    if (!isFrrClassified(classification)) {
+      continue;
+    }
+
+    cache[inseeCode] ??= {};
+    cache[inseeCode].publicPolicy ??= {
+      petitesVillesDeDemain: false,
+      actionCoeurDeVille: false,
+      franceRuralitesRevitalisation: false,
+      franceRuralitesRevitalisationPlus: false,
+      villagesAvenir: false,
+      vintage: 2025,
+    };
+
+    cache[inseeCode].publicPolicy!.franceRuralitesRevitalisation = true;
+    if (isFrrPlusClassified(classification)) {
+      cache[inseeCode].publicPolicy!.franceRuralitesRevitalisationPlus = true;
+    }
+    count += 1;
+  }
+
   return count;
 }
 
@@ -302,6 +387,7 @@ async function main(): Promise<void> {
       ingestPolicyList(cache, source.url, source.key, 2024),
     );
   }
+  await runStep("FRR / FRR+", () => ingestFrr(cache));
 
   writeFileSync(OUTPUT_PATH, JSON.stringify(cache));
   console.log(`\n✅ Cache typologie généré : ${OUTPUT_PATH}`);

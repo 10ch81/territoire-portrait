@@ -2,6 +2,7 @@ import type { TerritoryProfile } from "../types";
 import { formatEuro } from "./format";
 import {
   DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR,
+  debtWatchPointThresholdEur,
   qualifiesAsProfileAwareDebtWatchPoint,
   qualifiesAsProfileAwareVacancyWatchPoint,
   qualifiesAsLowPublicTransportShare,
@@ -331,9 +332,17 @@ function unemploymentIntensity(rate: number): FactIntensity {
   return "low";
 }
 
-function debtIntensity(debtPerCapita: number): FactIntensity {
-  if (debtPerCapita >= 2_000) return "high";
-  if (debtPerCapita >= DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR) return "medium";
+function debtIntensity(debtPerCapita: number, territory: TerritoryProfile): FactIntensity {
+  const threshold = debtWatchPointThresholdEur(
+    resolveComparisonProfile(territory),
+    territory.population,
+  );
+  if (debtPerCapita >= Math.max(2_000, threshold * 1.5)) {
+    return "high";
+  }
+  if (debtPerCapita >= threshold) {
+    return "medium";
+  }
   return "low";
 }
 
@@ -488,7 +497,7 @@ function qualifyFinancesFact(fact: AnalysisFact, territory: TerritoryProfile): Q
   if (qualifiesAsDebtWatchPoint(debt, territory)) {
     return withTargets(fact, {
       polarity: "negative",
-      intensity: debtIntensity(debt),
+      intensity: debtIntensity(debt, territory),
       qualificationReason: "dette_seuil_eleve",
     });
   }

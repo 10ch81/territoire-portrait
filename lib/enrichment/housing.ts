@@ -1,4 +1,4 @@
-import { createRplsSource, createRpHousingSource, RP_VINTAGE } from "../sources";
+import { createRplsSource, createRpHousingSource, RP_VINTAGE, RPLS_VINTAGE } from "../sources";
 import { loadJsonCache } from "./cache";
 import type { HousingCommuneCache, SocialHousingSnapshot } from "../types";
 
@@ -53,7 +53,7 @@ export function loadSocialHousingSnapshot(
     vacancyRatePercent,
     available: true,
     note:
-      `Parc locatif social (RPLS) et vacance générale du parc (RP logement ${entry.year}) — périmètres distincts.`,
+      `Parc locatif social (RPLS ${RPLS_VINTAGE}) et vacance générale du parc (RP logement ${RP_VINTAGE}) — périmètres distincts.`,
   };
 }
 

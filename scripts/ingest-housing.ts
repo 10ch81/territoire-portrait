@@ -13,7 +13,7 @@ import {
   parseCsvLine,
   parseFrenchDecimal,
 } from "./ingest-utils";
-import { RP_HOUSING_FILE_URL, RP_VINTAGE } from "../lib/sources";
+import { RP_HOUSING_FILE_URL, RP_VINTAGE, RPLS_VINTAGE } from "../lib/sources";
 import type { HousingCommuneCache } from "../lib/types";
 
 const OUTPUT_PATH = resolve(CACHE_DIR, "housing-by-commune.json");
@@ -81,7 +81,7 @@ async function aggregateRpls(): Promise<HousingCommuneCache> {
     }
 
     cache[com] = {
-      year: RP_VINTAGE,
+      year: RPLS_VINTAGE,
       totalUnits,
       occupiedUnits: Number.parseInt(loueRaw, 10) || 0,
       vacantUnits: Number.parseInt(vacantRaw, 10) || 0,
