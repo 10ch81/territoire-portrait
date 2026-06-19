@@ -209,7 +209,8 @@ export function createDvfSource(accessedAt: string): DataSource {
     id: SOURCE_IDS.DVF,
     name: "DVF — Indicateurs immobiliers",
     url: DVF_URL,
-    description: "Prix et volumes de mutations immobilières agrégés par commune.",
+    description:
+      "Prix et volumes de mutations immobilières agrégés par commune (hors Alsace-Moselle et Mayotte).",
     accessedAt,
   };
 }

@@ -1,8 +1,40 @@
 import { createDvfSource } from "../sources";
-import { loadJsonCache } from "./cache";
+import { isJsonCachePresent, loadJsonCache } from "./cache";
 import type { PropertyCommuneCache, PropertyMarketSnapshot } from "../types";
 
 const PROPERTY_CACHE_FILE = "property-by-commune.json";
+
+const DVF_EXCLUDED_METROPOLITAN_DEPARTMENTS = new Set(["57", "67", "68"]);
+
+function departmentPrefixFromInsee(inseeCode: string): string {
+  if (inseeCode.startsWith("97") || inseeCode.startsWith("98")) {
+    return inseeCode.slice(0, 3);
+  }
+
+  return inseeCode.slice(0, 2);
+}
+
+function isDvfExcludedTerritory(inseeCode: string): boolean {
+  if (inseeCode.startsWith("976")) {
+    return true;
+  }
+
+  return DVF_EXCLUDED_METROPOLITAN_DEPARTMENTS.has(
+    departmentPrefixFromInsee(inseeCode),
+  );
+}
+
+function unavailablePropertyNote(inseeCode: string): string {
+  if (!isJsonCachePresent(PROPERTY_CACHE_FILE)) {
+    return "Cache DVF absent. Exécutez « npm run ingest:property » pour activer les prix immobiliers.";
+  }
+
+  if (isDvfExcludedTerritory(inseeCode)) {
+    return "Prix DVF non diffusés pour l'Alsace-Moselle et Mayotte (Livre foncier local, hors périmètre DGFiP). Aucune source publique équivalente n'est disponible à l'échelle communale.";
+  }
+
+  return "Aucune mutation DVF agrégée disponible pour cette commune dans le millésime courant.";
+}
 
 export function loadPropertyMarketSnapshot(
   inseeCode: string,
@@ -21,11 +53,12 @@ export function loadPropertyMarketSnapshot(
       houseSharePercent: null,
       apartmentSharePercent: null,
       priceHistory: [],
-      departmentCode: null,
+      departmentCode: isDvfExcludedTerritory(inseeCode)
+        ? departmentPrefixFromInsee(inseeCode)
+        : null,
       departmentAveragePricePerM2: null,
       available: false,
-      note:
-        "Cache DVF absent. Exécutez « npm run ingest:property » pour activer les prix immobiliers.",
+      note: unavailablePropertyNote(inseeCode),
     };
   }
 
