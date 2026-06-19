@@ -45,6 +45,20 @@ export {
   qualifyAnalysisFacts,
   qualifiedWatchPointCandidates,
 } from "./qualify-facts";
+export {
+  buildOpportunityCandidates,
+  dedupeOpportunityCandidates,
+  scoreOpportunityCandidate,
+  selectOpportunities,
+  selectOpportunityFacts,
+} from "./opportunities";
+export type {
+  OpportunityActionFamily,
+  OpportunityCandidate,
+  OpportunityKind,
+  OpportunityLevel,
+  OpportunitySelectionContext,
+} from "./opportunities";
 export type {
   FactIntensity,
   FactPolarity,

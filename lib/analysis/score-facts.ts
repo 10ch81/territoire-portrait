@@ -161,6 +161,5 @@ export function isStudyOnlyFact(fact: AnalysisFact): boolean {
 export function isActionableOpportunity(fact: AnalysisFact): boolean {
   if (fact.target !== "opportunities") return false;
   if (isStudyOnlyFact(fact)) return false;
-  if (fact.theme === "security") return false;
   return true;
 }

@@ -300,6 +300,8 @@ export type PanelPreset =
   | "highMunicipalDebt"
   | "compositeIncomeFragility"
   | "twoNegativeEnjeux"
+  | "lowTourismCapacity"
+  | "lowEssVolume"
   | "sireneCapped"
   | "fullEnrichment";
 
@@ -962,6 +964,30 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           debtOutstandingEur: 4_000_000,
           debtPerCapitaEur: 500,
           available: true,
+          note: "",
+        },
+      });
+    case "lowTourismCapacity":
+      return baseProfile("Commune faible capacité touristique", "99025", 4_000, 110, {
+        tourism: {
+          year: 2025,
+          accommodationPlaces: 60,
+          available: true,
+          note: "",
+        },
+      });
+    case "lowEssVolume":
+      return baseProfile("Commune faible volume ESS", "99026", 6_000, 150, {
+        enterprises: {
+          legalUnitsWithEstablishment: 120,
+          legalUnitsIsCapped: false,
+          essCount: 8,
+          rgeCount: 3,
+          inseeLegalUnits: 110,
+          inseeEstablishments: 130,
+          inseeSideYear: 2022,
+          millesime: "2022",
+          divergenceWarning: null,
           note: "",
         },
       });

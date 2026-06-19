@@ -16,6 +16,9 @@ import {
   type ScoreContext,
 } from "./score-facts";
 import {
+  selectOpportunityFacts,
+} from "./opportunities";
+import {
   countQualifiedWatchPointCandidates,
   isEligibleEmploymentWatchPoint,
   isFactEligibleForWatchPoint,
@@ -64,18 +67,6 @@ const STRENGTH_THEME_CONFLICTS: Array<[AnalysisFactTheme, AnalysisFactTheme]> = 
   ["equipments", "health"],
   ["mobility", "connectivity"],
   ["energy", "connectivity"],
-];
-
-const OPPORTUNITY_SLOTS: AnalysisFactTheme[][] = [
-  ["housing"],
-  ["ess_rge"],
-  ["risks"],
-  ["connectivity"],
-  ["tourism"],
-  ["mobility"],
-  ["education", "health"],
-  ["public_services"],
-  ["policy_city"],
 ];
 
 const STRICT_ONE_THEME_TARGETS: AnalysisFactTarget[] = [
@@ -167,7 +158,6 @@ function canAddToTarget(
 
   if (target === "opportunities") {
     if (isStudyOnlyFact(candidate)) return false;
-    if (candidate.theme === "security") return false;
     if (!isActionableOpportunity(candidate)) return false;
   }
 
@@ -472,7 +462,6 @@ export function selectAnalysisFactsForPrompt(
 
   fillTargetFromSlots(facts, "strengths", context, selected, STRENGTH_SLOTS);
   fillTargetFromSlots(facts, "watchPoints", context, selected, WATCH_POINT_SLOTS);
-  fillTargetFromSlots(facts, "opportunities", context, selected, OPPORTUNITY_SLOTS);
 
   const hasIdentity = selected.some(
     (f) => f.target === "summary" && SUMMARY_THEMES.includes(f.theme),
@@ -494,6 +483,19 @@ export function selectAnalysisFactsForPrompt(
   ensureWatchPointsMinimum(facts, selected, context);
   ensureMandatoryWatchThemes(facts, selected, context, ["security", "risks"]);
   reconcileSummaryDemographyWatchSlot(facts, selected, context);
+
+  const selectedStrengths = selected.filter((fact) => fact.target === "strengths");
+  const selectedWatchPoints = selected.filter((fact) => fact.target === "watchPoints");
+  for (const opportunity of selectOpportunityFacts(
+    facts,
+    selectedStrengths,
+    selectedWatchPoints,
+    context,
+  )) {
+    if (canAddToTarget(opportunity, selected, "opportunities", context)) {
+      selected.push(opportunity);
+    }
+  }
 
   trimTargetToLimit(selected, "watchPoints", context);
   trimTargetToLimit(selected, "strengths", context);
