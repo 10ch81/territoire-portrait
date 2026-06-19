@@ -114,6 +114,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | ------ | ----- | ---- | ------ | --------------- | ----- |
 | [INSEE — BPE 2024](https://api.insee.fr/melodi/file/DS_BPE/DS_BPE_2024_CSV_FR) | Commerces, santé, écoles, services | R | ✅ | `ingest-bpe.ts` → `equipments.ts` | Dénombrement, pas accessibilité |
 | [Annuaire de l'Éducation](https://www.data.gouv.fr/datasets/annuaire-de-leducation) | Établissements scolaires ouverts | C | ✅ | `ingest-education.ts` → `education.ts` | Agrégats communaux (sans liste nominative) |
+| [DEPP — IPS écoles](https://www.data.gouv.fr/datasets/indices-de-position-sociale-dans-les-ecoles-a-partir-de-2022) | Contexte social scolaire | C | ✅ | `ingest-ips.ts` → `education.ts` | Moyenne communale ; écoles éligibles uniquement |
 | [France Services](https://www.data.gouv.fr/datasets/liste-des-structures-labellisees-france-services) | Accueil public de proximité | C | ✅ | `ingest-services.ts` → `proximity-services.ts` | |
 | [DREES — APL santé](https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl) | Accessibilité aux soins | C | ❌ 📋 P2 | — | **Écarté** (xlsx, pas bulk communal) |
 | [Cerema — LOVAC](https://www.data.gouv.fr/datasets/logements-vacants-du-parc-prive-par-commune-departement-region-france) | Vacance parc privé structurelle | R | ✅ | `ingest-lovac.ts` → `housing.ts` | Secret statistique < 11 logements ; distinct RP/RPLS |

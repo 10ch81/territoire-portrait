@@ -26,6 +26,7 @@ const steps = [
   { name: "Annuaire Éducation", script: "scripts/ingest-education.ts" },
   { name: "LOVAC (vacance parc privé)", script: "scripts/ingest-lovac.ts" },
   { name: "France Travail (inscrits communaux)", script: "scripts/ingest-france-travail.ts" },
+  { name: "IPS DEPP (écoles)", script: "scripts/ingest-ips.ts" },
 ];
 
 for (const step of steps) {

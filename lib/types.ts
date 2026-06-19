@@ -245,6 +245,12 @@ export interface EducationSnapshot {
   byType: EducationAggregateCount[];
   bySector: EducationAggregateCount[];
   byLevel: EducationAggregateCount[];
+  ipsSchoolYear: string | null;
+  averageIps: number | null;
+  schoolsWithIps: number | null;
+  ipsMin: number | null;
+  ipsMax: number | null;
+  ipsNote: string | null;
   available: boolean;
   note: string;
 }
@@ -694,3 +700,13 @@ export interface EducationCommuneCacheEntry {
 }
 
 export type EducationCommuneCache = Record<string, EducationCommuneCacheEntry>;
+
+export interface IpsCommuneCacheEntry {
+  schoolYear: string;
+  averageIps: number;
+  schoolsWithIps: number;
+  ipsMin: number;
+  ipsMax: number;
+}
+
+export type IpsCommuneCache = Record<string, IpsCommuneCacheEntry>;

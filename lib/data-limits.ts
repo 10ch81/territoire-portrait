@@ -324,6 +324,10 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
     );
   }
 
+  if (enrichment.education?.averageIps != null && enrichment.education?.ipsNote) {
+    pushUnique(limits, enrichment.education.ipsNote);
+  }
+
   if (enrichment.health?.available) {
     pushUnique(
       limits,

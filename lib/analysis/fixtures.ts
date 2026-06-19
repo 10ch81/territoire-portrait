@@ -16,6 +16,15 @@ const HOUSING_LOVAC_ABSENT: Pick<
   lovacNote: null,
 };
 
+const EDUCATION_IPS_ABSENT = {
+  ipsSchoolYear: null,
+  averageIps: null,
+  schoolsWithIps: null,
+  ipsMin: null,
+  ipsMax: null,
+  ipsNote: null,
+} as const;
+
 function baseEnrichment(overrides: Partial<TerritoryEnrichment> = {}): TerritoryEnrichment {
   return {
     populationHistory: null,
@@ -199,6 +208,7 @@ export const saintGironsProfile: TerritoryProfile = {
         { code: "PR", label: "Privé", count: 1 },
       ],
       byLevel: [{ code: "1", label: "Élémentaire", count: 3 }],
+      ...EDUCATION_IPS_ABSENT,
       available: true,
       note: "",
     },
@@ -591,6 +601,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
           byType: [{ code: "E", label: "École", count: 5 }],
           bySector: [{ code: "PU", label: "Public", count: 5 }],
           byLevel: [{ code: "1", label: "Élémentaire", count: 4 }],
+          ...EDUCATION_IPS_ABSENT,
           available: true,
           note: "",
         },

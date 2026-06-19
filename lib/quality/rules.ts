@@ -5,6 +5,7 @@ import type {
   FiscalCommuneCache,
   FloresCommuneCache,
   HousingCommuneCache,
+  IpsCommuneCache,
   FranceTravailCommuneCache,
   LovacCommuneCache,
   IrveCommuneCache,
@@ -497,6 +498,32 @@ function validateFranceTravailCache(findings: QualityFinding[]): void {
   }
 }
 
+function validateIpsCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<IpsCommuneCache>("ips-by-commune.json");
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/ips-by-commune.json",
+      message: "Cache IPS absent — exécutez npm run ingest:ips",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    if (entry.averageIps < 0 || entry.schoolsWithIps < 1) {
+      findings.push({
+        ruleId: "ips-invalid",
+        severity: "warning",
+        location: `ips-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message: "Agrégat IPS communal invalide",
+      });
+    }
+  }
+}
+
 function validateArcepCache(findings: QualityFinding[]): void {
   const cache = loadJsonCache<ArcepCommuneCache>("arcep-by-commune.json");
 
@@ -529,6 +556,7 @@ export function validateInternalCache(): QualityFinding[] {
   validateHousingCache(findings);
   validateLovacCache(findings);
   validateFranceTravailCache(findings);
+  validateIpsCache(findings);
   validatePopulationCache(findings);
   validateIrveCache(findings);
   validatePropertyCache(findings);

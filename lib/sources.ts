@@ -82,6 +82,11 @@ const FLORES_FILE_URL =
 const ARCEP_URL = "https://www.data.gouv.fr/datasets/ma-connexion-internet/";
 const FINESS_URL = "https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess/";
 const EDUCATION_URL = "https://www.data.gouv.fr/datasets/annuaire-de-leducation/";
+export const IPS_ECOLES_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/indices-de-position-sociale-dans-les-ecoles-a-partir-de-2022";
+export const IPS_ECOLES_FILE_URL =
+  "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-ips-ecoles-ap2022/exports/csv?delimiter=%3B";
+export const IPS_SCHOOL_YEAR = "2024-2025";
 
 const SSMSI_URL =
   "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales";
@@ -120,6 +125,7 @@ export const SOURCE_IDS = {
   ARCEP_FIBRE: "arcep-fibre",
   FINESS: "finess",
   EDUCATION_DIRECTORY: "education-directory",
+  DEPP_IPS_ECOLES: "depp-ips-ecoles",
   AAV: "aav2020",
   INSEE_DENSITY_GRID: "insee-density-grid",
   INSEE_URBAN_UNIT: "insee-urban-unit",
@@ -488,6 +494,17 @@ export function createEducationSource(accessedAt: string): DataSource {
     name: "Annuaire de l'Éducation",
     url: EDUCATION_URL,
     description: "Établissements scolaires ouverts par commune.",
+    accessedAt,
+  };
+}
+
+export function createIpsSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.DEPP_IPS_ECOLES,
+    name: `DEPP — IPS écoles (${IPS_SCHOOL_YEAR})`,
+    url: IPS_ECOLES_DATASET_URL,
+    description:
+      "Indice de position sociale des écoles (agrégat communal des établissements éligibles).",
     accessedAt,
   };
 }

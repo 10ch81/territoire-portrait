@@ -7,7 +7,7 @@ import {
   createFloresSource,
 } from "./employment-sectors";
 import { loadEquipmentSnapshot, createBpeSource } from "./equipments";
-import { loadEducationSnapshot, createEducationSource } from "./education";
+import { loadEducationSnapshot, createEducationSource, createIpsSource } from "./education";
 import { loadHealthSnapshot, createFinessSource } from "./health";
 import {
   loadPopulationHistorySnapshot,
@@ -97,6 +97,9 @@ function collectEnrichmentSources(
   }
   if (enrichment.education?.available) {
     sources.push(createEducationSource(accessedAt));
+    if (enrichment.education.averageIps !== null) {
+      sources.push(createIpsSource(accessedAt));
+    }
   }
   if (enrichment.health?.available) {
     sources.push(createFinessSource(accessedAt));

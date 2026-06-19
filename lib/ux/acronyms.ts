@@ -24,6 +24,7 @@ export const ACRONYMS: Record<string, string> = {
   FRR: "France Ruralités Revitalisation — zonage de soutien aux territoires ruraux",
   UU: "Unité urbaine — agglomération au sens INSEE (UU2020)",
   LOVAC: "Logements vacants du parc privé — base Cerema croisant fichiers fiscaux et fonciers",
+  IPS: "Indice de position sociale — contexte socio-économique des écoles (DEPP)",
 };
 
 export function getAcronymDefinition(term: string): string | undefined {
