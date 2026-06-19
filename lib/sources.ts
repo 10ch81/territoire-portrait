@@ -86,6 +86,14 @@ const EDUCATION_URL = "https://www.data.gouv.fr/datasets/annuaire-de-leducation/
 const SSMSI_URL =
   "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales";
 
+const FRANCE_TRAVAIL_DATASET_URL =
+  "https://www.data.gouv.fr/datasets/inscrits-a-france-travail-donnees-communales-trimestrielles-brutes";
+export const FRANCE_TRAVAIL_API_BASE =
+  "https://data.dares.travail-emploi.gouv.fr/api/explore/v2.1/catalog/datasets/dares_defm_communales-brutes";
+
+/** Dernier trimestre ingéré — recalculé par `ingest-france-travail`. */
+export const FRANCE_TRAVAIL_QUARTER = "2024-T4";
+
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
   RECHERCHE_ENTREPRISES: "recherche-entreprises",
@@ -100,6 +108,7 @@ export const SOURCE_IDS = {
   GEORISQUES: "georisques",
   RPLS: "rpls",
   CEREMA_LOVAC: "cerema-lovac",
+  FRANCE_TRAVAIL_DEFM: "france-travail-defm",
   IRVE: "irve",
   QPV: "qpv-sig-ville",
   REI: "rei",
@@ -233,6 +242,20 @@ export function createLovacSource(accessedAt: string): DataSource {
     url: LOVAC_DATASET_URL,
     description:
       "Logements vacants du parc privé par commune (croisement DGFiP / Fichiers fonciers) — vacance structurelle distincte du recensement.",
+    accessedAt,
+  };
+}
+
+export function createFranceTravailSource(
+  accessedAt: string,
+  quarter = FRANCE_TRAVAIL_QUARTER,
+): DataSource {
+  return {
+    id: SOURCE_IDS.FRANCE_TRAVAIL_DEFM,
+    name: `France Travail — Inscrits communaux (${quarter})`,
+    url: FRANCE_TRAVAIL_DATASET_URL,
+    description:
+      "Demandeurs d'emploi inscrits à France Travail (catégorie ABC, moyenne trimestrielle communale, DARES).",
     accessedAt,
   };
 }

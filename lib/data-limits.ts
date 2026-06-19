@@ -94,6 +94,23 @@ function appendEmploymentLimits(
   }
 }
 
+function appendLabourMarketLimits(
+  limits: string[],
+  enrichment: TerritoryEnrichment,
+): void {
+  if (enrichment.labourMarket?.available) {
+    pushUnique(
+      limits,
+      `France Travail (${enrichment.labourMarket.quarter ?? "trimestre récent"}) : inscrits catégorie ABC — distinct du chômage RP ${RP_VINTAGE} ; effectifs arrondis au multiple de 5 ; prudence sur petites communes et depuis 2025 (inscription automatique).`,
+    );
+    return;
+  }
+
+  if (enrichment.labourMarket?.note) {
+    pushUnique(limits, enrichment.labourMarket.note);
+  }
+}
+
 function appendPopulationLimits(
   limits: string[],
   territory: TerritoryProfile,
@@ -293,6 +310,8 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
   } else {
     appendEmploymentLimits(limits, enrichment);
   }
+
+  appendLabourMarketLimits(limits, enrichment);
 
   appendEnterpriseLimits(limits, enrichment);
 

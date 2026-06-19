@@ -20,6 +20,7 @@ function baseEnrichment(overrides: Partial<TerritoryEnrichment> = {}): Territory
   return {
     populationHistory: null,
     sociodemographics: null,
+    labourMarket: null,
     enterprises: null,
     employmentSectors: null,
     equipments: null,

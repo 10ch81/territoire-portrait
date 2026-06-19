@@ -28,6 +28,7 @@
     "ingest:finess": "tsx scripts/ingest-finess.ts",
     "ingest:education": "tsx scripts/ingest-education.ts",
     "ingest:lovac": "tsx scripts/ingest-lovac.ts",
+    "ingest:france-travail": "tsx scripts/ingest-france-travail.ts",
     "ingest:social": "tsx scripts/ingest-social.ts",
     "ingest:all": "tsx scripts/ingest-all.ts",
     "validate:internal": "tsx scripts/validate-internal.ts",

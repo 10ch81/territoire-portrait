@@ -5,6 +5,7 @@ import type {
   FiscalCommuneCache,
   FloresCommuneCache,
   HousingCommuneCache,
+  FranceTravailCommuneCache,
   LovacCommuneCache,
   IrveCommuneCache,
   PopulationCommuneCache,
@@ -468,6 +469,34 @@ function validateLovacCache(findings: QualityFinding[]): void {
   }
 }
 
+function validateFranceTravailCache(findings: QualityFinding[]): void {
+  const cache = loadJsonCache<FranceTravailCommuneCache>(
+    "france-travail-by-commune.json",
+  );
+
+  if (!cache) {
+    findings.push({
+      ruleId: "cache-missing",
+      severity: "warning",
+      location: "data/cache/france-travail-by-commune.json",
+      message: "Cache France Travail absent — exécutez npm run ingest:france-travail",
+    });
+    return;
+  }
+
+  for (const [inseeCode, entry] of Object.entries(cache)) {
+    if (entry.totalJobSeekers !== null && entry.totalJobSeekers < 0) {
+      findings.push({
+        ruleId: "france-travail-negative",
+        severity: "critical",
+        location: `france-travail-by-commune.json:${inseeCode}`,
+        inseeCode,
+        message: "Effectif France Travail négatif",
+      });
+    }
+  }
+}
+
 function validateArcepCache(findings: QualityFinding[]): void {
   const cache = loadJsonCache<ArcepCommuneCache>("arcep-by-commune.json");
 
@@ -499,6 +528,7 @@ export function validateInternalCache(): QualityFinding[] {
   validateBpeCache(findings);
   validateHousingCache(findings);
   validateLovacCache(findings);
+  validateFranceTravailCache(findings);
   validatePopulationCache(findings);
   validateIrveCache(findings);
   validatePropertyCache(findings);

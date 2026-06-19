@@ -25,6 +25,7 @@ const steps = [
   { name: "FINESS (santé & social)", script: "scripts/ingest-finess.ts" },
   { name: "Annuaire Éducation", script: "scripts/ingest-education.ts" },
   { name: "LOVAC (vacance parc privé)", script: "scripts/ingest-lovac.ts" },
+  { name: "France Travail (inscrits communaux)", script: "scripts/ingest-france-travail.ts" },
 ];
 
 for (const step of steps) {

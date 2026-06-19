@@ -107,6 +107,17 @@ export interface SociodemographicsSnapshot {
   note: string;
 }
 
+export interface LabourMarketSnapshot {
+  quarter: string | null;
+  totalJobSeekers: number | null;
+  categoryA: number | null;
+  under25: number | null;
+  age50AndOver: number | null;
+  longTerm: number | null;
+  available: boolean;
+  note: string;
+}
+
 export interface PopulationHistorySnapshot {
   latestYear: number | null;
   latestPopulation: number | null;
@@ -359,6 +370,7 @@ export interface SecuritySnapshot {
 export interface TerritoryEnrichment {
   populationHistory: PopulationHistorySnapshot | null;
   sociodemographics: SociodemographicsSnapshot | null;
+  labourMarket: LabourMarketSnapshot | null;
   enterprises: EnterpriseSnapshot | null;
   employmentSectors: EmploymentSectorsSnapshot | null;
   equipments: EquipmentSnapshot | null;
@@ -532,6 +544,20 @@ export interface LovacCommuneCacheEntry {
 }
 
 export type LovacCommuneCache = Record<string, LovacCommuneCacheEntry>;
+
+export interface FranceTravailCommuneCacheEntry {
+  quarter: string;
+  totalJobSeekers: number | null;
+  categoryA: number | null;
+  under25: number | null;
+  age50AndOver: number | null;
+  longTerm: number | null;
+}
+
+export type FranceTravailCommuneCache = Record<
+  string,
+  FranceTravailCommuneCacheEntry
+>;
 
 export interface IrveCommuneCacheEntry {
   year: number;

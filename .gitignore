@@ -59,6 +59,7 @@ yarn-error.log*
 !/data/cache/finess-by-commune.json
 !/data/cache/education-by-commune.json
 !/data/cache/lovac-by-commune.json
+!/data/cache/france-travail-by-commune.json
 
 # vercel
 .vercel

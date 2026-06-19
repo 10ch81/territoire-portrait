@@ -77,6 +77,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | [INSEE — Populations historiques](https://api.insee.fr/melodi/file/DS_POPULATIONS_HISTORIQUES/) | Évolution démographique | R | ✅ | `ingest-population.ts` → `population.ts` | Série historique par commune |
 | [INSEE — RP 2022 structure par âge](https://www.insee.fr/fr/statistiques/8581696) | Pyramide des âges | R | ✅ | `ingest-social.ts` → `sociodemographics.ts` | Millésime RP 2022 |
 | [INSEE — RP 2022 emploi / chômage](https://www.insee.fr/fr/statistiques/8581444) | Chômage 15-64 ans | R | ✅ | `ingest-social.ts` | Taux au recensement, pas au BIT |
+| [France Travail — inscrits communaux](https://www.data.gouv.fr/datasets/inscrits-a-france-travail-donnees-communales-trimestrielles-brutes) | Demande d'emploi trimestrielle | C | ✅ | `ingest-france-travail.ts` → `labour-market.ts` | Catégorie ABC ; distinct du chômage RP |
 | [INSEE — FILOSOFI](https://www.insee.fr/fr/statistiques/8984752) | Niveau de vie médian | R | ✅ | `ingest-social.ts` | Millésime 2023 (Filosofi 2) |
 | [INSEE — RP logement 2022](https://www.insee.fr/fr/statistiques/8581474) | Vacance, parc total, statut d'occupation | R | ✅ | `ingest-housing.ts` | Vacance générale (P22_LOGVAC) + RPLS |
 | [SIG Ville / INSEE TAG QPV](https://www.insee.fr/fr/information/8186239) | QPV, politique de la ville | R | ✅ | `ingest-qpv.ts` | Table d'appartenance QPV 2025 |
