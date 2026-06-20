@@ -1,11 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import type { PortraitNarrative } from "@/lib/portrait/types";
+import type { PortraitClosingSynthesis, PortraitNarrative } from "@/lib/portrait/types";
 import { ErrorBox } from "./ErrorBox";
 
 interface PortraitNarratifClientProps {
   codeInsee: string;
+}
+
+function isPortraitClosingSynthesis(value: unknown): value is PortraitClosingSynthesis {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "resume" in value &&
+    "watchPoints" in value &&
+    "opportunities" in value &&
+    typeof (value as PortraitClosingSynthesis).resume === "string" &&
+    Array.isArray((value as PortraitClosingSynthesis).watchPoints) &&
+    Array.isArray((value as PortraitClosingSynthesis).opportunities)
+  );
 }
 
 function isPortraitNarrative(value: unknown): value is PortraitNarrative {
@@ -16,9 +29,64 @@ function isPortraitNarrative(value: unknown): value is PortraitNarrative {
     "paragraphs" in value &&
     typeof (value as PortraitNarrative).title === "string" &&
     Array.isArray((value as PortraitNarrative).paragraphs) &&
-    (!("generatedBy" in value) ||
+    ((!("generatedBy" in value) ||
       (value as PortraitNarrative).generatedBy === "deterministic" ||
-      (value as PortraitNarrative).generatedBy === "mistral_polish")
+      (value as PortraitNarrative).generatedBy === "mistral_polish") &&
+      (!("closingSynthesis" in value) ||
+        isPortraitClosingSynthesis(
+          (value as PortraitNarrative).closingSynthesis,
+        )))
+  );
+}
+
+function ClosingSynthesisBlock({ synthesis }: { synthesis: PortraitClosingSynthesis }) {
+  return (
+    <section className="mt-8 space-y-4 rounded-xl border border-violet-200 bg-violet-50/60 p-5">
+      <div>
+        <h4 className="text-sm font-semibold text-violet-950">Synthèse après lecture</h4>
+        <p className="mt-1 text-xs text-violet-900/80">
+          Reprise structurée après les rubriques sectorielles — résumé canonique, vigilance
+          filtrée du portrait et opportunités documentées.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <h5 className="text-xs font-semibold uppercase tracking-wide text-slate-700">
+          Résumé
+        </h5>
+        <p className="text-sm leading-relaxed text-slate-800">{synthesis.resume}</p>
+      </div>
+
+      <div className="space-y-2">
+        <h5 className="text-xs font-semibold uppercase tracking-wide text-slate-700">
+          Points d&apos;attention
+        </h5>
+        {synthesis.watchPoints.length > 0 ? (
+          <ul className="list-inside list-disc space-y-1 text-sm text-slate-800">
+            {synthesis.watchPoints.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-slate-600">Aucun point d&apos;attention retenu.</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <h5 className="text-xs font-semibold uppercase tracking-wide text-slate-700">
+          Opportunités
+        </h5>
+        {synthesis.opportunities.length > 0 ? (
+          <ul className="list-inside list-disc space-y-1 text-sm text-slate-800">
+            {synthesis.opportunities.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-slate-600">Aucune opportunité documentée.</p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -78,6 +146,9 @@ export function PortraitNarratifClient({ codeInsee }: PortraitNarratifClientProp
     portrait !== null &&
     (portrait.title.trim().length > 0 || portrait.paragraphs.length > 0);
 
+  const displaySectors =
+    portrait?.sectors?.filter((sector) => sector.id !== "synthesis") ?? [];
+
   return (
     <section className="rounded-2xl border border-violet-200 bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -116,8 +187,8 @@ export function PortraitNarratifClient({ codeInsee }: PortraitNarratifClientProp
               {portrait.title}
             </h3>
           ) : null}
-          {portrait.sectors && portrait.sectors.length > 0
-            ? portrait.sectors.map((sector) => (
+          {displaySectors.length > 0
+            ? displaySectors.map((sector) => (
                 <section key={sector.id} className="space-y-2">
                   <h4 className="text-sm font-semibold text-slate-800">
                     {sector.index}. {sector.title}
@@ -133,6 +204,9 @@ export function PortraitNarratifClient({ codeInsee }: PortraitNarratifClientProp
                   {paragraph}
                 </p>
               ))}
+          {portrait.closingSynthesis ? (
+            <ClosingSynthesisBlock synthesis={portrait.closingSynthesis} />
+          ) : null}
         </article>
       ) : null}
 

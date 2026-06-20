@@ -24,10 +24,17 @@ export interface PortraitSectorBlock {
   omittedReason?: string;
 }
 
+export interface PortraitClosingSynthesis {
+  resume: string;
+  watchPoints: string[];
+  opportunities: string[];
+}
+
 export interface PortraitNarrative {
   title: string;
   paragraphs: string[];
   sectors?: PortraitSectorBlock[];
+  closingSynthesis?: PortraitClosingSynthesis;
   profileId?: EditorialProfileId;
   generatedBy: "deterministic" | "mistral_polish";
   dataLimits?: string[];

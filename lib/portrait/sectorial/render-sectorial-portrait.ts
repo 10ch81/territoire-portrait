@@ -4,6 +4,7 @@ import { classifyEditorialProfile } from "@/lib/analysis/editorial/classifyEdito
 import { qualifyAnalysisFacts } from "@/lib/analysis/qualify-facts";
 import { computeDataLimits } from "@/lib/data-limits";
 import type { TerritoryProfile } from "@/lib/types";
+import { buildPortraitClosingSynthesis } from "../build-closing-synthesis";
 import type { PortraitNarrative } from "../types";
 import {
   renderAllSectorBlocks,
@@ -43,6 +44,7 @@ export function renderSectorialPortrait(territory: TerritoryProfile): PortraitNa
     title: renderPortraitTitle(ctx),
     paragraphs: sectors.map((sector) => sector.paragraph),
     sectors,
+    closingSynthesis: buildPortraitClosingSynthesis(territory),
     profileId,
     generatedBy: "deterministic",
     dataLimits: computeDataLimits(territory),

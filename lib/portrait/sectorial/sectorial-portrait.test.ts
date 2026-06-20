@@ -129,6 +129,20 @@ describe("sectorial portrait — Angers", () => {
     assert.ok(result.portrait);
     assert.ok(result.portrait.paragraphs.length >= 10);
   });
+
+  it("expose une synthèse de clôture en trois blocs", () => {
+    const portrait = renderSectorialPortrait(angersProfile);
+    const closing = portrait.closingSynthesis;
+
+    assert.ok(closing);
+    assert.match(closing!.resume, /159.?022 habitants/i);
+    assert.ok(closing!.watchPoints.length >= 1);
+    assert.ok(closing!.opportunities.length >= 1);
+    assert.doesNotMatch(closing!.resume, /radon/i);
+    for (const watchPoint of closing!.watchPoints) {
+      assert.doesNotMatch(watchPoint, /radon/i);
+    }
+  });
 });
 
 describe("sectorial portrait — Palaiseau", () => {

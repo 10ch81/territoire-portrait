@@ -85,8 +85,13 @@ export function AiAnalysis({ result }: AiAnalysisProps) {
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-slate-900">Synthèse territoriale</h2>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">Synthèse territoriale</h2>
+          <p className="mt-0.5 text-xs font-medium uppercase tracking-wide text-slate-500">
+            Synthèse data
+          </p>
+        </div>
         <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
           {result.llmUsed === false || result.degraded ? "Serveur" : "Mistral"}
         </span>
@@ -112,8 +117,10 @@ export function AiAnalysis({ result }: AiAnalysisProps) {
 
       {hasAnalysisContent && display ? (
         <div className="mt-4 space-y-5">
-          <p className="text-sm leading-relaxed text-slate-700">
-            {display.summary}
+          <p className="text-sm text-slate-600">
+            Constats structurés à partir des sources publiques — listes exploitables
+            avant la lecture du portrait détaillé. Le résumé narratif complet figure
+            en fin de portrait.
           </p>
 
           {display.hideStrengthsList ? null : (
