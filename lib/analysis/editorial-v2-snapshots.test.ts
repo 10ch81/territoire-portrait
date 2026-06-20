@@ -35,10 +35,10 @@ function editorialV2SnapshotHash(profile: TerritoryProfile): string {
 
 /** Golden hashes — régénérer via `npx tsx scripts/gen-editorial-v2-snapshot-hashes.ts`. */
 const EDITORIAL_V2_SNAPSHOT_HASHES: Record<string, string> = {
-  rennes: "0f90e102aebecd84",
-  palaiseau: "7589f44fd6fd2823",
-  chamonix: "ba53ff8d38edfeb9",
-  bousse: "d1c2e61c98f8b27a",
+  rennes: "9c9ae3c25b5732ab",
+  palaiseau: "5a8f1930a7366762",
+  chamonix: "f0e99df7478b7a4a",
+  bousse: "601e181b797c7583",
 };
 
 function requireEditorial(analysis: TerritoryAnalysis): EditorialAnalysisOutput {
@@ -115,7 +115,10 @@ describe("editorial v2 snapshots — garde-fous explicites", () => {
     assert.doesNotMatch(text, ESS_RGE_LEVER_PATTERN);
     assert.doesNotMatch(text, ESS_RGE_OPPORTUNITY_PATTERN);
     assert.doesNotMatch(text, FRANCE_SERVICES_PATTERN);
-    assert.match(editorial.summary, /centralité majeure|grande centralité urbaine/i);
+    assert.match(
+      editorial.summary,
+      /centralité majeure|grande centralité urbaine|ville-centre attractive/i,
+    );
   });
 
   it("Palaiseau — pas tourisme ni ESS/RGE, centralité locale non répétée", () => {
@@ -163,12 +166,7 @@ describe("editorial v2 snapshots — garde-fous explicites", () => {
 
     assertGlobalEditorialPolish(editorial);
     assert.match(editorial.summary, /petite commune|couronne périurbaine|périurbain/i);
-    for (const strength of editorial.strengths) {
-      assert.doesNotMatch(strength, MECHANICAL_PRUDENCE_SUFFIX);
-    }
-    const distinct = editorial.strengths.filter(
-      (item, index) => item !== analysis.strengths[index],
-    );
-    assert.ok(distinct.length > 0);
+    assert.equal(editorial.strengths.length, 0);
+    assert.notEqual(editorial.summary, analysis.summary);
   });
 });

@@ -94,7 +94,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
     preferredWatchThemes: ["security", "risks"],
     bannedWeakStrengthPatterns: [...INVENTORY_STRENGTH_PATTERNS, FIBER_GENERIC],
     smallNumbersCaution: true,
-    summarySignatureKeywords: [/croissance|rang|périurbain|centralité locale/i],
+    summarySignatureKeywords: [/croissance|rang|périurbain|centralité locale|petite commune|développement/i],
   },
   employmentPole: {
     id: "employmentPole",

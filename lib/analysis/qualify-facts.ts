@@ -730,6 +730,15 @@ function qualifyRisksFact(fact: AnalysisFact): QualificationCore {
 }
 
 function qualifyDemographyFact(fact: AnalysisFact, territory: TerritoryProfile): QualificationCore {
+  if (/moins de 30 ans/i.test(fact.sentence)) {
+    return withTargets(fact, {
+      polarity: "positive",
+      intensity: "medium",
+      qualificationReason: "part_jeunes_elevee",
+      eligibleTargets: ["strengths"],
+    });
+  }
+
   const growth = territory.enrichment?.derived?.populationGrowthPercent;
 
   if (growth != null && growth < 0) {

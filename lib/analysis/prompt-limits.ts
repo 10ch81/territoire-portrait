@@ -3,7 +3,7 @@ import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./type
 /** Limites communes sélection serveur ↔ consignes Mistral. */
 export const ANALYSIS_OUTPUT_LIMITS = {
   summary: { minFacts: 2, maxFacts: 4, sentences: 2 },
-  strengths: { min: 3, max: 4 },
+  strengths: { min: 3, max: 5 },
   watchPoints: { min: 3, max: 5 },
   opportunities: { min: 2, max: 4 },
 } as const;

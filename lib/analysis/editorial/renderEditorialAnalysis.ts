@@ -10,7 +10,6 @@ import {
 } from "./editorialQualityGuards";
 import { applyEditorialPolish } from "./editorialPolish";
 import { renderOpportunityByProfile } from "./renderOpportunityByProfile";
-import { renderStrengthsByProfile } from "./renderStrengthByProfile";
 import { renderSummaryByProfileWithFallback } from "./renderSummaryByProfile";
 
 export function renderEditorialAnalysis(
@@ -27,7 +26,7 @@ export function renderEditorialAnalysis(
     selectedFacts,
   );
 
-  const strengths = renderStrengthsByProfile(selectedFacts, territory, profile);
+  const strengths: string[] = [];
   const verbatim = buildVerbatimLists(selectedFacts);
   const opportunities = renderOpportunityByProfile(profile, selectedFacts);
   const mvpOpportunities = selectedFacts

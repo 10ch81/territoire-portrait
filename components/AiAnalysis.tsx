@@ -13,7 +13,9 @@ type DisplayAnalysis = Pick<
   "summary" | "strengths" | "watchPoints" | "opportunities"
 >;
 
-function resolveDisplayAnalysis(analysis: TerritoryAnalysis): DisplayAnalysis {
+function resolveDisplayAnalysis(analysis: TerritoryAnalysis): DisplayAnalysis & {
+  hideStrengthsList: boolean;
+} {
   const editorial = analysis.editorial;
   if (editorial?.summary.trim()) {
     return {
@@ -24,6 +26,7 @@ function resolveDisplayAnalysis(analysis: TerritoryAnalysis): DisplayAnalysis {
           ? editorial.watchPoints
           : analysis.watchPoints,
       opportunities: editorial.opportunities,
+      hideStrengthsList: true,
     };
   }
 
@@ -32,6 +35,7 @@ function resolveDisplayAnalysis(analysis: TerritoryAnalysis): DisplayAnalysis {
     strengths: analysis.strengths,
     watchPoints: analysis.watchPoints,
     opportunities: analysis.opportunities,
+    hideStrengthsList: false,
   };
 }
 
@@ -113,11 +117,13 @@ export function AiAnalysis({ result }: AiAnalysisProps) {
             {display.summary}
           </p>
 
-          <AnalysisList
-            title="Points forts"
-            items={display.strengths}
-            emptyLabel="Aucun point identifié."
-          />
+          {display.hideStrengthsList ? null : (
+            <AnalysisList
+              title="Points forts"
+              items={display.strengths}
+              emptyLabel="Aucun point identifié."
+            />
+          )}
           <AnalysisList
             title="Points d'attention"
             items={display.watchPoints}

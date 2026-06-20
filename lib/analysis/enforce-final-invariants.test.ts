@@ -28,7 +28,7 @@ describe("enforceFinalAnalysisInvariants", () => {
       }),
     );
 
-    assert.equal(result.strengths.length, 4);
+    assert.equal(result.strengths.length, 5);
     assert.equal(result.watchPoints.length, 5);
     assert.equal(result.opportunities.length, 4);
   });

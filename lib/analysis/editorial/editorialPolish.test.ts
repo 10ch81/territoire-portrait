@@ -90,8 +90,11 @@ describe("editorialPolish — Rennes v2", () => {
   const { analysis } = buildFinalTerritorialAnalysis(rennesProfile);
   const editorial = requireEditorial(analysis);
 
-  it("summary contient une centralité majeure", () => {
-    assert.match(editorial.summary, /centralité majeure|grande centralité urbaine/i);
+  it("summary contient une ouverture urbaine forte", () => {
+    assert.match(
+      editorial.summary,
+      /centralité majeure|grande centralité urbaine|ville-centre attractive/i,
+    );
   });
 
   it("summary sans montagne ni touristique", () => {
@@ -215,11 +218,10 @@ describe("editorialPolish — Bousse v2", () => {
     assert.match(editorial.summary, /petite commune|couronne périurbaine|périurbain/i);
   });
 
-  it("points forts v2 ne sont pas tous des copies MVP", () => {
-    const distinct = editorial.strengths.filter(
-      (item, index) => item !== analysis.strengths[index],
-    );
-    assert.ok(distinct.length > 0, editorial.strengths.join(" | "));
+  it("points forts v2 vides — atouts synthétisés dans le résumé", () => {
+    assert.equal(editorial.strengths.length, 0);
+    assert.notEqual(editorial.summary, analysis.summary);
+    assert.match(editorial.summary, /avec|complétée par/i);
   });
 
   it("points forts v2 sans suffixe de prudence mécanique", () => {

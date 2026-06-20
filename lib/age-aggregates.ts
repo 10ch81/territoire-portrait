@@ -13,10 +13,15 @@ export interface AgeAggregateSnapshot {
 }
 
 const BAND_MATCHERS = {
+  part0_14: /0\s*[-–]\s*14/i,
+  part15_29: /15\s*[-–]\s*29/i,
   part60_74: /60\s*[-–]\s*74/i,
   part75_89: /75\s*[-–]\s*89/i,
   part90Plus: /90\s*(?:ans)?\s*(?:ou\s*plus|\+)/i,
 } as const;
+
+/** Part 0–29 ans retenue pour le signal « jeunes adultes » en strengths. */
+export const YOUNG_ADULT_STRENGTH_THRESHOLD_PERCENT = 40;
 
 export const AGE_AGGREGATE_ROUNDING_TOLERANCE = 0.15;
 
@@ -27,6 +32,17 @@ function roundOneDecimal(value: number): number {
 function findBandShare(bands: AgeBandInput[], matcher: RegExp): number | null {
   const band = bands.find((item) => matcher.test(item.label));
   return band?.sharePercent ?? null;
+}
+
+export function computeYoungAdultShare(bands: AgeBandInput[]): number | null {
+  const part0_14 = findBandShare(bands, BAND_MATCHERS.part0_14);
+  const part15_29 = findBandShare(bands, BAND_MATCHERS.part15_29);
+
+  if (part0_14 === null || part15_29 === null) {
+    return null;
+  }
+
+  return roundOneDecimal(part0_14 + part15_29);
 }
 
 export function computeAgeAggregates(bands: AgeBandInput[]): AgeAggregateSnapshot {

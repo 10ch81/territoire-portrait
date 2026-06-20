@@ -1,8 +1,9 @@
 import type { TerritoryProfile } from "../../types";
 import { resolveDisplayTypologyLabel } from "../context/displayTypologyLabel";
 import { buildDeterministicSummary } from "../build-canonical-output";
-import { joinFrenchList } from "../render-text";
 import type { AnalysisFact, AnalysisFactTheme } from "../types";
+import { buildStrengthSummaryPhrase } from "../strength-summary-fragments";
+import { qualifiesForAttractiveUrbanOpening } from "../strength-signals";
 import type { EditorialProfile, EditorialProfileId } from "./editorialProfiles";
 import {
   formatVigilanceOnIssues,
@@ -27,85 +28,9 @@ function watchIssueLabels(facts: AnalysisFact[], max = 3): string[] {
   return labels;
 }
 
-function assetClause(profileId: EditorialProfileId, facts: AnalysisFact[]): string {
-  const strengths = facts.filter((f) => f.target === "strengths");
-  const themes = selectedThemes(strengths);
-
-  switch (profileId) {
-    case "largeUrbanCenter": {
-      const parts: string[] = [];
-      if (themes.has("employment_sectors") || themes.has("economy")) {
-        parts.push("une forte base d'emploi");
-      }
-      if (themes.has("equipments")) {
-        parts.push("une offre d'équipements importante");
-      }
-      if (parts.length === 0) {
-        parts.push("des atouts documentés dans les sources consultées");
-      }
-      return joinFrenchList(parts);
-    }
-    case "growthEpciCentrality": {
-      const parts: string[] = [];
-      if (themes.has("employment_sectors") || themes.has("economy")) {
-        parts.push("une base d'emploi significative");
-      }
-      if (themes.has("equipments")) {
-        parts.push("une offre d'équipements cohérente avec cette dynamique");
-      }
-      if (parts.length === 0) {
-        parts.push("des atouts documentés dans les sources consultées");
-      }
-      return joinFrenchList(parts);
-    }
-    case "mountainTourismCenter": {
-      const parts: string[] = [];
-      if (themes.has("tourism")) {
-        parts.push("une fonction touristique structurante");
-      }
-      if (themes.has("employment_sectors")) {
-        parts.push("une base d'emploi importante au regard de la population résidente");
-      }
-      if (themes.has("equipments")) {
-        parts.push("une offre d'équipements très dense");
-      }
-      if (parts.length === 0) {
-        parts.push("un profil touristique de montagne documenté");
-      }
-      return joinFrenchList(parts);
-    }
-    case "smallPeriurbanGrowth": {
-      const parts: string[] = [];
-      if (themes.has("centrality")) {
-        parts.push("une centralité locale marquée");
-      }
-      if (themes.has("demography")) {
-        parts.push("une dynamique démographique favorable");
-      }
-      if (themes.has("connectivity")) {
-        parts.push("une connectivité numérique documentée");
-      }
-      if (parts.length === 0) {
-        parts.push("des atouts de proximité documentés");
-      }
-      return joinFrenchList(parts);
-    }
-    default: {
-      if (themes.has("employment_sectors")) {
-        return "une base d'emploi documentée";
-      }
-      if (themes.has("equipments")) {
-        return "une offre d'équipements documentée";
-      }
-      return "des éléments favorables documentés";
-    }
-  }
-}
-
-function openingClause(
+function fallbackOpeningClause(
   profileId: EditorialProfileId,
   territory: TerritoryProfile,
-  _profile: EditorialProfile,
 ): string {
   const name = territory.name || "La commune";
   const epci = territory.epci?.name;
@@ -132,6 +57,17 @@ function openingClause(
     default:
       return `${name} présente un profil territorial documenté dans les sources consultées`;
   }
+}
+
+function openingClause(
+  profileId: EditorialProfileId,
+  territory: TerritoryProfile,
+): string {
+  const name = territory.name || "La commune";
+  if (qualifiesForAttractiveUrbanOpening(territory)) {
+    return `${name} présente un profil de ville-centre attractive et bien équipée`;
+  }
+  return fallbackOpeningClause(profileId, territory);
 }
 
 function vigilanceClause(profileId: EditorialProfileId, facts: AnalysisFact[]): string {
@@ -167,8 +103,8 @@ export function renderSummaryByProfile(
   profile: EditorialProfile,
   selectedFacts: AnalysisFact[],
 ): string {
-  const opening = openingClause(profile.id, territory, profile);
-  const assets = assetClause(profile.id, selectedFacts);
+  const opening = openingClause(profile.id, territory);
+  const assets = buildStrengthSummaryPhrase(selectedFacts);
   const vigilance = vigilanceClause(profile.id, selectedFacts);
 
   const typology = resolveDisplayTypologyLabel(territory);
@@ -176,10 +112,12 @@ export function renderSummaryByProfile(
     typology && shouldAppendTypologyHint(opening, typology) ? ` (${typology})` : "";
 
   let phrase1: string;
-  if (profile.id === "growthEpciCentrality") {
+  if (qualifiesForAttractiveUrbanOpening(territory)) {
+    phrase1 = `${opening}, avec ${assets}.`;
+  } else if (profile.id === "growthEpciCentrality") {
     phrase1 = `${opening}${typologyHint}, complétée par ${assets}.`;
   } else {
-    phrase1 = `${opening}${typologyHint}, et combine ${assets}.`;
+    phrase1 = `${opening}${typologyHint}, avec ${assets}.`;
   }
 
   const phrase2 = vigilance;

@@ -24,9 +24,9 @@ function snapshotHash(profile: TerritoryProfile): string {
 
 /** Golden hashes — régénérer via `npx tsx scripts/gen-mvp-snapshot-hashes.ts` si changement intentionnel. */
 const MVP_SNAPSHOT_HASHES: Record<string, string> = {
-  palaiseau: "488c3309f550071f",
+  palaiseau: "61325ba247e9e5d0",
   chamonix: "7411f09211988e38",
-  rennes: "f334d909d5cc997b",
+  rennes: "8c02647e3cece5a1",
   bousse: "a9b89a323e594e2d",
 };
 

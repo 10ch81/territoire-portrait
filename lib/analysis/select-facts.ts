@@ -35,6 +35,7 @@ import {
 import {
   selectOpportunityFacts,
 } from "./opportunities";
+import { qualifiesAsStrongStrength } from "./strength-signals";
 import {
   countQualifiedWatchPointCandidates,
   isEligibleEmploymentWatchPoint,
@@ -63,12 +64,13 @@ export {
 const SUMMARY_THEMES: AnalysisFactTheme[] = ["identity", "centrality", "demography"];
 
 const STRENGTH_SLOTS: AnalysisFactTheme[][] = [
-  ["centrality"],
-  ["equipments"],
-  ["public_services"],
   ["employment_sectors"],
+  ["equipments"],
   ["health"],
   ["education"],
+  ["demography"],
+  ["centrality"],
+  ["public_services"],
   ["connectivity"],
   ["tourism"],
   ["economy"],
@@ -183,6 +185,12 @@ function canAddToTarget(
   ) {
     const rgeCount = context.territory.enrichment?.enterprises?.rgeCount ?? 0;
     if (rgeCount < 10) {
+      return false;
+    }
+  }
+
+  if (target === "strengths" && context?.territory) {
+    if (!qualifiesAsStrongStrength(candidate, context.territory)) {
       return false;
     }
   }

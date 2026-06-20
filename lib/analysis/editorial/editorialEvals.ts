@@ -47,8 +47,14 @@ export function expectOpportunitiesLinkStrengthAndWatchPoint(
 
     const lower = opportunity.toLowerCase();
     const linksStrength =
-      /emploi|centralité|croissance|tourisme|équipements|connectivité/i.test(lower) &&
-      (mvpStrengthText.length > 0 || editorial.strengths.length > 0);
+      /emploi|centralité|croissance|tourisme|équipements|connectivité|postes salariés|établissements|jeunes|moins de 30/i.test(
+        lower,
+      ) &&
+      (mvpStrengthText.length > 0 ||
+        editorial.strengths.length > 0 ||
+        /emploi|équipements|postes salariés|établissements|jeunes|moins de 30/i.test(
+          editorial.summary,
+        ));
     const linksWatch =
       /risque|sécurité|chômage|quartiers|finances|logement|prudence/i.test(lower) &&
       (mvpWatchText.length > 0 || editorial.watchPoints.length > 0);
