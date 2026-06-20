@@ -27,7 +27,7 @@ const ruralTypology = {
 };
 
 describe("politique synthèse sources P2", () => {
-  it("LOVAC B1 — watch point si taux parc privé au-dessus du seuil rural", () => {
+  it("LOVAC B1 — watch point si taux parc privé au-dessus du seuil rural (RP seul sous seuil)", () => {
     const base = createPanelProfile("ruralSparse");
     const profile = withEnrichment(base, {
       housing: {
@@ -52,12 +52,207 @@ describe("politique synthèse sources P2", () => {
     });
 
     const facts = buildAnalysisFacts(profile);
-    const lovac = facts.find((fact) => fact.sourceKeys.includes("cerema-lovac"));
+    const lovac = facts.find(
+      (fact) =>
+        fact.sourceKeys.includes("cerema-lovac") &&
+        !fact.sourceKeys.includes("insee-rp-logement"),
+    );
 
     assert.ok(lovac);
     assert.equal(lovac!.target, "watchPoints");
     assert.match(lovac!.sentence, /LOVAC/);
     assert.match(lovac!.sentence, /42 vacants depuis au moins deux ans/);
+    assert.ok(
+      !facts.some(
+        (fact) =>
+          fact.target === "watchPoints" &&
+          fact.sourceKeys.includes("insee-rp-logement") &&
+          fact.sourceKeys.includes("cerema-lovac"),
+      ),
+    );
+  });
+
+  it("dual vacance — watchPoint consolidé (D3) si RP et LOVAC au-dessus du seuil rural", () => {
+    const profile = withEnrichment(createPanelProfile("ruralSparse"), {
+      housing: {
+        year: 2022,
+        totalUnits: 0,
+        occupiedUnits: 0,
+        vacantUnits: 0,
+        totalDwellings: 800,
+        rpVacantDwellings: 128,
+        rpVacancyRatePercent: 16,
+        socialHousingSharePercent: 0,
+        vacancyRatePercent: null,
+        privateVacantDwellings: 120,
+        privateVacancyRatePercent: 17,
+        privateVacantStructural: 42,
+        lovacVintage: 2025,
+        lovacNote: null,
+        available: true,
+        note: "",
+      },
+      territoryTypology: ruralTypology,
+    });
+
+    const facts = buildAnalysisFacts(profile);
+    const composite = facts.find(
+      (fact) =>
+        fact.target === "watchPoints" &&
+        fact.sourceKeys.includes("insee-rp-logement") &&
+        fact.sourceKeys.includes("cerema-lovac"),
+    );
+    const rpWatch = facts.find(
+      (fact) =>
+        fact.target === "watchPoints" &&
+        fact.sourceKeys.length === 1 &&
+        fact.sourceKeys.includes("insee-rp-logement") &&
+        /logements vacants/i.test(fact.sentence),
+    );
+    const lovacWatch = facts.find(
+      (fact) =>
+        fact.target === "watchPoints" &&
+        fact.sourceKeys.length === 1 &&
+        fact.sourceKeys.includes("cerema-lovac"),
+    );
+    const rpSummary = facts.find(
+      (fact) =>
+        fact.target === "summary" &&
+        fact.sourceKeys.includes("insee-rp-logement") &&
+        /logements vacants/i.test(fact.sentence),
+    );
+    const lovacSummary = facts.find(
+      (fact) =>
+        fact.target === "summary" &&
+        fact.sourceKeys.includes("cerema-lovac"),
+    );
+
+    assert.ok(composite);
+    assert.match(composite!.sentence, /deux registres distincts/i);
+    assert.equal(rpWatch, undefined);
+    assert.equal(lovacWatch, undefined);
+    assert.ok(rpSummary);
+    assert.ok(lovacSummary);
+  });
+
+  it("vacance + prix DVF — watchPoint consolidé si LOVAC élevé et prime immobilière (D3)", () => {
+    const profile = withEnrichment(createPanelProfile("ruralSparse"), {
+      housing: {
+        year: 2022,
+        totalUnits: 0,
+        occupiedUnits: 0,
+        vacantUnits: 0,
+        totalDwellings: 800,
+        rpVacantDwellings: 40,
+        rpVacancyRatePercent: 5,
+        socialHousingSharePercent: 0,
+        vacancyRatePercent: null,
+        privateVacantDwellings: 120,
+        privateVacancyRatePercent: 16,
+        privateVacantStructural: 42,
+        lovacVintage: 2025,
+        lovacNote: null,
+        available: true,
+        note: "",
+      },
+      property: {
+        year: 2024,
+        averagePricePerM2: 1_600,
+        averageTransactionPrice: 185_000,
+        mutationCount: 114,
+        houseMutations: 80,
+        apartmentMutations: 34,
+        houseSharePercent: null,
+        apartmentSharePercent: null,
+        priceHistory: [],
+        departmentCode: "09",
+        departmentAveragePricePerM2: 1_300,
+        available: true,
+        note: "",
+      },
+      territoryTypology: ruralTypology,
+    });
+
+    const facts = buildAnalysisFacts(profile);
+    const priceTension = facts.find(
+      (fact) =>
+        fact.target === "watchPoints" &&
+        fact.sourceKeys.includes("dvf") &&
+        fact.sourceKeys.includes("cerema-lovac"),
+    );
+    const lovacWatch = facts.find(
+      (fact) =>
+        fact.target === "watchPoints" &&
+        fact.sourceKeys.length === 1 &&
+        fact.sourceKeys.includes("cerema-lovac"),
+    );
+    const lovacSummary = facts.find(
+      (fact) =>
+        fact.target === "summary" &&
+        fact.sourceKeys.includes("cerema-lovac"),
+    );
+
+    assert.ok(priceTension);
+    assert.match(priceTension!.sentence, /sans permettre d'en attribuer la cause/i);
+    assert.equal(lovacWatch, undefined);
+    assert.ok(lovacSummary);
+  });
+
+  it("dual vacance + prime DVF — note de discordance prix dans les limites du watchPoint dual", () => {
+    const profile = withEnrichment(createPanelProfile("ruralSparse"), {
+      housing: {
+        year: 2022,
+        totalUnits: 0,
+        occupiedUnits: 0,
+        vacantUnits: 0,
+        totalDwellings: 800,
+        rpVacantDwellings: 128,
+        rpVacancyRatePercent: 16,
+        socialHousingSharePercent: 0,
+        vacancyRatePercent: null,
+        privateVacantDwellings: 120,
+        privateVacancyRatePercent: 17,
+        privateVacantStructural: 42,
+        lovacVintage: 2025,
+        lovacNote: null,
+        available: true,
+        note: "",
+      },
+      property: {
+        year: 2024,
+        averagePricePerM2: 1_600,
+        averageTransactionPrice: 185_000,
+        mutationCount: 114,
+        houseMutations: 80,
+        apartmentMutations: 34,
+        houseSharePercent: null,
+        apartmentSharePercent: null,
+        priceHistory: [],
+        departmentCode: "09",
+        departmentAveragePricePerM2: 1_300,
+        available: true,
+        note: "",
+      },
+      territoryTypology: ruralTypology,
+    });
+
+    const facts = buildAnalysisFacts(profile);
+    const composite = facts.find(
+      (fact) =>
+        fact.target === "watchPoints" &&
+        fact.sourceKeys.includes("insee-rp-logement") &&
+        fact.sourceKeys.includes("cerema-lovac") &&
+        !fact.sourceKeys.includes("dvf"),
+    );
+    const separatePriceTension = facts.find(
+      (fact) => fact.target === "watchPoints" && fact.sourceKeys.includes("dvf"),
+    );
+
+    assert.ok(composite);
+    assert.ok(
+      composite!.limitations?.some((line) => /référence départementale/i.test(line)),
+    );
+    assert.equal(separatePriceTension, undefined);
   });
 
   it("LOVAC B1 — aucun fait si sous le seuil typologique", () => {

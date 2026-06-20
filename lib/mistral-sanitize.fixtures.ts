@@ -400,6 +400,8 @@ export const saintGironsFacts: TerritorialFacts = baseFacts({
     irvePointsPer1000Residents: 0.97,
     socialHousingVacancyRatePercent: null,
     equipmentsPer1000Residents: 13.7,
+    lovacRpVacancySpreadPercent: null,
+    realEstatePremiumRatio: null,
     available: true,
     note: "",
   },

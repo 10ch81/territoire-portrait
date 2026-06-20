@@ -52,11 +52,38 @@ export function computeDerivedIndicators(
         )
       : null;
 
+  const housing = enrichment.housing;
+  let lovacRpVacancySpreadPercent: number | null = null;
+  if (
+    housing?.available &&
+    housing.rpVacancyRatePercent !== null &&
+    housing.privateVacancyRatePercent !== null
+  ) {
+    lovacRpVacancySpreadPercent = roundOneDecimal(
+      housing.privateVacancyRatePercent - housing.rpVacancyRatePercent,
+    );
+  }
+
+  const property = enrichment.property;
+  let realEstatePremiumRatio: number | null = null;
+  if (
+    property?.available &&
+    property.averagePricePerM2 !== null &&
+    property.departmentAveragePricePerM2 !== null &&
+    property.departmentAveragePricePerM2 > 0
+  ) {
+    realEstatePremiumRatio = roundOneDecimal(
+      property.averagePricePerM2 / property.departmentAveragePricePerM2,
+    );
+  }
+
   const available = Boolean(
     populationGrowthPercent !== null ||
       irvePointsPer1000Residents !== null ||
       socialHousingVacancyRatePercent !== null ||
-      equipmentsPer1000Residents !== null,
+      equipmentsPer1000Residents !== null ||
+      lovacRpVacancySpreadPercent !== null ||
+      realEstatePremiumRatio !== null,
   );
 
   return {
@@ -66,8 +93,10 @@ export function computeDerivedIndicators(
     irvePointsPer1000Residents,
     socialHousingVacancyRatePercent,
     equipmentsPer1000Residents,
+    lovacRpVacancySpreadPercent,
+    realEstatePremiumRatio,
     available,
     note:
-      "Indicateurs dérivés calculés à partir des données disponibles (population, IRVE, RPLS, BPE).",
+      "Indicateurs dérivés calculés à partir des données disponibles (population, IRVE, RPLS, BPE, logement, DVF).",
   };
 }

@@ -200,6 +200,17 @@ function fragmentsForFact(
 
     case "housing":
       if (fact.target === "watchPoints") {
+        if (
+          fact.sourceKeys.includes("insee-rp-logement") &&
+          fact.sourceKeys.includes("cerema-lovac")
+        ) {
+          return withIssueFragments("la vacance résidentielle selon deux registres");
+        }
+        if (fact.sourceKeys.includes("dvf")) {
+          return withIssueFragments(
+            "la discordance entre vacance résidentielle et prix immobilier",
+          );
+        }
         if (fact.sourceKeys.includes("cerema-lovac")) {
           return withIssueFragments("la vacance du parc privé");
         }

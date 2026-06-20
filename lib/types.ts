@@ -359,6 +359,10 @@ export interface DerivedIndicatorsSnapshot {
   irvePointsPer1000Residents: number | null;
   socialHousingVacancyRatePercent: number | null;
   equipmentsPer1000Residents: number | null;
+  /** LOVAC − RP (points de pourcentage) lorsque les deux taux sont disponibles. */
+  lovacRpVacancySpreadPercent: number | null;
+  /** Prix m² communal DVF / prix m² département. */
+  realEstatePremiumRatio: number | null;
   available: boolean;
   note: string;
 }

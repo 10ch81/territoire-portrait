@@ -306,6 +306,16 @@ export async function verifyReferenceCommune(
         reference: recomputedDerived.populationGrowthPercent,
         actual: storedDerived.populationGrowthPercent,
       },
+      {
+        field: "écart vacance LOVAC − RP (pts)",
+        reference: recomputedDerived.lovacRpVacancySpreadPercent,
+        actual: storedDerived.lovacRpVacancySpreadPercent,
+      },
+      {
+        field: "ratio prix DVF communal / département",
+        reference: recomputedDerived.realEstatePremiumRatio,
+        actual: storedDerived.realEstatePremiumRatio,
+      },
     ];
 
     for (const check of derivedChecks) {

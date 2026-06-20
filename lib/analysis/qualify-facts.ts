@@ -7,6 +7,15 @@ import { formatEuro, formatPercent } from "./format";
 import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
 import { passesWatchPointSelectionGates } from "./watch-point-selection-gates";
 import {
+  DUAL_VACANCY_QUALIFICATION_REASON,
+  isDualVacancyWatchPointFact,
+  isVacancyPriceTensionWatchPointFact,
+  qualifiesAsDualVacancy,
+  qualifiesAsVacancyPriceTension,
+  suppressIsolatedVacancyWatchPoint,
+  VACANCY_PRICE_TENSION_QUALIFICATION_REASON,
+} from "./housing-vacancy-cross";
+import {
   DEBT_PER_CAPITA_WATCH_POINT_THRESHOLD_EUR,
   debtWatchPointThresholdEur,
   qualifiesAsProfileAwareDebtWatchPoint,
@@ -255,7 +264,11 @@ export function countHousingFragilitySignals(territory: TerritoryProfile): numbe
   const urbanPolicy = territory.enrichment?.urbanPolicy;
   let count = 0;
 
-  if (qualifiesAsVacancyWatchPoint(housing?.rpVacancyRatePercent, territory)) {
+  if (qualifiesAsDualVacancy(territory)) {
+    count += 1;
+  } else if (qualifiesAsVacancyPriceTension(territory)) {
+    count += 1;
+  } else if (qualifiesAsVacancyWatchPoint(housing?.rpVacancyRatePercent, territory)) {
     count += 1;
   }
   if (urbanPolicy?.hasQpv === true) {
@@ -387,6 +400,48 @@ function debtIntensity(debtPerCapita: number, territory: TerritoryProfile): Fact
 
 function qualifyHousingFact(fact: AnalysisFact, territory: TerritoryProfile): QualificationCore {
   const housing = territory.enrichment?.housing;
+  const suppressIsolatedWatch = suppressIsolatedVacancyWatchPoint(territory);
+
+  if (isVacancyPriceTensionWatchPointFact(fact)) {
+    if (!qualifiesAsVacancyPriceTension(territory) || qualifiesAsDualVacancy(territory)) {
+      return withTargets(fact, {
+        polarity: "neutral",
+        intensity: "low",
+        qualificationReason: "vacance_prix_tension_incomplete",
+        eligibleTargets: [],
+      });
+    }
+
+    const rpRate = housing?.rpVacancyRatePercent;
+    const lovacRate = housing?.privateVacancyRatePercent;
+    const intensityRate = Math.max(rpRate ?? 0, lovacRate ?? 0);
+
+    return withTargets(fact, {
+      polarity: "negative",
+      intensity: vacancyIntensity(intensityRate, territory),
+      qualificationReason: VACANCY_PRICE_TENSION_QUALIFICATION_REASON,
+    });
+  }
+
+  if (isDualVacancyWatchPointFact(fact)) {
+    const rpRate = housing?.rpVacancyRatePercent;
+    const lovacRate = housing?.privateVacancyRatePercent;
+
+    if (!qualifiesAsDualVacancy(territory) || rpRate == null || lovacRate == null) {
+      return withTargets(fact, {
+        polarity: "neutral",
+        intensity: "low",
+        qualificationReason: "dual_vacance_incomplete",
+        eligibleTargets: [],
+      });
+    }
+
+    return withTargets(fact, {
+      polarity: "negative",
+      intensity: vacancyIntensity(Math.max(rpRate, lovacRate), territory),
+      qualificationReason: DUAL_VACANCY_QUALIFICATION_REASON,
+    });
+  }
 
   if (fact.sourceKeys.includes("cerema-lovac")) {
     const lovacRate = housing?.privateVacancyRatePercent;
@@ -397,6 +452,15 @@ function qualifyHousingFact(fact: AnalysisFact, territory: TerritoryProfile): Qu
         resolveComparisonProfile(territory),
       )
     ) {
+      if (suppressIsolatedWatch) {
+        return withTargets(fact, {
+          polarity: "negative",
+          intensity: vacancyIntensity(lovacRate, territory),
+          qualificationReason: "lovac_descriptif_vacance_consolidee",
+          eligibleTargets: ["summary"],
+        });
+      }
+
       return withTargets(fact, {
         polarity: "negative",
         intensity: vacancyIntensity(lovacRate, territory),
@@ -416,6 +480,15 @@ function qualifyHousingFact(fact: AnalysisFact, territory: TerritoryProfile): Qu
 
   if (/logements vacants|vacance/i.test(fact.sentence) && vacancy != null) {
     if (qualifiesAsVacancyWatchPoint(vacancy, territory)) {
+      if (suppressIsolatedWatch) {
+        return withTargets(fact, {
+          polarity: "negative",
+          intensity: vacancyIntensity(vacancy, territory),
+          qualificationReason: "vacance_rp_descriptif_vacance_consolidee",
+          eligibleTargets: ["summary"],
+        });
+      }
+
       return withTargets(fact, {
         polarity: "negative",
         intensity: vacancyIntensity(vacancy, territory),

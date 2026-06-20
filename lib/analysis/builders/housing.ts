@@ -3,6 +3,19 @@ import {
   qualifiesAsProfileAwareLovacWatchPoint,
   resolveComparisonProfile,
 } from "../../typology/thresholds";
+import {
+  buildDualVacancyWatchPointEvidence,
+  buildDualVacancyWatchPointSentence,
+  buildVacancyPriceTensionWatchPointEvidence,
+  buildVacancyPriceTensionWatchPointSentence,
+  dualVacancyWatchPointLimitations,
+  qualifiesAsDualVacancy,
+  resolveVacancyPriceTensionSourceKeys,
+  shouldEmitVacancyPriceTensionWatchPoint,
+  suppressIsolatedVacancyWatchPoint,
+  vacancyPriceTensionNumericBindings,
+  vacancyPriceTensionWatchPointLimitations,
+} from "../housing-vacancy-cross";
 import { formatPercent } from "../format";
 import { qualifiesAsVacancyWatchPoint } from "../qualify-facts";
 import { binding, createFact } from "./utils";
@@ -38,13 +51,17 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
     );
   }
 
+  const dualVacancy = qualifiesAsDualVacancy(territory);
+  const suppressIsolatedWatch = suppressIsolatedVacancyWatchPoint(territory);
+
   if (housing.rpVacancyRatePercent !== null) {
-    const isHigh = qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent);
+    const isHigh = qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent, territory);
+    const rpTarget = isHigh && !suppressIsolatedWatch ? "watchPoints" : "summary";
 
     facts.push(
       createFact({
         theme: "housing",
-        target: isHigh ? "watchPoints" : "summary",
+        target: rpTarget,
         sentence: `Les logements vacants représentent ${formatPercent(housing.rpVacancyRatePercent)} de l'ensemble des logements en ${housing.year} (INSEE).`,
         sourceKeys: ["insee-rp-logement"],
         year: housing.year,
@@ -77,10 +94,12 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
         ? `, dont ${housing.privateVacantStructural.toLocaleString("fr-FR")} vacants depuis au moins deux ans`
         : "";
 
+    const lovacTarget = suppressIsolatedWatch ? "summary" : "watchPoints";
+
     facts.push(
       createFact({
         theme: "housing",
-        target: "watchPoints",
+        target: lovacTarget,
         sentence: `Le parc privé compte ${formatPercent(housing.privateVacancyRatePercent)} de logements vacants au 1er janvier ${housing.lovacVintage} (LOVAC)${structuralPart}.`,
         sourceKeys: ["cerema-lovac"],
         year: housing.lovacVintage,
@@ -107,6 +126,62 @@ export function buildHousingFacts(territory: TerritoryProfile): AnalysisFact[] {
               ]
             : []),
         ],
+      }),
+    );
+  }
+
+  if (dualVacancy) {
+    facts.push(
+      createFact({
+        theme: "housing",
+        target: "watchPoints",
+        sentence: buildDualVacancyWatchPointSentence(housing),
+        evidence: buildDualVacancyWatchPointEvidence(housing),
+        sourceKeys: ["insee-rp-logement", "cerema-lovac"],
+        year: housing.year,
+        confidence: "high",
+        limitations: dualVacancyWatchPointLimitations(housing, territory),
+        numericBindings: [
+          binding(
+            housing.rpVacancyRatePercent!,
+            "part logements vacants RP",
+            "housing",
+            ["logements vacants", "vacance", "ensemble des logements", "INSEE", "recensement"],
+          ),
+          binding(
+            housing.privateVacancyRatePercent!,
+            "taux vacance parc privé LOVAC",
+            "housing",
+            ["LOVAC", "parc privé", "vacance", "logements vacants"],
+          ),
+          ...(housing.privateVacantStructural != null
+            ? [
+                binding(
+                  housing.privateVacantStructural,
+                  "logements privés vacants structurels LOVAC",
+                  "housing",
+                  ["LOVAC", "vacance structurelle", "deux ans", "parc privé"],
+                ),
+              ]
+            : []),
+        ],
+      }),
+    );
+  }
+
+  const property = territory.enrichment?.property;
+  if (shouldEmitVacancyPriceTensionWatchPoint(territory) && property?.available) {
+    facts.push(
+      createFact({
+        theme: "housing",
+        target: "watchPoints",
+        sentence: buildVacancyPriceTensionWatchPointSentence(territory),
+        evidence: buildVacancyPriceTensionWatchPointEvidence(territory),
+        sourceKeys: resolveVacancyPriceTensionSourceKeys(territory),
+        year: property.year,
+        confidence: "medium",
+        limitations: vacancyPriceTensionWatchPointLimitations(territory),
+        numericBindings: vacancyPriceTensionNumericBindings(territory, property),
       }),
     );
   }

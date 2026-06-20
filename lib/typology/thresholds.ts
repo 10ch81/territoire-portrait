@@ -31,6 +31,9 @@ export const DEBT_THRESHOLD_METRO_GRANDE_VILLE_EUR = 1_000;
 /** Seuil dette — petite commune (< 2 000 hab., €/hab.). */
 export const DEBT_THRESHOLD_SMALL_COMMUNE_EUR = 1_500;
 
+/** Ratio prix/m² communal vs département — pression immobilière élevée. */
+export const HIGH_REAL_ESTATE_PREMIUM_RATIO = 1.15;
+
 /** Seuil population — petite commune pour dette. */
 export const SMALL_COMMUNE_POPULATION_THRESHOLD = 2_000;
 

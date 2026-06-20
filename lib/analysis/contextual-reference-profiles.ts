@@ -240,6 +240,8 @@ export const bousseLikeProfile: TerritoryProfile = {
       irvePointsPer1000Residents: null,
       socialHousingVacancyRatePercent: null,
       equipmentsPer1000Residents: null,
+      lovacRpVacancySpreadPercent: null,
+      realEstatePremiumRatio: null,
       available: true,
       note: "",
     },

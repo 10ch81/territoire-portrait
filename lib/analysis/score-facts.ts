@@ -11,6 +11,7 @@ import {
 } from "./opportunity-quality";
 import { hasSecurityIndicatorsAboveReference } from "./security-indicators";
 import { riskWatchSubtypeScoreBonus } from "./risk-watch-subtypes";
+import { isDualVacancyWatchPointFact, isVacancyPriceTensionWatchPointFact, suppressIsolatedVacancyWatchPoint } from "./housing-vacancy-cross";
 import type { AnalysisFact, AnalysisFactTheme } from "./types";
 import { qpvDenseUrbanScoreBonus } from "./watch-point-selection-gates";
 import {
@@ -62,11 +63,31 @@ function intensityBonus(fact: AnalysisFact, territory: TerritoryProfile): number
   const sociodemographics = territory.enrichment?.sociodemographics;
   const connectivity = territory.enrichment?.mobility?.connectivity;
 
-  if (fact.theme === "housing" && housing?.rpVacancyRatePercent != null) {
-    if (qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent, territory)) {
-      return 12;
+  if (fact.theme === "housing") {
+    if (isVacancyPriceTensionWatchPointFact(fact)) {
+      return 14;
     }
-    return -20;
+
+    if (isDualVacancyWatchPointFact(fact)) {
+      return 14;
+    }
+
+    const suppressIsolatedWatch = suppressIsolatedVacancyWatchPoint(territory);
+    if (
+      suppressIsolatedWatch &&
+      (fact.sourceKeys.includes("cerema-lovac") ||
+        (fact.sourceKeys.includes("insee-rp-logement") &&
+          /logements vacants|vacance/i.test(fact.sentence)))
+    ) {
+      return 0;
+    }
+
+    if (housing?.rpVacancyRatePercent != null) {
+      if (qualifiesAsVacancyWatchPoint(housing.rpVacancyRatePercent, territory)) {
+        return 12;
+      }
+      return -20;
+    }
   }
 
   if (fact.theme === "employment" && sociodemographics?.unemploymentRate != null) {
