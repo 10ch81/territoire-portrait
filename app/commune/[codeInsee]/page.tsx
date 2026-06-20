@@ -76,7 +76,10 @@ export default async function CommunePage({ params }: CommunePageProps) {
       <AiAnalysisClient codeInsee={territory.inseeCode} />
 
       {portraitNarrativeAvailable ? (
-        <PortraitNarratifClient codeInsee={territory.inseeCode} />
+        <PortraitNarratifClient
+          key={territory.inseeCode}
+          codeInsee={territory.inseeCode}
+        />
       ) : null}
 
       <div className="space-y-4">

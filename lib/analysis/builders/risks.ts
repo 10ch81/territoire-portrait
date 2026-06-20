@@ -58,11 +58,12 @@ export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
   }
 
   if (risks.radon) {
+    const radonLevel = risks.radon.label.replace(/^potentiel radon\s+/i, "").toLowerCase();
     facts.push(
       createFact({
         theme: "risks",
         target: "watchPoints",
-        sentence: `Potentiel radon classé ${risks.radon.label.toLowerCase()} sur la commune.`,
+        sentence: `Le potentiel radon est ${radonLevel} sur la commune.`,
         sourceKeys: ["georisques"],
         confidence: "high",
         limitations: ["Risque naturel radon ; distinct des indicateurs SSMSI."],

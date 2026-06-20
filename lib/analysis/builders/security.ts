@@ -46,5 +46,28 @@ export function buildSecurityFacts(territory: TerritoryProfile): AnalysisFact[] 
     }),
   );
 
+  const aboveReference = assessments.filter((assessment) => assessment.aboveReference);
+  for (const assessment of aboveReference.slice(0, 4)) {
+    facts.push(
+      createFact({
+        theme: "security",
+        target: "summary",
+        sentence: `${assessment.label} : ${assessment.localRate.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} pour 1 000 habitants (référence départementale ${assessment.referenceRate.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}, SSMSI ${security.year}).`,
+        sourceKeys: ["ssmsi"],
+        year: security.year,
+        confidence: "medium",
+        limitations: SECURITY_LIMITATIONS,
+        numericBindings: [
+          {
+            value: assessment.localRate,
+            label: `${assessment.id} pour 1000 hab.`,
+            theme: "security",
+            allowedContexts: [assessment.label, "pour 1 000 habitants", "SSMSI"],
+          },
+        ],
+      }),
+    );
+  }
+
   return facts;
 }

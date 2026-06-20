@@ -4,6 +4,10 @@ function cleanMarkdownLine(line: string): string {
   return line.replace(/^#+\s*/, "").replace(/\*\*/g, "").trim();
 }
 
+function emptyPortrait(): PortraitNarrative {
+  return { title: "", paragraphs: [], generatedBy: "deterministic" };
+}
+
 /**
  * Parse une réponse Mistral en titre + paragraphes.
  * Tolère le markdown simple et les séparations par ligne simple ou double.
@@ -12,7 +16,7 @@ export function parsePortraitContent(content: string): PortraitNarrative {
   const normalized = content.replace(/\r\n/g, "\n").trim();
 
   if (!normalized) {
-    return { title: "", paragraphs: [] };
+    return emptyPortrait();
   }
 
   const blocks = normalized
@@ -26,11 +30,12 @@ export function parsePortraitContent(content: string): PortraitNarrative {
       .map(cleanMarkdownLine)
       .filter(Boolean);
     if (singleLines.length === 0) {
-      return { title: "", paragraphs: [] };
+      return emptyPortrait();
     }
     return {
       title: singleLines[0],
       paragraphs: singleLines.slice(1),
+      generatedBy: "deterministic",
     };
   }
 
@@ -52,9 +57,10 @@ export function parsePortraitContent(content: string): PortraitNarrative {
       return {
         title: lines[0],
         paragraphs: lines.slice(1),
+        generatedBy: "deterministic",
       };
     }
   }
 
-  return { title, paragraphs };
+  return { title, paragraphs, generatedBy: "deterministic" };
 }

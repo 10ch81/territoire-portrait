@@ -60,6 +60,26 @@ export function buildPolicyCityFacts(territory: TerritoryProfile): AnalysisFact[
         ],
       }),
     );
+
+    if (
+      urbanPolicy.qpvLabels &&
+      urbanPolicy.qpvLabels.length > 0 &&
+      urbanPolicy.qpvLabels.length <= 8
+    ) {
+      facts.push(
+        createFact({
+          theme: "policy_city",
+          target: "summary",
+          sentence: `Quartiers prioritaires recensés : ${urbanPolicy.qpvLabels.join(", ")} (QPV).`,
+          sourceKeys: ["qpv"],
+          year: urbanPolicy.year,
+          confidence: "high",
+          limitations: [
+            "Liste des QPV sur la commune ; enjeux localisés, pas généralisables.",
+          ],
+        }),
+      );
+    }
   }
 
   return facts;

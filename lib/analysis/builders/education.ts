@@ -72,3 +72,4 @@ export function buildEducationFacts(territory: TerritoryProfile): AnalysisFact[]
 
   return facts;
 }
+

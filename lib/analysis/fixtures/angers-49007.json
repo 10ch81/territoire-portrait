@@ -289,6 +289,16 @@
       "available": true,
       "note": "Recensement 2022 (structure par âge, chômage) et FILOSOFI 2023 (niveau de vie médian)."
     },
+    "labourMarket": {
+      "quarter": "2024-T4",
+      "totalJobSeekers": 10245,
+      "categoryA": null,
+      "under25": 2180,
+      "age50AndOver": 2890,
+      "longTerm": null,
+      "available": true,
+      "note": "Inscrits France Travail (catégorie ABC, moyenne trimestrielle) — distinct du taux de chômage RP (BIT recensement) ; effectifs arrondis au multiple de 5 ; prudence 2025+ (réforme inscription automatique)."
+    },
     "enterprises": {
       "legalUnitsWithEstablishment": 10000,
       "legalUnitsIsCapped": true,
@@ -1401,6 +1411,9 @@
       "rpVacancyRatePercent": 6,
       "socialHousingSharePercent": 28.8,
       "vacancyRatePercent": 1.1,
+      "privateVacancyRatePercent": 5.8,
+      "lovacVintage": 2025,
+      "privateVacantStructural": 1472,
       "available": true,
       "note": "Parc locatif social (RPLS 2021) et vacance générale du parc (RP logement 2022) — périmètres distincts."
     },

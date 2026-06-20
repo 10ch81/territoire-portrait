@@ -230,6 +230,50 @@ export function buildSocialHousingFacts(territory: TerritoryProfile): AnalysisFa
         ],
       }),
     );
+
+    if (housing.socialHousingSharePercent !== null) {
+      facts.push(
+        createFact({
+          theme: "social_housing",
+          target: "summary",
+          sentence: `Le logement social représente ${formatPercent(housing.socialHousingSharePercent)} du parc global en ${housing.year} (RPLS).`,
+          sourceKeys: ["rpls"],
+          year: housing.year,
+          confidence: "high",
+          limitations: ["Part du parc locatif social RPLS dans le parc global."],
+          numericBindings: [
+            binding(
+              housing.socialHousingSharePercent,
+              "part logement social RPLS",
+              "social_housing",
+              ["logement social", "RPLS", "parc global"],
+            ),
+          ],
+        }),
+      );
+    }
+
+    if (housing.vacancyRatePercent !== null) {
+      facts.push(
+        createFact({
+          theme: "social_housing",
+          target: "summary",
+          sentence: `La vacance du parc locatif social s'élève à ${formatPercent(housing.vacancyRatePercent)} en ${housing.year} (RPLS).`,
+          sourceKeys: ["rpls"],
+          year: housing.year,
+          confidence: "high",
+          limitations: ["Vacance du parc locatif social — distinct de la vacance globale RP."],
+          numericBindings: [
+            binding(
+              housing.vacancyRatePercent,
+              "vacance parc social RPLS",
+              "social_housing",
+              ["vacance", "logement social", "RPLS"],
+            ),
+          ],
+        }),
+      );
+    }
   }
 
   return facts;

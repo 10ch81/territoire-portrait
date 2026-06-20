@@ -75,7 +75,7 @@ Deuxième paragraphe sur l'économie.`;
 });
 
 describe("portraitNarrativeModel", () => {
-  it("utilise mistral-large-latest", () => {
-    assert.equal(portraitNarrativeModel, "mistral-large-latest");
+  it("utilise le mode déterministe sectoriel", () => {
+    assert.equal(portraitNarrativeModel, "deterministic-sectorial");
   });
 });

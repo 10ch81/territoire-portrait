@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { PortraitNarrative } from "@/lib/portrait/types";
 import { ErrorBox } from "./ErrorBox";
 
@@ -15,7 +15,10 @@ function isPortraitNarrative(value: unknown): value is PortraitNarrative {
     "title" in value &&
     "paragraphs" in value &&
     typeof (value as PortraitNarrative).title === "string" &&
-    Array.isArray((value as PortraitNarrative).paragraphs)
+    Array.isArray((value as PortraitNarrative).paragraphs) &&
+    (!("generatedBy" in value) ||
+      (value as PortraitNarrative).generatedBy === "deterministic" ||
+      (value as PortraitNarrative).generatedBy === "mistral_polish")
   );
 }
 
@@ -23,12 +26,6 @@ export function PortraitNarratifClient({ codeInsee }: PortraitNarratifClientProp
   const [portrait, setPortrait] = useState<PortraitNarrative | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setPortrait(null);
-    setError(null);
-    setLoading(false);
-  }, [codeInsee]);
 
   async function handleGenerate() {
     const targetCodeInsee = codeInsee;
@@ -86,15 +83,24 @@ export function PortraitNarratifClient({ codeInsee }: PortraitNarratifClientProp
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-lg font-semibold text-slate-900">Portrait narratif</h2>
         <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium text-violet-800">
-          Rédaction libre · Mistral
+          {portrait?.generatedBy === "mistral_polish"
+            ? "Reformulation · Mistral"
+            : "Portrait sectoriel · serveur"}
         </span>
       </div>
 
       <div className="mt-4 rounded-lg border border-violet-200 bg-violet-50 px-4 py-3">
-        <p className="text-sm font-medium text-violet-950">
-          Rédaction libre générée par IA : ce portrait peut interpréter les données
-          affichées et extrapoler au-delà des faits strictement établis.
-        </p>
+        {portrait?.generatedBy === "mistral_polish" ? (
+          <p className="text-sm font-medium text-violet-950">
+            Reformulation stylistique — chiffres contrôlés côté serveur, sans ajout de
+            faits.
+          </p>
+        ) : (
+          <p className="text-sm font-medium text-violet-950">
+            Portrait structuré à partir des données publiques — chiffres vérifiés côté
+            serveur.
+          </p>
+        )}
       </div>
 
       {error ? (
@@ -104,20 +110,29 @@ export function PortraitNarratifClient({ codeInsee }: PortraitNarratifClientProp
       ) : null}
 
       {hasPortrait ? (
-        <article className="mt-5 space-y-4">
+        <article className="mt-5 space-y-5">
           {portrait.title.trim() ? (
             <h3 className="text-xl font-semibold leading-snug text-slate-900">
               {portrait.title}
             </h3>
           ) : null}
-          {portrait.paragraphs.map((paragraph, index) => (
-            <p
-              key={`${index}-${paragraph.slice(0, 24)}`}
-              className="text-sm leading-relaxed text-slate-700"
-            >
-              {paragraph}
-            </p>
-          ))}
+          {portrait.sectors && portrait.sectors.length > 0
+            ? portrait.sectors.map((sector) => (
+                <section key={sector.id} className="space-y-2">
+                  <h4 className="text-sm font-semibold text-slate-800">
+                    {sector.index}. {sector.title}
+                  </h4>
+                  <p className="text-sm leading-relaxed text-slate-700">{sector.paragraph}</p>
+                </section>
+              ))
+            : portrait.paragraphs.map((paragraph, index) => (
+                <p
+                  key={`${index}-${paragraph.slice(0, 24)}`}
+                  className="text-sm leading-relaxed text-slate-700"
+                >
+                  {paragraph}
+                </p>
+              ))}
         </article>
       ) : null}
 
