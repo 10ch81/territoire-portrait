@@ -16,6 +16,7 @@ import type { AnalysisFact, AnalysisFactTheme } from "./types";
 export const MIN_ABSOLUTE_SALARIED_POSTS = 2_000;
 export const MIN_ABSOLUTE_EQUIPMENTS = 500;
 export const MIN_POPULATION_FOR_ABSOLUTE_EQUIPMENTS = 50_000;
+export const MIN_POPULATION_FOR_EQUIPMENT_DENSITY_ASSERTIVE = 2_000;
 
 const STRONG_STRENGTH_THEMES: AnalysisFactTheme[] = [
   "employment_sectors",
@@ -56,6 +57,13 @@ export function qualifiesAsStrongEquipmentStrength(territory: TerritoryProfile):
     equipments.totalEquipments >= MIN_ABSOLUTE_EQUIPMENTS
   ) {
     return true;
+  }
+
+  if (
+    population === null ||
+    population < MIN_POPULATION_FOR_EQUIPMENT_DENSITY_ASSERTIVE
+  ) {
+    return false;
   }
 
   const per1000 = territory.enrichment?.derived?.equipmentsPer1000Residents ?? null;

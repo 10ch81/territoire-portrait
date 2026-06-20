@@ -795,6 +795,24 @@ function qualifyEquipmentsFact(fact: AnalysisFact, _territory: TerritoryProfile)
 }
 
 function qualifyRisksFact(fact: AnalysisFact): QualificationCore {
+  if (/radon/i.test(fact.sentence) && /faible/i.test(fact.sentence)) {
+    return withTargets(fact, {
+      polarity: "neutral",
+      intensity: "low",
+      qualificationReason: "radon_faible_descriptif",
+      eligibleTargets: ["summary"],
+    });
+  }
+
+  if (fact.target === "summary" && /radon/i.test(fact.sentence)) {
+    return withTargets(fact, {
+      polarity: "neutral",
+      intensity: "low",
+      qualificationReason: "radon_descriptif_sectoriel",
+      eligibleTargets: ["summary"],
+    });
+  }
+
   return withTargets(fact, {
     polarity: "negative",
     intensity: "medium",

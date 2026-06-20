@@ -62,7 +62,7 @@ export function buildRiskFacts(territory: TerritoryProfile): AnalysisFact[] {
     facts.push(
       createFact({
         theme: "risks",
-        target: "watchPoints",
+        target: "summary",
         sentence: `Le potentiel radon est ${radonLevel} sur la commune.`,
         sourceKeys: ["georisques"],
         confidence: "high",

@@ -87,7 +87,7 @@ export function renderSectorialBlock(
   }
 
   if (sectorId === "synthesis") {
-    const paragraph = renderSynthesisFromFacts(facts, ctx.territory.name);
+    const paragraph = renderSynthesisFromFacts(facts, ctx);
     if (!paragraph.trim()) {
       return null;
     }
