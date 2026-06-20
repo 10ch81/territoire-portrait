@@ -35,7 +35,7 @@ export default async function CommunePage({ params }: CommunePageProps) {
   const portraitNarrativeAvailable = isPortraitNarrativeAvailable();
 
   return (
-    <AnalysisReadyProvider>
+    <AnalysisReadyProvider key={territory.inseeCode}>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10 print:max-w-none print:py-4">
       <RecentCommuneTracker
         inseeCode={territory.inseeCode}
@@ -76,10 +76,7 @@ export default async function CommunePage({ params }: CommunePageProps) {
       <AiAnalysisClient codeInsee={territory.inseeCode} />
 
       {portraitNarrativeAvailable ? (
-        <PortraitNarratifClient
-          key={territory.inseeCode}
-          codeInsee={territory.inseeCode}
-        />
+        <PortraitNarratifClient codeInsee={territory.inseeCode} />
       ) : null}
 
       <div className="space-y-4">
