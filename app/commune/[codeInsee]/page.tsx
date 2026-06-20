@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AiAnalysisClient } from "@/components/AiAnalysisClient";
+import { PortraitNarratifClient } from "@/components/PortraitNarratifClient";
 import { AnalysisReadyProvider } from "@/components/AnalysisReadyProvider";
 import { CompletenessIndicator } from "@/components/CompletenessIndicator";
 import { EnrichmentIntro } from "@/components/DataSection";
@@ -11,6 +12,7 @@ import { SectionNav } from "@/components/SectionNav";
 import { ShareActions } from "@/components/ShareActions";
 import { SourcesList } from "@/components/SourcesList";
 import { getEnrichedTerritoryByInsee } from "@/lib/enrichment";
+import { isPortraitNarrativeAvailable } from "@/lib/portrait/generate-portrait";
 import { computeCompleteness } from "@/lib/ux/completeness";
 import { extractHeroKpis } from "@/lib/ux/kpis";
 import { getVisibleSections } from "@/lib/ux/sections";
@@ -30,6 +32,7 @@ export default async function CommunePage({ params }: CommunePageProps) {
   const kpis = extractHeroKpis(territory);
   const completeness = computeCompleteness(territory);
   const sections = getVisibleSections(territory);
+  const portraitNarrativeAvailable = isPortraitNarrativeAvailable();
 
   return (
     <AnalysisReadyProvider>
@@ -71,6 +74,10 @@ export default async function CommunePage({ params }: CommunePageProps) {
       <SectionNav sections={sections} />
 
       <AiAnalysisClient codeInsee={territory.inseeCode} />
+
+      {portraitNarrativeAvailable ? (
+        <PortraitNarratifClient codeInsee={territory.inseeCode} />
+      ) : null}
 
       <div className="space-y-4">
         <EnrichmentIntro />
