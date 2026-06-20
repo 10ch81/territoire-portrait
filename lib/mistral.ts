@@ -179,14 +179,14 @@ export function isMistralConfigured(): boolean {
 function getMissingApiKeyMessage(): string {
   if (process.env.VERCEL) {
     return (
-      "L'analyse IA n'est pas configurée sur ce déploiement Vercel. " +
+      "La synthèse territoriale n'est pas configurée sur ce déploiement Vercel. " +
       "Vérifiez que MISTRAL_API_KEY est définie pour l'environnement Production " +
       "(ou Preview), puis redéployez le projet."
     );
   }
 
   return (
-    "L'analyse IA n'est pas configurée en local. " +
+    "La synthèse territoriale n'est pas configurée en local. " +
     "Ajoutez MISTRAL_API_KEY dans .env.local, ou exécutez « npx vercel env pull .env.local » " +
     "après avoir ajouté la clé à l'environnement Development sur Vercel."
   );
@@ -227,7 +227,7 @@ export async function analyzeTerritory(
       console.error("Erreur Mistral:", response.status, errorBody);
       return buildDegradedAnalysisResult(territory, {
         configured: true,
-        error: `L'analyse IA a échoué (statut ${response.status}). Vérifiez la clé API et le modèle.`,
+        error: `La synthèse territoriale a échoué (statut ${response.status}). Vérifiez la clé API et le modèle.`,
       });
     }
 

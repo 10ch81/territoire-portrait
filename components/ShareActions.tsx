@@ -44,7 +44,7 @@ export function ShareActions({ communeName }: ShareActionsProps) {
         title={
           analysisReady
             ? undefined
-            : "Attendez la fin du chargement de l'analyse IA"
+            : "Attendez la fin du chargement de la synthèse territoriale"
         }
         className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         aria-label={`Imprimer la fiche de ${communeName}`}

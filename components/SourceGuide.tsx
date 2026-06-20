@@ -96,7 +96,7 @@ export function SourceGuide({
             href={`#${ANALYSIS_LIMITS_SECTION_ID}`}
             className="text-xs text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-slate-700"
           >
-            Retour aux limites de l&apos;analyse
+            Retour aux limites de la synthèse
           </a>
         </p>
       ) : null}
