@@ -3,10 +3,8 @@ import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
-  assertDownloadUnderMaxBytes,
-  assertFileUnderMaxBytes,
   createCsvReadStream,
-  downloadFile,
+  downloadFileUnderMaxBytes,
   parseCsvLine,
   stripCsvBom,
 } from "./ingest-utils";
@@ -52,9 +50,7 @@ function isCommuneLevel(raw: string): boolean {
 
 async function main(): Promise<void> {
   console.log("Téléchargement indicateurs territoriaux de précarité (CNAF)…");
-  await assertDownloadUnderMaxBytes(CNAF_PRECARITE_FILE_URL);
-  await downloadFile(CNAF_PRECARITE_FILE_URL, CSV_PATH);
-  await assertFileUnderMaxBytes(CSV_PATH);
+  await downloadFileUnderMaxBytes(CNAF_PRECARITE_FILE_URL, CSV_PATH);
 
   const cache: CafCommuneCache = {};
   const stream = createCsvReadStream(CSV_PATH);

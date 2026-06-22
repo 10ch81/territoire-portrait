@@ -3,9 +3,8 @@ import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
-  assertFileUnderMaxBytes,
   createCsvReadStream,
-  downloadFile,
+  downloadFileUnderMaxBytes,
   parseCsvLine,
   stripCsvBom,
 } from "./ingest-utils";
@@ -90,8 +89,7 @@ async function aggregateFranceTravail(): Promise<FranceTravailCommuneCache> {
   );
   const url = `${FRANCE_TRAVAIL_API_BASE}/exports/csv?use_labels=true&where=${where}`;
 
-  await downloadFile(url, CSV_PATH);
-  assertFileUnderMaxBytes(CSV_PATH);
+  await downloadFileUnderMaxBytes(url, CSV_PATH);
 
   const cache: FranceTravailCommuneCache = {};
   const stream = createInterface({
@@ -150,7 +148,7 @@ async function aggregateFranceTravail(): Promise<FranceTravailCommuneCache> {
 
 async function main(): Promise<void> {
   const cache = await aggregateFranceTravail();
-  writeFileSync(OUTPUT_PATH, JSON.stringify(cache, null, 2));
+  writeFileSync(OUTPUT_PATH, JSON.stringify(cache, null, 0));
   console.log(
     `Cache France Travail écrit : ${OUTPUT_PATH} (${Object.keys(cache).length} communes).`,
   );
