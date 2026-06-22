@@ -3,10 +3,8 @@ import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
-  assertDownloadUnderMaxBytes,
-  assertFileUnderMaxBytes,
   createCsvReadStream,
-  downloadFile,
+  downloadFileUnderMaxBytes,
   parseCsvLine,
   parseFrenchDecimal,
   stripCsvBom,
@@ -32,9 +30,7 @@ function normalizeInseeCode(raw: string): string | null {
 }
 
 async function aggregateIps(): Promise<IpsCommuneCache> {
-  await assertDownloadUnderMaxBytes(IPS_ECOLES_FILE_URL);
-  await downloadFile(IPS_ECOLES_FILE_URL, CSV_PATH);
-  assertFileUnderMaxBytes(CSV_PATH);
+  await downloadFileUnderMaxBytes(IPS_ECOLES_FILE_URL, CSV_PATH);
 
   const valuesByCommuneYear = new Map<string, Map<string, number[]>>();
   let latestSchoolYear = "";
@@ -106,7 +102,7 @@ async function aggregateIps(): Promise<IpsCommuneCache> {
 
 async function main(): Promise<void> {
   const cache = await aggregateIps();
-  writeFileSync(OUTPUT_PATH, JSON.stringify(cache, null, 2));
+  writeFileSync(OUTPUT_PATH, JSON.stringify(cache, null, 0));
   console.log(`Cache IPS écrit : ${OUTPUT_PATH} (${Object.keys(cache).length} communes).`);
 }
 
