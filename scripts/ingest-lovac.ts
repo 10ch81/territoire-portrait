@@ -3,10 +3,8 @@ import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import {
   CACHE_DIR,
-  assertDownloadUnderMaxBytes,
-  assertFileUnderMaxBytes,
   createCsvReadStream,
-  downloadFile,
+  downloadFileUnderMaxBytes,
   parseCsvLine,
   stripCsvBom,
 } from "./ingest-utils";
@@ -80,10 +78,8 @@ function detectLatestColumns(headers: string[]): LovacColumnSet {
 }
 
 async function aggregateLovac(): Promise<LovacCommuneCache> {
-  console.log("Vérification taille LOVAC…");
-  await assertDownloadUnderMaxBytes(LOVAC_FILE_URL);
-  await downloadFile(LOVAC_FILE_URL, CSV_PATH);
-  assertFileUnderMaxBytes(CSV_PATH);
+  console.log("Téléchargement LOVAC avec garde-fou 20 Mo…");
+  await downloadFileUnderMaxBytes(LOVAC_FILE_URL, CSV_PATH);
 
   console.log("Agrégation LOVAC par commune…");
 
@@ -154,7 +150,7 @@ async function aggregateLovac(): Promise<LovacCommuneCache> {
 
 async function main(): Promise<void> {
   const cache = await aggregateLovac();
-  writeFileSync(OUTPUT_PATH, JSON.stringify(cache, null, 2));
+  writeFileSync(OUTPUT_PATH, JSON.stringify(cache, null, 0));
   console.log(`Cache LOVAC écrit : ${OUTPUT_PATH} (${Object.keys(cache).length} communes).`);
 }
 
