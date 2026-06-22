@@ -3,7 +3,11 @@ import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { detectCsvEncoding, assertFileUnderMaxBytes } from "./ingest-utils";
+import {
+  assertFileUnderMaxBytes,
+  detectCsvEncoding,
+  parseCsvLine,
+} from "./ingest-utils";
 
 function withTempCsv(content: Buffer, run: (path: string) => void): void {
   const dir = mkdtempSync(join(tmpdir(), "csv-encoding-"));
@@ -52,6 +56,13 @@ test("detectCsvEncoding reste UTF-8 malgré un octet invalide isolé (FINESS)", 
   withTempCsv(content, (path) => {
     assert.equal(detectCsvEncoding(path), "utf-8");
   });
+});
+
+test("parseCsvLine conserve les séparateurs entre guillemets", () => {
+  assert.deepEqual(
+    parseCsvLine('"code";"libellé";"note; avec ; séparateurs";"guillemet ""échappé"""'),
+    ["code", "libellé", "note; avec ; séparateurs", 'guillemet "échappé"'],
+  );
 });
 
 test("assertFileUnderMaxBytes accepte un fichier sous le seuil", () => {
