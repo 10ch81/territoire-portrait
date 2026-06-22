@@ -4,6 +4,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  rmSync,
   statSync,
   writeFileSync,
 } from "node:fs";
@@ -12,16 +13,46 @@ import { spawnSync } from "node:child_process";
 import { platform } from "node:os";
 import { pipeline } from "node:stream/promises";
 import { resolve } from "node:path";
-import { Readable } from "node:stream";
+import { Readable, Transform } from "node:stream";
 
 export const CACHE_DIR = resolve(process.cwd(), "data/cache");
 
 /** Seuil par défaut pour les téléchargements bulk (20 Mo). */
 export const DEFAULT_MAX_DOWNLOAD_BYTES = 20 * 1024 * 1024;
 
+interface DownloadFileOptions {
+  maxBytes?: number;
+}
+
+function formatMegaBytes(bytes: number): string {
+  return (bytes / 1024 / 1024).toFixed(1);
+}
+
+function createMaxBytesTransform(url: string, maxBytes: number): Transform {
+  let downloadedBytes = 0;
+
+  return new Transform({
+    transform(chunk: Buffer, _encoding, callback) {
+      downloadedBytes += chunk.length;
+
+      if (downloadedBytes > maxBytes) {
+        callback(
+          new Error(
+            `Téléchargement interrompu (${formatMegaBytes(downloadedBytes)} Mo > ${formatMegaBytes(maxBytes)} Mo) : ${url}`,
+          ),
+        );
+        return;
+      }
+
+      callback(null, chunk);
+    },
+  });
+}
+
 /**
  * Vérifie via HEAD que la ressource ne dépasse pas maxBytes.
- * Si Content-Length est absent, la vérification est ignorée (contrôle post-téléchargement recommandé).
+ * Si Content-Length est absent, la vérification est ignorée : downloadFile(maxBytes)
+ * reste le garde-fou principal et interrompt le flux pendant le téléchargement.
  */
 export async function assertDownloadUnderMaxBytes(
   url: string,
@@ -41,7 +72,7 @@ export async function assertDownloadUnderMaxBytes(
   const size = Number.parseInt(contentLength, 10);
   if (Number.isFinite(size) && size > maxBytes) {
     throw new Error(
-      `Ressource trop lourde (${(size / 1024 / 1024).toFixed(1)} Mo > ${(maxBytes / 1024 / 1024).toFixed(0)} Mo) : ${url}`,
+      `Ressource trop lourde (${formatMegaBytes(size)} Mo > ${formatMegaBytes(maxBytes)} Mo) : ${url}`,
     );
   }
 }
@@ -54,13 +85,41 @@ export function assertFileUnderMaxBytes(
   const { size } = statSync(filePath);
   if (size > maxBytes) {
     throw new Error(
-      `Fichier trop lourd (${(size / 1024 / 1024).toFixed(1)} Mo > ${(maxBytes / 1024 / 1024).toFixed(0)} Mo) : ${filePath}`,
+      `Fichier trop lourd (${formatMegaBytes(size)} Mo > ${formatMegaBytes(maxBytes)} Mo) : ${filePath}`,
     );
   }
 }
 
 export function parseCsvLine(line: string, delimiter = ";"): string[] {
-  return line.split(delimiter).map((cell) => cell.replace(/^"|"$/g, "").trim());
+  const cells: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+
+    if (char === '"') {
+      if (inQuotes && line[index + 1] === '"') {
+        current += '"';
+        index += 1;
+        continue;
+      }
+
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === delimiter && !inQuotes) {
+      cells.push(current.trim());
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  cells.push(current.trim());
+  return cells;
 }
 
 const FRENCH_ACCENTS = /[éèêàâùûôîçÉÊÀÂÙÛÔÎÇ]/g;
@@ -102,7 +161,11 @@ export function createCsvReadStream(filePath: string): ReadStream {
   return createReadStream(filePath, { encoding: detectCsvEncoding(filePath) });
 }
 
-export async function downloadFile(url: string, destination: string): Promise<void> {
+export async function downloadFile(
+  url: string,
+  destination: string,
+  options: DownloadFileOptions = {},
+): Promise<void> {
   console.log(`Téléchargement : ${url}`);
   const response = await fetch(url);
 
@@ -112,8 +175,35 @@ export async function downloadFile(url: string, destination: string): Promise<vo
 
   mkdirSync(resolve(destination, ".."), { recursive: true });
   const fileStream = createWriteStream(destination);
-  await pipeline(Readable.fromWeb(response.body as never), fileStream);
+  const sourceStream = Readable.fromWeb(response.body as never);
+
+  try {
+    if (options.maxBytes !== undefined) {
+      await pipeline(
+        sourceStream,
+        createMaxBytesTransform(url, options.maxBytes),
+        fileStream,
+      );
+    } else {
+      await pipeline(sourceStream, fileStream);
+    }
+  } catch (error) {
+    fileStream.destroy();
+    rmSync(destination, { force: true });
+    throw error;
+  }
+
   console.log(`Fichier enregistré : ${destination}`);
+}
+
+export async function downloadFileUnderMaxBytes(
+  url: string,
+  destination: string,
+  maxBytes = DEFAULT_MAX_DOWNLOAD_BYTES,
+): Promise<void> {
+  await assertDownloadUnderMaxBytes(url, maxBytes);
+  await downloadFile(url, destination, { maxBytes });
+  assertFileUnderMaxBytes(destination, maxBytes);
 }
 
 function runZipExtraction(zipPath: string, destinationDir: string): void {
