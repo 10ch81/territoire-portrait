@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { CompareHighlight } from "@/lib/compare/types";
 
 interface CompareHighlightsProps {
@@ -66,10 +67,23 @@ export function CompareWarnings({ warnings }: CompareWarningsProps) {
 
 interface ShareCompareActionsProps {
   communeNames: string[];
+  selectedCodes: string[];
 }
 
-export function ShareCompareActions({ communeNames }: ShareCompareActionsProps) {
+export function ShareCompareActions({ communeNames, selectedCodes }: ShareCompareActionsProps) {
+  const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
+
+  const jsonLdHref = useMemo(() => {
+    const params = new URLSearchParams({
+      codes: selectedCodes.join(","),
+    });
+    const priorites = searchParams.get("priorites");
+    if (priorites) {
+      params.set("priorites", priorites);
+    }
+    return `/api/compare/jsonld?${params.toString()}`;
+  }, [searchParams, selectedCodes]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -97,6 +111,13 @@ export function ShareCompareActions({ communeNames }: ShareCompareActionsProps) 
       >
         {copied ? "Lien copié" : "Copier le lien"}
       </button>
+      <a
+        href={jsonLdHref}
+        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+        download={`comparaison-${selectedCodes.join("-")}.jsonld.json`}
+      >
+        Export JSON-LD
+      </a>
       <button
         type="button"
         onClick={handlePrint}

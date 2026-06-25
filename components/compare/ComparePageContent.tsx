@@ -46,7 +46,12 @@ export function ComparePageContent({
             ← Accueil
           </Link>
           {comparison ? (
-            <ShareCompareActions communeNames={communeNames} />
+            <Suspense fallback={null}>
+              <ShareCompareActions
+                communeNames={communeNames}
+                selectedCodes={selectedCodes}
+              />
+            </Suspense>
           ) : null}
         </div>
         <div>

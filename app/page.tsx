@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HabitatProfileWizard } from "@/components/HabitatProfileWizard";
 import { SearchForm } from "@/components/SearchForm";
 import { SearchSuggestions } from "@/components/SearchSuggestions";
 import { UseCaseCards } from "@/components/UseCaseCards";
@@ -28,6 +29,7 @@ export default function HomePage() {
         </Link>
       </header>
 
+      <HabitatProfileWizard />
       <SearchForm />
       <SearchSuggestions />
       <UseCaseCards />

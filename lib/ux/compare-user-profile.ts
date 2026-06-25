@@ -64,6 +64,19 @@ export function getComparePrioritiesServerSnapshot(): string[] {
   return [...COMPARE_PRIORITY_IDS];
 }
 
+export function saveComparePriorities(ids: string[]): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const valid = ids.filter((id) => COMPARE_PRIORITY_IDS.includes(id));
+  const next = valid.length > 0 ? valid : [...COMPARE_PRIORITY_IDS];
+  cachedRaw = next.join(",");
+  cachedPriorities = next;
+  window.localStorage.setItem(STORAGE_KEY, cachedRaw);
+  notifyListeners();
+}
+
 export function resolveComparePriorities(
   urlPriorities: string[],
   storedPriorities: string[],
