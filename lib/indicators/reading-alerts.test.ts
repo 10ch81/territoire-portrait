@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createPanelProfile } from "@/lib/analysis/fixtures";
+import { RP_VINTAGE } from "@/lib/sources";
 import { collectTerritoryReadingAlerts } from "./reading-alerts";
 
 describe("collectTerritoryReadingAlerts", () => {
@@ -19,5 +20,16 @@ describe("collectTerritoryReadingAlerts", () => {
     territory.population = 400;
     const alerts = collectTerritoryReadingAlerts(territory);
     assert.ok(alerts.some((alert) => /500 hab/i.test(alert)));
+  });
+
+  it("n'alerte pas sur le millésime RP adopté en cache", () => {
+    const territory = createPanelProfile("urbanDense");
+    territory.enrichment!.sociodemographics = {
+      ...territory.enrichment!.sociodemographics!,
+      available: true,
+      year: RP_VINTAGE,
+    };
+    const alerts = collectTerritoryReadingAlerts(territory);
+    assert.ok(!alerts.some((alert) => /données démographiques RP/i.test(alert)));
   });
 });

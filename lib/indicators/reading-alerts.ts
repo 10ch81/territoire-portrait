@@ -1,3 +1,4 @@
+import { RP_VINTAGE } from "@/lib/sources";
 import type { TerritoryProfile } from "@/lib/types";
 
 const STALE_VINTAGE_YEARS = 3;
@@ -28,14 +29,22 @@ export function collectTerritoryReadingAlerts(territory: TerritoryProfile): stri
   }
 
   const sociodemographics = territory.enrichment?.sociodemographics;
-  if (sociodemographics?.year && currentYear - sociodemographics.year > STALE_VINTAGE_YEARS) {
+  if (
+    sociodemographics?.available &&
+    sociodemographics.year &&
+    sociodemographics.year < RP_VINTAGE
+  ) {
     alerts.add(
-      `Certaines données démographiques RP datent de ${sociodemographics.year} (millésime > ${STALE_VINTAGE_YEARS} ans).`,
+      `Certaines données démographiques RP datent de ${sociodemographics.year} (millésime antérieur au RP ${RP_VINTAGE} en cache).`,
     );
   }
 
   const property = territory.enrichment?.property;
-  if (property?.year && currentYear - property.year > STALE_VINTAGE_YEARS) {
+  if (
+    property?.available &&
+    property.year &&
+    currentYear - property.year > STALE_VINTAGE_YEARS
+  ) {
     alerts.add(
       `Les prix DVF affichés datent de ${property.year} — vérifier l'actualité du marché local.`,
     );

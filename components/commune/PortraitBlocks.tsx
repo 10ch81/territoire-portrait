@@ -20,7 +20,10 @@ export function PortraitBlocks({ portrait }: PortraitBlocksProps) {
           if (!item.available) {
             return false;
           }
-          if (hideSensitive && (item.sensitive || SENSITIVE_INDICATOR_IDS.has(item.id))) {
+          if (
+            hideSensitive &&
+            (item.sensitive || SENSITIVE_INDICATOR_IDS.has(item.id) || item.fragile)
+          ) {
             return false;
           }
           return true;
