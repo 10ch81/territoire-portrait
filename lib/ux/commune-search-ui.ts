@@ -65,6 +65,24 @@ export function buildCommuneSearchSuggestions(
   return suggestions;
 }
 
+export function communeNameFromSearchSuggestion(
+  suggestion: CommuneSearchSuggestion,
+): string {
+  if (suggestion.kind === "commune") {
+    return suggestion.title;
+  }
+
+  const prefix = "Commune de ";
+  const idx = suggestion.subtitle.indexOf(prefix);
+  if (idx === -1) {
+    return suggestion.title;
+  }
+
+  const rest = suggestion.subtitle.slice(idx + prefix.length);
+  const end = rest.search(/ ·|\(/);
+  return end === -1 ? rest.trim() : rest.slice(0, end).trim();
+}
+
 export function pickCommuneSearchInsee(result: CommuneSearchResult): string | null {
   if (result.resolved) {
     return result.resolved.inseeCode;

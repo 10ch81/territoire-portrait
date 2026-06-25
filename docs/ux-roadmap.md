@@ -69,6 +69,7 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] Export JSON-LD par commune — `GET /api/commune/[codeInsee]/jsonld` (indicateurs + sources, sans ontologie lourde)
 - [x] Export JSON-LD comparateur — `GET /api/compare/jsonld?codes=…&priorites=…`
 - [x] Questionnaire « Où habiter ? » — profil utilisateur → `priorites=` + comparateur exemple
+- [x] Parcours complet « Où habiter ? » — commune de départ (récente/recherche) → comparables → `/compare`
 
 ## Sprint 5 — Qualité des données
 

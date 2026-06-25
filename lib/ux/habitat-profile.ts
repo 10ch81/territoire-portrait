@@ -1,12 +1,25 @@
 import { COMPARE_THEMATIC_PROFILES } from "@/lib/compare/profiles";
+import {
+  isValidInseeCode,
+  normalizeInseeCode,
+} from "@/lib/compare/parse-codes";
 import { COMPARE_PRIORITY_IDS } from "@/lib/compare/user-priorities";
 
 export const HABITAT_STORAGE_KEY = "territoire-portrait:habitat-profile";
 export const MAX_HABITAT_PRIORITIES = 3;
 
-export interface HabitatProfileAnswers {
-  priorityIds: string[];
+export interface HabitatReferenceCommune {
+  inseeCode: string;
+  name: string;
 }
+
+export interface HabitatProfile {
+  priorityIds: string[];
+  referenceCommune: HabitatReferenceCommune | null;
+}
+
+/** @deprecated Alias rétrocompat — préférer HabitatProfile */
+export type HabitatProfileAnswers = Pick<HabitatProfile, "priorityIds">;
 
 export interface HabitatProfileOption {
   id: string;
@@ -64,6 +77,27 @@ function profileHintForHabitat(id: string): string {
   }
 }
 
+export function normalizeHabitatReferenceCommune(
+  raw: unknown,
+): HabitatReferenceCommune | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+
+  const candidate = raw as Partial<HabitatReferenceCommune>;
+  if (typeof candidate.inseeCode !== "string" || typeof candidate.name !== "string") {
+    return null;
+  }
+
+  const inseeCode = normalizeInseeCode(candidate.inseeCode);
+  const name = candidate.name.trim();
+  if (!isValidInseeCode(inseeCode) || name.length === 0) {
+    return null;
+  }
+
+  return { inseeCode, name };
+}
+
 export function validateHabitatPriorities(rawIds: string[]): string[] {
   const seen = new Set<string>();
   const valid: string[] = [];
@@ -82,33 +116,59 @@ export function validateHabitatPriorities(rawIds: string[]): string[] {
   return valid;
 }
 
-export function prioritiesFromHabitatProfile(answers: HabitatProfileAnswers): string[] {
-  const validated = validateHabitatPriorities(answers.priorityIds);
+export function prioritiesFromHabitatProfile(profile: HabitatProfile): string[] {
+  const validated = validateHabitatPriorities(profile.priorityIds);
   return validated.length > 0 ? validated : [...COMPARE_PRIORITY_IDS];
 }
 
-export function parseHabitatProfile(raw: string | null): HabitatProfileAnswers | null {
+export function parseHabitatProfile(raw: string | null): HabitatProfile | null {
   if (!raw) {
     return null;
   }
 
   try {
-    const parsed = JSON.parse(raw) as HabitatProfileAnswers;
-    if (!Array.isArray(parsed.priorityIds)) {
+    const parsed = JSON.parse(raw) as Partial<HabitatProfile>;
+    const priorityIds = validateHabitatPriorities(
+      Array.isArray(parsed.priorityIds) ? parsed.priorityIds : [],
+    );
+    const referenceCommune = normalizeHabitatReferenceCommune(parsed.referenceCommune);
+
+    if (priorityIds.length === 0 && referenceCommune === null) {
       return null;
     }
-    const priorityIds = validateHabitatPriorities(parsed.priorityIds);
-    if (priorityIds.length === 0) {
-      return null;
-    }
-    return { priorityIds };
+
+    return { priorityIds, referenceCommune };
   } catch {
     return null;
   }
 }
 
-export function serializeHabitatProfile(answers: HabitatProfileAnswers): string {
+export function serializeHabitatProfile(profile: HabitatProfile): string {
   return JSON.stringify({
-    priorityIds: validateHabitatPriorities(answers.priorityIds),
+    priorityIds: validateHabitatPriorities(profile.priorityIds),
+    ...(profile.referenceCommune
+      ? { referenceCommune: profile.referenceCommune }
+      : {}),
   });
+}
+
+export function readStoredHabitatProfile(): HabitatProfile {
+  if (typeof window === "undefined") {
+    return { priorityIds: [], referenceCommune: null };
+  }
+
+  return (
+    parseHabitatProfile(window.localStorage.getItem(HABITAT_STORAGE_KEY)) ?? {
+      priorityIds: [],
+      referenceCommune: null,
+    }
+  );
+}
+
+export function saveHabitatProfile(profile: HabitatProfile): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(HABITAT_STORAGE_KEY, serializeHabitatProfile(profile));
 }
