@@ -12,8 +12,8 @@ describe("computeDepartmentRank", () => {
       ["b", 30],
       ["c", 20],
     ]);
-    assert.deepEqual(computeDepartmentRank(values, "b", true), { rank: 1, total: 3 });
-    assert.deepEqual(computeDepartmentRank(values, "c", true), { rank: 2, total: 3 });
+    assert.deepEqual(computeDepartmentRank(values, "b", true), { rank: 1, rankedCount: 3 });
+    assert.deepEqual(computeDepartmentRank(values, "c", true), { rank: 2, rankedCount: 3 });
   });
 
   it("classe par ordre croissant pour le chômage", () => {
@@ -22,12 +22,20 @@ describe("computeDepartmentRank", () => {
       ["b", 4],
       ["c", 8],
     ]);
-    assert.deepEqual(computeDepartmentRank(values, "b", false), { rank: 1, total: 3 });
+    assert.deepEqual(computeDepartmentRank(values, "b", false), { rank: 1, rankedCount: 3 });
   });
 });
 
 describe("formatDepartmentRankLabel", () => {
-  it("formate le rang départemental", () => {
-    assert.equal(formatDepartmentRankLabel({ rank: 3, total: 35 }), "3e / 35 communes (dépt.)");
+  it("précise le département et le périmètre avec donnée", () => {
+    assert.equal(
+      formatDepartmentRankLabel({
+        rank: 3,
+        rankedCount: 35,
+        departmentCode: "35",
+        departmentCommuneCount: 332,
+      }),
+      "3e / 35 comm. avec donnée · dépt. 35 (332 comm.)",
+    );
   });
 });

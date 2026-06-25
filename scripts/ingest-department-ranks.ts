@@ -99,7 +99,11 @@ async function main(): Promise<void> {
           continue;
         }
         cache[commune.code] ??= {};
-        cache[commune.code]![indicatorId] = rank;
+        cache[commune.code]![indicatorId] = {
+          ...rank,
+          departmentCode,
+          departmentCommuneCount: communes.length,
+        };
       }
     }
 
