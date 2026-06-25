@@ -1,4 +1,19 @@
 export { buildTerritoryComparison, getCell, getIndicatorRows } from "./build-comparison";
+export { buildCommunePortrait } from "./single-portrait";
+export type {
+  CommunePortraitBlock,
+  CommunePortraitIndicator,
+  CommunePortraitResult,
+} from "./single-portrait";
+export {
+  findComparableCommunes,
+  MAX_COMPARABLE_SUGGESTIONS,
+  POPULATION_TOLERANCE_RATIO,
+} from "./comparable";
+export type {
+  ComparableCommuneSuggestion,
+  ComparableCommunesResult,
+} from "./comparable";
 export { COMPARE_BLOCKS, COMPARE_INDICATORS, COMPARE_INDICATOR_MAP } from "./indicators";
 export { buildCompareHighlights } from "./highlights";
 export { COMPARE_THEMATIC_PROFILES } from "./profiles";

@@ -54,6 +54,8 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] **Copier le lien** + **Impression / PDF** (`@media print`)
 - [x] Accueil orienté **cas d'usage** (élus, prospecteurs, risques)
 - [x] Comparaison de communes (phase 2 — page `/compare`, scénario 1 MVP)
+- [x] Vue **synthèse particulier** sur fiche commune (6 blocs, 28 indicateurs)
+- [x] Moteur **communes comparables** (profil + département + population ±30 %)
 
 ## Sprint 5 — Qualité des données
 
