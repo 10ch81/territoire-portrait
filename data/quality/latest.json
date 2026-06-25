@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-19T13:51:03.297Z",
-  "phase": "validate-internal",
+  "generatedAt": "2026-06-25T07:50:59.805Z",
+  "phase": "quality-all",
   "findings": [
     {
       "ruleId": "housing-unit-sum-exceeds",
