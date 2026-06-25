@@ -59,6 +59,7 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] Modèle **PublicIndicator** (scale, sensitive, alertes de lecture)
 - [x] Ingestion RP logement enrichie (propriétaires, résidences secondaires) — `ingest:housing`
 - [x] Rangs départementaux précalculés (6 indicateurs clés) — `ingest:department-ranks`
+- [x] Accessibilité comparateur (RGAA) — tableaux structurés, légendes, navigation blocs, impression lisible
 
 ## Sprint 5 — Qualité des données
 

@@ -13,9 +13,14 @@ export function CompareHighlights({ highlights }: CompareHighlightsProps) {
   }
 
   return (
-    <section className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-      <h2 className="text-base font-semibold text-amber-950">Points saillants</h2>
-      <p className="mt-1 text-sm text-amber-900/80">
+    <section
+      className="rounded-2xl border border-amber-300 bg-amber-50 p-6 print:border-slate-400 print:bg-white"
+      aria-labelledby="compare-highlights-heading"
+    >
+      <h2 id="compare-highlights-heading" className="text-base font-semibold text-amber-950 print:text-black">
+        Points saillants
+      </h2>
+      <p className="mt-1 text-sm text-amber-950/90 print:text-black">
         Comparaisons thématiques — sans score global ni classement général.
       </p>
       <ul className="mt-4 space-y-2">
@@ -43,8 +48,13 @@ export function CompareWarnings({ warnings }: CompareWarningsProps) {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-      <h2 className="text-sm font-semibold text-slate-900">Limites de lecture</h2>
+    <section
+      className="rounded-2xl border border-slate-200 bg-slate-50 p-5 print:border-slate-400 print:bg-white"
+      aria-labelledby="compare-warnings-heading"
+    >
+      <h2 id="compare-warnings-heading" className="text-sm font-semibold text-slate-900">
+        Limites de lecture
+      </h2>
       <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-600">
         {warnings.map((warning) => (
           <li key={warning}>{warning}</li>
@@ -82,14 +92,15 @@ export function ShareCompareActions({ communeNames }: ShareCompareActionsProps) 
       <button
         type="button"
         onClick={handleCopy}
-        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-700"
+        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+        aria-live="polite"
       >
         {copied ? "Lien copié" : "Copier le lien"}
       </button>
       <button
         type="button"
         onClick={handlePrint}
-        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-700"
+        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         aria-label={`Imprimer la comparaison ${label}`}
       >
         Imprimer / PDF

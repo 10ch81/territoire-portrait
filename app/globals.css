@@ -35,4 +35,30 @@ body {
   section {
     break-inside: avoid;
   }
+
+  .compare-table {
+    border-collapse: collapse;
+  }
+
+  .compare-table th,
+  .compare-table td {
+    border: 1px solid #334155;
+    color: #000;
+  }
+
+  .compare-table-caption {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    color: #000;
+  }
+
+  a {
+    color: #000;
+    text-decoration: underline;
+  }
 }

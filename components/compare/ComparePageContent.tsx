@@ -21,7 +21,21 @@ export function ComparePageContent({
   const communeNames = selectedCodes.map((code) => selectedNames[code] ?? code);
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-10 print:max-w-none print:py-4">
+    <main
+      id="compare-main"
+      className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-10 print:max-w-none print:py-4"
+    >
+      {comparison ? (
+        <div className="hidden print:block print:rounded-lg print:border print:border-slate-400 print:p-4">
+          <p className="text-lg font-semibold text-black">
+            Comparaison : {communeNames.join(", ")}
+          </p>
+          <p className="mt-1 text-sm text-black">
+            Portrait de territoire — tableau comparatif imprimable. Chaque valeur
+            reprend sa source et son millésime dans le détail du tableau.
+          </p>
+        </div>
+      ) : null}
       <header className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
@@ -52,7 +66,10 @@ export function ComparePageContent({
       <CompareSelector selectedCodes={selectedCodes} selectedNames={selectedNames} />
 
       {notFoundCodes.length > 0 ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <p
+          role="alert"
+          className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-900"
+        >
           Commune(s) introuvable(s) : {notFoundCodes.join(", ")}.
         </p>
       ) : null}
