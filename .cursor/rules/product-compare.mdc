@@ -1,0 +1,30 @@
+---
+description: Cible produit particulier — comparateur communal et trajectoire
+alwaysApply: true
+---
+
+# Produit — comparateur communal (particuliers)
+
+## Décision
+
+Priorité produit : **comparaison compréhensible, fiable et actionnable** (pas volume de données).
+
+Trajectoire retenue :
+1. **Scénario 1 (en cours)** — Comparateur utile MVP : `/compare`, 27 indicateurs, 6 blocs, profils thématiques sans score global, traçabilité cellule, export lien/PDF.
+2. **Scénario 2 (suite)** — Confiance & comparabilité : moteur communes similaires, modèle `PublicIndicator` enrichi, Observatoire des territoires, RGAA AA.
+3. **Scénario 3 (roadmap)** — Plateforme sémantique : personnalisation profils, BAN, RDF/API, enrichissements métiers.
+
+Ne pas commencer par l'ontologie RDF. Réutiliser le cache et la typologie `ComparisonProfile` existants.
+
+## Principes comparateur
+
+- 2 à 5 communes ; pas de score global unique.
+- Profils : « plus familiale », « plus dense », « plus équipée », etc.
+- Chaque chiffre : source, millésime, définition simple.
+- Comparaisons contextualisées (EPCI/département en MVP ; similarité en scénario 2).
+
+## Fichiers clés
+
+- `lib/compare/` — catalogue indicateurs, highlights, build
+- `app/compare/` — page comparateur
+- `components/compare/` — UI tableau, sélecteur, partage

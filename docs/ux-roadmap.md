@@ -53,7 +53,7 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 
 - [x] **Copier le lien** + **Impression / PDF** (`@media print`)
 - [x] Accueil orienté **cas d'usage** (élus, prospecteurs, risques)
-- [ ] Comparaison de communes (phase 2 — page `/compare` à venir)
+- [x] Comparaison de communes (phase 2 — page `/compare`, scénario 1 MVP)
 
 ## Sprint 5 — Qualité des données
 

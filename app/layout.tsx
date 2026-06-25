@@ -32,9 +32,17 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-slate-100 text-slate-900">
         <header className="border-b border-slate-200 bg-white">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-            <Link href="/" className="font-semibold text-slate-900">
-              Portrait de territoire
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/" className="font-semibold text-slate-900">
+                Portrait de territoire
+              </Link>
+              <Link
+                href="/compare"
+                className="text-sm font-medium text-slate-600 hover:text-blue-700"
+              >
+                Comparer
+              </Link>
+            </div>
             <span className="text-xs text-slate-500">MVP · données publiques</span>
           </div>
         </header>

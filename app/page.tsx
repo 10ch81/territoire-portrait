@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { SearchForm } from "@/components/SearchForm";
 import { SearchSuggestions } from "@/components/SearchSuggestions";
 import { UseCaseCards } from "@/components/UseCaseCards";
+import { buildCompareUrl } from "@/lib/compare";
+import { COMPARE_EXAMPLE_CODES, COMPARE_EXAMPLE_LABEL } from "@/lib/ux/recent-communes";
 
 export default function HomePage() {
   return (
@@ -10,13 +13,19 @@ export default function HomePage() {
           Portrait territorial
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          Portrait de territoire
+          Où habiter ? Comparez des communes
         </h1>
         <p className="max-w-2xl text-base leading-relaxed text-slate-600">
-          Saisissez une commune française pour générer une fiche claire à partir
-          de données publiques, enrichie d&apos;une analyse IA prudente et
-          sourcée.
+          Comparez 2 à 5 communes sur la vie quotidienne — famille, logement,
+          emploi, équipements — à partir de données publiques sourcées. Ou
+          consultez une fiche détaillée avec analyse IA prudente.
         </p>
+        <Link
+          href={buildCompareUrl([...COMPARE_EXAMPLE_CODES])}
+          className="inline-flex rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-800"
+        >
+          Comparer {COMPARE_EXAMPLE_LABEL} →
+        </Link>
       </header>
 
       <SearchForm />

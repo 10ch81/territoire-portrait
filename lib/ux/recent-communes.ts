@@ -113,6 +113,11 @@ export const EXAMPLE_COMMUNES: Array<{
   { inseeCode: "35238", name: "Rennes", label: "Rennes (35)" },
 ];
 
+/** Exemple comparateur : Rennes, Nantes, Angers. */
+export const COMPARE_EXAMPLE_CODES = ["35238", "44109", "49007"] as const;
+
+export const COMPARE_EXAMPLE_LABEL = "Rennes · Nantes · Angers";
+
 export const USE_CASE_EXAMPLES = [
   {
     id: "elected",
