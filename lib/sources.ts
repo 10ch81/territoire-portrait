@@ -1,5 +1,6 @@
 import type { DataSource } from "./types";
 
+const BAN_URL = "https://adresse.data.gouv.fr/api-doc/adresse";
 const GEO_API_BASE = "https://geo.api.gouv.fr";
 const ENTREPRISES_API_BASE = "https://recherche-entreprises.api.gouv.fr";
 const BPE_DATASET_URL =
@@ -116,6 +117,7 @@ export const CNAF_RSA_VINTAGE = 2024;
 
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
+  BAN: "ban-adresse",
   RECHERCHE_ENTREPRISES: "recherche-entreprises",
   INSEE_BPE: "insee-bpe",
   INSEE_POPULATION: "insee-population",
@@ -160,6 +162,18 @@ export function createGeoApiSource(accessedAt: string): DataSource {
     url: `${GEO_API_BASE}/communes`,
     description:
       "Référentiel officiel des communes françaises (nom, code INSEE, population, EPCI, coordonnées).",
+    accessedAt,
+  };
+}
+
+/** Source consultée pour la recherche par adresse (géocodage → commune). */
+export function createBanSearchSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.BAN,
+    name: "Base Adresse Nationale (BAN)",
+    url: BAN_URL,
+    description:
+      "Géocodage d'adresses postales pour résoudre la commune (API adresse.data.gouv.fr).",
     accessedAt,
   };
 }

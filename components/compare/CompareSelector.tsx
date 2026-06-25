@@ -11,6 +11,11 @@ import {
   parseComparePrioritiesParam,
 } from "@/lib/compare/parse-codes";
 import { COMPARE_EXAMPLE_CODES } from "@/lib/ux/recent-communes";
+import {
+  buildCommuneSearchSuggestions,
+  pickCommuneSearchInsee,
+  type CommuneSearchSuggestion,
+} from "@/lib/ux/commune-search-ui";
 import { ErrorBox } from "@/components/ErrorBox";
 
 const DEBOUNCE_MS = 300;
@@ -30,7 +35,7 @@ export function CompareSelector({
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [suggestions, setSuggestions] = useState<CommuneSearchResult["matches"]>([]);
+  const [suggestions, setSuggestions] = useState<CommuneSearchSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -97,9 +102,7 @@ export function CompareSelector({
           setSuggestions([]);
           return;
         }
-        setSuggestions(
-          data.resolved ? [data.resolved] : data.matches.slice(0, 8),
-        );
+        setSuggestions(buildCommuneSearchSuggestions(data, 8));
       } catch (err) {
         if (err instanceof Error && err.name === "AbortError") {
           return;
@@ -145,12 +148,12 @@ export function CompareSelector({
         setError("Commune introuvable.");
         return;
       }
-      const match = data.resolved ?? data.matches[0];
-      if (!match) {
+      const inseeCode = pickCommuneSearchInsee(data);
+      if (!inseeCode) {
         setError("Aucune commune trouvée.");
         return;
       }
-      addCommune(match.inseeCode);
+      addCommune(inseeCode);
     } catch {
       setError("Impossible de contacter le serveur.");
     } finally {
@@ -167,7 +170,8 @@ export function CompareSelector({
         Communes à comparer ({selectedCodes.length}/{MAX_COMPARE_COMMUNES})
       </h2>
       <p className="mt-1 text-sm text-slate-600">
-        Sélectionnez entre {MIN_COMPARE_COMMUNES} et {MAX_COMPARE_COMMUNES} communes.
+        Sélectionnez entre {MIN_COMPARE_COMMUNES} et {MAX_COMPARE_COMMUNES} communes
+        (nom, adresse BAN, code postal ou INSEE).
       </p>
 
       {selectedCodes.length > 0 ? (
@@ -211,22 +215,25 @@ export function CompareSelector({
               setShowSuggestions(true);
             }}
             onFocus={() => setShowSuggestions(true)}
-            placeholder="Ajouter une commune…"
+            placeholder="Ajouter une commune ou une adresse…"
             disabled={loading || selectedCodes.length >= MAX_COMPARE_COMMUNES}
             className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100 disabled:opacity-60"
             autoComplete="off"
           />
           {showSuggestions && suggestions.length > 0 ? (
             <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
-              {suggestions.map((match) => (
-                <li key={match.inseeCode}>
+              {suggestions.map((suggestion) => (
+                <li key={suggestion.key}>
                   <button
                     type="button"
-                    onClick={() => addCommune(match.inseeCode)}
+                    onClick={() => addCommune(suggestion.inseeCode)}
                     className="flex w-full flex-col px-4 py-3 text-left hover:bg-slate-50"
                   >
-                    <span className="font-medium text-slate-900">{match.name}</span>
-                    <span className="text-sm text-slate-500">INSEE {match.inseeCode}</span>
+                    <span className="font-medium text-slate-900">
+                      {suggestion.kind === "address" ? "Adresse — " : ""}
+                      {suggestion.title}
+                    </span>
+                    <span className="text-sm text-slate-500">{suggestion.subtitle}</span>
                   </button>
                 </li>
               ))}

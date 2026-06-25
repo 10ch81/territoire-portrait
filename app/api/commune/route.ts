@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resolveCommuneQuery } from "@/lib/territory";
+import { resolveCommuneAndAddressSearch } from "@/lib/geo/resolve-search";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const result = await resolveCommuneQuery(query);
+    const result = await resolveCommuneAndAddressSearch(query);
     return NextResponse.json(result);
   } catch (error) {
     console.error("Erreur API commune:", error);

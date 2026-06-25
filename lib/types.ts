@@ -481,10 +481,19 @@ export interface AnalysisResult {
   error?: string;
 }
 
+export interface AddressSearchMatch {
+  label: string;
+  inseeCode: string;
+  communeName: string;
+  postalCode: string;
+  score: number;
+}
+
 export interface CommuneSearchResult {
   query: string;
   matches: TerritoryProfile[];
   resolved: TerritoryProfile | null;
+  addressMatches: AddressSearchMatch[];
 }
 
 export interface GeoApiCommune {

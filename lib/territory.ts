@@ -137,7 +137,7 @@ export async function resolveCommuneQuery(
   const query = normalizeQuery(rawQuery);
 
   if (!query) {
-    return { query, matches: [], resolved: null };
+    return { query, matches: [], resolved: null, addressMatches: [] };
   }
 
   if (isInseeCode(query)) {
@@ -146,13 +146,14 @@ export async function resolveCommuneQuery(
       query,
       matches: resolved ? [resolved] : [],
       resolved,
+      addressMatches: [],
     };
   }
 
   if (isPostalCode(query)) {
     const byInsee = await fetchCommuneByInsee(query);
     if (byInsee) {
-      return { query, matches: [byInsee], resolved: byInsee };
+      return { query, matches: [byInsee], resolved: byInsee, addressMatches: [] };
     }
 
     const matches = await fetchCommunesByPostalCode(query);
@@ -160,6 +161,7 @@ export async function resolveCommuneQuery(
       query,
       matches,
       resolved: matches.length === 1 ? matches[0] : null,
+      addressMatches: [],
     };
   }
 
@@ -168,6 +170,7 @@ export async function resolveCommuneQuery(
     query,
     matches,
     resolved: matches.length === 1 ? matches[0] : null,
+    addressMatches: [],
   };
 }
 

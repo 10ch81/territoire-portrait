@@ -65,7 +65,7 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 
 - [x] Personnalisation profils utilisateur (`priorites=` + localStorage) sur `/compare`
 - [x] API catalogue indicateurs publics — `GET /api/indicators/catalog`
-- [ ] BAN / géocodage adresse — roadmap
+- [x] BAN / géocodage adresse — recherche accueil et comparateur via `/api/commune`
 - [ ] RDF / export sémantique — roadmap (ne pas commencer par l'ontologie)
 
 ## Sprint 5 — Qualité des données
