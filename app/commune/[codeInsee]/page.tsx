@@ -51,8 +51,10 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
   const completeness = computeCompleteness(territory);
   const sections = getVisibleSections(territory);
   const portraitNarrativeAvailable = isPortraitNarrativeAvailable();
-  const portrait = buildCommunePortrait(territory);
-  const comparable = await findComparableCommunes(territory);
+  const portrait =
+    vue === "particulier" ? buildCommunePortrait(territory) : null;
+  const comparable =
+    vue === "particulier" ? await findComparableCommunes(territory) : null;
 
   return (
     <AnalysisReadyProvider key={territory.inseeCode}>
@@ -92,7 +94,7 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
 
         <KpiHero kpis={kpis} />
 
-        {vue === "particulier" ? (
+        {vue === "particulier" && portrait && comparable ? (
           <div className="space-y-6 print:hidden">
             <PortraitBlocks portrait={portrait} />
             <ComparableCommunesPanel

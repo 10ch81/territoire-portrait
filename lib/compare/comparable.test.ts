@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { POPULATION_TOLERANCE_RATIO } from "./comparable";
+import { MAX_COMPARABLE_SUGGESTIONS, POPULATION_TOLERANCE_RATIO } from "./comparable";
+import { MAX_COMPARE_COMMUNES } from "./parse-codes";
+
+describe("MAX_COMPARABLE_SUGGESTIONS", () => {
+  it("laisse une place à la commune courante dans le comparateur", () => {
+    assert.equal(MAX_COMPARABLE_SUGGESTIONS, MAX_COMPARE_COMMUNES - 1);
+  });
+});
 
 describe("POPULATION_TOLERANCE_RATIO", () => {
   it("reste à 30 % pour le filtre de similarité", () => {

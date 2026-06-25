@@ -10,11 +10,13 @@ import { deriveComparisonProfile } from "@/lib/typology/comparison-profile";
 import { formatComparisonProfile } from "@/lib/ux/typology-display";
 import type { ComparisonProfile } from "@/lib/typology/types";
 import type { GeographyCommuneCache, TerritoryProfile } from "@/lib/types";
+import { MAX_COMPARE_COMMUNES } from "./parse-codes";
 
 const GEO_API_BASE = "https://geo.api.gouv.fr";
 const GEOGRAPHY_CACHE_FILE = "geography-by-commune.json";
 export const POPULATION_TOLERANCE_RATIO = 0.3;
-export const MAX_COMPARABLE_SUGGESTIONS = 5;
+/** La commune courante occupe une place dans le comparateur (max 5 communes). */
+export const MAX_COMPARABLE_SUGGESTIONS = MAX_COMPARE_COMMUNES - 1;
 
 interface GeoApiDepartmentCommune {
   nom: string;
@@ -79,19 +81,24 @@ function populationWithinTolerance(
 async function fetchDepartmentCommunes(
   departmentCode: string,
 ): Promise<GeoApiDepartmentCommune[]> {
-  const response = await fetch(
-    `${GEO_API_BASE}/departements/${encodeURIComponent(departmentCode)}/communes?fields=nom,code,population&format=json`,
-    {
-      headers: { Accept: "application/json" },
-      next: { revalidate: 86400 },
-    },
-  );
+  try {
+    const response = await fetch(
+      `${GEO_API_BASE}/departements/${encodeURIComponent(departmentCode)}/communes?fields=nom,code,population&format=json`,
+      {
+        headers: { Accept: "application/json" },
+        next: { revalidate: 86400 },
+      },
+    );
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return [];
+    }
+
+    return (await response.json()) as GeoApiDepartmentCommune[];
+  } catch (error) {
+    console.error("Erreur API Géo département (communes comparables):", error);
     return [];
   }
-
-  return (await response.json()) as GeoApiDepartmentCommune[];
 }
 
 export async function findComparableCommunes(
@@ -118,6 +125,15 @@ export async function findComparableCommunes(
 
   const geographyCache = loadJsonCache<GeographyCommuneCache>(GEOGRAPHY_CACHE_FILE);
   const departmentCommunes = await fetchDepartmentCommunes(departmentCode);
+  if (departmentCommunes.length === 0) {
+    return {
+      suggestions: [],
+      criteriaLabel: `Même profil (${formatComparisonProfile(referenceProfile)}) · même département`,
+      available: false,
+      note: "Impossible de charger les communes du département pour proposer des comparables.",
+    };
+  }
+
   const profileLabel = formatComparisonProfile(referenceProfile);
 
   const candidates: ComparableCommuneSuggestion[] = [];
@@ -128,6 +144,9 @@ export async function findComparableCommunes(
     }
 
     const population = commune.population ?? null;
+    if (referencePopulation !== null && population === null) {
+      continue;
+    }
     if (
       referencePopulation !== null &&
       population !== null &&

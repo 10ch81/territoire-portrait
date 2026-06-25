@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ComparableCommunesResult } from "@/lib/compare/comparable";
-import { buildCompareUrl } from "@/lib/compare/parse-codes";
+import { buildCompareUrl, MAX_COMPARE_COMMUNES } from "@/lib/compare/parse-codes";
 import { formatPopulation } from "@/lib/territory";
 
 interface ComparableCommunesPanelProps {
@@ -14,10 +14,9 @@ export function ComparableCommunesPanel({
   currentName,
   comparable,
 }: ComparableCommunesPanelProps) {
-  const compareCodes = [
-    currentInseeCode,
-    ...comparable.suggestions.map((item) => item.inseeCode),
-  ].slice(0, 5);
+  const maxSuggestions = MAX_COMPARE_COMMUNES - 1;
+  const suggestions = comparable.suggestions.slice(0, maxSuggestions);
+  const compareCodes = [currentInseeCode, ...suggestions.map((item) => item.inseeCode)];
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
@@ -27,7 +26,7 @@ export function ComparableCommunesPanel({
       {comparable.available ? (
         <>
           <ul className="mt-4 space-y-2">
-            {comparable.suggestions.map((commune) => (
+            {suggestions.map((commune) => (
               <li key={commune.inseeCode}>
                 <Link
                   href={`/commune/${commune.inseeCode}`}
