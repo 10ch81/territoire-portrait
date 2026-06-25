@@ -22,6 +22,7 @@ import {
   buildCommunePortrait,
   findComparableCommunes,
 } from "@/lib/compare";
+import { attachDepartmentRanksToPortrait } from "@/lib/indicators/department-ranks";
 import { isPortraitNarrativeAvailable } from "@/lib/portrait/generate-portrait";
 import { computeCompleteness } from "@/lib/ux/completeness";
 import { extractHeroKpis } from "@/lib/ux/kpis";
@@ -52,7 +53,9 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
   const sections = getVisibleSections(territory);
   const portraitNarrativeAvailable = isPortraitNarrativeAvailable();
   const portrait =
-    vue === "particulier" ? buildCommunePortrait(territory) : null;
+    vue === "particulier"
+      ? attachDepartmentRanksToPortrait(buildCommunePortrait(territory), territory.inseeCode)
+      : null;
   const comparable =
     vue === "particulier" ? await findComparableCommunes(territory) : null;
 

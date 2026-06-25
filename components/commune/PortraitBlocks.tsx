@@ -58,6 +58,9 @@ export function PortraitBlocks({ portrait }: PortraitBlocksProps) {
                     {indicator.fragile ? (
                       <p className="mt-1 text-xs text-amber-700">Donnée fragile</p>
                     ) : null}
+                    {indicator.departmentRankLabel ? (
+                      <p className="mt-1 text-xs text-slate-500">{indicator.departmentRankLabel}</p>
+                    ) : null}
                     {indicator.warning ? (
                       <p className="mt-1 text-xs text-amber-700">{indicator.warning}</p>
                     ) : null}

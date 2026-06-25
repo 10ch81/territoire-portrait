@@ -45,6 +45,7 @@ export interface CompareCell {
   fragile: boolean;
   warning: string | null;
   available: boolean;
+  departmentRankLabel?: string | null;
 }
 
 export interface CompareBlock {

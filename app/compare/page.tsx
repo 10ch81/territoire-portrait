@@ -4,6 +4,7 @@ import {
   MIN_COMPARE_COMMUNES,
   parseCompareCodesParam,
 } from "@/lib/compare";
+import { attachDepartmentRanksToComparison } from "@/lib/indicators/department-ranks";
 import { ComparePageContent } from "@/components/compare/ComparePageContent";
 
 interface ComparePageProps {
@@ -37,7 +38,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
 
   const comparison =
     territories.length >= MIN_COMPARE_COMMUNES
-      ? buildTerritoryComparison(territories)
+      ? attachDepartmentRanksToComparison(buildTerritoryComparison(territories))
       : null;
 
   return (

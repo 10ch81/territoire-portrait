@@ -9,20 +9,14 @@ import { loadJsonCache } from "@/lib/enrichment/cache";
 import { deriveComparisonProfile } from "@/lib/typology/comparison-profile";
 import { formatComparisonProfile } from "@/lib/ux/typology-display";
 import type { ComparisonProfile } from "@/lib/typology/types";
+import { fetchDepartmentCommunes } from "@/lib/geo/department-communes";
 import type { GeographyCommuneCache, TerritoryProfile } from "@/lib/types";
 import { MAX_COMPARE_COMMUNES } from "./parse-codes";
 
-const GEO_API_BASE = "https://geo.api.gouv.fr";
 const GEOGRAPHY_CACHE_FILE = "geography-by-commune.json";
 export const POPULATION_TOLERANCE_RATIO = 0.3;
 /** La commune courante occupe une place dans le comparateur (max 5 communes). */
 export const MAX_COMPARABLE_SUGGESTIONS = MAX_COMPARE_COMMUNES - 1;
-
-interface GeoApiDepartmentCommune {
-  nom: string;
-  code: string;
-  population?: number;
-}
 
 export interface ComparableCommuneSuggestion {
   inseeCode: string;
@@ -76,29 +70,6 @@ function populationWithinTolerance(
   const min = reference * (1 - toleranceRatio);
   const max = reference * (1 + toleranceRatio);
   return candidate >= min && candidate <= max;
-}
-
-async function fetchDepartmentCommunes(
-  departmentCode: string,
-): Promise<GeoApiDepartmentCommune[]> {
-  try {
-    const response = await fetch(
-      `${GEO_API_BASE}/departements/${encodeURIComponent(departmentCode)}/communes?fields=nom,code,population&format=json`,
-      {
-        headers: { Accept: "application/json" },
-        next: { revalidate: 86400 },
-      },
-    );
-
-    if (!response.ok) {
-      return [];
-    }
-
-    return (await response.json()) as GeoApiDepartmentCommune[];
-  } catch (error) {
-    console.error("Erreur API Géo département (communes comparables):", error);
-    return [];
-  }
 }
 
 export async function findComparableCommunes(

@@ -1,4 +1,4 @@
-import { getIndicatorRows } from "@/lib/compare/build-comparison";
+import { getIndicatorRows } from "@/lib/compare/indicator-rows";
 import type { CompareCell, TerritoryComparisonResult } from "@/lib/compare/types";
 
 interface CompareTableProps {
@@ -46,6 +46,9 @@ function CellValue({ cell }: { cell: CompareCell | undefined }) {
       ) : null}
       {cell.warning ? (
         <span className="block text-xs text-amber-700">{cell.warning}</span>
+      ) : null}
+      {cell.departmentRankLabel ? (
+        <span className="block text-xs text-slate-500">{cell.departmentRankLabel}</span>
       ) : null}
     </div>
   );

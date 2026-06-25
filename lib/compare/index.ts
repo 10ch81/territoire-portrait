@@ -1,4 +1,5 @@
-export { buildTerritoryComparison, getCell, getIndicatorRows } from "./build-comparison";
+export { buildTerritoryComparison, getCell } from "./build-comparison";
+export { getIndicatorRows } from "./indicator-rows";
 export { buildCommunePortrait } from "./single-portrait";
 export type {
   CommunePortraitBlock,

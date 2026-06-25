@@ -15,6 +15,7 @@ export interface CommunePortraitIndicator {
   available: boolean;
   sensitive: boolean;
   scale: string;
+  departmentRankLabel: string | null;
 }
 
 export interface CommunePortraitBlock {
@@ -53,6 +54,7 @@ export function buildCommunePortrait(territory: TerritoryProfile): CommunePortra
         available: extracted.available,
         sensitive: indicator.sensitive,
         scale: indicator.scale,
+        departmentRankLabel: null,
       });
     }
 
