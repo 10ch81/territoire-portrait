@@ -55,6 +55,7 @@ export interface CompareBlock {
 }
 
 export interface CompareHighlight {
+  profileId: string;
   profileLabel: string;
   sentence: string;
   indicatorId: string;

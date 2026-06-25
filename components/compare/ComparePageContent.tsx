@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import type { TerritoryComparisonResult } from "@/lib/compare/types";
 import { MIN_COMPARE_COMMUNES } from "@/lib/compare/parse-codes";
 import { ShareCompareActions } from "./CompareHighlights";
@@ -63,7 +64,13 @@ export function ComparePageContent({
         </div>
       </header>
 
-      <CompareSelector selectedCodes={selectedCodes} selectedNames={selectedNames} />
+      <Suspense
+        fallback={
+          <p className="text-sm text-slate-500">Chargement du sélecteur de communes…</p>
+        }
+      >
+        <CompareSelector selectedCodes={selectedCodes} selectedNames={selectedNames} />
+      </Suspense>
 
       {notFoundCodes.length > 0 ? (
         <p
@@ -81,7 +88,15 @@ export function ComparePageContent({
         </p>
       ) : null}
 
-      {comparison ? <CompareResults comparison={comparison} /> : null}
+      {comparison ? (
+        <Suspense
+          fallback={
+            <p className="text-sm text-slate-500">Chargement de la comparaison…</p>
+          }
+        >
+          <CompareResults comparison={comparison} />
+        </Suspense>
+      ) : null}
     </main>
   );
 }

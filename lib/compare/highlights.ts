@@ -72,6 +72,7 @@ export function buildCompareHighlights(input: {
       const trailer = communeName(nameByInsee, pair.worst.communeInsee);
 
       highlights.push({
+        profileId: profile.id,
         profileLabel: profile.label,
         indicatorId,
         sentence: `${leader} est ${profile.shortLabel} que ${trailer} sur « ${indicator.label} » (${pair.best.displayValue} vs ${pair.worst.displayValue}).`,

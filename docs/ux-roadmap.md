@@ -61,6 +61,13 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] Rangs départementaux précalculés (6 indicateurs clés) — `ingest:department-ranks`
 - [x] Accessibilité comparateur (RGAA) — tableaux structurés, légendes, navigation blocs, impression lisible
 
+## Scénario 3 — Plateforme sémantique (amorcé)
+
+- [x] Personnalisation profils utilisateur (`priorites=` + localStorage) sur `/compare`
+- [x] API catalogue indicateurs publics — `GET /api/indicators/catalog`
+- [ ] BAN / géocodage adresse — roadmap
+- [ ] RDF / export sémantique — roadmap (ne pas commencer par l'ontologie)
+
 ## Sprint 5 — Qualité des données
 
 - [x] `lib/quality/rules.ts` — cohérence interne (densité, dérivés, bornes)

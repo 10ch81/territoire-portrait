@@ -9,3 +9,4 @@ export {
   collectComparisonReadingAlerts,
   collectTerritoryReadingAlerts,
 } from "./reading-alerts";
+export { buildPublicIndicatorCatalog } from "./catalog";

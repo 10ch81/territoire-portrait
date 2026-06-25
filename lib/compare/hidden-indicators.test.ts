@@ -71,11 +71,13 @@ describe("filterCompareHighlights", () => {
     const filtered = filterCompareHighlights(
       [
         {
+          profileId: "revenus",
           profileLabel: "Revenus",
           indicatorId: "rsa_share",
           sentence: "Exemple RSA",
         },
         {
+          profileId: "dense",
           profileLabel: "Démographie",
           indicatorId: "population",
           sentence: "Exemple population",

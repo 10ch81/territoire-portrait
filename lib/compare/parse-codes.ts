@@ -1,3 +1,5 @@
+import { isValidComparePriorityId, serializeComparePrioritiesParam } from "./user-priorities";
+
 const INSEE_CODE_PATTERN = /^(\d{5}|2[AB]\d{3})$/i;
 export const MIN_COMPARE_COMMUNES = 2;
 export const MAX_COMPARE_COMMUNES = 5;
@@ -34,10 +36,35 @@ export function parseCompareCodesParam(raw: string | string[] | undefined): stri
   return codes;
 }
 
-export function buildCompareUrl(codes: string[]): string {
+export function buildCompareUrl(
+  codes: string[],
+  options?: { priorities?: string[] },
+): string {
   const valid = codes.filter(isValidInseeCode).slice(0, MAX_COMPARE_COMMUNES);
   if (valid.length === 0) {
     return "/compare";
   }
-  return `/compare?codes=${valid.map(normalizeInseeCode).join(",")}`;
+
+  const params = new URLSearchParams({
+    codes: valid.map(normalizeInseeCode).join(","),
+  });
+
+  const priorities = options?.priorities?.filter(isValidComparePriorityId) ?? [];
+  const serialized = serializeComparePrioritiesParam(priorities);
+  if (serialized) {
+    params.set("priorites", serialized);
+  }
+
+  return `/compare?${params.toString()}`;
 }
+
+export {
+  parseComparePrioritiesParam,
+  serializeComparePrioritiesParam,
+  isValidComparePriorityId,
+  COMPARE_PRIORITY_IDS,
+  filterHighlightsByPriorities,
+  orderCompareBlocksByPriorities,
+  getComparePriorityLabel,
+  shouldFilterByPriorities,
+} from "./user-priorities";

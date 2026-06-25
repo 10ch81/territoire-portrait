@@ -1,13 +1,21 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import type { TerritoryComparisonResult } from "@/lib/compare/types";
 import {
   filterCompareHighlights,
   getHiddenCompareIndicatorIds,
 } from "@/lib/compare/hidden-indicators";
+import {
+  filterHighlightsByPriorities,
+  orderCompareBlocksByPriorities,
+  parseComparePrioritiesParam,
+} from "@/lib/compare/parse-codes";
+import { useComparePriorities } from "@/lib/ux/compare-user-profile";
 import { useHideSensitiveIndicators } from "@/lib/ux/sensitive-indicators";
 import { SensitiveIndicatorsToggle } from "@/components/SensitiveIndicatorsToggle";
 import { CompareHighlights, CompareWarnings } from "./CompareHighlights";
+import { CompareProfileSelector } from "./CompareProfileSelector";
 import { CompareTable } from "./CompareTable";
 
 interface CompareResultsProps {
@@ -15,26 +23,36 @@ interface CompareResultsProps {
 }
 
 export function CompareResults({ comparison }: CompareResultsProps) {
+  const searchParams = useSearchParams();
+  const urlPriorities = parseComparePrioritiesParam(searchParams.get("priorites") ?? undefined);
+  const { priorityIds } = useComparePriorities({ urlPriorities });
   const { hideSensitive } = useHideSensitiveIndicators();
   const hiddenIndicatorIds = getHiddenCompareIndicatorIds(comparison, hideSensitive);
-  const highlights = filterCompareHighlights(comparison.highlights, hiddenIndicatorIds);
-  const visibleBlocks = comparison.blocks.filter(
-    (block) => block.indicatorIds.some((id) => !hiddenIndicatorIds?.has(id)),
+  const prioritizedHighlights = filterHighlightsByPriorities(
+    comparison.highlights,
+    priorityIds,
   );
+  const highlights = filterCompareHighlights(prioritizedHighlights, hiddenIndicatorIds);
+  const orderedBlocks = orderCompareBlocksByPriorities(comparison.blocks, priorityIds);
+  const visibleBlocks = orderedBlocks.filter((block) =>
+    block.indicatorIds.some((id) => !hiddenIndicatorIds?.has(id)),
+  );
+  const orderedComparison: TerritoryComparisonResult = {
+    ...comparison,
+    blocks: orderedBlocks,
+  };
 
   return (
     <div aria-labelledby="compare-results-heading">
       <h2 id="compare-results-heading" className="sr-only">
         Résultats de la comparaison
       </h2>
+      <CompareProfileSelector />
       <div className="print:hidden">
         <SensitiveIndicatorsToggle />
       </div>
       {visibleBlocks.length > 0 ? (
-        <nav
-          aria-label="Sections du tableau comparatif"
-          className="print:hidden"
-        >
+        <nav aria-label="Sections du tableau comparatif" className="print:hidden">
           <ul className="mb-4 flex flex-wrap gap-2">
             {visibleBlocks.map((block) => (
               <li key={block.id}>
@@ -51,7 +69,7 @@ export function CompareResults({ comparison }: CompareResultsProps) {
       ) : null}
       <CompareHighlights highlights={highlights} />
       <CompareWarnings warnings={comparison.warnings} />
-      <CompareTable comparison={comparison} hiddenIndicatorIds={hiddenIndicatorIds} />
+      <CompareTable comparison={orderedComparison} hiddenIndicatorIds={hiddenIndicatorIds} />
     </div>
   );
 }

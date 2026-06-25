@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { CommuneSearchResult } from "@/lib/types";
 import {
   buildCompareUrl,
   MAX_COMPARE_COMMUNES,
   MIN_COMPARE_COMMUNES,
+  parseComparePrioritiesParam,
 } from "@/lib/compare/parse-codes";
 import { COMPARE_EXAMPLE_CODES } from "@/lib/ux/recent-communes";
 import { ErrorBox } from "@/components/ErrorBox";
@@ -24,6 +25,8 @@ export function CompareSelector({
   selectedNames,
 }: CompareSelectorProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const priorities = parseComparePrioritiesParam(searchParams.get("priorites") ?? undefined);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,9 +38,9 @@ export function CompareSelector({
 
   const navigateWithCodes = useCallback(
     (codes: string[]) => {
-      router.push(buildCompareUrl(codes));
+      router.push(buildCompareUrl(codes, { priorities }));
     },
-    [router],
+    [priorities, router],
   );
 
   const addCommune = useCallback(

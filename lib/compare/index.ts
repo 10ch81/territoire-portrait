@@ -25,6 +25,8 @@ export {
   MIN_COMPARE_COMMUNES,
   normalizeInseeCode,
   parseCompareCodesParam,
+  parseComparePrioritiesParam,
+  COMPARE_PRIORITY_IDS,
 } from "./parse-codes";
 export type {
   CompareBlock,
