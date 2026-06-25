@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { buildCompareUrl } from "@/lib/compare/parse-codes";
 import {
   COMPARE_EXAMPLE_CODES,
@@ -17,7 +17,7 @@ import {
   validateHabitatPriorities,
 } from "@/lib/ux/habitat-profile";
 
-function readInitialSelection(): string[] {
+function readStoredSelection(): string[] {
   if (typeof window === "undefined") {
     return [];
   }
@@ -26,8 +26,12 @@ function readInitialSelection(): string[] {
 
 export function HabitatProfileWizard() {
   const router = useRouter();
-  const [selected, setSelected] = useState<string[]>(readInitialSelection);
+  const [selected, setSelected] = useState<string[]>([]);
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSelected(readStoredSelection());
+  }, []);
 
   const handleToggle = useCallback(
     (profileId: string) => {

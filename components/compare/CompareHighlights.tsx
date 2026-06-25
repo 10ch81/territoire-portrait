@@ -2,7 +2,13 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import {
+  parseComparePrioritiesParam,
+  serializeComparePrioritiesParam,
+} from "@/lib/compare/parse-codes";
 import type { CompareHighlight } from "@/lib/compare/types";
+import { useComparePriorities } from "@/lib/ux/compare-user-profile";
+import { useHideSensitiveIndicators } from "@/lib/ux/sensitive-indicators";
 
 interface CompareHighlightsProps {
   highlights: CompareHighlight[];
@@ -72,18 +78,29 @@ interface ShareCompareActionsProps {
 
 export function ShareCompareActions({ communeNames, selectedCodes }: ShareCompareActionsProps) {
   const searchParams = useSearchParams();
+  const urlPriorities = parseComparePrioritiesParam(searchParams.get("priorites") ?? undefined);
+  const { priorityIds } = useComparePriorities({ urlPriorities });
+  const { hideSensitive } = useHideSensitiveIndicators();
   const [copied, setCopied] = useState(false);
 
   const jsonLdHref = useMemo(() => {
     const params = new URLSearchParams({
       codes: selectedCodes.join(","),
     });
-    const priorites = searchParams.get("priorites");
-    if (priorites) {
-      params.set("priorites", priorites);
+    const urlPriorites = searchParams.get("priorites");
+    if (urlPriorites) {
+      params.set("priorites", urlPriorites);
+    } else {
+      const serialized = serializeComparePrioritiesParam(priorityIds);
+      if (serialized) {
+        params.set("priorites", serialized);
+      }
+    }
+    if (!hideSensitive) {
+      params.set("includeSensitive", "1");
     }
     return `/api/compare/jsonld?${params.toString()}`;
-  }, [searchParams, selectedCodes]);
+  }, [hideSensitive, priorityIds, searchParams, selectedCodes]);
 
   const handleCopy = useCallback(async () => {
     try {

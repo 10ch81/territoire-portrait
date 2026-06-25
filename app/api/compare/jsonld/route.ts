@@ -65,7 +65,8 @@ export async function GET(request: Request) {
     buildTerritoryComparison(territories),
   );
 
-  const compareUrl = buildCompareUrl(codes, { priorities: priorityIds });
+  const resolvedCodes = territories.map((territory) => territory.inseeCode);
+  const compareUrl = buildCompareUrl(resolvedCodes, { priorities: priorityIds });
   const baseUrl = resolveBaseUrl(request);
 
   const document = buildCompareJsonLd({
