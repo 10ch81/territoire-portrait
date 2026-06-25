@@ -22,7 +22,7 @@ export const COMPARE_THEMATIC_PROFILES: CompareThematicProfile[] = [
     label: "Accessibilité au logement",
     shortLabel: "logement plus accessible (prix)",
     questionId: "housing",
-    indicatorIds: ["price_per_m2", "rp_vacancy_rate", "total_dwellings"],
+    indicatorIds: ["price_per_m2", "rp_vacancy_rate", "secondary_residence_share", "owner_occupied_share"],
   },
   {
     id: "revenus",

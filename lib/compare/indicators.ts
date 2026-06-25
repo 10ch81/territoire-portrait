@@ -5,7 +5,7 @@ import {
   formatPercent,
   formatPropertyPrice,
   formatRate,
-} from "@/lib/enrichment";
+} from "@/lib/enrichment/format";
 import { formatPopulation } from "@/lib/territory";
 import {
   FILOSOFI_VINTAGE,
@@ -13,6 +13,7 @@ import {
   SOURCE_IDS,
 } from "@/lib/sources";
 import { formatComparisonProfile } from "@/lib/ux/typology-display";
+import { isSensitiveIndicator } from "@/lib/indicators/types";
 import type { TerritoryProfile } from "@/lib/types";
 import type {
   CompareBlock,
@@ -97,7 +98,9 @@ export const COMPARE_BLOCKS: CompareBlock[] = [
   { id: "dynamics", label: "Dynamiques & accessibilité", indicatorIds: [] },
 ];
 
-export const COMPARE_INDICATORS: CompareIndicatorDefinition[] = [
+type CompareIndicatorInput = Omit<CompareIndicatorDefinition, "scale" | "sensitive">;
+
+const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
   {
     id: "population",
     label: "Population",
@@ -327,6 +330,55 @@ export const COMPARE_INDICATORS: CompareIndicatorDefinition[] = [
         value,
         housing?.year ?? RP_VINTAGE,
         value !== null,
+      );
+    },
+  },
+  {
+    id: "owner_occupied_share",
+    label: "Propriétaires occupants (RP)",
+    definition:
+      "Part des résidences principales occupées par des propriétaires (recensement RP).",
+    blockId: "housing",
+    questionIds: ["housing"],
+    sourceId: SOURCE_IDS.INSEE_RP_HOUSING,
+    sourceName: "INSEE RP",
+    valueType: "ratio",
+    higherIsBetter: null,
+    extract: (t) => {
+      const housing = t.enrichment?.housing;
+      const value = housing?.ownerOccupiedPrimarySharePercent ?? null;
+      return numericCell(
+        formatPercent(value),
+        value,
+        housing?.year ?? RP_VINTAGE,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "secondary_residence_share",
+    label: "Résidences secondaires",
+    definition:
+      "Part de résidences secondaires et logements occasionnels dans le parc total (RP).",
+    blockId: "housing",
+    questionIds: ["housing"],
+    sourceId: SOURCE_IDS.INSEE_RP_HOUSING,
+    sourceName: "INSEE RP",
+    valueType: "ratio",
+    higherIsBetter: null,
+    extract: (t) => {
+      const housing = t.enrichment?.housing;
+      const value = housing?.secondaryResidenceSharePercent ?? null;
+      const warning =
+        value !== null && value >= 20
+          ? "Forte part de résidences secondaires — interpréter les ratios par habitant avec prudence."
+          : tourismWarning(t);
+      return numericCell(
+        formatPercent(value),
+        value,
+        housing?.year ?? RP_VINTAGE,
+        value !== null,
+        { warning },
       );
     },
   },
@@ -680,6 +732,14 @@ export const COMPARE_INDICATORS: CompareIndicatorDefinition[] = [
     },
   },
 ];
+
+export const COMPARE_INDICATORS: CompareIndicatorDefinition[] = RAW_COMPARE_INDICATORS.map(
+  (item) => ({
+    ...item,
+    scale: "commune",
+    sensitive: isSensitiveIndicator(item.id),
+  }),
+);
 
 for (const block of COMPARE_BLOCKS) {
   block.indicatorIds = COMPARE_INDICATORS.filter((item) => item.blockId === block.id).map(

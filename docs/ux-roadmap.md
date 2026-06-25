@@ -56,6 +56,8 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] Comparaison de communes (phase 2 — page `/compare`, scénario 1 MVP)
 - [x] Vue **synthèse particulier** sur fiche commune (6 blocs, 28 indicateurs)
 - [x] Moteur **communes comparables** (profil + département + population ±30 %)
+- [x] Modèle **PublicIndicator** (scale, sensitive, alertes de lecture)
+- [x] Ingestion RP logement enrichie (propriétaires, résidences secondaires) — relancer `ingest:housing`
 
 ## Sprint 5 — Qualité des données
 

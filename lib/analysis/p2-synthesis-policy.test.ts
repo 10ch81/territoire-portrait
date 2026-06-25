@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildAnalysisFacts } from "./build-analysis-facts";
 import { buildIncomeWatchPointSentence } from "./socio-economic-watch-points";
-import { createPanelProfile, saintGironsProfile } from "./fixtures";
+import { createPanelProfile, HOUSING_RP_EXTRA, saintGironsProfile } from "./fixtures";
 import { extractHeroKpis } from "../ux/kpis";
 import type { TerritoryEnrichment, TerritoryProfile } from "../types";
 
@@ -47,6 +47,7 @@ describe("politique synthèse sources P2", () => {
         lovacNote: null,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       territoryTypology: ruralTypology,
     });
@@ -91,6 +92,7 @@ describe("politique synthèse sources P2", () => {
         lovacNote: null,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       territoryTypology: ruralTypology,
     });
@@ -154,6 +156,7 @@ describe("politique synthèse sources P2", () => {
         lovacNote: null,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       property: {
         year: 2024,
@@ -169,6 +172,7 @@ describe("politique synthèse sources P2", () => {
         departmentAveragePricePerM2: 1_300,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       territoryTypology: ruralTypology,
     });
@@ -217,6 +221,7 @@ describe("politique synthèse sources P2", () => {
         lovacNote: null,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       property: {
         year: 2024,
@@ -232,6 +237,7 @@ describe("politique synthèse sources P2", () => {
         departmentAveragePricePerM2: 1_300,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       territoryTypology: ruralTypology,
     });
@@ -274,6 +280,7 @@ describe("politique synthèse sources P2", () => {
         lovacNote: null,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       territoryTypology: ruralTypology,
     });
@@ -313,6 +320,7 @@ describe("politique synthèse sources P2", () => {
         medianDisposableIncome: 19_200,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       labourMarket: {
         quarter: "2024-T4",

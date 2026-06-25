@@ -1,8 +1,9 @@
-import type { CompareCell, TerritoryComparisonResult } from "@/lib/compare";
-import { getIndicatorRows } from "@/lib/compare";
+import { getIndicatorRows } from "@/lib/compare/build-comparison";
+import type { CompareCell, TerritoryComparisonResult } from "@/lib/compare/types";
 
 interface CompareTableProps {
   comparison: TerritoryComparisonResult;
+  hiddenIndicatorIds?: Set<string>;
 }
 
 function IndicatorMeta({
@@ -50,11 +51,11 @@ function CellValue({ cell }: { cell: CompareCell | undefined }) {
   );
 }
 
-export function CompareTable({ comparison }: CompareTableProps) {
+export function CompareTable({ comparison, hiddenIndicatorIds }: CompareTableProps) {
   return (
     <div className="space-y-8">
       {comparison.blocks.map((block) => {
-        const rows = getIndicatorRows(comparison, block.id);
+        const rows = getIndicatorRows(comparison, block.id, { hiddenIndicatorIds });
         if (rows.length === 0) {
           return null;
         }

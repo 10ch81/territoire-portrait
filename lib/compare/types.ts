@@ -19,6 +19,8 @@ export type CompareQuestionId =
 
 export type CompareValueType = "absolute" | "ratio" | "evolution" | "rank" | "text";
 
+export type CompareGeographicScale = "commune" | "epci" | "dept" | "region";
+
 export interface CompareIndicatorMeta {
   id: string;
   label: string;
@@ -28,6 +30,8 @@ export interface CompareIndicatorMeta {
   sourceId: string;
   sourceName: string;
   valueType: CompareValueType;
+  scale: CompareGeographicScale;
+  sensitive: boolean;
   /** Pour le tri des highlights — null = neutre ou texte. */
   higherIsBetter: boolean | null;
 }

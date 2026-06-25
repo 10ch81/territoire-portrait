@@ -88,6 +88,9 @@ async function aggregateRpls(): Promise<HousingCommuneCache> {
       totalDwellings: null,
       rpVacantDwellings: null,
       rpVacancyRatePercent: null,
+      primaryResidences: null,
+      ownerOccupiedPrimarySharePercent: null,
+      secondaryResidenceSharePercent: null,
     };
   }
 
@@ -111,6 +114,17 @@ async function enrichWithTotalDwellings(
   let headerIndex: Map<string, number> | null = null;
   const dwellingsColumn = "P22_LOG";
   const vacantColumn = "P22_LOGVAC";
+  const primaryColumn = "P22_RP";
+  const ownerColumn = "P22_RP_PROP";
+  const secondaryColumn = "P22_RSECOCC";
+
+  function readCell(cells: string[], column: string): string {
+    const index = headerIndex?.get(column);
+    if (index === undefined) {
+      return "";
+    }
+    return cells[index] ?? "";
+  }
 
   for await (const line of stream) {
     if (!line.trim()) {
@@ -129,12 +143,11 @@ async function enrichWithTotalDwellings(
       continue;
     }
 
-    const totalDwellings = parseFrenchDecimal(
-      cells[headerIndex.get(dwellingsColumn) ?? -1] ?? "",
-    );
-    const vacantDwellings = parseFrenchDecimal(
-      cells[headerIndex.get(vacantColumn) ?? -1] ?? "",
-    );
+    const totalDwellings = parseFrenchDecimal(readCell(cells, dwellingsColumn));
+    const vacantDwellings = parseFrenchDecimal(readCell(cells, vacantColumn));
+    const primaryResidences = parseFrenchDecimal(readCell(cells, primaryColumn));
+    const ownerOccupied = parseFrenchDecimal(readCell(cells, ownerColumn));
+    const secondaryResidences = parseFrenchDecimal(readCell(cells, secondaryColumn));
     if (totalDwellings === null) {
       continue;
     }
@@ -147,20 +160,38 @@ async function enrichWithTotalDwellings(
         ? Math.round((roundedVacant / roundedTotal) * 1000) / 10
         : null;
 
+    const roundedPrimary =
+      primaryResidences !== null ? Math.round(primaryResidences) : null;
+    const ownerOccupiedPrimarySharePercent =
+      roundedPrimary !== null &&
+      roundedPrimary > 0 &&
+      ownerOccupied !== null
+        ? Math.round((ownerOccupied / roundedPrimary) * 1000) / 10
+        : null;
+    const secondaryResidenceSharePercent =
+      roundedTotal > 0 && secondaryResidences !== null
+        ? Math.round((secondaryResidences / roundedTotal) * 1000) / 10
+        : null;
+
+    const rpFields = {
+      totalDwellings: roundedTotal,
+      rpVacantDwellings: roundedVacant,
+      rpVacancyRatePercent: vacancyRatePercent,
+      primaryResidences: roundedPrimary,
+      ownerOccupiedPrimarySharePercent,
+      secondaryResidenceSharePercent,
+    };
+
     const entry = cache[inseeCode];
     if (entry) {
-      entry.totalDwellings = roundedTotal;
-      entry.rpVacantDwellings = roundedVacant;
-      entry.rpVacancyRatePercent = vacancyRatePercent;
+      Object.assign(entry, rpFields);
     } else {
       cache[inseeCode] = {
         year: RP_VINTAGE,
         totalUnits: 0,
         occupiedUnits: 0,
         vacantUnits: 0,
-        totalDwellings: roundedTotal,
-        rpVacantDwellings: roundedVacant,
-        rpVacancyRatePercent: vacancyRatePercent,
+        ...rpFields,
       };
     }
   }

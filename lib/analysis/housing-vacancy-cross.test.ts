@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { createPanelProfile } from "./fixtures";
+import { createPanelProfile, HOUSING_RP_EXTRA } from "./fixtures";
 import type { PropertyMarketSnapshot, TerritoryEnrichment, TerritoryProfile } from "../types";
 import {
   buildDualVacancyWatchPointSentence,
@@ -73,6 +73,7 @@ describe("housing-vacancy-cross", () => {
       lovacNote: null,
       available: true,
       note: "",
+      ...HOUSING_RP_EXTRA,
     });
 
     assert.equal(qualifiesAsDualVacancy(profile), true);
@@ -97,6 +98,7 @@ describe("housing-vacancy-cross", () => {
       lovacNote: null,
       available: true,
       note: "",
+      ...HOUSING_RP_EXTRA,
     });
 
     assert.equal(qualifiesAsDualVacancy(onlyLovac), false);
@@ -120,6 +122,7 @@ describe("housing-vacancy-cross", () => {
       lovacNote: null,
       available: true,
       note: "",
+      ...HOUSING_RP_EXTRA,
     });
 
     const sentence = buildDualVacancyWatchPointSentence(profile.enrichment!.housing!);
@@ -168,6 +171,7 @@ describe("housing-vacancy-cross", () => {
         lovacNote: null,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       premiumProperty,
     );
@@ -203,6 +207,7 @@ describe("housing-vacancy-cross", () => {
         lovacNote: null,
         available: true,
         note: "",
+        ...HOUSING_RP_EXTRA,
       },
       premiumProperty,
     );

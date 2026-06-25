@@ -166,6 +166,9 @@ export interface SocialHousingSnapshot {
   rpVacancyRatePercent: number | null;
   socialHousingSharePercent: number | null;
   vacancyRatePercent: number | null;
+  primaryResidences: number | null;
+  ownerOccupiedPrimarySharePercent: number | null;
+  secondaryResidenceSharePercent: number | null;
   lovacVintage: number | null;
   privateVacantDwellings: number | null;
   privateVacancyRatePercent: number | null;
@@ -532,6 +535,9 @@ export interface HousingCommuneCacheEntry {
   totalDwellings: number | null;
   rpVacantDwellings: number | null;
   rpVacancyRatePercent: number | null;
+  primaryResidences: number | null;
+  ownerOccupiedPrimarySharePercent: number | null;
+  secondaryResidenceSharePercent: number | null;
 }
 
 export interface CommuteCommuneCacheEntry {

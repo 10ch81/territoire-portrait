@@ -1,9 +1,9 @@
 import Link from "next/link";
-import type { TerritoryComparisonResult } from "@/lib/compare";
-import { MIN_COMPARE_COMMUNES } from "@/lib/compare";
-import { CompareHighlights, CompareWarnings, ShareCompareActions } from "./CompareHighlights";
+import type { TerritoryComparisonResult } from "@/lib/compare/types";
+import { MIN_COMPARE_COMMUNES } from "@/lib/compare/parse-codes";
+import { ShareCompareActions } from "./CompareHighlights";
 import { CompareSelector } from "./CompareSelector";
-import { CompareTable } from "./CompareTable";
+import { CompareResults } from "./CompareResults";
 
 interface ComparePageContentProps {
   selectedCodes: string[];
@@ -64,13 +64,7 @@ export function ComparePageContent({
         </p>
       ) : null}
 
-      {comparison ? (
-        <>
-          <CompareHighlights highlights={comparison.highlights} />
-          <CompareWarnings warnings={comparison.warnings} />
-          <CompareTable comparison={comparison} />
-        </>
-      ) : null}
+      {comparison ? <CompareResults comparison={comparison} /> : null}
     </main>
   );
 }

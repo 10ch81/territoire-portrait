@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import { buildAnalysisFacts } from "./build-analysis-facts";
-import { createPanelProfile } from "./fixtures";
+import { createPanelProfile, HOUSING_RP_EXTRA } from "./fixtures";
 import {
   isEligibleForWatchPoint,
   qualifyAnalysisFact,
@@ -188,6 +188,7 @@ describe("qualifyAnalysisFact — watchPoints", () => {
           lovacNote: null,
           available: true,
           note: "",
+          ...HOUSING_RP_EXTRA,
         },
       },
     };

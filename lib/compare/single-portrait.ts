@@ -13,6 +13,8 @@ export interface CommunePortraitIndicator {
   fragile: boolean;
   warning: string | null;
   available: boolean;
+  sensitive: boolean;
+  scale: string;
 }
 
 export interface CommunePortraitBlock {
@@ -49,6 +51,8 @@ export function buildCommunePortrait(territory: TerritoryProfile): CommunePortra
         fragile: extracted.fragile,
         warning: extracted.warning,
         available: extracted.available,
+        sensitive: indicator.sensitive,
+        scale: indicator.scale,
       });
     }
 

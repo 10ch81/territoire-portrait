@@ -1,14 +1,30 @@
+"use client";
+
 import type { CommunePortraitResult } from "@/lib/compare/single-portrait";
+import { SENSITIVE_INDICATOR_IDS } from "@/lib/indicators/types";
+import { useHideSensitiveIndicators } from "@/lib/ux/sensitive-indicators";
+import { SensitiveIndicatorsToggle } from "@/components/SensitiveIndicatorsToggle";
 
 interface PortraitBlocksProps {
   portrait: CommunePortraitResult;
 }
 
 export function PortraitBlocks({ portrait }: PortraitBlocksProps) {
+  const { hideSensitive } = useHideSensitiveIndicators();
+
   return (
     <div className="space-y-6">
+      <SensitiveIndicatorsToggle />
       {portrait.blocks.map((block) => {
-        const visibleIndicators = block.indicators.filter((item) => item.available);
+        const visibleIndicators = block.indicators.filter((item) => {
+          if (!item.available) {
+            return false;
+          }
+          if (hideSensitive && (item.sensitive || SENSITIVE_INDICATOR_IDS.has(item.id))) {
+            return false;
+          }
+          return true;
+        });
         if (visibleIndicators.length === 0) {
           return null;
         }
@@ -22,7 +38,10 @@ export function PortraitBlocks({ portrait }: PortraitBlocksProps) {
             <h2 className="text-lg font-semibold text-slate-900">{block.label}</h2>
             <dl className="mt-4 divide-y divide-slate-100">
               {visibleIndicators.map((indicator) => (
-                <div key={indicator.id} className="grid gap-1 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
+                <div
+                  key={indicator.id}
+                  className="grid gap-1 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4"
+                >
                   <div>
                     <dt className="font-medium text-slate-800">{indicator.label}</dt>
                     <dd className="mt-1 text-xs leading-relaxed text-slate-500">
@@ -31,6 +50,7 @@ export function PortraitBlocks({ portrait }: PortraitBlocksProps) {
                     <dd className="mt-1 text-xs text-slate-400">
                       Source : {indicator.sourceName}
                       {indicator.vintage != null ? ` · ${indicator.vintage}` : ""}
+                      {indicator.scale ? ` · échelle ${indicator.scale}` : ""}
                     </dd>
                     {indicator.fragile ? (
                       <p className="mt-1 text-xs text-amber-700">Donnée fragile</p>

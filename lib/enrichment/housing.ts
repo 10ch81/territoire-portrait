@@ -91,6 +91,9 @@ export function loadSocialHousingSnapshot(
       rpVacancyRatePercent: null,
       socialHousingSharePercent: null,
       vacancyRatePercent: null,
+      primaryResidences: null,
+      ownerOccupiedPrimarySharePercent: null,
+      secondaryResidenceSharePercent: null,
       ...lovacFields,
       available: false,
       note:
@@ -118,6 +121,10 @@ export function loadSocialHousingSnapshot(
     rpVacancyRatePercent: entry.rpVacancyRatePercent ?? null,
     socialHousingSharePercent,
     vacancyRatePercent,
+    primaryResidences: entry.primaryResidences ?? null,
+    ownerOccupiedPrimarySharePercent:
+      entry.ownerOccupiedPrimarySharePercent ?? null,
+    secondaryResidenceSharePercent: entry.secondaryResidenceSharePercent ?? null,
     ...lovacFields,
     available: true,
     note:

@@ -1,32 +1,8 @@
 import type { TerritoryProfile } from "@/lib/types";
+import { collectComparisonReadingAlerts } from "@/lib/indicators/reading-alerts";
 import { COMPARE_BLOCKS, COMPARE_INDICATORS } from "./indicators";
 import { buildCompareHighlights } from "./highlights";
 import type { CompareCell, TerritoryComparisonResult } from "./types";
-
-function collectGlobalWarnings(territories: TerritoryProfile[]): string[] {
-  const warnings = new Set<string>();
-
-  for (const territory of territories) {
-    const tourism = territory.enrichment?.tourism;
-    const population = territory.population;
-    if (
-      tourism?.available &&
-      population &&
-      population > 0 &&
-      tourism.accommodationPlaces / population >= 0.05
-    ) {
-      warnings.add(
-        "Au moins une commune a une forte capacité touristique : certains ratios par habitant se comparent avec prudence.",
-      );
-    }
-  }
-
-  warnings.add(
-    "Les communes de nature différente (centre-ville, périurbain, rural) ne se comparent pas toujours sur les mêmes indicateurs.",
-  );
-
-  return [...warnings];
-}
 
 export function buildTerritoryComparison(
   territories: TerritoryProfile[],
@@ -68,7 +44,7 @@ export function buildTerritoryComparison(
     })),
     cells,
     highlights,
-    warnings: collectGlobalWarnings(territories),
+    warnings: collectComparisonReadingAlerts(territories),
   };
 }
 
@@ -85,6 +61,7 @@ export function getCell(
 export function getIndicatorRows(
   comparison: TerritoryComparisonResult,
   blockId: string,
+  options?: { hiddenIndicatorIds?: Set<string> },
 ): Array<{
   indicator: (typeof COMPARE_INDICATORS)[number];
   cellsByCommune: Map<string, CompareCell>;
@@ -95,6 +72,7 @@ export function getIndicatorRows(
   }
 
   return block.indicatorIds
+    .filter((indicatorId) => !options?.hiddenIndicatorIds?.has(indicatorId))
     .map((indicatorId) => {
       const indicator = COMPARE_INDICATORS.find((item) => item.id === indicatorId);
       if (!indicator) {
