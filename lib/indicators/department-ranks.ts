@@ -24,10 +24,51 @@ export interface DepartmentRankEntry {
 
 export type DepartmentRanksCommuneCache = Record<
   string,
-  Partial<Record<DepartmentRankIndicatorId, DepartmentRankEntry>>
+  Partial<Record<DepartmentRankIndicatorId, DepartmentRankEntry | LegacyDepartmentRankEntry>>
 >;
 
+/** Ancien millésime du cache (rank + total) avant dépt. explicite. */
+interface LegacyDepartmentRankEntry {
+  rank: number;
+  total?: number;
+  rankedCount?: number;
+  departmentCode?: string;
+  departmentCommuneCount?: number;
+}
+
 const CACHE_FILE = "department-ranks-by-commune.json";
+
+export function departmentCodeFromInsee(inseeCode: string): string {
+  if (inseeCode.startsWith("97") || inseeCode.startsWith("98")) {
+    return inseeCode.slice(0, 3);
+  }
+
+  return inseeCode.slice(0, 2);
+}
+
+export function normalizeDepartmentRankEntry(
+  entry: LegacyDepartmentRankEntry,
+  inseeCode: string,
+): DepartmentRankEntry | null {
+  const rankedCount = entry.rankedCount ?? entry.total ?? null;
+  const departmentCode = entry.departmentCode ?? departmentCodeFromInsee(inseeCode);
+
+  if (
+    !Number.isFinite(entry.rank) ||
+    rankedCount === null ||
+    !Number.isFinite(rankedCount) ||
+    !departmentCode
+  ) {
+    return null;
+  }
+
+  return {
+    rank: entry.rank,
+    rankedCount,
+    departmentCode,
+    departmentCommuneCount: entry.departmentCommuneCount ?? rankedCount,
+  };
+}
 
 export function computeDepartmentRank(
   valuesByInsee: Map<string, number>,
@@ -70,7 +111,11 @@ export function getDepartmentRankLabel(
   }
 
   const entry = loadDepartmentRanksCache()?.[inseeCode]?.[indicatorId as DepartmentRankIndicatorId];
-  return entry ? formatDepartmentRankLabel(entry) : null;
+  if (!entry) {
+    return null;
+  }
+  const normalized = normalizeDepartmentRankEntry(entry, inseeCode);
+  return normalized ? formatDepartmentRankLabel(normalized) : null;
 }
 
 export function attachDepartmentRanksToPortrait(
@@ -87,9 +132,10 @@ export function attachDepartmentRanksToPortrait(
       ...block,
       indicators: block.indicators.map((indicator) => {
         const entry = cache[indicator.id as DepartmentRankIndicatorId];
+        const normalized = entry ? normalizeDepartmentRankEntry(entry, inseeCode) : null;
         return {
           ...indicator,
-          departmentRankLabel: entry ? formatDepartmentRankLabel(entry) : null,
+          departmentRankLabel: normalized ? formatDepartmentRankLabel(normalized) : null,
         };
       }),
     })),
@@ -109,9 +155,12 @@ export function attachDepartmentRanksToComparison(
     cells: comparison.cells.map((cell) => {
       const entry =
         ranksCache[cell.communeInsee]?.[cell.indicatorId as DepartmentRankIndicatorId];
+      const normalized = entry
+        ? normalizeDepartmentRankEntry(entry, cell.communeInsee)
+        : null;
       return {
         ...cell,
-        departmentRankLabel: entry ? formatDepartmentRankLabel(entry) : null,
+        departmentRankLabel: normalized ? formatDepartmentRankLabel(normalized) : null,
       };
     }),
   };

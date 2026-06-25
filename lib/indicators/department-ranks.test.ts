@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   computeDepartmentRank,
   formatDepartmentRankLabel,
+  normalizeDepartmentRankEntry,
 } from "./department-ranks";
 
 describe("computeDepartmentRank", () => {
@@ -23,6 +24,21 @@ describe("computeDepartmentRank", () => {
       ["c", 8],
     ]);
     assert.deepEqual(computeDepartmentRank(values, "b", false), { rank: 1, rankedCount: 3 });
+  });
+});
+
+describe("normalizeDepartmentRankEntry", () => {
+  it("accepte l'ancien format rank + total", () => {
+    assert.deepEqual(normalizeDepartmentRankEntry({ rank: 327, total: 332 }, "35238"), {
+      rank: 327,
+      rankedCount: 332,
+      departmentCode: "35",
+      departmentCommuneCount: 332,
+    });
+  });
+
+  it("retourne null si les champs essentiels manquent", () => {
+    assert.equal(normalizeDepartmentRankEntry({ rank: 1 }, "35238"), null);
   });
 });
 
