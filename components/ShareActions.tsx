@@ -5,9 +5,10 @@ import { useAnalysisReady } from "./AnalysisReadyProvider";
 
 interface ShareActionsProps {
   communeName: string;
+  codeInsee: string;
 }
 
-export function ShareActions({ communeName }: ShareActionsProps) {
+export function ShareActions({ communeName, codeInsee }: ShareActionsProps) {
   const { ready: analysisReady } = useAnalysisReady();
   const [copied, setCopied] = useState(false);
 
@@ -37,6 +38,13 @@ export function ShareActions({ communeName }: ShareActionsProps) {
       >
         {copied ? "Lien copié" : "Copier le lien"}
       </button>
+      <a
+        href={`/api/commune/${encodeURIComponent(codeInsee)}/jsonld`}
+        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-blue-300 hover:text-blue-700"
+        download={`portrait-${codeInsee}.jsonld.json`}
+      >
+        Export JSON-LD
+      </a>
       <button
         type="button"
         onClick={handlePrint}

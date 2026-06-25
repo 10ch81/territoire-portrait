@@ -66,7 +66,7 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] Personnalisation profils utilisateur (`priorites=` + localStorage) sur `/compare`
 - [x] API catalogue indicateurs publics — `GET /api/indicators/catalog`
 - [x] BAN / géocodage adresse — recherche accueil et comparateur via `/api/commune`
-- [ ] RDF / export sémantique — roadmap (ne pas commencer par l'ontologie)
+- [x] Export JSON-LD par commune — `GET /api/commune/[codeInsee]/jsonld` (indicateurs + sources, sans ontologie lourde)
 
 ## Sprint 5 — Qualité des données
 

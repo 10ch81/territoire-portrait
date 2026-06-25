@@ -76,7 +76,7 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
             >
               ← Nouvelle recherche
             </Link>
-            <ShareActions communeName={territory.name} />
+            <ShareActions communeName={territory.name} codeInsee={territory.inseeCode} />
           </div>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>

@@ -12,7 +12,7 @@ Priorité produit : **comparaison compréhensible, fiable et actionnable** (pas 
 Trajectoire retenue :
 1. **Scénario 1 (en cours)** — Comparateur utile MVP : `/compare`, 27 indicateurs, 6 blocs, profils thématiques sans score global, traçabilité cellule, export lien/PDF.
 2. **Scénario 2 (suite)** — Confiance & comparabilité : moteur communes similaires, modèle `PublicIndicator` enrichi, Observatoire des territoires, RGAA AA.
-3. **Scénario 3 (amorcé)** — Plateforme sémantique : personnalisation profils (`priorites`), API catalogue `/api/indicators/catalog`, géocodage BAN ; RDF en roadmap.
+3. **Scénario 3 (amorcé)** — Plateforme sémantique : profils (`priorites`), API catalogue, BAN, export JSON-LD par commune.
 
 Ne pas commencer par l'ontologie RDF. Réutiliser le cache et la typologie `ComparisonProfile` existants.
 
