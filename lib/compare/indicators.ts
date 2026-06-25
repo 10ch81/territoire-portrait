@@ -125,7 +125,7 @@ export const COMPARE_INDICATORS: CompareIndicatorDefinition[] = [
     sourceId: SOURCE_IDS.GEO_API_COMMUNES,
     sourceName: "API Géo",
     valueType: "ratio",
-    higherIsBetter: null,
+    higherIsBetter: true,
     extract: (t) =>
       numericCell(
         formatDensity(t.densityPerKm2),
@@ -180,7 +180,7 @@ export const COMPARE_INDICATORS: CompareIndicatorDefinition[] = [
       if (!aav?.available) {
         return textCell("Donnée non disponible");
       }
-      return textCell(aav.label, aav.categoryLabel);
+      return textCell(aav.label, 2020);
     },
   },
   {
@@ -353,7 +353,7 @@ export const COMPARE_INDICATORS: CompareIndicatorDefinition[] = [
   },
   {
     id: "price_per_m2",
-    label: "Prix médian au m²",
+    label: "Prix moyen au m²",
     definition: "Prix moyen au m² des mutations DVF (dernière année disponible).",
     blockId: "housing",
     questionIds: ["housing"],

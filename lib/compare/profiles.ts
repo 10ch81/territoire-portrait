@@ -15,7 +15,7 @@ export const COMPARE_THEMATIC_PROFILES: CompareThematicProfile[] = [
     label: "Commune familiale",
     shortLabel: "plus familiale",
     questionId: "family",
-    indicatorIds: ["share_under_30", "schools_open", "average_ips"],
+    indicatorIds: ["share_under_30", "average_ips"],
   },
   {
     id: "logement",
@@ -48,7 +48,7 @@ export const COMPARE_THEMATIC_PROFILES: CompareThematicProfile[] = [
     label: "Mobilité & connectivité",
     shortLabel: "mieux desservie en transports",
     questionId: "accessible",
-    indicatorIds: ["public_transport_share", "fiber_eligible_share", "car_commute_share"],
+    indicatorIds: ["public_transport_share", "fiber_eligible_share"],
   },
   {
     id: "dynamique",
@@ -62,6 +62,6 @@ export const COMPARE_THEMATIC_PROFILES: CompareThematicProfile[] = [
     label: "Densité urbaine",
     shortLabel: "plus dense",
     questionId: "territorial_context",
-    indicatorIds: ["density", "population"],
+    indicatorIds: ["density"],
   },
 ];
