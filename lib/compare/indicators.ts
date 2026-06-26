@@ -694,8 +694,8 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     definition: DAILY_LIFE_EQUIPMENTS_NOTE,
     blockId: "services",
     questionIds: ["equipped"],
-    sourceId: SOURCE_IDS.OBSERVATOIRE_TERRITOIRES,
-    sourceName: "Observatoire des territoires (panier BPE)",
+    sourceId: SOURCE_IDS.INSEE_BPE,
+    sourceName: "INSEE BPE (panier OT vie courante)",
     valueType: "ratio",
     higherIsBetter: true,
     comparisonHint:
