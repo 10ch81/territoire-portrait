@@ -1,6 +1,9 @@
 import { loadJsonCache } from "@/lib/enrichment/cache";
 import type { CommunePortraitResult } from "@/lib/compare/single-portrait";
 import type { TerritoryComparisonResult } from "@/lib/compare/types";
+import { departmentCodeFromInsee } from "./department-code";
+
+export { departmentCodeFromInsee } from "./department-code";
 
 export const DEPARTMENT_RANK_INDICATOR_IDS = [
   "density",
@@ -37,14 +40,6 @@ interface LegacyDepartmentRankEntry {
 }
 
 const CACHE_FILE = "department-ranks-by-commune.json";
-
-export function departmentCodeFromInsee(inseeCode: string): string {
-  if (inseeCode.startsWith("97") || inseeCode.startsWith("98")) {
-    return inseeCode.slice(0, 3);
-  }
-
-  return inseeCode.slice(0, 2);
-}
 
 export function normalizeDepartmentRankEntry(
   entry: LegacyDepartmentRankEntry,

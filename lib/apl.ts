@@ -1,4 +1,4 @@
-import { departmentCodeFromInsee } from "./indicators/department-ranks";
+import { departmentCodeFromInsee } from "./indicators/department-code";
 import type { AplCommuneCacheEntry } from "./types";
 
 export const APL_GENERAL_PRACTITIONER_XLSX_URL =

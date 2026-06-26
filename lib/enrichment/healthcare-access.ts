@@ -1,4 +1,4 @@
-import { departmentCodeFromInsee } from "../indicators/department-ranks";
+import { departmentCodeFromInsee } from "../indicators/department-code";
 import {
   APL_GENERAL_PRACTITIONER_NOTE,
   APL_VINTAGE,
