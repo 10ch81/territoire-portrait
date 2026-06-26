@@ -56,6 +56,8 @@ npm run ingest:bpe       # ingestion BPE INSEE → data/cache/
 npm run ingest:flores    # emploi salarié A17
 npm run ingest:fibre     # couverture fibre ARCEP
 npm run ingest:finess    # établissements sanitaires et sociaux
+npm run ingest:apl       # APL DREES médecins généralistes
+npm run ingest:observatoire-access  # OT accessibilité (santé > 20 min, centralités)
 npm run ingest:education # annuaire scolaire (agrégats)
 npm run ingest:geography # aires d'attraction 2020
 npm run ingest:typology  # densité INSEE, UU, PVD, ACV, FRR, Villages d'avenir

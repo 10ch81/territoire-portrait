@@ -60,6 +60,7 @@ Statut des sprints : voir cases cochées dans les titres au fil de l'implémenta
 - [x] Ingestion RP logement enrichie (propriétaires, résidences secondaires) — `ingest:housing`
 - [x] Rangs départementaux précalculés (6 indicateurs clés) — `ingest:department-ranks`
 - [x] Accessibilité comparateur (RGAA) — tableaux structurés, légendes, navigation blocs, impression lisible
+- [x] Indicateurs accessibilité santé comparateur — APL DREES + population éloignée soins > 20 min (OT) ; centralités OT en attente API producteur
 
 ## Scénario 3 — Plateforme sémantique (amorcé)
 
@@ -102,7 +103,7 @@ Référence détaillée : [docs/mcp-datagouv.md](./mcp-datagouv.md) (matrice sou
 - [x] FLORES A17 — emploi salarié par secteur (`ingest-flores.ts`)
 - [x] ARCEP — couverture fibre (`ingest-fibre.ts`)
 - [x] FINESS — établissements sanitaires et sociaux (`ingest-finess.ts`)
-- [ ] APL santé (DREES) — **écarté** (xlsx, pas bulk communal)
+- [x] APL santé (DREES) — `ingest-apl.ts` → `healthcare-access.ts` (xlsx national MG, comparateur)
 - [ ] BANATIC — **reporté** (pas de JSON public par commune)
 - [x] OFGL (dette, recettes — API live, pas bulk)
 - [ ] PPRN régionaux — **reporté**
@@ -114,7 +115,7 @@ Référence détaillée : [docs/mcp-datagouv.md](./mcp-datagouv.md) (matrice sou
 - [ ] DATAtourisme — **reporté** (INSEE suffit)
 - [ ] GTFS national — **reporté** (trop lourd)
 - [ ] Artificialisation des sols — **écarté**
-- [ ] Observatoire des territoires — **reporté**
+- [x] Observatoire des territoires — `ingest-observatoire-access.ts` (santé > 20 min ✅ ; centralités ⚠️ API OT indisponible)
 
 ---
 

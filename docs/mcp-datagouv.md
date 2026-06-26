@@ -120,7 +120,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | [DREES — APL santé](https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl) | Accessibilité aux soins | C | ✅ | `ingest-apl.ts` → `healthcare-access.ts` | xlsx national MG (~5 Mo) ; API DREES explore vide |
 | [Cerema — LOVAC](https://www.data.gouv.fr/datasets/logements-vacants-du-parc-prive-par-commune-departement-region-france) | Vacance parc privé structurelle | R | ✅ | `ingest-lovac.ts` → `housing.ts` | Secret statistique < 11 logements ; distinct RP/RPLS |
 | [FINESS — réexposition data.gouv](https://www.data.gouv.fr/datasets/reexposition-des-donnees-finess) | Établissements sanitaires et sociaux | C | ✅ | `ingest-finess.ts` → `health.ts` | Agrégats par catégorie ; pas d'accessibilité spatiale |
-| [CartoSanté / AtlaSanté](https://cartosante.atlasante.fr/) | Offre et accès PS | C | ❌ | — | Portail carto ; pas de bulk simple ; APL prioritaire |
+| [CartoSanté / AtlaSanté](https://cartosante.atlasante.fr/) | Offre et accès PS | C | ❌ | — | Portail carto ; pas de bulk communal ; APL DREES + OT (> 20 min) couvrent l'accessibilité agrégée |
 
 ### Mobilité et transition
 
@@ -157,7 +157,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | [INSEE — capacités touristiques](https://www.insee.fr/fr/statistiques/2021703) | Hébergements touristiques | C | ✅ | `ingest-tourism.ts` → `tourism.ts` | Places d'hébergement agrégées |
 | [DATAtourisme](https://www.data.gouv.fr/datasets/datatourisme-la-base-nationale-des-donnees-publiques-dinformation-touristique-en-open-data) | Offre touristique | C | ❌ 📋 P3 | — | INSEE capacités suffit pour MVP |
 | [Portail artificialisation des sols](https://artificialisation.developpement-durable.gouv.fr/) | Consommation d'espaces, ZAN | C | ❌ 📋 P3 | — | **Écarté** (jeux lourds) |
-| [Observatoire des territoires](https://www.observatoire-des-territoires.gouv.fr/) | Indicateurs transversaux | C | ❌ 📋 P3 | — | Agrégateur ; utile pour comparaisons |
+| [Observatoire des territoires](https://www.observatoire-des-territoires.gouv.fr/) | Accessibilité santé (> 20 min), centralités | C | ⚠️ | `ingest-observatoire-access.ts` → `territorial-access.ts` | Santé : ~34 850 communes (BPE + distancier Metric-OSRM, millésime 2023) ; **centralités** : export API Géoclip OT en erreur 500 (indicateur comparateur câblé, données absentes) |
 
 ### Synthèse par thème (couverture actuelle)
 
@@ -166,7 +166,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | Démographie | ✅ Forte | — |
 | Emploi / revenus | ✅ Forte | Emploi salarié au lieu de travail |
 | Économie | ✅ Forte | Emploi salarié FLORES A17 ; emploi au lieu de travail absent |
-| Équipements | ✅ Forte | APL santé écarté (pas de bulk communal) |
+| Équipements | ✅ Forte | Accessibilité spatiale : centralités OT en attente (API producteur) |
 | Mobilité | ⚠️ Partielle | RP domicile-travail + IRVE ; GTFS reporté |
 | Logement | ✅ Correcte | RPLS + vacance RP |
 | Immobilier | ✅ Correcte | Faibles volumes → prudence |
@@ -202,7 +202,7 @@ Ordre recommandé pour les prochaines ingestions. Chaque item suit le workflow M
 | 6c | FLORES A17 | Économie | ✅ Fait | `ingest-flores.ts` |
 | 6d | ARCEP fibre | Numérique fixe | ✅ Fait | `ingest-fibre.ts` |
 | 6e | FINESS | Santé | ✅ Fait | `ingest-finess.ts` |
-| 7 | APL santé (DREES) | Santé | **Bloqué** | Export data.drees vide ; pas bulk communal ≤ 20 Mo (`ingest-apl.ts` skip) |
+| 7 | APL santé (DREES) | Santé | ✅ Fait | `ingest-apl.ts` → `healthcare-access.ts` ; xlsx national MG (~5 Mo), pas d'API explore ; comparateur + fiche |
 | 7b | CNAF — indicateurs précarité | Social | ✅ Fait | `ingest-caf.ts` — part RSA (indicateur partiel) |
 | 8 | BANATIC | Institutions | **Reporté** | Pas de JSON public par commune |
 | 9 | OFGL | Finances | ✅ Fait (API live) | Pas d'export bulk (~22 M lignes) |
@@ -216,9 +216,8 @@ Ordre recommandé pour les prochaines ingestions. Chaque item suit le workflow M
 | 12 | Capacités touristiques INSEE | Tourisme | ✅ Fait | `ingest-tourism.ts` |
 | 13 | DATAtourisme | Tourisme | **Reporté** | INSEE suffit pour MVP |
 | 14 | Artificialisation des sols | Environnement | **Écarté** | Jeux lourds |
-| 15 | Observatoire des territoires | Transversal | **Reporté** | Agrégateur externe |
-| 13 | Artificialisation des sols | Environnement | ZAN, consommation d'espaces |
-| 14 | Observatoire des territoires | Transversal | Comparaisons pré-calculées |
+| 15 | Observatoire des territoires | Accessibilité | ⚠️ Partiel | `ingest-observatoire-access.ts` — santé > 20 min OK ; temps vers centralités bloqué (API Géoclip OT) |
+| 16 | Artificialisation des sols | Environnement | **Écarté** | Jeux lourds |
 
 ### Critères de passage en production
 
@@ -243,7 +242,7 @@ Requêtes MCP orientées par les lacunes P1 :
 | Mobilité | RP domicile-travail, IRVE, BPE transport | P3 (GTFS national reporté) |
 | Politique ville | SIG Ville, QPV, Cœur de ville | P1 |
 | Logement | RP logement 2022, vacance, statut occupation | P1 |
-| Santé | APL, accessibilité localisée DREES | P2 |
+| Santé | APL DREES (✅), Observatoire des territoires accessibilité (⚠️ centralités) | — |
 | Finances | OFGL, budgets locaux | P2 |
 | Économie | Démographie d'entreprises INSEE, SIRENE filtres | P2 |
 
@@ -261,6 +260,8 @@ Requêtes MCP orientées par les lacunes P1 :
 | `scripts/ingest-geography.ts`  | **Actif**     | Aires d'attraction 2020                  |
 | `scripts/ingest-property.ts`   | **Actif**     | Indicateurs DVF agrégés (2014-2024)      |
 | `scripts/ingest-security.ts`   | **Actif**     | SSMSI délinquance enregistrée            |
+| `scripts/ingest-apl.ts`        | **Actif**     | APL DREES médecins généralistes → `apl-by-commune.json` |
+| `scripts/ingest-observatoire-access.ts` | **Actif** | OT accessibilité santé + centralités → `observatoire-access-by-commune.json` |
 | `scripts/validate-internal.ts` | **Actif**   | Cohérence interne du cache communal      |
 | `scripts/verify-reference.ts`  | **Actif**   | Golden communes vs APIs live             |
 | `scripts/quality-all.ts`       | **Actif**     | validate + verify (pipeline qualité)     |
@@ -284,4 +285,4 @@ Pas de scraping web — liste blanche `lib/sources.ts` uniquement.
 - Toujours noter l'**URL**, la **licence** et la **date** de consultation d'un dataset
 - Préférer les sources avec **API stable** ou **fichiers bulk** téléchargeables
 - Ne jamais inventer de chiffres dans l'analyse IA — transmettre uniquement les faits ingérés
-- Versionner les scripts d'ingestion, pas le cache (`data/cache/` est ignoré sauf `.gitkeep`)
+- Versionner les scripts d'ingestion ; caches agrégés whitelistés dans `.gitignore` pour Vercel (voir `data/cache/`)

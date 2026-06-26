@@ -100,6 +100,8 @@ docs/data-quality.md              # Boucle qualité des données
 | INSEE FLORES A17 (cache) | Emploi salarié par secteur (établissements, postes) |
 | ARCEP Ma connexion internet (cache) | Couverture fibre et technologies fixe |
 | FINESS (cache) | Établissements sanitaires et sociaux |
+| DREES APL (cache) | Accessibilité potentielle localisée — médecins généralistes |
+| Observatoire des territoires (cache) | Part de population éloignée des soins de proximité (> 20 min en voiture) |
 | Annuaire Éducation (cache) | Établissements scolaires ouverts (agrégats) |
 
 ### Ingestion des caches locaux
@@ -118,6 +120,8 @@ npm run ingest:social     # structure par âge, chômage, revenus
 npm run ingest:flores     # emploi salarié A17 (~15 Mo cache JSON)
 npm run ingest:fibre      # couverture fibre ARCEP
 npm run ingest:finess     # établissements sanitaires et sociaux
+npm run ingest:apl        # APL DREES médecins généralistes (~5 Mo xlsx)
+npm run ingest:observatoire-access  # OT accessibilité santé + centralités (CSV API Géoclip)
 npm run ingest:education  # annuaire scolaire (agrégats communaux)
 ```
 
