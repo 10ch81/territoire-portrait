@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { AiAnalysisClient } from "@/components/AiAnalysisClient";
-import { CommuneNotFoundView } from "@/components/commune/CommuneNotFoundView";
 import { PortraitNarratifClient } from "@/components/PortraitNarratifClient";
 import { AnalysisReadyProvider } from "@/components/AnalysisReadyProvider";
 import { ComparableCommunesPanel } from "@/components/commune/ComparableCommunesPanel";
@@ -22,6 +22,7 @@ import {
   buildCommunePortrait,
   findComparableCommunes,
 } from "@/lib/compare";
+import { isValidInseeCode, normalizeInseeCode } from "@/lib/compare/parse-codes";
 import { attachDepartmentRanksToPortrait } from "@/lib/indicators/department-ranks";
 import { isPortraitNarrativeAvailable } from "@/lib/portrait/generate-portrait";
 import { computeCompleteness } from "@/lib/ux/completeness";
@@ -41,11 +42,16 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
   const { codeInsee } = await params;
   const { vue: vueParam } = await searchParams;
   const vue = resolveCommuneView(vueParam);
+  const normalizedCode = normalizeInseeCode(codeInsee);
 
-  const territory = await getEnrichedTerritoryByInsee(codeInsee);
+  if (!isValidInseeCode(normalizedCode)) {
+    notFound();
+  }
+
+  const territory = await getEnrichedTerritoryByInsee(normalizedCode);
 
   if (!territory) {
-    return <CommuneNotFoundView />;
+    notFound();
   }
 
   const kpis = extractHeroKpis(territory);
