@@ -24,6 +24,9 @@ export interface ComparableCommuneSuggestion {
   population: number | null;
   profileLabel: string;
   populationDeltaPercent: number | null;
+  /** Score de similarité (0–100) — profil identique + proximité démographique. */
+  similarityScore: number;
+  similarityLabel: string;
 }
 
 export interface ComparableCommunesResult {
@@ -70,6 +73,31 @@ function populationWithinTolerance(
   const min = reference * (1 - toleranceRatio);
   const max = reference * (1 + toleranceRatio);
   return candidate >= min && candidate <= max;
+}
+
+/** Score de similarité pondéré (profil identique + proximité démographique). */
+export function computeComparableSimilarity(
+  populationDeltaPercent: number | null,
+): { score: number; label: string } {
+  const profileWeight = 50;
+  if (populationDeltaPercent === null) {
+    return { score: profileWeight, label: "Profil identique · taille non comparée" };
+  }
+
+  const absDelta = Math.abs(populationDeltaPercent);
+  const populationWeight = Math.max(0, 50 - absDelta * 2);
+  const score = Math.round(profileWeight + populationWeight);
+
+  if (absDelta <= 5) {
+    return { score, label: "Très proche" };
+  }
+  if (absDelta <= 15) {
+    return { score, label: "Proche" };
+  }
+  if (absDelta <= 25) {
+    return { score, label: "Comparable" };
+  }
+  return { score, label: "Éloignée en taille" };
 }
 
 export async function findComparableCommunes(
@@ -149,16 +177,24 @@ export async function findComparableCommunes(
           ) / 10
         : null;
 
+    const similarity = computeComparableSimilarity(populationDeltaPercent);
+
     candidates.push({
       inseeCode: commune.code,
       name: commune.nom,
       population,
       profileLabel,
       populationDeltaPercent,
+      similarityScore: similarity.score,
+      similarityLabel: similarity.label,
     });
   }
 
   candidates.sort((a, b) => {
+    const scoreDelta = b.similarityScore - a.similarityScore;
+    if (scoreDelta !== 0) {
+      return scoreDelta;
+    }
     const deltaA = Math.abs(a.populationDeltaPercent ?? Number.POSITIVE_INFINITY);
     const deltaB = Math.abs(b.populationDeltaPercent ?? Number.POSITIVE_INFINITY);
     return deltaA - deltaB;

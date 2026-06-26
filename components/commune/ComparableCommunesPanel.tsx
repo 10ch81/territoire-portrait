@@ -40,6 +40,11 @@ export function ComparableCommunesPanel({
                     {commune.populationDeltaPercent != null
                       ? ` (${commune.populationDeltaPercent > 0 ? "+" : ""}${commune.populationDeltaPercent} % vs ${currentName})`
                       : ""}
+                    {" · "}
+                    {commune.similarityLabel}
+                    {commune.populationDeltaPercent != null
+                      ? ` (${commune.similarityScore}/100)`
+                      : ""}
                   </span>
                 </Link>
               </li>

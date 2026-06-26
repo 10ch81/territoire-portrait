@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { MAX_COMPARABLE_SUGGESTIONS, POPULATION_TOLERANCE_RATIO } from "./comparable";
+import {
+  computeComparableSimilarity,
+  MAX_COMPARABLE_SUGGESTIONS,
+  POPULATION_TOLERANCE_RATIO,
+} from "./comparable";
 import { MAX_COMPARE_COMMUNES } from "./parse-codes";
 
 describe("MAX_COMPARABLE_SUGGESTIONS", () => {
@@ -22,5 +26,19 @@ describe("POPULATION_TOLERANCE_RATIO", () => {
     assert.equal(max, 13_000);
     assert.ok(8000 >= min && 8000 <= max);
     assert.ok(15_000 > max);
+  });
+});
+
+describe("computeComparableSimilarity", () => {
+  it("classe une commune très proche en population", () => {
+    const result = computeComparableSimilarity(3);
+    assert.equal(result.label, "Très proche");
+    assert.ok(result.score >= 90);
+  });
+
+  it("ne surévalue pas la similarité sans population comparable", () => {
+    const result = computeComparableSimilarity(null);
+    assert.equal(result.label, "Profil identique · taille non comparée");
+    assert.equal(result.score, 50);
   });
 });

@@ -28,6 +28,10 @@ export interface PublicIndicatorCatalogEntry {
   sourceId: string;
   sourceName: string;
   sensitive?: boolean;
+  /** Mise en garde de lecture (millésime, comparabilité limitée). */
+  readingAlert?: string | null;
+  /** Conseil pour comparer cet indicateur entre communes. */
+  comparisonHint?: string | null;
 }
 
 /** Indicateurs masquables par défaut (précarité, etc.). */

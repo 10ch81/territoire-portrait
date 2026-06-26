@@ -129,6 +129,8 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     sourceName: "API Géo",
     valueType: "ratio",
     higherIsBetter: true,
+    comparisonHint:
+      "Comparez plutôt des communes de taille proche : la densité seule ne résume pas le cadre de vie.",
     extract: (t) =>
       numericCell(
         formatDensity(t.densityPerKm2),
@@ -441,6 +443,9 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     sourceName: "INSEE FILOSOFI",
     valueType: "absolute",
     higherIsBetter: true,
+    readingAlert:
+      "Filosofi 2 (2023+) n'est pas directement comparable aux millésimes 2012-2021.",
+    comparisonHint: "Privilégiez des communes du même type urbain/rural pour la lecture des revenus.",
     extract: (t) => {
       const socio = t.enrichment?.sociodemographics;
       const value = socio?.medianDisposableIncome ?? null;
@@ -525,6 +530,8 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     sourceName: "CNAF",
     valueType: "ratio",
     higherIsBetter: false,
+    readingAlert: "Indicateur sensible — à interpréter avec prudence, sans stigmatisation.",
+    comparisonHint: "Croisez avec le revenu médian et le taux de chômage pour une lecture équilibrée.",
     extract: (t) => {
       const benefits = t.enrichment?.socialBenefits;
       const value = benefits?.rsaShareAmongHouseholdsPercent ?? null;

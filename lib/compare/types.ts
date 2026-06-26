@@ -32,6 +32,10 @@ export interface CompareIndicatorMeta {
   valueType: CompareValueType;
   scale: CompareGeographicScale;
   sensitive: boolean;
+  /** Mise en garde de lecture (millésime, comparabilité limitée). */
+  readingAlert?: string | null;
+  /** Conseil pour comparer cet indicateur entre communes. */
+  comparisonHint?: string | null;
   /** Pour le tri des highlights — null = neutre ou texte. */
   higherIsBetter: boolean | null;
 }

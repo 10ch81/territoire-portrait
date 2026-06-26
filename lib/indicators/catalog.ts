@@ -11,5 +11,7 @@ export function buildPublicIndicatorCatalog(): PublicIndicatorCatalogEntry[] {
     sourceId: indicator.sourceId,
     sourceName: indicator.sourceName,
     sensitive: indicator.sensitive,
+    readingAlert: indicator.readingAlert ?? null,
+    comparisonHint: indicator.comparisonHint ?? null,
   }));
 }
