@@ -1,5 +1,6 @@
 import { computeYoungAdultShare, computeAgeAggregates } from "@/lib/age-aggregates";
-import { formatAplConsultations } from "@/lib/apl";
+import { formatAplConsultations, formatAplEtpPer100k } from "@/lib/apl";
+import { DAILY_LIFE_EQUIPMENTS_NOTE } from "@/lib/daily-life-equipments";
 import {
   formatCurrency,
   formatDensity,
@@ -55,6 +56,16 @@ function textCell(
     warning: null,
     available: text !== "Donnée non disponible",
   };
+}
+
+function dailyLifeEquipmentsPer1000(territory: TerritoryProfile): number | null {
+  const equipments = territory.enrichment?.equipments;
+  const population = territory.population;
+  if (!equipments?.available || !population || population <= 0) {
+    return null;
+  }
+
+  return roundOneDecimal((equipments.dailyLifeEquipmentsCount / population) * 1000);
 }
 
 function bpeDomainPer1000(
@@ -590,6 +601,72 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     },
   },
   {
+    id: "apl_nurse",
+    label: "APL — infirmières",
+    definition:
+      "Équivalents temps plein (ETP) d'infirmières accessibles pour 100 000 habitants standardisés (DREES). Tient compte de l'offre des communes voisines.",
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.DREES_APL,
+    sourceName: "DREES APL",
+    valueType: "ratio",
+    higherIsBetter: true,
+    extract: (t) => {
+      const nurse = t.enrichment?.healthcareAccess?.nurse;
+      const value = nurse?.available ? nurse.value : null;
+      return numericCell(
+        value !== null ? formatAplEtpPer100k(value) : "Donnée non disponible",
+        value,
+        nurse?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "apl_physiotherapist",
+    label: "APL — masseurs-kinésithérapeutes",
+    definition:
+      "ETP de masseurs-kinésithérapeutes accessibles pour 100 000 habitants standardisés (DREES). Tient compte de l'offre des communes voisines.",
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.DREES_APL,
+    sourceName: "DREES APL",
+    valueType: "ratio",
+    higherIsBetter: true,
+    extract: (t) => {
+      const physio = t.enrichment?.healthcareAccess?.physiotherapist;
+      const value = physio?.available ? physio.value : null;
+      return numericCell(
+        value !== null ? formatAplEtpPer100k(value) : "Donnée non disponible",
+        value,
+        physio?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "apl_dentist",
+    label: "APL — chirurgiens-dentistes",
+    definition:
+      "ETP de chirurgiens-dentistes accessibles pour 100 000 habitants standardisés (DREES). Tient compte de l'offre des communes voisines.",
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.DREES_APL,
+    sourceName: "DREES APL",
+    valueType: "ratio",
+    higherIsBetter: true,
+    extract: (t) => {
+      const dentist = t.enrichment?.healthcareAccess?.dentist;
+      const value = dentist?.available ? dentist.value : null;
+      return numericCell(
+        value !== null ? formatAplEtpPer100k(value) : "Donnée non disponible",
+        value,
+        dentist?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
     id: "health_per_1000",
     label: "Établissements santé / 1 000 hab.",
     definition: "Établissements sanitaires et sociaux (FINESS) pour 1 000 habitants.",
@@ -674,6 +751,29 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
         value,
         services?.year ?? null,
         value !== null,
+      );
+    },
+  },
+  {
+    id: "daily_life_equipments_per_1000",
+    label: "Équipements vie courante / 1 000 hab.",
+    definition: DAILY_LIFE_EQUIPMENTS_NOTE,
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.INSEE_BPE,
+    sourceName: "INSEE BPE (panier OT vie courante)",
+    valueType: "ratio",
+    higherIsBetter: true,
+    comparisonHint:
+      "Sous-ensemble BPE (commerces, services, santé de proximité) — distinct du total BPE et des ratios par domaine.",
+    extract: (t) => {
+      const value = dailyLifeEquipmentsPer1000(t);
+      return numericCell(
+        value !== null ? formatRate(value) : "Donnée non disponible",
+        value,
+        t.enrichment?.equipments?.year ?? null,
+        value !== null,
+        { warning: tourismWarning(t) },
       );
     },
   },

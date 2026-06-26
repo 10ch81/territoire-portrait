@@ -19,6 +19,7 @@ export const rennesLikeProfile: TerritoryProfile = {
     equipments: {
       year: 2024,
       totalEquipments: 1_850,
+      dailyLifeEquipmentsCount: 0,
       byDomain: [{ code: "D", label: "Santé", count: 120 }],
       byType: [{ code: "D201", label: "Médecin généraliste", count: 85 }],
       transport: { totalEquipments: 12, byType: [], available: true, note: "" },

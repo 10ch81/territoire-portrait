@@ -2,11 +2,30 @@ import { DataRow } from "@/components/DataRow";
 import { DataSection } from "@/components/DataSection";
 import { SectionUnavailable } from "@/components/SectionUnavailable";
 import { AcronymTooltip } from "@/components/AcronymTooltip";
-import { formatAplConsultations } from "@/lib/apl";
+import { formatAplConsultations, formatAplEtpPer100k } from "@/lib/apl";
+import type { AplEtpSnapshot } from "@/lib/types";
 import type { TerritoryProfile } from "@/lib/types";
 
 interface HealthSectionProps {
   territory: TerritoryProfile;
+}
+
+function AplEtpRows({ snapshot, label }: { snapshot: AplEtpSnapshot; label: string }) {
+  if (!snapshot.available) {
+    return null;
+  }
+
+  return (
+    <>
+      <DataRow label={label} value={formatAplEtpPer100k(snapshot.value)} />
+      {snapshot.departmentMedian !== null ? (
+        <DataRow
+          label={`${label} — médiane départementale (réf.)`}
+          value={formatAplEtpPer100k(snapshot.departmentMedian)}
+        />
+      ) : null}
+    </>
+  );
 }
 
 export function HealthSection({ territory }: HealthSectionProps) {
@@ -53,6 +72,22 @@ export function HealthSection({ territory }: HealthSectionProps) {
                     label="Médiane départementale (réf.)"
                     value={formatAplConsultations(gp.departmentMedian)}
                   />
+                ) : null}
+                {healthcareAccess ? (
+                  <>
+                    <AplEtpRows
+                      snapshot={healthcareAccess.nurse}
+                      label="APL — infirmières"
+                    />
+                    <AplEtpRows
+                      snapshot={healthcareAccess.physiotherapist}
+                      label="APL — masseurs-kinésithérapeutes"
+                    />
+                    <AplEtpRows
+                      snapshot={healthcareAccess.dentist}
+                      label="APL — chirurgiens-dentistes"
+                    />
+                  </>
                 ) : null}
               </dl>
               <p className="mt-3 text-xs text-slate-500">{gp.note}</p>

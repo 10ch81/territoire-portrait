@@ -8,6 +8,7 @@ import {
   buildDomainCounts,
   sumTransportTypeCounts,
 } from "../bpe-semantics";
+import { sumDailyLifeEquipments } from "../daily-life-equipments";
 import { createBpeSource } from "../sources";
 import { loadJsonCache } from "./cache";
 import type {
@@ -35,6 +36,7 @@ function emptyEquipmentSnapshot(note: string): EquipmentSnapshot {
   return {
     year: 2024,
     totalEquipments: 0,
+    dailyLifeEquipmentsCount: 0,
     byDomain: [],
     byType: [],
     transport: {
@@ -114,6 +116,7 @@ export function loadEquipmentSnapshot(inseeCode: string): EquipmentSnapshot {
   return {
     year: entry.year,
     totalEquipments: entry.total,
+    dailyLifeEquipmentsCount: sumDailyLifeEquipments(entry.byType ?? {}),
     byDomain,
     byType,
     transport: buildTransportSnapshot(entry.byType ?? {}, labels),

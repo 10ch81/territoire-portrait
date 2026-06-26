@@ -140,6 +140,7 @@ export const saintGironsProfile: TerritoryProfile = {
     equipments: {
       year: 2024,
       totalEquipments: 515,
+      dailyLifeEquipmentsCount: 4,
       byDomain: [
         { code: "A", label: "Services pour les particuliers", count: 12 },
         { code: "B", label: "Commerces", count: 8 },
@@ -379,6 +380,7 @@ export function createPanelProfile(preset: PanelPreset): TerritoryProfile {
         equipments: {
           year: 2024,
           totalEquipments: 12,
+          dailyLifeEquipmentsCount: 1,
           byDomain: [{ code: "B", label: "Commerces", count: 2 }],
           byType: [{ code: "B201", label: "Supérette", count: 1 }],
           transport: { totalEquipments: 0, byType: [], available: false, note: "" },

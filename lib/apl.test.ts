@@ -2,9 +2,12 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   computeDepartmentMedians,
+  computeDepartmentMediansFromValues,
   findAplHeaderRowIndex,
   findLatestAplSheetName,
   formatAplConsultations,
+  formatAplEtpPer100k,
+  parseAplEtpRows,
   parseAplGeneralPractitionerRows,
 } from "./apl";
 
@@ -57,5 +60,30 @@ describe("lib/apl", () => {
   it("formate les consultations APL", () => {
     assert.match(formatAplConsultations(1.942), /1,94\d? consultations \/ hab\. standardisé/);
     assert.equal(formatAplConsultations(null), "Donnée non disponible");
+  });
+
+  it("parse les lignes communales APL ETP", () => {
+    const rows = [
+      ["Code commune INSEE", "Commune", "APL aux infirmières"],
+      ["", "", "En ETP pour 100 000 habitants standardisés"],
+      ["35238", "Rennes", 125.4, 220000, 225000],
+    ];
+
+    const communes = parseAplEtpRows(rows, 2023);
+    assert.equal(communes["35238"]?.value, 125.4);
+    assert.equal(communes["35238"]?.standardizedPopulation, 220000);
+  });
+
+  it("calcule la médiane départementale depuis des valeurs brutes", () => {
+    const medians = computeDepartmentMediansFromValues({
+      "35238": 100,
+      "35001": 200,
+    });
+    assert.equal(medians["35"], 150);
+  });
+
+  it("formate les ETP APL", () => {
+    assert.match(formatAplEtpPer100k(125.4), /125,4 ETP \/ 100 000 hab\. standardisés/);
+    assert.equal(formatAplEtpPer100k(null), "Donnée non disponible");
   });
 });

@@ -108,6 +108,12 @@ export const APL_DATASET_URL =
   "https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl/";
 export const APL_GENERAL_PRACTITIONER_XLSX_URL =
   "https://data.drees.solidarites-sante.gouv.fr/api/v2/catalog/datasets/530_l-accessibilite-potentielle-localisee-apl/attachments/indicateur_d_accessibilite_potentielle_localisee_apl_aux_medecins_generalistes_xlsx";
+export const APL_NURSE_XLSX_URL =
+  "https://data.drees.solidarites-sante.gouv.fr/api/v2/catalog/datasets/530_l-accessibilite-potentielle-localisee-apl/attachments/indicateur_d_accessibilite_potentielle_localisee_apl_aux_infirmieres_xlsx";
+export const APL_PHYSIOTHERAPIST_XLSX_URL =
+  "https://data.drees.solidarites-sante.gouv.fr/api/v2/catalog/datasets/530_l-accessibilite-potentielle-localisee-apl/attachments/indicateur_d_accessibilite_potentielle_localisee_apl_aux_kinesitherapeutes_xlsx";
+export const APL_DENTIST_XLSX_URL =
+  "https://data.drees.solidarites-sante.gouv.fr/api/v2/catalog/datasets/530_l-accessibilite-potentielle-localisee-apl/attachments/indicateur_d_accessibilite_potentielle_localisee_apl_aux_chirurgiens_dentistes_xlsx";
 export const APL_VINTAGE = 2023;
 
 const CNAF_PRECARITE_DATASET_URL =
@@ -132,6 +138,10 @@ export const OT_TERRITORIAL_ACCESS_DATASET_URL =
 
 export const OT_CENTRALITY_ACCESS_PAGE_URL =
   "https://www.observatoire-des-territoires.gouv.fr/temps-dacces-routier-moyen-un-centre-dequipements-et-de-services-en-hexagone";
+
+/** Panier BPE « services et équipements de la vie courante » (indicateur serv_com_equip). */
+export const OT_DAILY_LIFE_EQUIPMENTS_PAGE_URL =
+  "https://www.observatoire-des-territoires.gouv.fr/les-services-et-equipements-de-la-vie-courante";
 
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
@@ -563,10 +573,10 @@ export function createFinessSource(accessedAt: string): DataSource {
 export function createAplSource(accessedAt: string): DataSource {
   return {
     id: SOURCE_IDS.DREES_APL,
-    name: `DREES — APL médecins généralistes (${APL_VINTAGE})`,
+    name: `DREES — APL soins de ville (${APL_VINTAGE})`,
     url: APL_DATASET_URL,
     description:
-      "Accessibilité potentielle localisée aux médecins généralistes (consultations accessibles par habitant standardisé).",
+      "Accessibilité potentielle localisée aux soins de ville : médecins généralistes (consultations / hab. standardisé), infirmières, kinésithérapeutes et chirurgiens-dentistes (ETP / 100 000 hab. standardisés).",
     accessedAt,
   };
 }

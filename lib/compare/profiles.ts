@@ -38,8 +38,12 @@ export const COMPARE_THEMATIC_PROFILES: CompareThematicProfile[] = [
     questionId: "equipped",
     indicatorIds: [
       "equipments_per_1000",
+      "daily_life_equipments_per_1000",
       "commerce_per_1000",
       "apl_general_practitioner",
+      "apl_nurse",
+      "apl_physiotherapist",
+      "apl_dentist",
       "health_per_1000",
       "france_services",
     ],
