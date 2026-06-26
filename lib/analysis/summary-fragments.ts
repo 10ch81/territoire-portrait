@@ -97,8 +97,14 @@ function fragmentsForCentrality(
 }
 
 function fragmentsForDemography(
+  fact: AnalysisFact,
   territory: TerritoryProfile,
 ): AnalysisFactSummaryFragments {
+  // Structure par âge (strengths) : pas de phrase d'évolution dans le résumé.
+  if (fact.target === "strengths") {
+    return {};
+  }
+
   const context = buildDemographyContextPhrase(territory);
   if (!context) return {};
   return { summaryContextPhrase: context };
@@ -116,7 +122,7 @@ function fragmentsForFact(
       return fragmentsForCentrality(fact, territory);
 
     case "demography":
-      return fragmentsForDemography(territory);
+      return fragmentsForDemography(fact, territory);
 
     case "equipments":
       if (fact.target === "strengths") {

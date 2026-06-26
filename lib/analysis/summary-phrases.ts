@@ -70,15 +70,34 @@ function trendFromPercent(percent: number): DemographyTrend {
   return percent > 0 ? "growth" : "decline";
 }
 
+function isDemographyEvolutionSelectedFact(fact: AnalysisFact): boolean {
+  return (
+    fact.theme === "demography" &&
+    (fact.target === "summary" || fact.target === "watchPoints")
+  );
+}
+
 export function extractDemographySnapshot(
   territory: TerritoryProfile,
   selectedFacts: AnalysisFact[],
 ): DemographySnapshot {
-  const contextFromFacts = selectedFacts.find(
-    (fact) => fact.theme === "demography" && fact.summaryContextPhrase,
-  )?.summaryContextPhrase;
+  const evolutionFact = selectedFacts.find(isDemographyEvolutionSelectedFact);
 
-  const contextPhrase = contextFromFacts ?? buildDemographyContextPhrase(territory);
+  if (!evolutionFact) {
+    return {
+      trend: "unknown",
+      percent: null,
+      percentLabel: null,
+      fromYear: null,
+      toYear: null,
+      contextPhrase: null,
+    };
+  }
+
+  const contextPhrase =
+    selectedFacts.find(
+      (fact) => fact.theme === "demography" && fact.summaryContextPhrase,
+    )?.summaryContextPhrase ?? buildDemographyContextPhrase(territory);
 
   const derived = territory.enrichment?.derived;
   let percent = derived?.populationGrowthPercent ?? null;
@@ -86,14 +105,11 @@ export function extractDemographySnapshot(
   let toYear = derived?.populationGrowthToYear ?? null;
 
   if (percent === null) {
-    const demographyFact = selectedFacts.find((fact) => fact.theme === "demography");
-    if (demographyFact) {
-      const parsed = parseDemographyFromSentence(demographyFact.sentence);
-      if (parsed) {
-        percent = parsed.percent;
-        fromYear = parsed.fromYear;
-        toYear = parsed.toYear;
-      }
+    const parsed = parseDemographyFromSentence(evolutionFact.sentence);
+    if (parsed) {
+      percent = parsed.percent;
+      fromYear = parsed.fromYear;
+      toYear = parsed.toYear;
     }
   }
 
