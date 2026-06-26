@@ -1,5 +1,5 @@
 import { computeYoungAdultShare, computeAgeAggregates } from "@/lib/age-aggregates";
-import { formatAplConsultations } from "@/lib/apl";
+import { formatAplConsultations, formatAplEtpPer100k } from "@/lib/apl";
 import { DAILY_LIFE_EQUIPMENTS_NOTE } from "@/lib/daily-life-equipments";
 import {
   formatCurrency,
@@ -596,6 +596,72 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
         value !== null ? formatAplConsultations(value) : "Donnée non disponible",
         value,
         gp?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "apl_nurse",
+    label: "APL — infirmières",
+    definition:
+      "Équivalents temps plein (ETP) d'infirmières accessibles pour 100 000 habitants standardisés (DREES). Tient compte de l'offre des communes voisines.",
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.DREES_APL,
+    sourceName: "DREES APL",
+    valueType: "ratio",
+    higherIsBetter: true,
+    extract: (t) => {
+      const nurse = t.enrichment?.healthcareAccess?.nurse;
+      const value = nurse?.available ? nurse.value : null;
+      return numericCell(
+        value !== null ? formatAplEtpPer100k(value) : "Donnée non disponible",
+        value,
+        nurse?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "apl_physiotherapist",
+    label: "APL — masseurs-kinésithérapeutes",
+    definition:
+      "ETP de masseurs-kinésithérapeutes accessibles pour 100 000 habitants standardisés (DREES). Tient compte de l'offre des communes voisines.",
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.DREES_APL,
+    sourceName: "DREES APL",
+    valueType: "ratio",
+    higherIsBetter: true,
+    extract: (t) => {
+      const physio = t.enrichment?.healthcareAccess?.physiotherapist;
+      const value = physio?.available ? physio.value : null;
+      return numericCell(
+        value !== null ? formatAplEtpPer100k(value) : "Donnée non disponible",
+        value,
+        physio?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "apl_dentist",
+    label: "APL — chirurgiens-dentistes",
+    definition:
+      "ETP de chirurgiens-dentistes accessibles pour 100 000 habitants standardisés (DREES). Tient compte de l'offre des communes voisines.",
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.DREES_APL,
+    sourceName: "DREES APL",
+    valueType: "ratio",
+    higherIsBetter: true,
+    extract: (t) => {
+      const dentist = t.enrichment?.healthcareAccess?.dentist;
+      const value = dentist?.available ? dentist.value : null;
+      return numericCell(
+        value !== null ? formatAplEtpPer100k(value) : "Donnée non disponible",
+        value,
+        dentist?.year ?? null,
         value !== null,
       );
     },

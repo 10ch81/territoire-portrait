@@ -254,8 +254,19 @@ export interface AplGeneralPractitionerSnapshot {
   note: string;
 }
 
+export interface AplEtpSnapshot {
+  year: number;
+  value: number;
+  departmentMedian: number | null;
+  available: boolean;
+  note: string;
+}
+
 export interface HealthcareAccessSnapshot {
   generalPractitioner: AplGeneralPractitionerSnapshot;
+  nurse: AplEtpSnapshot;
+  physiotherapist: AplEtpSnapshot;
+  dentist: AplEtpSnapshot;
   available: boolean;
 }
 
@@ -787,19 +798,35 @@ export interface AplGeneralPractitionerValues {
   referencePopulation: number;
 }
 
+export interface AplEtpValues {
+  year: number;
+  value: number;
+  standardizedPopulation: number;
+  referencePopulation: number;
+}
+
 export interface AplCommuneCacheEntry {
   generalPractitioner: AplGeneralPractitionerValues;
+  nurse: AplEtpValues;
+  physiotherapist: AplEtpValues;
+  dentist: AplEtpValues;
+}
+
+export interface AplDepartmentMedians {
+  generalPractitioner: Record<string, number>;
+  nurse: Record<string, number>;
+  physiotherapist: Record<string, number>;
+  dentist: Record<string, number>;
 }
 
 export interface AplCacheMeta {
   vintage: number;
-  profession: "general_practitioner";
   ingestedAt: string;
 }
 
 export interface AplCommuneCache {
   meta: AplCacheMeta;
-  departmentMedians: Record<string, number>;
+  departmentMedians: AplDepartmentMedians;
   communes: Record<string, AplCommuneCacheEntry>;
 }
 
