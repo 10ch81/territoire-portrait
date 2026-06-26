@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { AiAnalysisClient } from "@/components/AiAnalysisClient";
+import { CommuneNotFoundView } from "@/components/commune/CommuneNotFoundView";
 import { PortraitNarratifClient } from "@/components/PortraitNarratifClient";
 import { AnalysisReadyProvider } from "@/components/AnalysisReadyProvider";
 import { ComparableCommunesPanel } from "@/components/commune/ComparableCommunesPanel";
@@ -45,7 +45,7 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
   const territory = await getEnrichedTerritoryByInsee(codeInsee);
 
   if (!territory) {
-    notFound();
+    return <CommuneNotFoundView />;
   }
 
   const kpis = extractHeroKpis(territory);
