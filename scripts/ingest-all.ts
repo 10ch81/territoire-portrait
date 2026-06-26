@@ -1,5 +1,6 @@
 /**
  * Lance toutes les ingestions de données publiques vers data/cache/
+ * Ingestions CSV lourdes (BPE, FLORES, DVF, SSMSI, RP/FILOSOFI) : agrégation DuckDB offline.
  */
 
 import { spawnSync } from "node:child_process";
@@ -29,6 +30,7 @@ const steps = [
   { name: "IPS DEPP (écoles)", script: "scripts/ingest-ips.ts" },
   { name: "APL DREES (accessibilité soins — skip documenté)", script: "scripts/ingest-apl.ts" },
   { name: "CNAF (indicateurs précarité / RSA)", script: "scripts/ingest-caf.ts" },
+  { name: "Rangs départementaux (compare)", script: "scripts/ingest-department-ranks.ts" },
 ];
 
 for (const step of steps) {

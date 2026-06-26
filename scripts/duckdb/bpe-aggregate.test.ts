@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, it } from "node:test";
 import type { BpeCommuneCache } from "@/lib/types";
+import { assertCacheMatchesSample } from "./cache-regression";
 import {
   aggregateBpeCommuneCache,
   exportBpeTypeLabels,
@@ -16,7 +17,6 @@ const METADATA_CSV_PATH = resolve(
   "bpe-2024-extract/DS_BPE_2024_metadata.csv",
 );
 const EXISTING_CACHE_PATH = resolve(CACHE_DIR, "bpe-by-commune.json");
-const SAMPLE_INSEE_CODES = ["35238", "44109", "75056", "13055"];
 
 describe("aggregateBpeCommuneCache (DuckDB)", () => {
   it("reproduit le cache BPE existant sur un échantillon de communes", async () => {
@@ -33,19 +33,7 @@ describe("aggregateBpeCommuneCache (DuckDB)", () => {
       aggregateBpeCommuneCache(connection, DATA_CSV_PATH),
     );
 
-    assert.equal(
-      Object.keys(duckdbCache).length,
-      Object.keys(existing).length,
-      "nombre de communes indexées",
-    );
-
-    for (const inseeCode of SAMPLE_INSEE_CODES) {
-      assert.deepEqual(
-        duckdbCache[inseeCode],
-        existing[inseeCode],
-        `entrée BPE pour ${inseeCode}`,
-      );
-    }
+    assertCacheMatchesSample(duckdbCache, existing, "BPE");
   });
 
   it("exporte les libellés FACILITY_TYPE", async () => {

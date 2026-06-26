@@ -36,3 +36,6 @@ jobs:
 
       - name: Analysis unit tests
         run: npm run test:analysis
+
+      - name: DuckDB ingest regressions
+        run: npm run test:duckdb-all
