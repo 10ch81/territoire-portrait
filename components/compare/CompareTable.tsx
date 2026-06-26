@@ -1,5 +1,6 @@
 import { getIndicatorRows } from "@/lib/compare/indicator-rows";
 import type { CompareCell, TerritoryComparisonResult } from "@/lib/compare/types";
+import { getSourceUrlById } from "@/lib/sources";
 import {
   buildCompareCellAccessibleName,
   buildCompareTableCaption,
@@ -13,14 +14,47 @@ interface CompareTableProps {
   hiddenIndicatorIds?: Set<string>;
 }
 
+function SourceReference({
+  sourceId,
+  sourceName,
+  inline = false,
+}: {
+  sourceId: string;
+  sourceName: string;
+  inline?: boolean;
+}) {
+  const url = getSourceUrlById(sourceId);
+  const sourceLabel = url ? (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-700 underline-offset-2 hover:underline"
+    >
+      {sourceName}
+    </a>
+  ) : (
+    sourceName
+  );
+  const content = <>Source : {sourceLabel}</>;
+
+  if (inline) {
+    return <span className="text-xs text-slate-500">{content}</span>;
+  }
+
+  return <p className="block text-xs text-slate-500 print:text-[10px]">{content}</p>;
+}
+
 function IndicatorMeta({
   label,
   definition,
+  sourceId,
   sourceName,
   vintage,
 }: {
   label: string;
   definition: string;
+  sourceId: string;
   sourceName: string;
   vintage: number | string | null;
 }) {
@@ -30,7 +64,7 @@ function IndicatorMeta({
       <div className="font-medium text-slate-900">{label}</div>
       <p className="text-xs leading-relaxed text-slate-600">{definition}</p>
       <p className="text-xs text-slate-500">
-        Source : {sourceName}
+        <SourceReference sourceId={sourceId} sourceName={sourceName} inline />
         {vintageLabel}
       </p>
     </div>
@@ -41,10 +75,14 @@ function CellValue({
   cell,
   communeName,
   indicatorLabel,
+  sourceId,
+  sourceName,
 }: {
   cell: CompareCell | undefined;
   communeName: string;
   indicatorLabel: string;
+  sourceId: string;
+  sourceName: string;
 }) {
   const accessibleName = buildCompareCellAccessibleName({
     communeName,
@@ -64,8 +102,9 @@ function CellValue({
     <div className="space-y-1" aria-label={accessibleName}>
       <span className="font-medium text-slate-900">{cell.displayValue}</span>
       {cell.vintage != null ? (
-        <span className="block text-xs text-slate-500">{cell.vintage}</span>
+        <span className="block text-xs text-slate-500">Millésime {cell.vintage}</span>
       ) : null}
+      <SourceReference sourceId={sourceId} sourceName={sourceName} />
       {cell.fragile ? (
         <span className="block text-xs text-amber-800">Donnée fragile</span>
       ) : null}
@@ -161,6 +200,7 @@ export function CompareTable({ comparison, hiddenIndicatorIds }: CompareTablePro
                           <IndicatorMeta
                             label={indicator.label}
                             definition={indicator.definition}
+                            sourceId={indicator.sourceId}
                             sourceName={indicator.sourceName}
                             vintage={sampleCell?.vintage ?? null}
                           />
@@ -181,6 +221,8 @@ export function CompareTable({ comparison, hiddenIndicatorIds }: CompareTablePro
                                 cell={cellsByCommune.get(column.inseeCode)}
                                 communeName={column.name}
                                 indicatorLabel={indicator.label}
+                                sourceId={indicator.sourceId}
+                                sourceName={indicator.sourceName}
                               />
                             </td>
                           );

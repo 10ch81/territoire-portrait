@@ -574,3 +574,58 @@ export function mergeSources(...groups: DataSource[][]): DataSource[] {
 
   return merged;
 }
+
+const SOURCE_URL_REFERENCE_AT = "reference";
+
+let cachedSourceUrls: Map<string, string> | null = null;
+
+function buildSourceUrlMap(): Map<string, string> {
+  const accessedAt = SOURCE_URL_REFERENCE_AT;
+  const sources: DataSource[] = [
+    createGeoApiSource(accessedAt),
+    createBanSearchSource(accessedAt),
+    createEnterpriseSource(accessedAt),
+    createBpeSource(accessedAt),
+    createPopulationSource(accessedAt),
+    createPopulationHistorySource(accessedAt),
+    createRpPopulationSource(accessedAt),
+    createRpEmploymentSource(accessedAt),
+    createFilosofiSource(accessedAt),
+    createGeorisquesSource(accessedAt),
+    createRplsSource(accessedAt),
+    createLovacSource(accessedAt),
+    createFranceTravailSource(accessedAt),
+    createCafSource(accessedAt),
+    createIrveSource(accessedAt),
+    createReiSource(accessedAt),
+    createAavSource(accessedAt),
+    createDensityGridSource(accessedAt),
+    createUrbanUnitSource(accessedAt),
+    createPvdSource(accessedAt),
+    createAcvSource(accessedAt),
+    createFrrSource(accessedAt),
+    createVillagesAvenirSource(accessedAt),
+    createDvfSource(accessedAt),
+    createSsmsiSource(accessedAt),
+    createRpHousingSource(accessedAt),
+    createCommuteSource(accessedAt),
+    createQpvSource(accessedAt),
+    createOfglSource(accessedAt),
+    createFranceServicesSource(accessedAt),
+    createInseeSideSource(accessedAt),
+    createTourismSource(accessedAt),
+    createFloresSource(accessedAt),
+    createArcepSource(accessedAt),
+    createFinessSource(accessedAt),
+    createEducationSource(accessedAt),
+    createIpsSource(accessedAt),
+  ];
+
+  return new Map(sources.map((source) => [source.id, source.url]));
+}
+
+/** URL publique d'une source cataloguée (traçabilité comparateur / API). */
+export function getSourceUrlById(sourceId: string): string | null {
+  cachedSourceUrls ??= buildSourceUrlMap();
+  return cachedSourceUrls.get(sourceId) ?? null;
+}
