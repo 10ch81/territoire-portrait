@@ -4,6 +4,7 @@ import { AiAnalysisClient } from "@/components/AiAnalysisClient";
 import { PortraitNarratifClient } from "@/components/PortraitNarratifClient";
 import { AnalysisReadyProvider } from "@/components/AnalysisReadyProvider";
 import { ComparableCommunesPanel } from "@/components/commune/ComparableCommunesPanel";
+import { HashSectionScroll } from "@/components/commune/HashSectionScroll";
 import {
   CommuneViewToggle,
   type CommuneViewMode,
@@ -115,6 +116,7 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
           </div>
         ) : (
           <>
+            <HashSectionScroll />
             <SectionNav sections={sections} />
             <AiAnalysisClient codeInsee={territory.inseeCode} />
             {portraitNarrativeAvailable ? (

@@ -13,7 +13,7 @@ export function UseCaseCards() {
         {USE_CASE_EXAMPLES.map((useCase) => (
           <Link
             key={useCase.id}
-            href={`/commune/${useCase.inseeCode}#${useCase.anchor}`}
+            href={`/commune/${useCase.inseeCode}?vue=detail#${useCase.anchor}`}
             className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
           >
             <h3 className="font-semibold text-slate-900">{useCase.title}</h3>

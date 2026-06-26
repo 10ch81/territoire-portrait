@@ -122,14 +122,14 @@ export const USE_CASE_EXAMPLES = [
   {
     id: "elected",
     title: "Élus & collectivités",
-    description: "Fiscalité, logement social, équipements de proximité.",
+    description: "Taux de fiscalité locale et comptes publics (REI, OFGL).",
     inseeCode: "44109",
     anchor: "fiscalite",
   },
   {
     id: "prospect",
     title: "Prospection territoriale",
-    description: "Économie locale, immobilier, mobilité et densité.",
+    description: "Entreprises, emploi salarié et revenus médians.",
     inseeCode: "69123",
     anchor: "economie",
   },
