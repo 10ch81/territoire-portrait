@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { BackToTop } from "@/components/BackToTop";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -52,6 +53,7 @@ export default function RootLayout({
             Données issues de sources publiques · Analyse IA Mistral côté serveur
           </div>
         </footer>
+        <BackToTop />
       </body>
     </html>
   );
