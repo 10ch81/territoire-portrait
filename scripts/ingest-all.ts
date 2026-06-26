@@ -30,6 +30,7 @@ const steps = [
   { name: "IPS DEPP (écoles)", script: "scripts/ingest-ips.ts" },
   { name: "APL DREES (accessibilité soins)", script: "scripts/ingest-apl.ts" },
   { name: "CNAF (indicateurs précarité / RSA)", script: "scripts/ingest-caf.ts" },
+  { name: "Observatoire des territoires (accessibilité)", script: "scripts/ingest-observatoire-access.ts" },
   { name: "Rangs départementaux (compare)", script: "scripts/ingest-department-ranks.ts" },
 ];
 

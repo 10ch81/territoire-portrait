@@ -63,6 +63,7 @@ yarn-error.log*
 !/data/cache/ips-by-commune.json
 !/data/cache/caf-by-commune.json
 !/data/cache/apl-by-commune.json
+!/data/cache/observatoire-access-by-commune.json
 !/data/cache/department-ranks-by-commune.json
 
 # vercel

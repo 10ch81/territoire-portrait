@@ -118,6 +118,21 @@ export const CNAF_PRECARITE_FILE_URL =
 /** Millésime de la part RSA (CNAF) dans les indicateurs territoriaux de précarité. */
 export const CNAF_RSA_VINTAGE = 2024;
 
+const OBSERVATOIRE_TERRITOIRES_BASE =
+  "https://www.observatoire-des-territoires.gouv.fr/outils/cartographie-interactive/api/v1/functions/GC_API_download.php";
+
+/** Part de la population éloignée de plus de 20 min d'au moins un service de santé de proximité (communes 2025). */
+export const OT_HEALTH_DISTANT_SHARE_URL = `${OBSERVATOIRE_TERRITOIRES_BASE}?type=stat&nivgeo=com2025&dataset=acces_soin&indic=part_pop_eloigne_soin&format=csv`;
+
+/** Temps d'accès routier moyen à un centre d'équipements et de services (communes 2025, hexagone). */
+export const OT_CENTRALITY_ACCESS_MINUTES_URL = `${OBSERVATOIRE_TERRITOIRES_BASE}?type=stat&nivgeo=com2025&dataset=centr_tps_acces&indic=temps_acces_centralites&format=csv`;
+
+export const OT_TERRITORIAL_ACCESS_DATASET_URL =
+  "https://www.observatoire-des-territoires.gouv.fr/part-de-la-population-eloignee-de-plus-de-20-minutes-dau-moins-un-des-services-de-sante-de-0";
+
+export const OT_CENTRALITY_ACCESS_PAGE_URL =
+  "https://www.observatoire-des-territoires.gouv.fr/temps-dacces-routier-moyen-un-centre-dequipements-et-de-services-en-hexagone";
+
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
   BAN: "ban-adresse",
@@ -148,6 +163,7 @@ export const SOURCE_IDS = {
   EDUCATION_DIRECTORY: "education-directory",
   DEPP_IPS_ECOLES: "depp-ips-ecoles",
   CNAF_PRECARITE: "cnaf-precarite",
+  OBSERVATOIRE_TERRITOIRES: "observatoire-territoires",
   AAV: "aav2020",
   INSEE_DENSITY_GRID: "insee-density-grid",
   INSEE_URBAN_UNIT: "insee-urban-unit",
@@ -307,6 +323,17 @@ export function createCafSource(accessedAt: string): DataSource {
     url: CNAF_PRECARITE_DATASET_URL,
     description:
       "Part des allocataires du RSA parmi les ménages (indicateurs territoriaux de précarité CNAF) — seul agrégat CAF en bulk communal ≤ 20 Mo.",
+    accessedAt,
+  };
+}
+
+export function createObservatoireAccessSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.OBSERVATOIRE_TERRITOIRES,
+    name: "Observatoire des territoires — accessibilité",
+    url: OT_TERRITORIAL_ACCESS_DATASET_URL,
+    description:
+      "Indicateurs d'accessibilité routière aux services (INSEE BPE + distancier Metric-OSRM) : part de population éloignée des soins de proximité (> 20 min) et temps moyen vers un centre d'équipements.",
     accessedAt,
   };
 }

@@ -32,6 +32,7 @@
     "ingest:ips": "tsx scripts/ingest-ips.ts",
     "ingest:apl": "tsx scripts/ingest-apl.ts",
     "ingest:caf": "tsx scripts/ingest-caf.ts",
+    "ingest:observatoire-access": "tsx scripts/ingest-observatoire-access.ts",
     "ingest:social": "tsx scripts/ingest-social.ts",
     "ingest:department-ranks": "tsx scripts/ingest-department-ranks.ts",
     "ingest:all": "tsx scripts/ingest-all.ts",

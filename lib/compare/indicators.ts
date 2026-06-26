@@ -678,6 +678,52 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     },
   },
   {
+    id: "health_distant_share_20min",
+    label: "Pop. éloignée soins > 20 min",
+    definition:
+      "Part de la population pour laquelle au moins un des 5 services de santé de proximité (pharmacie, médecin généraliste, kiné, dentiste, infirmier) est à plus de 20 minutes en voiture (BPE, Metric-OSRM).",
+    blockId: "services",
+    questionIds: ["accessible", "equipped"],
+    sourceId: SOURCE_IDS.OBSERVATOIRE_TERRITOIRES,
+    sourceName: "Observatoire des territoires",
+    valueType: "ratio",
+    higherIsBetter: false,
+    extract: (t) => {
+      const health = t.enrichment?.territorialAccess?.health;
+      const value = health?.available ? health.distantSharePercent : null;
+      return numericCell(
+        formatPercent(value ?? null),
+        value,
+        health?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "centrality_access_minutes",
+    label: "Temps accès centre services",
+    definition:
+      "Temps de trajet routier moyen vers le centre d'équipements et de services le plus proche (polarités intermédiaires et au-delà, typologie ANCT/INRAE). Temps théoriques en voiture.",
+    blockId: "services",
+    questionIds: ["accessible"],
+    sourceId: SOURCE_IDS.OBSERVATOIRE_TERRITOIRES,
+    sourceName: "Observatoire des territoires",
+    valueType: "absolute",
+    higherIsBetter: false,
+    extract: (t) => {
+      const centrality = t.enrichment?.territorialAccess?.centrality;
+      const value = centrality?.available ? centrality.accessMinutes : null;
+      return numericCell(
+        value !== null
+          ? `${value.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} min`
+          : "Donnée non disponible",
+        value,
+        centrality?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
     id: "car_commute_share",
     label: "Actifs en voiture",
     definition: "Part des actifs en emploi utilisant la voiture pour se rendre au travail (RP mobilité).",

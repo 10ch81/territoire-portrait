@@ -257,6 +257,26 @@ export interface HealthcareAccessSnapshot {
   available: boolean;
 }
 
+export interface TerritorialHealthAccessSnapshot {
+  distantSharePercent: number | null;
+  year: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface TerritorialCentralityAccessSnapshot {
+  accessMinutes: number | null;
+  year: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface TerritorialAccessSnapshot {
+  health: TerritorialHealthAccessSnapshot;
+  centrality: TerritorialCentralityAccessSnapshot;
+  available: boolean;
+}
+
 export interface EducationAggregateCount {
   code: string;
   label: string;
@@ -416,6 +436,7 @@ export interface TerritoryEnrichment {
   education: EducationSnapshot | null;
   health: HealthSnapshot | null;
   healthcareAccess: HealthcareAccessSnapshot | null;
+  territorialAccess: TerritorialAccessSnapshot | null;
   risks: RisksSnapshot | null;
   security: SecuritySnapshot | null;
   housing: SocialHousingSnapshot | null;
@@ -617,6 +638,18 @@ export interface CafCommuneCacheEntry {
 }
 
 export type CafCommuneCache = Record<string, CafCommuneCacheEntry>;
+
+export interface ObservatoireAccessCommuneCacheEntry {
+  healthDistantSharePercent: number | null;
+  healthVintage: number | null;
+  centralityAccessMinutes: number | null;
+  centralityVintage: number | null;
+}
+
+export type ObservatoireAccessCommuneCache = Record<
+  string,
+  ObservatoireAccessCommuneCacheEntry
+>;
 
 export interface IrveCommuneCacheEntry {
   year: number;

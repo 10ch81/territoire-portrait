@@ -358,6 +358,16 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
     );
   }
 
+  if (enrichment.territorialAccess?.health.available) {
+    pushUnique(limits, enrichment.territorialAccess.health.note);
+  }
+
+  if (enrichment.territorialAccess?.centrality.available) {
+    pushUnique(limits, enrichment.territorialAccess.centrality.note);
+  } else if (enrichment.territorialAccess?.available) {
+    pushUnique(limits, enrichment.territorialAccess.centrality.note);
+  }
+
   if (enrichment.health?.available) {
     pushUnique(
       limits,

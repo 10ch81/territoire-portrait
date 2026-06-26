@@ -65,6 +65,10 @@ import {
   loadSocialBenefitsSnapshot,
   createCafSource,
 } from "./social-benefits";
+import {
+  loadTerritorialAccessSnapshot,
+  createObservatoireAccessSource,
+} from "./territorial-access";
 
 function collectEnrichmentSources(
   accessedAt: string,
@@ -118,6 +122,9 @@ function collectEnrichmentSources(
   }
   if (enrichment.healthcareAccess?.available) {
     sources.push(createAplSource(accessedAt));
+  }
+  if (enrichment.territorialAccess?.available) {
+    sources.push(createObservatoireAccessSource(accessedAt));
   }
   if (enrichment.risks?.available) {
     sources.push(createGeorisquesSource(accessedAt));
@@ -223,6 +230,7 @@ export async function enrichTerritory(
     territory.inseeCode,
     territory.department?.code,
   );
+  const territorialAccess = loadTerritorialAccessSnapshot(territory.inseeCode);
   const housing = loadSocialHousingSnapshot(territory.inseeCode);
   const mobility = loadMobilitySnapshot(territory.inseeCode);
   const urbanPolicy = loadQpvSnapshot(territory.inseeCode);
@@ -243,6 +251,7 @@ export async function enrichTerritory(
     education,
     health,
     healthcareAccess,
+    territorialAccess,
     risks,
     security,
     housing,
