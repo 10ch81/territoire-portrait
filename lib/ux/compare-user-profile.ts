@@ -5,14 +5,17 @@ import { COMPARE_PRIORITY_IDS } from "@/lib/compare/user-priorities";
 
 const STORAGE_KEY = "territoire-portrait:compare-priorities";
 
+/** Référence stable pour getServerSnapshot (useSyncExternalStore). */
+const DEFAULT_COMPARE_PRIORITIES: string[] = [...COMPARE_PRIORITY_IDS];
+
 let cachedRaw: string | null | undefined;
-let cachedPriorities: string[] = [...COMPARE_PRIORITY_IDS];
+let cachedPriorities: string[] = DEFAULT_COMPARE_PRIORITIES;
 
 const listeners = new Set<() => void>();
 
 function parseStoredPriorities(raw: string | null): string[] {
   if (!raw) {
-    return [...COMPARE_PRIORITY_IDS];
+    return DEFAULT_COMPARE_PRIORITIES;
   }
 
   const ids = raw
@@ -20,12 +23,12 @@ function parseStoredPriorities(raw: string | null): string[] {
     .map((item) => item.trim())
     .filter((item) => COMPARE_PRIORITY_IDS.includes(item));
 
-  return ids.length > 0 ? ids : [...COMPARE_PRIORITY_IDS];
+  return ids.length > 0 ? ids : DEFAULT_COMPARE_PRIORITIES;
 }
 
 function readPrioritiesSnapshot(): string[] {
   if (typeof window === "undefined") {
-    return [...COMPARE_PRIORITY_IDS];
+    return DEFAULT_COMPARE_PRIORITIES;
   }
 
   const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -61,7 +64,7 @@ function notifyListeners(): void {
 }
 
 export function getComparePrioritiesServerSnapshot(): string[] {
-  return [...COMPARE_PRIORITY_IDS];
+  return DEFAULT_COMPARE_PRIORITIES;
 }
 
 export function saveComparePriorities(ids: string[]): void {
@@ -70,7 +73,7 @@ export function saveComparePriorities(ids: string[]): void {
   }
 
   const valid = ids.filter((id) => COMPARE_PRIORITY_IDS.includes(id));
-  const next = valid.length > 0 ? valid : [...COMPARE_PRIORITY_IDS];
+  const next = valid.length > 0 ? valid : DEFAULT_COMPARE_PRIORITIES;
   cachedRaw = next.join(",");
   cachedPriorities = next;
   window.localStorage.setItem(STORAGE_KEY, cachedRaw);
@@ -104,7 +107,7 @@ export function useComparePriorities(input?: {
 
   const setPriorityIds = useCallback((ids: string[]) => {
     const valid = ids.filter((id) => COMPARE_PRIORITY_IDS.includes(id));
-    const next = valid.length > 0 ? valid : [...COMPARE_PRIORITY_IDS];
+    const next = valid.length > 0 ? valid : DEFAULT_COMPARE_PRIORITIES;
     cachedRaw = next.join(",");
     cachedPriorities = next;
     window.localStorage.setItem(STORAGE_KEY, cachedRaw);

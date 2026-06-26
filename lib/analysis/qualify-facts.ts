@@ -641,12 +641,12 @@ function qualifyFinancesFact(fact: AnalysisFact, territory: TerritoryProfile): Q
   const accounts = territory.enrichment?.publicAccounts;
   const debt = accounts?.debtPerCapitaEur;
 
-  if (/recettes de fonctionnement/i.test(fact.sentence)) {
+  if (/annuité de la dette/i.test(fact.sentence) && /recettes de fonctionnement/i.test(fact.sentence)) {
     if (debt == null) {
       return withTargets(fact, {
         polarity: "neutral",
         intensity: "medium",
-        qualificationReason: "dette_ratio_recettes_descriptif",
+        qualificationReason: "dette_annuite_recettes_descriptif",
         eligibleTargets: ["summary", "watchPoints"],
       });
     }
@@ -655,27 +655,37 @@ function qualifyFinancesFact(fact: AnalysisFact, territory: TerritoryProfile): Q
       return withTargets(fact, {
         polarity: "negative",
         intensity: debtIntensity(debt, territory),
-        qualificationReason: "dette_ratio_recettes",
+        qualificationReason: "dette_annuite_recettes",
       });
     }
 
     return withTargets(fact, {
       polarity: "neutral",
       intensity: "medium",
-      qualificationReason: "dette_ratio_recettes_descriptif",
+      qualificationReason: "dette_annuite_recettes_descriptif",
+      eligibleTargets: ["summary"],
+    });
+  }
+
+  if (/délai de désendettement/i.test(fact.sentence)) {
+    return withTargets(fact, {
+      polarity: "neutral",
+      intensity: "medium",
+      qualificationReason: "dette_desendettement_descriptif",
       eligibleTargets: ["summary"],
     });
   }
 
   if (
-    (accounts?.operatingRevenueEur != null ||
-      accounts?.operatingRevenuePerCapitaEur != null) &&
-    /€ par habitant/i.test(fact.sentence)
+    (accounts?.debtServiceEur != null ||
+      accounts?.debtServicePerCapitaEur != null) &&
+    /€ par habitant/i.test(fact.sentence) &&
+    !/annuité de la dette/i.test(fact.sentence)
   ) {
     return withTargets(fact, {
       polarity: "neutral",
       intensity: "low",
-      qualificationReason: "dette_hab_avec_recettes",
+      qualificationReason: "dette_hab_avec_annuite",
       eligibleTargets: ["summary"],
     });
   }

@@ -26,6 +26,17 @@ export function formatCurrency(value: number | null): string {
   return `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(value)} €`;
 }
 
+export function formatPaybackYears(years: number | null): string {
+  if (!isDisplayableNumber(years)) {
+    return "Donnée non disponible";
+  }
+
+  return `${new Intl.NumberFormat("fr-FR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(years)} ans`;
+}
+
 export function formatRate(value: number | null): string {
   if (!isDisplayableNumber(value)) {
     return "Donnée non disponible";

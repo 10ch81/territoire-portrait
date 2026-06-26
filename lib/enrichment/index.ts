@@ -277,8 +277,18 @@ export async function getEnrichedTerritoryByInsee(
 }
 
 export {
+  computeDebtPaybackYears,
+  computeDebtPaybackYearsFromSnapshot,
+  computeDebtServiceToRevenuePercent,
+  computeDebtServiceToRevenuePercentFromSnapshot,
+  fetchPublicAccountsSnapshot,
+  resolvePublicAccountsAmountEur,
+} from "./public-accounts";
+
+export {
   formatCurrency,
   formatDensity,
+  formatPaybackYears,
   formatPercent,
   formatPropertyPrice,
   formatRate,

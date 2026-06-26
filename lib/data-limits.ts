@@ -281,7 +281,7 @@ function appendFiscalLimits(
   if (hasOfgl) {
     pushUnique(
       limits,
-      "Comptes publics OFGL : encours de dette et recettes de fonctionnement (budget principal) ; pas de dépenses détaillées ni d'années antérieures dans le portrait.",
+      "Comptes publics OFGL : dette, délai de désendettement et annuité rapportée aux recettes (budget principal) ; pas de dépenses détaillées ni d'années antérieures dans le portrait.",
     );
   } else if (hasRei) {
     pushUnique(

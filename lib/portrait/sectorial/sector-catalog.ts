@@ -166,7 +166,7 @@ export const SECTOR_DEFINITIONS: SectorDefinition[] = [
         themes: ["finances"],
         role: "lead",
         maxCount: 3,
-        predicate: (fact) => !/ratio dette\/recettes/i.test(fact.sentence.toLowerCase()),
+        predicate: (fact) => !/ratio annuité\/recettes/i.test(fact.sentence.toLowerCase()),
       },
     ],
   },

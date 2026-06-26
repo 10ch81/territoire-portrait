@@ -176,6 +176,10 @@ export interface TerritorialFacts {
     recettesParHabitant: number | null;
     encoursDette: number | null;
     detteParHabitant: number | null;
+    epargneBrute: number | null;
+    epargneBruteParHabitant: number | null;
+    annuiteDette: number | null;
+    annuiteDetteParHabitant: number | null;
     note: string;
   } | null;
   servicesProximite: {
@@ -439,6 +443,12 @@ export function buildTerritorialFacts(territory: TerritoryProfile): TerritorialF
             territory.enrichment.publicAccounts.operatingRevenuePerCapitaEur,
           encoursDette: territory.enrichment.publicAccounts.debtOutstandingEur,
           detteParHabitant: territory.enrichment.publicAccounts.debtPerCapitaEur,
+          epargneBrute: territory.enrichment.publicAccounts.grossSavingsEur,
+          epargneBruteParHabitant:
+            territory.enrichment.publicAccounts.grossSavingsPerCapitaEur,
+          annuiteDette: territory.enrichment.publicAccounts.debtServiceEur,
+          annuiteDetteParHabitant:
+            territory.enrichment.publicAccounts.debtServicePerCapitaEur,
           note: territory.enrichment.publicAccounts.note,
         }
       : null,

@@ -49,6 +49,7 @@
     "test:bpe-semantics": "tsx --test lib/bpe-semantics.test.ts",
     "test:age-aggregates": "tsx --test lib/age-aggregates.test.ts",
     "test:demographic-indicators": "tsx --test lib/demographic-indicators.test.ts",
+    "test:duckdb-bpe": "tsx --test scripts/duckdb/bpe-aggregate.test.ts",
     "repair:native": "node scripts/ensure-native-binaries.mjs",
     "postinstall": "node scripts/ensure-native-binaries.mjs"
   },
@@ -58,6 +59,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@duckdb/node-api": "^1.5.4-r.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

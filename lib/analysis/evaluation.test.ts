@@ -168,7 +168,7 @@ describe("évaluation métier — communes de référence", () => {
       assert.ok(debtTexts.length > 0, "Précondition : un constat dette est produit pour Chamonix.");
 
       const revenueContextPattern =
-        /\b(?:recettes|rapport|charge de la dette|endettement.*recettes|recettes.*endettement)\b/i;
+        /\b(?:recettes|rapport|charge de la dette|annuité de la dette|endettement.*recettes|recettes.*endettement)\b/i;
 
       for (const text of debtTexts) {
         assert.match(

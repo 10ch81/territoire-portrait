@@ -112,36 +112,36 @@ describe("qualifyAnalysisFact — watchPoints", () => {
     assert.doesNotMatch(incomeWatch!.sentence, /s'élève à/i);
   });
 
-  it("dette faible — unknown, pas de watchPoint", () => {
+  it("dette faible — neutral sur dette/hab, pas de watchPoint", () => {
     const profile = createPanelProfile("lowMunicipalDebt");
     const debt = buildAnalysisFacts(profile).find(
-      (f) => f.theme === "finances" && /dette/i.test(f.sentence),
+      (f) => f.theme === "finances" && /€ par habitant/i.test(f.sentence),
     );
 
     assert.ok(debt);
     const qualified = qualifyAnalysisFact(debt!, { territory: profile });
-    assert.equal(qualified.polarity, "unknown");
+    assert.equal(qualified.polarity, "neutral");
     assert.equal(isEligibleForWatchPoint(qualified), false);
     assert.ok(
       !selectedWatchThemes(profile).some(
-        (f) => f.theme === "finances" && /dette/i.test(f.sentence),
+        (f) => f.theme === "finances" && /annuité de la dette/i.test(f.sentence),
       ),
     );
   });
 
-  it("dette élevée — negative, watchPoint possible", () => {
+  it("dette élevée — negative sur annuité/recettes, watchPoint possible", () => {
     const profile = createPanelProfile("highMunicipalDebt");
-    const debt = buildAnalysisFacts(profile).find(
-      (f) => f.theme === "finances" && /dette/i.test(f.sentence),
+    const debtRatio = buildAnalysisFacts(profile).find(
+      (f) => f.theme === "finances" && /annuité de la dette/i.test(f.sentence),
     );
 
-    assert.ok(debt);
-    const qualified = qualifyAnalysisFact(debt!, { territory: profile });
+    assert.ok(debtRatio);
+    const qualified = qualifyAnalysisFact(debtRatio!, { territory: profile });
     assert.equal(qualified.polarity, "negative");
     assert.equal(isEligibleForWatchPoint(qualified), true);
     assert.ok(
       selectedWatchThemes(profile).some(
-        (f) => f.theme === "finances" && /dette/i.test(f.sentence),
+        (f) => f.theme === "finances" && /annuité de la dette/i.test(f.sentence),
       ),
     );
   });

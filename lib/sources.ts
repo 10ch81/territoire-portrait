@@ -460,7 +460,7 @@ export function createOfglSource(accessedAt: string): DataSource {
     name: "OFGL — Comptes des collectivités",
     url: OFGL_URL,
     description:
-      "Encours de dette et recettes de fonctionnement des communes (budget principal).",
+      "Encours de dette, épargne brute, annuité de la dette et recettes de fonctionnement (budget principal).",
     accessedAt,
   };
 }

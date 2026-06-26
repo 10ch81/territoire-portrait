@@ -1,4 +1,8 @@
 import type { TerritoryProfile } from "../../types";
+import {
+  computeDebtPaybackYearsFromSnapshot,
+  computeDebtServiceToRevenuePercentFromSnapshot,
+} from "../../enrichment/public-accounts";
 import { renderCountedLabel } from "../render-text";
 import { qualifiesAsDebtWatchPoint } from "../socio-economic-watch-points";
 import { binding, createFact } from "./utils";
@@ -115,130 +119,70 @@ export function buildFinancesFacts(territory: TerritoryProfile): AnalysisFact[] 
   }
 
   if (accounts?.available && accounts.debtPerCapitaEur !== null) {
-    const population = territory.population ?? null;
-    const debtOutstanding =
-      accounts.debtOutstandingEur ??
-      (population != null && population > 0
-        ? accounts.debtPerCapitaEur * population
-        : null);
-    const operatingRevenue =
-      accounts.operatingRevenueEur ??
-      (population != null &&
-      population > 0 &&
-      accounts.operatingRevenuePerCapitaEur != null
-        ? accounts.operatingRevenuePerCapitaEur * population
-        : null);
-    const hasRevenue =
-      accounts.operatingRevenueEur != null ||
-      accounts.operatingRevenuePerCapitaEur != null;
+    const debtIsWatchPoint = qualifiesAsDebtWatchPoint(accounts.debtPerCapitaEur);
+    const paybackYears = computeDebtPaybackYearsFromSnapshot(accounts);
+    const debtServicePercent = computeDebtServiceToRevenuePercentFromSnapshot(
+      accounts,
+    );
 
-    if (hasRevenue && debtOutstanding != null && operatingRevenue != null && operatingRevenue > 0) {
-      const debtToRevenueRatio = debtOutstanding / operatingRevenue;
-      const ratioPercent = Math.round(debtToRevenueRatio * 100);
-      const ratioPhrase =
-        ratioPercent >= 85 && ratioPercent <= 115
-          ? " ; l'encours représente environ une année de recettes de fonctionnement"
-          : "";
-      const debtIsWatchPoint = qualifiesAsDebtWatchPoint(accounts.debtPerCapitaEur);
+    facts.push(
+      createFact({
+        theme: "finances",
+        target: debtIsWatchPoint ? "watchPoints" : "summary",
+        sentence: `La dette communale s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
+        sourceKeys: ["ofgl"],
+        year: accounts.year,
+        confidence: "medium",
+        limitations: [
+          "Indicateur par habitant ; à lire avec le délai de désendettement et la charge annuelle de la dette.",
+        ],
+      }),
+    );
 
+    if (paybackYears !== null) {
       facts.push(
         createFact({
           theme: "finances",
-          target: debtIsWatchPoint ? "watchPoints" : "summary",
-          sentence: `L'encours de dette représente ${ratioPercent} % des recettes de fonctionnement annuelles (OFGL ${accounts.year})${ratioPhrase}, à contextualiser avec la capacité d'investissement.`,
+          target: "summary",
+          sentence: `Le délai de désendettement s'élève à ${paybackYears.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ans (encours / épargne brute, OFGL ${accounts.year}).`,
           sourceKeys: ["ofgl"],
           year: accounts.year,
           confidence: "medium",
           limitations: [
-            "Comptes publics OFGL ; budget principal ; endettement à lire avec les recettes et la capacité d'investissement.",
+            "Nombre d'années théoriques si toute l'épargne brute servait au remboursement ; indicateur OFGL, pas un jugement de gestion.",
           ],
           numericBindings: [
             binding(
-              ratioPercent,
-              "ratio dette/recettes OFGL",
+              paybackYears,
+              "délai désendettement OFGL",
               "finances",
-              ["dette", "recettes", "endettement", "OFGL"],
+              ["dette", "épargne brute", "désendettement", "OFGL"],
             ),
           ],
         }),
       );
+    }
 
-      facts.push(
-        createFact({
-          theme: "finances",
-          target: "summary",
-          sentence: `La dette communale s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
-          sourceKeys: ["ofgl"],
-          year: accounts.year,
-          confidence: "medium",
-          limitations: [
-            "Indicateur par habitant ; à lire avec le ratio dette/recettes et la population présente.",
-          ],
-        }),
-      );
-    } else {
-      const debtIsWatchPoint = qualifiesAsDebtWatchPoint(accounts.debtPerCapitaEur);
+    if (debtServicePercent !== null) {
+      const ratioPercent = Math.round(debtServicePercent);
       facts.push(
         createFact({
           theme: "finances",
           target: debtIsWatchPoint ? "watchPoints" : "summary",
-          sentence: `La dette communale s'élève à ${Math.round(accounts.debtPerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`,
-          sourceKeys: ["ofgl"],
-          year: accounts.year,
-          confidence: "medium",
-          limitations: debtIsWatchPoint
-            ? [
-                "Comptes publics OFGL ; budget principal ; lecture descriptive sans jugement de gestion.",
-              ]
-            : [
-                "Comptes publics OFGL ; budget principal ; niveau non interprétable comme tension sans comparaison ou série.",
-              ],
-        }),
-      );
-    }
-  }
-
-  if (accounts?.available) {
-    const revenueSentence =
-      accounts.operatingRevenuePerCapitaEur !== null
-        ? `Les recettes annuelles de la commune s'élèvent à ${Math.round(accounts.operatingRevenuePerCapitaEur).toLocaleString("fr-FR")} € par habitant (OFGL ${accounts.year}).`
-        : accounts.operatingRevenueEur !== null
-          ? `Les recettes annuelles de la commune s'élèvent à ${Math.round(accounts.operatingRevenueEur).toLocaleString("fr-FR")} € (OFGL ${accounts.year}).`
-          : null;
-
-    if (revenueSentence) {
-      facts.push(
-        createFact({
-          theme: "finances",
-          target: "summary",
-          sentence: revenueSentence,
+          sentence: `L'annuité de la dette représente ${ratioPercent} % des recettes de fonctionnement annuelles (OFGL ${accounts.year}), à contextualiser avec la capacité d'investissement.`,
           sourceKeys: ["ofgl"],
           year: accounts.year,
           confidence: "medium",
           limitations: [
-            "Comptes publics OFGL ; budget principal ; pas d'analyse de trajectoire sans série temporelle.",
+            "Charge annuelle de la dette (intérêts et capital) rapportée aux recettes de fonctionnement ; budget principal OFGL.",
           ],
           numericBindings: [
-            ...(accounts.operatingRevenuePerCapitaEur !== null
-              ? [
-                  binding(
-                    accounts.operatingRevenuePerCapitaEur,
-                    "recettes fonctionnement/hab OFGL",
-                    "finances",
-                    ["recettes", "fonctionnement", "OFGL", "budget"],
-                  ),
-                ]
-              : []),
-            ...(accounts.operatingRevenueEur !== null
-              ? [
-                  binding(
-                    accounts.operatingRevenueEur,
-                    "recettes fonctionnement OFGL",
-                    "finances",
-                    ["recettes", "fonctionnement", "OFGL", "budget"],
-                  ),
-                ]
-              : []),
+            binding(
+              ratioPercent,
+              "ratio annuité/recettes OFGL",
+              "finances",
+              ["annuité", "dette", "recettes", "OFGL"],
+            ),
           ],
         }),
       );

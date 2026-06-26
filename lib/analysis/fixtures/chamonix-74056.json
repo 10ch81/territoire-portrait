@@ -819,8 +819,12 @@
       "operatingRevenuePerCapitaEur": 4472.047139991083,
       "debtOutstandingEur": 39451789.67,
       "debtPerCapitaEur": 4397.212401917075,
+      "grossSavingsEur": 4000000,
+      "grossSavingsPerCapitaEur": 445.5,
+      "debtServiceEur": 3500000,
+      "debtServicePerCapitaEur": 389.2,
       "available": true,
-      "note": "Encours de dette et recettes de fonctionnement (budget principal), source OFGL — dernier exercice disponible."
+      "note": "Dette, épargne brute et annuité de la dette (budget principal), source OFGL — dernier exercice disponible."
     },
     "proximityServices": {
       "year": 2025,

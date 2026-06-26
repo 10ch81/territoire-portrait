@@ -289,6 +289,10 @@ export interface PublicAccountsSnapshot {
   operatingRevenuePerCapitaEur: number | null;
   debtOutstandingEur: number | null;
   debtPerCapitaEur: number | null;
+  grossSavingsEur: number | null;
+  grossSavingsPerCapitaEur: number | null;
+  debtServiceEur: number | null;
+  debtServicePerCapitaEur: number | null;
   available: boolean;
   note: string;
 }
