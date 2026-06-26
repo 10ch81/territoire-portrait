@@ -166,7 +166,7 @@ Référence implémentation : `lib/sources.ts`, `lib/enrichment/*`, `scripts/ing
 | Démographie | ✅ Forte | — |
 | Emploi / revenus | ✅ Forte | Emploi salarié au lieu de travail |
 | Économie | ✅ Forte | Emploi salarié FLORES A17 ; emploi au lieu de travail absent |
-| Équipements | ✅ Forte | France Services ; APL et Annuaire Éducation écartés |
+| Équipements | ✅ Forte | APL santé écarté (pas de bulk communal) |
 | Mobilité | ⚠️ Partielle | RP domicile-travail + IRVE ; GTFS reporté |
 | Logement | ✅ Correcte | RPLS + vacance RP |
 | Immobilier | ✅ Correcte | Faibles volumes → prudence |

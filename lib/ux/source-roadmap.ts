@@ -28,16 +28,6 @@ export const SOURCE_ROADMAP: SourceRoadmapEntry[] = [
     priority: "P3",
   },
   {
-    id: "education-directory",
-    name: "Annuaire de l'Éducation",
-    theme: "Équipements",
-    url: "https://www.data.gouv.fr/datasets/annuaire-de-leducation",
-    description:
-      "Agrégats d'établissements scolaires ouverts par commune (cache communal, sans liste nominative).",
-    status: "partial",
-    priority: "P2",
-  },
-  {
     id: "apl-sante",
     name: "DREES — APL santé",
     theme: "Santé",
