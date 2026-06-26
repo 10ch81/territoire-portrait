@@ -47,6 +47,7 @@ function emptyPublicAccountsSnapshot(
   };
 }
 
+/** @internal Réservé aux tests — ne pas utiliser pour des ratios affichés (voir compute*FromSnapshot). */
 export function resolvePublicAccountsAmountEur(
   totalEur: number | null,
   perCapitaEur: number | null,

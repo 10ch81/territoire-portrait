@@ -282,7 +282,6 @@ export {
   computeDebtServiceToRevenuePercent,
   computeDebtServiceToRevenuePercentFromSnapshot,
   fetchPublicAccountsSnapshot,
-  resolvePublicAccountsAmountEur,
 } from "./public-accounts";
 
 export {
