@@ -51,6 +51,7 @@
     "test:demographic-indicators": "tsx --test lib/demographic-indicators.test.ts",
     "test:duckdb-bpe": "tsx --test scripts/duckdb/bpe-aggregate.test.ts",
     "test:duckdb-p1": "tsx --test scripts/duckdb/p1-aggregate.test.ts",
+    "test:duckdb-p2": "tsx --test scripts/duckdb/p2-quality.test.ts",
     "repair:native": "node scripts/ensure-native-binaries.mjs",
     "postinstall": "node scripts/ensure-native-binaries.mjs"
   },

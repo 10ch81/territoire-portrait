@@ -1,5 +1,7 @@
 import { buildReport, shouldFailCi, writeLatestReport } from "../lib/quality/report";
 import { verifyGoldenCommunes } from "../lib/quality/reference";
+import { verifyGoldenCachesWithDuckDb } from "./duckdb/verify-golden-caches";
+import { withDuckDbSession } from "./duckdb/session";
 
 function printSummary(report: ReturnType<typeof buildReport>): void {
   const { summary } = report;
@@ -24,7 +26,11 @@ function printSummary(report: ReturnType<typeof buildReport>): void {
 async function main(): Promise<void> {
   console.log("Vérification référence (golden communes vs APIs live)…\n");
 
-  const findings = await verifyGoldenCommunes();
+  const liveFindings = await verifyGoldenCommunes();
+  const offlineFindings = await withDuckDbSession((connection) =>
+    verifyGoldenCachesWithDuckDb(connection),
+  );
+  const findings = [...liveFindings, ...offlineFindings];
   const report = buildReport("verify-reference", findings);
   const reportPath = writeLatestReport(report);
 

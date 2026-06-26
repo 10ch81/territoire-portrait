@@ -2,6 +2,9 @@ import { buildReport, mergeReports, shouldFailCi, writeLatestReport } from "../l
 import { verifyGoldenCommunes } from "../lib/quality/reference";
 import { validateInternalCache } from "../lib/quality/rules";
 import { checkCacheStaleness } from "../lib/quality/staleness";
+import { validateCacheJoinsWithDuckDb } from "./duckdb/validate-cache-joins";
+import { verifyGoldenCachesWithDuckDb } from "./duckdb/verify-golden-caches";
+import { withDuckDbSession } from "./duckdb/session";
 import { validateTypologySample } from "./validate-typology-sample";
 
 function printSummary(report: ReturnType<typeof buildReport>): void {
@@ -32,9 +35,13 @@ async function main(): Promise<void> {
   console.log("Contrôle qualité complet (validate + verify)…\n");
 
   console.log("▶ validate:internal");
+  const duckDbJoinFindings = await withDuckDbSession((connection) =>
+    validateCacheJoinsWithDuckDb(connection),
+  );
   const internalReport = buildReport("validate-internal", [
     ...validateInternalCache(),
     ...checkCacheStaleness(),
+    ...duckDbJoinFindings,
   ]);
 
   console.log("▶ validate:typology");
@@ -42,7 +49,13 @@ async function main(): Promise<void> {
 
   console.log("▶ verify:reference");
   const referenceFindings = await verifyGoldenCommunes();
-  const referenceReport = buildReport("verify-reference", referenceFindings);
+  const offlineGoldenFindings = await withDuckDbSession((connection) =>
+    verifyGoldenCachesWithDuckDb(connection),
+  );
+  const referenceReport = buildReport("verify-reference", [
+    ...referenceFindings,
+    ...offlineGoldenFindings,
+  ]);
 
   const merged = mergeReports("quality-all", [internalReport, referenceReport]);
   const reportPath = writeLatestReport(merged);

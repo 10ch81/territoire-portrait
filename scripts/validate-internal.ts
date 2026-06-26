@@ -1,6 +1,8 @@
 import { buildReport, shouldFailCi, writeLatestReport } from "../lib/quality/report";
 import { validateInternalCache } from "../lib/quality/rules";
 import { checkCacheStaleness } from "../lib/quality/staleness";
+import { validateCacheJoinsWithDuckDb } from "./duckdb/validate-cache-joins";
+import { withDuckDbSession } from "./duckdb/session";
 
 function printSummary(report: ReturnType<typeof buildReport>): void {
   const { summary } = report;
@@ -29,7 +31,14 @@ function printSummary(report: ReturnType<typeof buildReport>): void {
 async function main(): Promise<void> {
   console.log("Validation interne des caches data/cache/…\n");
 
-  const findings = [...validateInternalCache(), ...checkCacheStaleness()];
+  const duckDbFindings = await withDuckDbSession((connection) =>
+    validateCacheJoinsWithDuckDb(connection),
+  );
+  const findings = [
+    ...validateInternalCache(),
+    ...checkCacheStaleness(),
+    ...duckDbFindings,
+  ];
   const report = buildReport("validate-internal", findings);
   const reportPath = writeLatestReport(report);
 
