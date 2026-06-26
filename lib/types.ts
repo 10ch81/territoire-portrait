@@ -79,6 +79,8 @@ export interface TransportSnapshot {
 export interface EquipmentSnapshot {
   year: number;
   totalEquipments: number;
+  /** Panier OT serv_com_equip (25 types BPE vie courante). */
+  dailyLifeEquipmentsCount: number;
   byDomain: EquipmentDomainCount[];
   byType: EquipmentTypeCount[];
   transport: TransportSnapshot;

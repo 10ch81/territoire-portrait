@@ -133,6 +133,10 @@ export const OT_TERRITORIAL_ACCESS_DATASET_URL =
 export const OT_CENTRALITY_ACCESS_PAGE_URL =
   "https://www.observatoire-des-territoires.gouv.fr/temps-dacces-routier-moyen-un-centre-dequipements-et-de-services-en-hexagone";
 
+/** Panier BPE « services et équipements de la vie courante » (indicateur serv_com_equip). */
+export const OT_DAILY_LIFE_EQUIPMENTS_PAGE_URL =
+  "https://www.observatoire-des-territoires.gouv.fr/les-services-et-equipements-de-la-vie-courante";
+
 export const SOURCE_IDS = {
   GEO_API_COMMUNES: "geo-api-communes",
   BAN: "ban-adresse",

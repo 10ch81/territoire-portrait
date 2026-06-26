@@ -1,5 +1,6 @@
 import { computeYoungAdultShare, computeAgeAggregates } from "@/lib/age-aggregates";
 import { formatAplConsultations } from "@/lib/apl";
+import { DAILY_LIFE_EQUIPMENTS_NOTE } from "@/lib/daily-life-equipments";
 import {
   formatCurrency,
   formatDensity,
@@ -55,6 +56,16 @@ function textCell(
     warning: null,
     available: text !== "Donnée non disponible",
   };
+}
+
+function dailyLifeEquipmentsPer1000(territory: TerritoryProfile): number | null {
+  const equipments = territory.enrichment?.equipments;
+  const population = territory.population;
+  if (!equipments?.available || !population || population <= 0) {
+    return null;
+  }
+
+  return roundOneDecimal((equipments.dailyLifeEquipmentsCount / population) * 1000);
 }
 
 function bpeDomainPer1000(
@@ -674,6 +685,29 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
         value,
         services?.year ?? null,
         value !== null,
+      );
+    },
+  },
+  {
+    id: "daily_life_equipments_per_1000",
+    label: "Équipements vie courante / 1 000 hab.",
+    definition: DAILY_LIFE_EQUIPMENTS_NOTE,
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.OBSERVATOIRE_TERRITOIRES,
+    sourceName: "Observatoire des territoires (panier BPE)",
+    valueType: "ratio",
+    higherIsBetter: true,
+    comparisonHint:
+      "Sous-ensemble BPE (commerces, services, santé de proximité) — distinct du total BPE et des ratios par domaine.",
+    extract: (t) => {
+      const value = dailyLifeEquipmentsPer1000(t);
+      return numericCell(
+        value !== null ? formatRate(value) : "Donnée non disponible",
+        value,
+        t.enrichment?.equipments?.year ?? null,
+        value !== null,
+        { warning: tourismWarning(t) },
       );
     },
   },
