@@ -119,7 +119,10 @@ export function buildFinancesFacts(territory: TerritoryProfile): AnalysisFact[] 
   }
 
   if (accounts?.available && accounts.debtPerCapitaEur !== null) {
-    const debtIsWatchPoint = qualifiesAsDebtWatchPoint(accounts.debtPerCapitaEur);
+    const debtIsWatchPoint = qualifiesAsDebtWatchPoint(
+      accounts.debtPerCapitaEur,
+      territory,
+    );
     const paybackYears = computeDebtPaybackYearsFromSnapshot(accounts);
     const debtServicePercent = computeDebtServiceToRevenuePercentFromSnapshot(
       accounts,
