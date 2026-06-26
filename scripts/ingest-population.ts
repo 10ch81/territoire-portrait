@@ -7,7 +7,6 @@ import {
   downloadFile,
   extractZip,
   parseCsvLine,
-  parseFrenchDecimal,
 } from "./ingest-utils";
 import type { PopulationCommuneCache } from "../lib/types";
 
@@ -19,7 +18,7 @@ const SOURCE_URL =
 const TARGET_YEARS = new Set([2010, 2015, 2020, 2021, 2022]);
 
 async function aggregatePopulation(): Promise<PopulationCommuneCache> {
-  const { existsSync, readdirSync } = await import("node:fs");
+  const { readdirSync } = await import("node:fs");
   const csvName = readdirSync(EXTRACT_DIR).find((name) => name.endsWith(".csv"));
 
   if (!csvName) {

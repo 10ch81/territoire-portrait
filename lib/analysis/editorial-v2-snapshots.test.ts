@@ -162,7 +162,6 @@ describe("editorial v2 snapshots — garde-fous explicites", () => {
   it("Bousse — lecture simple sans suffixe de prudence mécanique", () => {
     const { analysis } = buildFinalTerritorialAnalysis(bousseLikeProfile);
     const editorial = requireEditorial(analysis);
-    const text = collectEditorialText(editorial);
 
     assertGlobalEditorialPolish(editorial);
     assert.match(editorial.summary, /petite commune|couronne périurbaine|périurbain/i);

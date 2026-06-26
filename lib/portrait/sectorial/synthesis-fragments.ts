@@ -69,7 +69,7 @@ export function selectSynthesisWatchFacts(
       (fact) =>
         fact.target === "watchPoints" &&
         !isRadonRiskWatchFact(fact) &&
-        passesWatchPointSelectionGates(fact, ctx.territory, ctx.territoryContext),
+        passesWatchPointSelectionGates(fact, ctx.territory),
     )
     .sort((a, b) => scoreAnalysisFact(b, ctx) - scoreAnalysisFact(a, ctx));
 

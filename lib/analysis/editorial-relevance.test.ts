@@ -20,7 +20,7 @@ describe("editorial-relevance", () => {
     assert.ok(tourism);
     const context = buildTerritoryContext(palaiseauProfile);
     assert.equal(isTourismAccommodationStrength(tourism!, context), false);
-    assert.equal(isEditoriallyStrongFact(tourism!, palaiseauProfile, context), false);
+    assert.equal(isEditoriallyStrongFact(tourism!, context), false);
   });
 
   it("autorise l'hébergement touristique pour Chamonix", () => {
@@ -31,7 +31,7 @@ describe("editorial-relevance", () => {
     assert.ok(tourism);
     const context = buildTerritoryContext(chamonixProfile);
     assert.equal(isTourismAccommodationStrength(tourism!, context), true);
-    assert.equal(isEditoriallyStrongFact(tourism!, chamonixProfile, context), true);
+    assert.equal(isEditoriallyStrongFact(tourism!, context), true);
   });
 
   it("déclasse l'inventaire ESS/RGE administratif", () => {
@@ -40,7 +40,7 @@ describe("editorial-relevance", () => {
     assert.ok(ess);
     assert.equal(isEssRgeAdministrativeInventory(ess!), true);
     const context = buildTerritoryContext(palaiseauProfile);
-    assert.equal(isEditoriallyStrongFact(ess!, palaiseauProfile, context), false);
+    assert.equal(isEditoriallyStrongFact(ess!, context), false);
   });
 
   it("Rennes-like — sélection sans tourisme ni ESS/RGE en strengths", () => {

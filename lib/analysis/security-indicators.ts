@@ -144,10 +144,8 @@ export function buildSecuritySummaryIssueFragments(
       break;
     case "none":
       break;
-    default: {
-      const _exhaustive: never = formulation;
-      break;
-    }
+    default:
+      formulation satisfies never;
   }
 
   if (!phrase) {

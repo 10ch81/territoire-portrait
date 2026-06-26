@@ -28,7 +28,6 @@ import {
 import type {
   AnalysisFact,
   AnalysisFactTarget,
-  AnalysisFactTheme,
   FactIntensity,
   FactPolarity,
   QualifiedAnalysisFact,
@@ -786,7 +785,7 @@ function qualifyGeographyFact(fact: AnalysisFact): QualificationCore {
   });
 }
 
-function qualifyEquipmentsFact(fact: AnalysisFact, _territory: TerritoryProfile): QualificationCore {
+function qualifyEquipmentsFact(fact: AnalysisFact): QualificationCore {
   if (fact.target === "strengths") {
     return withTargets(fact, {
       polarity: "positive",
@@ -867,7 +866,7 @@ function qualifyDemographyFact(fact: AnalysisFact, territory: TerritoryProfile):
   });
 }
 
-function qualifyAgeingFact(fact: AnalysisFact, territory: TerritoryProfile): QualificationCore {
+function qualifyAgeingFact(fact: AnalysisFact): QualificationCore {
   const match = fact.sentence.match(/([\d,]+)\s*%/);
   const share = match ? Number.parseFloat(match[1].replace(",", ".")) : null;
 
@@ -944,13 +943,13 @@ function qualifyByTheme(
     case "geography":
       return qualifyGeographyFact(fact);
     case "equipments":
-      return qualifyEquipmentsFact(fact, territory);
+      return qualifyEquipmentsFact(fact);
     case "risks":
       return qualifyRisksFact(fact);
     case "demography":
       return qualifyDemographyFact(fact, territory);
     case "ageing":
-      return qualifyAgeingFact(fact, territory);
+      return qualifyAgeingFact(fact);
     default:
       return qualifyDefaultFact(fact);
   }
@@ -992,9 +991,7 @@ export function isFactEligibleForWatchPoint(
     return false;
   }
 
-  const territoryContext =
-    context.territoryContext ?? buildTerritoryContext(context.territory);
-  return passesWatchPointSelectionGates(fact, context.territory, territoryContext);
+  return passesWatchPointSelectionGates(fact, context.territory);
 }
 
 /** @deprecated Préférer isFactEligibleForWatchPoint via qualifyAnalysisFact. */

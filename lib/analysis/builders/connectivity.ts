@@ -1,6 +1,5 @@
 import type { TerritoryProfile } from "../../types";
 import { formatPercent } from "../format";
-import { renderCountedLabel } from "../render-text";
 import { binding, createFact } from "./utils";
 import type { AnalysisFact } from "../types";
 

@@ -18,10 +18,8 @@ import {
 } from "./build-canonical-output";
 import { polishRenderedSentence } from "./render-text";
 import { ensureOutputCoverage } from "./ensure-output-coverage";
-import { ANALYSIS_OUTPUT_LIMITS } from "./prompt-limits";
 import {
   hasUnsourcedClaimIssue,
-  stripUnsourcedClaims,
 } from "./unsourced-claims";
 import { hasForbiddenDerivedRatio } from "./verify-numeric-claims";
 import type {
@@ -209,79 +207,8 @@ function validatePercentContext(text: string, analysisFacts: AnalysisFact[]): bo
   return true;
 }
 
-const OPPORTUNITY_STUDY_PATTERN =
-  /^(?:faire|mener|conduire)\s+(?:une\s+)?(?:analyse|étude)|analyse plus poussée/i;
-
 const FORBIDDEN_OPPORTUNITY_PATTERN =
   /(?:potentiel|dynamique).*(?:sous-exploité|à exploiter)|(?:sécurité|SSMSI).*(?:opportunité|levier)|filière touristique|développement de la filière/i;
-
-function extractNumericTokens(text: string): number[] {
-  const percents = extractPercentTokens(text);
-  const integers: number[] = [];
-  const intMatches = text.matchAll(/\b\d[\d\s]*\d\b/g);
-  for (const match of intMatches) {
-    const parsed = Number.parseInt(match[0].replace(/\s/g, ""), 10);
-    if (!Number.isNaN(parsed)) integers.push(parsed);
-  }
-  return [...percents, ...integers];
-}
-
-function listHasDuplicateIndicator(items: string[]): boolean {
-  const keys = new Set<string>();
-  for (const item of items) {
-    for (const value of extractNumericTokens(item)) {
-      const key = `num:${value}`;
-      if (keys.has(key)) return true;
-      keys.add(key);
-    }
-  }
-  return false;
-}
-
-function listHasSemanticDuplicate(items: string[]): boolean {
-  for (let i = 0; i < items.length; i += 1) {
-    for (let j = i + 1; j < items.length; j += 1) {
-      const overlap = tokenOverlap(items[i], items[j]);
-      if (overlap >= 0.72) return true;
-    }
-  }
-  return false;
-}
-
-function tokenOverlap(a: string, b: string): number {
-  const tokensA = new Set(
-    a
-      .toLowerCase()
-      .split(/\s+/)
-      .filter((t) => t.length > 3),
-  );
-  const tokensB = new Set(
-    b
-      .toLowerCase()
-      .split(/\s+/)
-      .filter((t) => t.length > 3),
-  );
-  if (tokensA.size === 0 || tokensB.size === 0) return 0;
-  let overlap = 0;
-  for (const token of tokensA) {
-    if (tokensB.has(token)) overlap += 1;
-  }
-  return overlap / Math.min(tokensA.size, tokensB.size);
-}
-
-function listHasDuplicateTheme(items: string[], analysisFacts: AnalysisFact[]): boolean {
-  const themes: string[] = [];
-  for (const item of items) {
-    const matched = analysisFacts.filter((fact) =>
-      tokenOverlap(item, fact.sentence) >= 0.45,
-    );
-    for (const fact of matched) {
-      if (themes.includes(fact.theme)) return true;
-      themes.push(fact.theme);
-    }
-  }
-  return false;
-}
 
 function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string | null {
   if (!text.trim()) return "empty";
@@ -299,105 +226,6 @@ function hasValidationIssue(text: string, analysisFacts: AnalysisFact[]): string
   if (hasForbiddenDerivedRatio(text, analysisFacts)) return "derived-ratio";
 
   return null;
-}
-
-function hasListValidationIssue(
-  items: string[],
-  field: "strengths" | "watchPoints" | "opportunities",
-  analysisFacts: AnalysisFact[],
-): boolean {
-  if (listHasDuplicateIndicator(items)) return true;
-  if (listHasSemanticDuplicate(items)) return true;
-  if (field !== "strengths" && listHasDuplicateTheme(items, analysisFacts)) {
-    return true;
-  }
-  return false;
-}
-
-function findReplacementFact(
-  text: string,
-  field: "summary" | "strengths" | "watchPoints" | "opportunities",
-  analysisFacts: AnalysisFact[],
-): AnalysisFact | null {
-  const target =
-    field === "summary"
-      ? "summary"
-      : field;
-
-  const candidates = analysisFacts.filter((f) => f.target === target);
-  if (candidates.length === 0) {
-    return analysisFacts[0] ?? null;
-  }
-
-  const lower = text.toLowerCase();
-  const themed = candidates.find((f) => lower.includes(f.theme.replace("_", " ")));
-  return themed ?? candidates[0] ?? null;
-}
-
-function sanitizeField(
-  text: string,
-  field: "summary" | "strengths" | "watchPoints" | "opportunities",
-  analysisFacts: AnalysisFact[],
-): string {
-  const stripped = stripUnsourcedClaims(text, analysisFacts);
-  const issue = hasValidationIssue(stripped, analysisFacts);
-  if (!issue) return stripped.trim();
-
-  const replacement = findReplacementFact(stripped, field, analysisFacts);
-  return replacement?.sentence ?? "";
-}
-
-function sanitizeList(
-  items: string[],
-  field: "strengths" | "watchPoints" | "opportunities",
-  analysisFacts: AnalysisFact[],
-): string[] {
-  const result: string[] = [];
-  const seenSentences = new Set<string>();
-  const seenIndicators = new Set<string>();
-
-  for (const item of items) {
-    if (field === "opportunities") {
-      if (OPPORTUNITY_STUDY_PATTERN.test(item.trim())) continue;
-      if (FORBIDDEN_OPPORTUNITY_PATTERN.test(item)) continue;
-    }
-
-    const sanitized = sanitizeField(item, field, analysisFacts);
-    if (!sanitized) continue;
-
-    const sentenceKey = sanitized.toLowerCase();
-    if (seenSentences.has(sentenceKey)) continue;
-
-    const indicatorConflict = extractNumericTokens(sanitized).some((value) => {
-      const key = `num:${value}`;
-      if (seenIndicators.has(key)) return true;
-      seenIndicators.add(key);
-      return false;
-    });
-    if (indicatorConflict) continue;
-
-    const semanticDuplicate = result.some(
-      (existing) => tokenOverlap(existing, sanitized) >= 0.72,
-    );
-    if (semanticDuplicate) continue;
-
-    seenSentences.add(sentenceKey);
-    result.push(sanitized);
-  }
-
-  if (hasListValidationIssue(result, field, analysisFacts)) {
-    const max =
-      field === "opportunities"
-        ? ANALYSIS_OUTPUT_LIMITS.opportunities.max
-        : ANALYSIS_OUTPUT_LIMITS[field].max;
-    const fallback = analysisFacts
-      .filter((f) => f.target === field)
-      .slice(0, max)
-      .map((f) => f.sentence);
-    return fallback.filter((sentence, index, list) => list.indexOf(sentence) === index);
-  }
-
-  return result;
 }
 
 export function validateAnalysisOutput(

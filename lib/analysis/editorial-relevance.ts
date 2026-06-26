@@ -1,6 +1,5 @@
-import type { TerritoryProfile } from "../types";
 import type { TerritoryContext } from "./context/buildTerritoryContext";
-import type { AnalysisFact, AnalysisFactTarget, AnalysisFactTheme } from "./types";
+import type { AnalysisFact, AnalysisFactTarget } from "./types";
 
 const TOURISM_ACCOMMODATION_PATTERN = /places d'hébergement touristique/i;
 const ESS_RGE_ADMIN_INVENTORY_PATTERN = /répertoire administratif identifie/i;
@@ -27,9 +26,7 @@ export function isEssRgeAdministrativeInventory(fact: AnalysisFact): boolean {
  */
 export function isEditoriallyStrongFact(
   fact: AnalysisFact,
-  _territory: TerritoryProfile,
   context: TerritoryContext,
-  _relatedWatchPointThemes: AnalysisFactTheme[] = [],
 ): boolean {
   if (!isTourismAccommodationStrength(fact, context)) {
     return false;
@@ -59,17 +56,10 @@ function isGenericEssRgeMobilizationOpportunity(
 export function isEditoriallyRelevantForTarget(
   fact: AnalysisFact,
   target: AnalysisFactTarget,
-  territory: TerritoryProfile,
   context: TerritoryContext,
-  relatedWatchPointThemes: AnalysisFactTheme[] = [],
 ): boolean {
   if (target === "strengths") {
-    return isEditoriallyStrongFact(
-      fact,
-      territory,
-      context,
-      relatedWatchPointThemes,
-    );
+    return isEditoriallyStrongFact(fact, context);
   }
 
   if (target === "opportunities" && isGenericEssRgeMobilizationOpportunity(fact, context)) {

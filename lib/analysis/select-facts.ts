@@ -45,7 +45,6 @@ import {
 } from "./qualify-facts";
 
 import {
-  countRobustWatchPointFamilies,
   missingWatchPointFamilies,
   WATCH_POINT_FAMILIES,
 } from "./watch-point-coverage";

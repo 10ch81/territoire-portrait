@@ -14,7 +14,6 @@ import {
 import {
   buildSourceVintageResult,
   discoverFilosofiVintageOnSeriePage,
-  discoverMaxYearOnInseePage,
   discoverSuccessorYearInUrl,
   probeUrlExists,
   replaceEmbeddedYear,
@@ -61,14 +60,6 @@ function yearFromMelodiUrl(url: string): number {
   const match = url.match(/_(\d{4})_/i);
   if (!match) {
     throw new Error(`Impossible d'extraire le millésime Melodi : ${url}`);
-  }
-  return Number.parseInt(match[1] ?? "", 10);
-}
-
-function yearFromRplsUrl(url: string): number {
-  const match = url.match(/rpls-(\d{4})\.csv/i);
-  if (!match) {
-    throw new Error(`Impossible d'extraire le millésime RPLS : ${url}`);
   }
   return Number.parseInt(match[1] ?? "", 10);
 }

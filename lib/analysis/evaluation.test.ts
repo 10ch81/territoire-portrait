@@ -180,7 +180,6 @@ describe("évaluation métier — communes de référence", () => {
     });
 
     it("formulation plurielle si plusieurs indicateurs SSMSI dépassent la référence", () => {
-      const security = chamonixProfile.enrichment!.security!;
       const aboveCount = countSecurityIndicatorsAboveDepartment(chamonixProfile);
 
       assert.ok(

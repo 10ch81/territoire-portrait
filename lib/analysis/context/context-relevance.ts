@@ -167,13 +167,7 @@ export function isContextuallySelectableForTarget(
   }
 
   if (
-    !isEditoriallyRelevantForTarget(
-      fact,
-      target,
-      territory,
-      context,
-      relatedWatchPointThemes,
-    )
+    !isEditoriallyRelevantForTarget(fact, target, context)
   ) {
     return false;
   }

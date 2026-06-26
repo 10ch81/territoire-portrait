@@ -9,7 +9,6 @@ export const QPV_WATCH_POINT_MIN_COUNT = 3;
 export function passesWatchPointSelectionGates(
   fact: AnalysisFact,
   territory: TerritoryProfile,
-  territoryContext: TerritoryContext,
 ): boolean {
   if (fact.theme === "risks" && isRadonRiskWatchFact(fact)) {
     return false;

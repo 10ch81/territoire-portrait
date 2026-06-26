@@ -4,7 +4,6 @@ import type { TerritoryAnalysis } from "./types";
 import {
   AGE_AGGREGATE_ROUNDING_TOLERANCE,
   formatFrenchPercentOneDecimal,
-  parseFrenchPercentToken,
 } from "./age-aggregates";
 import {
   computePopulationGrowthFromHistory,
