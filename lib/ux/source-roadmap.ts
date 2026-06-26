@@ -33,8 +33,8 @@ export const SOURCE_ROADMAP: SourceRoadmapEntry[] = [
     theme: "Santé",
     url: "https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl",
     description:
-      "Accessibilité potentielle localisée aux professionnels de santé. Écarté (fichiers xlsx départementaux, pas de bulk communal).",
-    status: "planned",
+      "Accessibilité potentielle localisée aux médecins généralistes (xlsx DREES, millésime 2023).",
+    status: "partial",
     priority: "P2",
   },
   {

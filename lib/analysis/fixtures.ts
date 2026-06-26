@@ -44,6 +44,7 @@ function baseEnrichment(overrides: Partial<TerritoryEnrichment> = {}): Territory
     equipments: null,
     education: null,
     health: null,
+    healthcareAccess: null,
     risks: null,
     security: null,
     housing: null,

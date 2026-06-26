@@ -243,6 +243,20 @@ export interface HealthSnapshot {
   note: string;
 }
 
+export interface AplGeneralPractitionerSnapshot {
+  year: number;
+  value: number;
+  valueUnder65: number | null;
+  departmentMedian: number | null;
+  available: boolean;
+  note: string;
+}
+
+export interface HealthcareAccessSnapshot {
+  generalPractitioner: AplGeneralPractitionerSnapshot;
+  available: boolean;
+}
+
 export interface EducationAggregateCount {
   code: string;
   label: string;
@@ -401,6 +415,7 @@ export interface TerritoryEnrichment {
   equipments: EquipmentSnapshot | null;
   education: EducationSnapshot | null;
   health: HealthSnapshot | null;
+  healthcareAccess: HealthcareAccessSnapshot | null;
   risks: RisksSnapshot | null;
   security: SecuritySnapshot | null;
   housing: SocialHousingSnapshot | null;
@@ -728,6 +743,30 @@ export interface FinessCommuneCacheEntry {
 }
 
 export type FinessCommuneCache = Record<string, FinessCommuneCacheEntry>;
+
+export interface AplGeneralPractitionerValues {
+  year: number;
+  value: number;
+  valueUnder65: number | null;
+  standardizedPopulation: number;
+  referencePopulation: number;
+}
+
+export interface AplCommuneCacheEntry {
+  generalPractitioner: AplGeneralPractitionerValues;
+}
+
+export interface AplCacheMeta {
+  vintage: number;
+  profession: "general_practitioner";
+  ingestedAt: string;
+}
+
+export interface AplCommuneCache {
+  meta: AplCacheMeta;
+  departmentMedians: Record<string, number>;
+  communes: Record<string, AplCommuneCacheEntry>;
+}
 
 export interface EducationCommuneCacheEntry {
   year: number;

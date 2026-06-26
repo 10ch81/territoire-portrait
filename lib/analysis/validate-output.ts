@@ -37,7 +37,10 @@ const THEME_CONTEXT_KEYWORDS: Partial<
   housing: (text) => /\b(?:logements vacants|vacance|logements)\b/i.test(text),
   connectivity: (text) => /\b(?:fibre|ARCEP|raccordables|internet)\b/i.test(text),
   mobility: (text) => /\b(?:voiture|domicile-travail|transports en commun)\b/i.test(text),
-  health: (text) => /\b(?:FINESS|santé|sanitaires|accompagnement social)\b/i.test(text),
+  health: (text) =>
+    /\b(?:FINESS|santé|sanitaires|accompagnement social|APL|accessibilité potentielle)\b/i.test(
+      text,
+    ),
   education: (text) => /\b(?:scolaires|Annuaire Éducation|scolarisation)\b/i.test(text),
   employment_sectors: (text) => /\b(?:FLORES|postes salariés|secteurs d'activité)\b/i.test(text),
   economy: (text) => /\b(?:SIDE|entreprises|établissements actifs)\b/i.test(text),

@@ -346,6 +346,18 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
     pushUnique(limits, enrichment.education.ipsNote);
   }
 
+  if (enrichment.healthcareAccess?.available) {
+    pushUnique(
+      limits,
+      "APL DREES : accessibilité potentielle aux médecins généralistes (consultations / habitant standardisé) ; ne mesure pas les délais de rendez-vous ni l'acceptation de nouveaux patients.",
+    );
+  } else {
+    pushUnique(
+      limits,
+      "APL DREES (accessibilité aux soins) : cache absent — exécutez « npm run ingest:apl ».",
+    );
+  }
+
   if (enrichment.health?.available) {
     pushUnique(
       limits,
@@ -359,11 +371,6 @@ export function computeDataLimits(territory: TerritoryProfile): string[] {
       enrichment.health?.note,
     );
   }
-
-  pushUnique(
-    limits,
-    "APL DREES (accessibilité aux soins) : non intégrée — pas de bulk communal CSV/JSON ≤ 20 Mo (export data.drees vide ; jeux data.gouv en xlsx/7z).",
-  );
 
   appendPropertyLimits(limits, enrichment);
 

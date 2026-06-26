@@ -9,6 +9,7 @@ import { buildEconomyFacts, buildEssRgeFacts } from "./builders/economy";
 import { buildEmploymentSectorsFacts } from "./builders/employment-sectors";
 import { buildConnectivityFacts } from "./builders/connectivity";
 import { buildHealthFacts } from "./builders/health";
+import { buildHealthcareAccessFacts } from "./builders/healthcare-access";
 import { buildEducationFacts } from "./builders/education";
 import { buildEquipmentFacts } from "./builders/equipments";
 import { buildHousingFacts, buildSocialHousingFacts } from "./builders/housing";
@@ -50,6 +51,7 @@ const BUILDERS: FactBuilder[] = [
   buildEquipmentFacts,
   buildEducationFacts,
   buildHealthFacts,
+  buildHealthcareAccessFacts,
   buildHousingFacts,
   buildSocialHousingFacts,
   buildSecurityFacts,

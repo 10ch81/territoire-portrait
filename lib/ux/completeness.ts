@@ -90,7 +90,9 @@ const ENRICHMENT_CHECKS: Array<{
   },
   {
     id: "health",
-    isAvailable: (t) => t.enrichment?.health?.available === true,
+    isAvailable: (t) =>
+      t.enrichment?.health?.available === true ||
+      t.enrichment?.healthcareAccess?.available === true,
   },
   {
     id: "employment-sectors",

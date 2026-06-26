@@ -39,6 +39,7 @@ export const COMPARE_THEMATIC_PROFILES: CompareThematicProfile[] = [
     indicatorIds: [
       "equipments_per_1000",
       "commerce_per_1000",
+      "apl_general_practitioner",
       "health_per_1000",
       "france_services",
     ],

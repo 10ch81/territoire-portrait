@@ -19,6 +19,7 @@ export const ACRONYMS: Record<string, string> = {
   SIDE: "Système d'information sur la démographie des entreprises (INSEE)",
   FLORES: "Fichier localisé des rémunérations et de l'emploi salarié — secteurs A17 INSEE",
   FINESS: "Fichier national des établissements sanitaires et sociaux",
+  APL: "Accessibilité potentielle localisée — adéquation offre/demande de soins de ville (DREES)",
   QPV: "Quartier prioritaire de la politique de la ville",
   PVD: "Petites villes de demain — programme ANCT de revitalisation des centralités",
   ACV: "Action cœur de ville — programme ANCT de revitalisation des centres-villes",

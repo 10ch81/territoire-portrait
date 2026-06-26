@@ -1,4 +1,5 @@
 import { computeYoungAdultShare, computeAgeAggregates } from "@/lib/age-aggregates";
+import { formatAplConsultations } from "@/lib/apl";
 import {
   formatCurrency,
   formatDensity,
@@ -563,6 +564,28 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
         t.enrichment?.equipments?.year ?? null,
         value !== null,
         { warning },
+      );
+    },
+  },
+  {
+    id: "apl_general_practitioner",
+    label: "APL — médecins généralistes",
+    definition:
+      "Consultations ou visites de médecine générale accessibles par habitant standardisé (DREES). Tient compte de l'offre des communes voisines.",
+    blockId: "services",
+    questionIds: ["equipped"],
+    sourceId: SOURCE_IDS.DREES_APL,
+    sourceName: "DREES APL",
+    valueType: "ratio",
+    higherIsBetter: true,
+    extract: (t) => {
+      const gp = t.enrichment?.healthcareAccess?.generalPractitioner;
+      const value = gp?.available ? gp.value : null;
+      return numericCell(
+        value !== null ? formatAplConsultations(value) : "Donnée non disponible",
+        value,
+        gp?.year ?? null,
+        value !== null,
       );
     },
   },

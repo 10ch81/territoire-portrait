@@ -10,6 +10,10 @@ import { loadEquipmentSnapshot, createBpeSource } from "./equipments";
 import { loadEducationSnapshot, createEducationSource, createIpsSource } from "./education";
 import { loadHealthSnapshot, createFinessSource } from "./health";
 import {
+  loadHealthcareAccessSnapshot,
+  createAplSource,
+} from "./healthcare-access";
+import {
   loadPopulationHistorySnapshot,
   createPopulationHistorySource,
 } from "./population";
@@ -112,6 +116,9 @@ function collectEnrichmentSources(
   if (enrichment.health?.available) {
     sources.push(createFinessSource(accessedAt));
   }
+  if (enrichment.healthcareAccess?.available) {
+    sources.push(createAplSource(accessedAt));
+  }
   if (enrichment.risks?.available) {
     sources.push(createGeorisquesSource(accessedAt));
   }
@@ -212,6 +219,10 @@ export async function enrichTerritory(
   const equipments = loadEquipmentSnapshot(territory.inseeCode);
   const education = loadEducationSnapshot(territory.inseeCode);
   const health = loadHealthSnapshot(territory.inseeCode);
+  const healthcareAccess = loadHealthcareAccessSnapshot(
+    territory.inseeCode,
+    territory.department?.code,
+  );
   const housing = loadSocialHousingSnapshot(territory.inseeCode);
   const mobility = loadMobilitySnapshot(territory.inseeCode);
   const urbanPolicy = loadQpvSnapshot(territory.inseeCode);
@@ -231,6 +242,7 @@ export async function enrichTerritory(
     equipments,
     education,
     health,
+    healthcareAccess,
     risks,
     security,
     housing,

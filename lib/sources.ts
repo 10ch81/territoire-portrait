@@ -101,11 +101,14 @@ export const FRANCE_TRAVAIL_API_BASE =
 export const FRANCE_TRAVAIL_QUARTER = "2024-T4";
 
 /**
- * APL DREES — non intégrée (skipped: true).
- * Gate MCP : export CSV data.drees vide ; jeux data.gouv en xlsx/7z sans bulk communal ≤ 20 Mo.
+ * APL DREES — accessibilité potentielle localisée aux soins de ville.
+ * Ingestion via xlsx national DREES (API explore vide).
  */
 export const APL_DATASET_URL =
   "https://www.data.gouv.fr/datasets/laccessibilite-potentielle-localisee-apl/";
+export const APL_GENERAL_PRACTITIONER_XLSX_URL =
+  "https://data.drees.solidarites-sante.gouv.fr/api/v2/catalog/datasets/530_l-accessibilite-potentielle-localisee-apl/attachments/indicateur_d_accessibilite_potentielle_localisee_apl_aux_medecins_generalistes_xlsx";
+export const APL_VINTAGE = 2023;
 
 const CNAF_PRECARITE_DATASET_URL =
   "https://www.data.gouv.fr/datasets/indicateurs-territoriaux-de-precarite-par-commune-epci-departement-et-region/";
@@ -141,6 +144,7 @@ export const SOURCE_IDS = {
   INSEE_FLORES: "insee-flores",
   ARCEP_FIBRE: "arcep-fibre",
   FINESS: "finess",
+  DREES_APL: "drees-apl",
   EDUCATION_DIRECTORY: "education-directory",
   DEPP_IPS_ECOLES: "depp-ips-ecoles",
   CNAF_PRECARITE: "cnaf-precarite",
@@ -525,6 +529,17 @@ export function createFinessSource(accessedAt: string): DataSource {
     url: FINESS_URL,
     description:
       "Référentiel national des établissements sanitaires, sociaux et médico-sociaux.",
+    accessedAt,
+  };
+}
+
+export function createAplSource(accessedAt: string): DataSource {
+  return {
+    id: SOURCE_IDS.DREES_APL,
+    name: `DREES — APL médecins généralistes (${APL_VINTAGE})`,
+    url: APL_DATASET_URL,
+    description:
+      "Accessibilité potentielle localisée aux médecins généralistes (consultations accessibles par habitant standardisé).",
     accessedAt,
   };
 }
