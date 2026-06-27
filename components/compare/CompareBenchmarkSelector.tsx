@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
+  benchmarkLabel,
   benchmarkShortLabel,
   type BenchmarkRef,
   parseBenchmarkParam,
@@ -35,7 +36,7 @@ export function CompareBenchmarkSelector({ className }: CompareBenchmarkSelector
   return (
     <fieldset className={className ?? "mb-4 print:hidden"}>
       <legend className="text-sm font-medium text-slate-700">
-        Référence comparative (KPI fiche — EPCI)
+        Référence des points saillants — {benchmarkLabel(current)}
       </legend>
       <div className="mt-2 flex flex-wrap gap-2">
         {BENCHMARK_OPTIONS.map((option) => (

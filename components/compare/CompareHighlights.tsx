@@ -7,6 +7,7 @@ import {
   serializeComparePrioritiesParam,
 } from "@/lib/compare/parse-codes";
 import type { CompareHighlight } from "@/lib/compare/types";
+import { benchmarkLabel, parseBenchmarkParam } from "@/lib/ux/benchmark";
 import { useComparePriorities } from "@/lib/ux/compare-user-profile";
 import { useHideSensitiveIndicators } from "@/lib/ux/sensitive-indicators";
 
@@ -15,6 +16,9 @@ interface CompareHighlightsProps {
 }
 
 export function CompareHighlights({ highlights }: CompareHighlightsProps) {
+  const searchParams = useSearchParams();
+  const benchmark = parseBenchmarkParam(searchParams.get("benchmark") ?? undefined);
+
   if (highlights.length === 0) {
     return null;
   }
@@ -28,7 +32,7 @@ export function CompareHighlights({ highlights }: CompareHighlightsProps) {
         Points saillants
       </h2>
       <p className="mt-1 text-sm text-amber-950/90 print:text-black">
-        Comparaisons thématiques — sans score global ni classement général.
+        Écarts vs {benchmarkLabel(benchmark)} — sans score global ni classement général.
       </p>
       <ul className="mt-4 space-y-2">
         {highlights.map((item) => (

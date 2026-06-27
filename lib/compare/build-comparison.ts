@@ -1,12 +1,13 @@
 import type { TerritoryProfile } from "@/lib/types";
 import { collectComparisonReadingAlerts } from "@/lib/indicators/reading-alerts";
+import type { BenchmarkRef } from "@/lib/ux/benchmark";
 import { COMPARE_BLOCKS, COMPARE_INDICATORS } from "./indicators";
 import { buildCompareHighlights } from "./highlights";
 import type { CompareCell, TerritoryComparisonResult } from "./types";
 
 export function buildTerritoryComparison(
   territories: TerritoryProfile[],
-  _options?: { benchmark?: string },
+  options?: { benchmark?: BenchmarkRef },
 ): TerritoryComparisonResult {
   const columns = territories.map((territory) => ({
     inseeCode: territory.inseeCode,
@@ -34,6 +35,8 @@ export function buildTerritoryComparison(
     columns,
     cells,
     indicators: COMPARE_INDICATORS,
+    territories,
+    benchmark: options?.benchmark,
   });
 
   return {

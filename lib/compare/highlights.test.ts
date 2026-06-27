@@ -5,7 +5,7 @@ import { COMPARE_INDICATORS } from "./indicators";
 import type { CompareCell } from "./types";
 
 describe("buildCompareHighlights", () => {
-  it("produit un point saillant densité quand les communes divergent", () => {
+  it("produit un point saillant densité vs moyenne du groupe (similaires)", () => {
     const columns = [
       { inseeCode: "35238", name: "Rennes" },
       { inseeCode: "01001", name: "L'Abergement-Clémenciat" },
@@ -37,11 +37,14 @@ describe("buildCompareHighlights", () => {
       columns,
       cells,
       indicators: COMPARE_INDICATORS,
+      benchmark: "similaires",
     });
 
     assert.ok(
       highlights.some(
-        (item) => item.indicatorId === "density" && /se distingue/i.test(item.sentence),
+        (item) =>
+          item.indicatorId === "density" &&
+          /vs communes similaires/i.test(item.sentence),
       ),
     );
   });
@@ -78,6 +81,7 @@ describe("buildCompareHighlights", () => {
       columns,
       cells,
       indicators: COMPARE_INDICATORS,
+      benchmark: "similaires",
     });
 
     assert.ok(!highlights.some((item) => item.indicatorId === "schools_open"));
