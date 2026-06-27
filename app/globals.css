@@ -65,8 +65,4 @@ body {
   body.print-mode-conseil [data-print-hide-conseil] {
     display: none !important;
   }
-
-  body.print-mode-conseil header .print\\:hidden {
-    display: none !important;
-  }
 }
