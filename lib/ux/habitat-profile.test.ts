@@ -29,7 +29,7 @@ describe("habitat-profile", () => {
       priorityIds: [],
       referenceCommune: null,
     });
-    assert.ok(all.length >= 7);
+    assert.ok(all.length >= 10);
   });
 
   it("sérialise et parse le profil habitat avec commune de référence", () => {
@@ -53,7 +53,7 @@ describe("habitat-profile", () => {
   });
 
   it("expose une option par profil thématique", () => {
-    assert.equal(HABITAT_PROFILE_OPTIONS.length, 7);
+    assert.equal(HABITAT_PROFILE_OPTIONS.length, 10);
     assert.ok(HABITAT_PROFILE_OPTIONS.every((option) => option.hint.length > 0));
   });
 });

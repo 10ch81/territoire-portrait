@@ -6,6 +6,24 @@ export const COMPARE_PRIORITY_IDS = COMPARE_THEMATIC_PROFILES.map((profile) => p
 
 const VALID_PRIORITY_IDS = new Set(COMPARE_PRIORITY_IDS);
 
+/** Ancien jeu complet (7 profils) avant profils collectivité — pas un filtre partiel. */
+const LEGACY_FULL_PRIORITY_IDS = [
+  "familial",
+  "logement",
+  "revenus",
+  "equipee",
+  "mobile",
+  "dynamique",
+  "dense",
+] as const;
+
+function isLegacyFullPrioritySelection(priorityIds: string[]): boolean {
+  if (priorityIds.length !== LEGACY_FULL_PRIORITY_IDS.length) {
+    return false;
+  }
+  return LEGACY_FULL_PRIORITY_IDS.every((id) => priorityIds.includes(id));
+}
+
 export function isValidComparePriorityId(id: string): boolean {
   return VALID_PRIORITY_IDS.has(id);
 }
@@ -37,11 +55,12 @@ export function serializeComparePrioritiesParam(priorityIds: string[]): string |
   return valid.join(",");
 }
 
-/** Vide ou complet = pas de filtre (comportement par défaut). */
+/** Vide, complet ou sélection legacy 7 profils = pas de filtre (comportement par défaut). */
 export function shouldFilterByPriorities(priorityIds: string[]): boolean {
-  return (
-    priorityIds.length > 0 && priorityIds.length < COMPARE_PRIORITY_IDS.length
-  );
+  if (priorityIds.length === 0 || isLegacyFullPrioritySelection(priorityIds)) {
+    return false;
+  }
+  return priorityIds.length < COMPARE_PRIORITY_IDS.length;
 }
 
 export function filterHighlightsByPriorities(

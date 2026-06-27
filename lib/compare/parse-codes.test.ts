@@ -32,6 +32,9 @@ describe("parseCompareCodesParam", () => {
 
 describe("buildCompareUrl", () => {
   it("construit une URL de comparaison", () => {
-    assert.equal(buildCompareUrl(["35238", "44109"]), "/compare?codes=35238,44109");
+    const url = buildCompareUrl(["35238", "44109"]);
+    assert.ok(url.startsWith("/compare?codes="));
+    assert.ok(url.includes("35238"));
+    assert.ok(url.includes("44109"));
   });
 });

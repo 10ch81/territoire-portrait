@@ -108,6 +108,7 @@ export const COMPARE_BLOCKS: CompareBlock[] = [
   { id: "income_employment", label: "Revenus & emploi", indicatorIds: [] },
   { id: "services", label: "Équipements & services", indicatorIds: [] },
   { id: "dynamics", label: "Dynamiques & accessibilité", indicatorIds: [] },
+  { id: "fiscalite", label: "Fiscalité & finances locales", indicatorIds: [] },
 ];
 
 type CompareIndicatorInput = Omit<CompareIndicatorDefinition, "scale" | "sensitive">;
@@ -247,7 +248,7 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     label: "Évolution population",
     definition: "Variation en % entre la première et la dernière année de l'historique INSEE.",
     blockId: "population",
-    questionIds: ["dynamic", "family"],
+    questionIds: ["dynamic", "family", "collectivity"],
     sourceId: SOURCE_IDS.INSEE_POPULATION_HISTORY,
     sourceName: "INSEE",
     valueType: "evolution",
@@ -495,7 +496,7 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     label: "Emplois salariés",
     definition: "Effectifs salariés totaux (FLORES A17, secteurs privé et public).",
     blockId: "income_employment",
-    questionIds: ["socioeconomic", "dynamic"],
+    questionIds: ["socioeconomic", "dynamic", "implantation"],
     sourceId: SOURCE_IDS.INSEE_FLORES,
     sourceName: "INSEE FLORES",
     valueType: "absolute",
@@ -516,7 +517,7 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     label: "Établissements actifs",
     definition: "Nombre d'établissements recensés (INSEE SIDE).",
     blockId: "income_employment",
-    questionIds: ["dynamic", "socioeconomic"],
+    questionIds: ["dynamic", "socioeconomic", "implantation"],
     sourceId: SOURCE_IDS.INSEE_SIDE,
     sourceName: "INSEE SIDE",
     valueType: "absolute",
@@ -561,7 +562,7 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     label: "Équipements / 1 000 hab.",
     definition: "Nombre d'équipements BPE (commerces, santé, sport…) pour 1 000 habitants.",
     blockId: "services",
-    questionIds: ["equipped"],
+    questionIds: ["equipped", "collectivity"],
     sourceId: SOURCE_IDS.INSEE_BPE,
     sourceName: "INSEE BPE",
     valueType: "ratio",
@@ -849,7 +850,7 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     label: "Actifs en transports en commun",
     definition: "Part des actifs utilisant les transports en commun pour le domicile-travail (RP).",
     blockId: "dynamics",
-    questionIds: ["accessible"],
+    questionIds: ["accessible", "implantation"],
     sourceId: SOURCE_IDS.INSEE_RP_COMMUTE,
     sourceName: "INSEE RP",
     valueType: "ratio",
@@ -870,7 +871,7 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     label: "Éligibilité fibre",
     definition: "Part des locaux éligibles à la fibre (ARCEP Mon Réseau Mobile).",
     blockId: "dynamics",
-    questionIds: ["accessible", "equipped"],
+    questionIds: ["accessible", "equipped", "implantation"],
     sourceId: SOURCE_IDS.ARCEP_FIBRE,
     sourceName: "ARCEP",
     valueType: "ratio",
@@ -893,11 +894,11 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     label: "Rang population (EPCI)",
     definition: "Classement par population au sein de l'intercommunalité.",
     blockId: "dynamics",
-    questionIds: ["dynamic", "territorial_context"],
+    questionIds: ["dynamic", "territorial_context", "collectivity"],
     sourceId: SOURCE_IDS.GEO_API_COMMUNES,
     sourceName: "API Géo",
     valueType: "rank",
-    higherIsBetter: null,
+    higherIsBetter: false,
     extract: (t) => {
       const epci = t.enrichment?.geography?.epciComparison;
       const rank = epci?.communeRankByPopulation ?? null;
@@ -905,6 +906,75 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
       const display =
         rank !== null && total !== null ? `${rank} / ${total}` : "Donnée non disponible";
       return numericCell(display, rank, null, rank !== null);
+    },
+  },
+  {
+    id: "property_tax_built_rate",
+    label: "Taux TFB bâtiments",
+    definition:
+      "Taux communal de taxe foncière sur les propriétés bâties (REI) — ne pas confondre avec pression fiscale globale.",
+    blockId: "fiscalite",
+    questionIds: ["fiscal"],
+    sourceId: SOURCE_IDS.REI,
+    sourceName: "REI",
+    valueType: "ratio",
+    higherIsBetter: false,
+    readingAlert: "Taux communal REI — compétences et bases d'imposition varient selon les communes.",
+    comparisonHint: "Comparer des communes de strate démographique proche.",
+    extract: (t) => {
+      const fiscal = t.enrichment?.fiscal;
+      const value = fiscal?.available ? fiscal.propertyTaxBuiltRate : null;
+      return numericCell(
+        value !== null
+          ? `${value.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %`
+          : "Donnée non disponible",
+        value,
+        fiscal?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "debt_per_capita",
+    label: "Dette / habitant",
+    definition: "Encours de dette par habitant (OFGL, comptes consolidés commune).",
+    blockId: "fiscalite",
+    questionIds: ["fiscal", "collectivity"],
+    sourceId: SOURCE_IDS.OFGL,
+    sourceName: "OFGL",
+    valueType: "absolute",
+    higherIsBetter: false,
+    comparisonHint: "Tenir compte de la taille communale et des investissements en cours.",
+    extract: (t) => {
+      const accounts = t.enrichment?.publicAccounts;
+      const value = accounts?.available ? accounts.debtPerCapitaEur : null;
+      return numericCell(
+        value !== null ? formatCurrency(value) : "Donnée non disponible",
+        value,
+        accounts?.year ?? null,
+        value !== null,
+      );
+    },
+  },
+  {
+    id: "operating_revenue_per_capita",
+    label: "Recettes de fonctionnement / habitant",
+    definition: "Recettes de fonctionnement par habitant (OFGL).",
+    blockId: "fiscalite",
+    questionIds: ["fiscal", "collectivity"],
+    sourceId: SOURCE_IDS.OFGL,
+    sourceName: "OFGL",
+    valueType: "absolute",
+    higherIsBetter: null,
+    extract: (t) => {
+      const accounts = t.enrichment?.publicAccounts;
+      const value = accounts?.available ? accounts.operatingRevenuePerCapitaEur : null;
+      return numericCell(
+        value !== null ? formatCurrency(value) : "Donnée non disponible",
+        value,
+        accounts?.year ?? null,
+        value !== null,
+      );
     },
   },
 ];

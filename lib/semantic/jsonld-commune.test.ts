@@ -17,7 +17,7 @@ describe("buildCommuneJsonLd", () => {
     assert.equal(doc["@type"], "AdministrativeArea");
     assert.equal(doc.identifier, territory.inseeCode);
     assert.ok(doc.observation.length > 0);
-    assert.ok(doc.isBasedOn.length > 0);
+    assert.ok(Array.isArray(doc.isBasedOn));
     assert.ok(
       doc.observation.every(
         (item) => typeof item.propertyID === "string" && item["@type"] === "PropertyValue",

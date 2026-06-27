@@ -51,6 +51,12 @@ function profileLabelForHabitat(id: string, fallback: string): string {
       return "Dynamisme local";
     case "dense":
       return "Cadre urbain";
+    case "fiscalite":
+      return "Charges fiscales locales";
+    case "collectivite":
+      return "Vie communale";
+    case "implantation":
+      return "Activité économique";
     default:
       return fallback;
   }
@@ -72,6 +78,12 @@ function profileHintForHabitat(id: string): string {
       return "Population, entreprises, emploi salarié.";
     case "dense":
       return "Densité, urbanité.";
+    case "fiscalite":
+      return "Taxe foncière, dette et recettes (REI, OFGL).";
+    case "collectivite":
+      return "Dynamique, équipements, rang dans l'EPCI.";
+    case "implantation":
+      return "Entreprises, emploi salarié, connectivité.";
     default:
       return "";
   }

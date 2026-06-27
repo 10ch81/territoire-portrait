@@ -119,14 +119,48 @@ Référence détaillée : [docs/mcp-datagouv.md](./mcp-datagouv.md) (matrice sou
 
 ---
 
+## UX multi-audience (décision 2026-06-27)
+
+**Décision figée et plan d'exécution :** [docs/ux-multi-audience.md](./ux-multi-audience.md)
+
+Principe : *une plateforme de données, plusieurs lentilles de lecture* (intentions + niveaux + URL partageable). Options A–H validées ; exécution en sprints 7–9 ci-dessous.
+
+## Sprint 7 — Intent-first & fiche 3 niveaux (Phase 1)
+
+- [x] Catalogue intentions — `lib/ux/intents.ts`
+- [x] Accueil intent-first — `components/IntentCards.tsx`, `app/page.tsx`
+- [x] Fiche `vue=synthese|analyse|sources` (alias `particulier`/`detail`) — toggle + page commune
+- [x] Persistance vue — `lib/ux/commune-view-store.ts`
+- [x] Vue Sources (L3) — `components/commune/CommuneSourcesView.tsx`
+- [x] Profils compare collectivité — `fiscalite`, `collectivite`, `implantation` dans `lib/compare/profiles.ts`
+
+## Sprint 8 — Benchmark, confiance, export élu (Phase 2)
+
+- [ ] Param URL `benchmark=` — `lib/ux/benchmark.ts` ; écarts KPI hero et highlights
+- [ ] Panneau traçabilité indicateur — `components/IndicatorProvenance.tsx`
+- [ ] Export PDF « fiche conseil » — styles print + `CommuneExportActions`
+- [ ] IA contextualisée (promotion portrait narratif en `vue=analyse`)
+- [ ] Enrichissement `comparisonHint` / `readingAlert` sur catalogue indicateurs
+
+## Sprint 9 — Wizards, CSV, catalogue audience (Phase 3)
+
+- [ ] Wizard benchmark collectivité — `CollectivityBenchmarkWizard`
+- [ ] Wizard implantation pro — `ImplantationWizard`
+- [ ] Export CSV — `GET /api/commune/[codeInsee]/indicators.csv`
+- [ ] Filtre `?audience=` sur `/api/indicators/catalog`
+- [ ] Doc README « Réutiliser les données »
+
+---
+
 ## Principes directeurs
 
 1. **Ne jamais inventer de données** — conserver « Donnée non disponible »
 2. **Sources traçables** — lien contextuel par section + liste globale
 3. **Qualité vérifiable** — boucle validate / verify documentée (`docs/data-quality.md`)
 4. **Analyse IA prudente** — synthèse après les faits, limites explicites
-5. **Progressive disclosure** — KPIs → synthèse → détail par onglet/ancre
+5. **Progressive disclosure** — Synthèse → Analyse → Sources (+ KPIs hero)
 6. **Pas de sur-ingénierie** — SVG natif pour les graphiques, pas de carte interactive lourde
+7. **Lentilles, pas silos** — intentions et niveaux URL ; un catalogue `PublicIndicator`
 
 ## À éviter (hors scope actuel)
 
@@ -150,6 +184,11 @@ Référence détaillée : [docs/mcp-datagouv.md](./mcp-datagouv.md) (matrice sou
 | `components/charts/*` | Visualisations SVG |
 | `components/AiAnalysisClient.tsx` | Analyse IA asynchrone |
 | `components/SearchForm.tsx` | Recherche enrichie |
+| `lib/ux/intents.ts` | Intentions accueil (Sprint 7) |
+| `lib/ux/benchmark.ts` | Référence comparative URL (Sprint 8) |
+| `components/IntentCards.tsx` | Cartes intent-first (Sprint 7) |
+| `components/commune/CommuneSourcesView.tsx` | Niveau Sources fiche (Sprint 7) |
+| `docs/ux-multi-audience.md` | Décision multi-audience & plan détaillé |
 
 ## Référence agent
 

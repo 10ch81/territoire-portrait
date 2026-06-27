@@ -1,30 +1,39 @@
 ---
-description: Cible produit particulier — comparateur communal et trajectoire
+description: Cible produit — comparateur communal et UX multi-audience
 alwaysApply: true
 ---
 
-# Produit — comparateur communal (particuliers)
+# Produit — comparateur & lentilles multi-audience
 
-## Décision
+## Décision (2026-06-27)
 
-Priorité produit : **comparaison compréhensible, fiable et actionnable** (pas volume de données).
+Priorité d'usage : **particuliers** (comparer où habiter). Élus, cadres, pros : **mêmes données**, lentilles et exports différents — voir `docs/ux-multi-audience.md`.
 
-Trajectoire retenue :
-1. **Scénario 1 (en cours)** — Comparateur utile MVP : `/compare`, 27 indicateurs, 6 blocs, profils thématiques sans score global, traçabilité cellule, export lien/PDF.
-2. **Scénario 2 (suite)** — Confiance & comparabilité : moteur communes similaires, modèle `PublicIndicator` enrichi, Observatoire des territoires, RGAA AA.
-3. **Scénario 3 (amorcé)** — Plateforme sémantique : profils (`priorites`), API catalogue, BAN, export JSON-LD par commune.
+Principe : **comparaison compréhensible, fiable et actionnable** (pas volume de données, pas de score global).
 
-Ne pas commencer par l'ontologie RDF. Réutiliser le cache et la typologie `ComparisonProfile` existants.
+Trajectoire :
+1. **Scénario 1** — Comparateur MVP : `/compare`, profils thématiques, traçabilité cellule, export lien/PDF.
+2. **Scénario 2** — Confiance & comparabilité : benchmark EPCI/dép./similaires, `PublicIndicator` enrichi, RGAA AA, PDF fiche conseil.
+3. **Scénario 3** — Plateforme sémantique : intentions accueil, wizards, API catalogue + CSV, JSON-LD.
+
+Ne pas commencer par l'ontologie RDF. Réutiliser cache, typologie `ComparisonProfile`, paramètres URL.
 
 ## Principes comparateur
 
 - 2 à 5 communes ; pas de score global unique.
-- Profils : « plus familiale », « plus dense », « plus équipée », etc.
-- Chaque chiffre : source, millésime, définition simple.
-- Comparaisons contextualisées (EPCI/département en MVP ; similarité en scénario 2 — communes comparables actives).
+- Profils : « plus familiale », « plus dense », « plus équipée », + collectivité (`fiscalite`, `collectivite`, `implantation`).
+- Chaque chiffre : source, millésime, définition simple ; écarts vs benchmark, pas superlatifs absolus.
+- Comparaisons contextualisées (EPCI / département / communes similaires).
+
+## UX fiche commune
+
+- 3 niveaux URL : `vue=synthese|analyse|sources` (alias `particulier`/`detail`).
+- Intentions accueil : habiter, comparer, comprendre, dossier, explorer — pas menu « persona ».
 
 ## Fichiers clés
 
 - `lib/compare/` — catalogue indicateurs, highlights, build
+- `lib/ux/intents.ts`, `lib/ux/benchmark.ts` — intentions & benchmark (Sprint 7–8)
 - `app/compare/` — page comparateur
 - `components/compare/` — UI tableau, sélecteur, partage
+- `docs/ux-multi-audience.md` — plan d'exécution sprints 7–9

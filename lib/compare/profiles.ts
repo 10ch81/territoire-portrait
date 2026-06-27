@@ -69,4 +69,38 @@ export const COMPARE_THEMATIC_PROFILES: CompareThematicProfile[] = [
     questionId: "territorial_context",
     indicatorIds: ["density"],
   },
+  {
+    id: "fiscalite",
+    label: "Fiscalité & finances locales",
+    shortLabel: "fiscalité plus basse (TFB)",
+    questionId: "fiscal",
+    indicatorIds: [
+      "property_tax_built_rate",
+      "debt_per_capita",
+      "operating_revenue_per_capita",
+    ],
+  },
+  {
+    id: "collectivite",
+    label: "Pilotage communal",
+    shortLabel: "centralité plus forte dans l'EPCI",
+    questionId: "collectivity",
+    indicatorIds: [
+      "population_growth",
+      "equipments_per_1000",
+      "epci_population_rank",
+    ],
+  },
+  {
+    id: "implantation",
+    label: "Implantation économique",
+    shortLabel: "mieux adaptée à l'implantation",
+    questionId: "implantation",
+    indicatorIds: [
+      "enterprises",
+      "salaried_posts",
+      "fiber_eligible_share",
+      "public_transport_share",
+    ],
+  },
 ];

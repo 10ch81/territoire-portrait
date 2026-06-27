@@ -6,7 +6,8 @@ export type CompareBlockId =
   | "housing"
   | "income_employment"
   | "services"
-  | "dynamics";
+  | "dynamics"
+  | "fiscalite";
 
 export type CompareQuestionId =
   | "family"
@@ -15,7 +16,10 @@ export type CompareQuestionId =
   | "equipped"
   | "accessible"
   | "dynamic"
-  | "territorial_context";
+  | "territorial_context"
+  | "fiscal"
+  | "collectivity"
+  | "implantation";
 
 export type CompareValueType = "absolute" | "ratio" | "evolution" | "rank" | "text";
 

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { HabitatProfileWizard } from "@/components/HabitatProfileWizard";
+import { IntentCards } from "@/components/IntentCards";
 import { SearchForm } from "@/components/SearchForm";
 import { SearchSuggestions } from "@/components/SearchSuggestions";
-import { UseCaseCards } from "@/components/UseCaseCards";
 import { buildCompareUrl } from "@/lib/compare";
 import { COMPARE_EXAMPLE_CODES, COMPARE_EXAMPLE_LABEL } from "@/lib/ux/recent-communes";
 
@@ -14,12 +14,12 @@ export default function HomePage() {
           Portrait territorial
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          Où habiter ? Comparez des communes
+          Comprendre et comparer des communes
         </h1>
         <p className="max-w-2xl text-base leading-relaxed text-slate-600">
-          Comparez 2 à 5 communes sur la vie quotidienne — famille, logement,
-          emploi, équipements — à partir de données publiques sourcées. Ou
-          consultez une fiche détaillée avec analyse IA prudente.
+          Particuliers, élus, cadres ou professionnels : une même base de données publique,
+          des parcours adaptés à votre intention — comparaison, fiche détaillée ou export
+          des sources.
         </p>
         <Link
           href={buildCompareUrl([...COMPARE_EXAMPLE_CODES])}
@@ -29,10 +29,12 @@ export default function HomePage() {
         </Link>
       </header>
 
-      <HabitatProfileWizard />
+      <div id="habiter">
+        <HabitatProfileWizard />
+      </div>
       <SearchForm />
       <SearchSuggestions />
-      <UseCaseCards />
+      <IntentCards />
 
       <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
         <h2 className="text-base font-semibold text-slate-900">

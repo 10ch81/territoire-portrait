@@ -77,9 +77,10 @@ npm run quality:sample      # validate + verify sur Rennes (35238)
 
 ## UX
 
-Feuille de route et statut d'implémentation : **`docs/ux-roadmap.md`**.
+Feuille de route et statut d'implémentation : **`docs/ux-roadmap.md`**.  
+Décision multi-audience (intentions, 3 niveaux fiche, exports) : **`docs/ux-multi-audience.md`**.
 
-Principes : KPI hero → synthèse IA → sections thématiques ; chargement progressif ; sources traçables ; pas d'invention de données.
+Principes : KPI hero → synthèse IA → sections thématiques ; chargement progressif ; sources traçables ; pas d'invention de données ; **lentilles URL** (`vue`, `priorites`, `benchmark`) — pas de score global ni chat IA libre.
 
 ## Qualité des données
 
