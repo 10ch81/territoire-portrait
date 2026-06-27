@@ -75,7 +75,7 @@ export function buildCompareHighlights(input: {
         profileId: profile.id,
         profileLabel: profile.label,
         indicatorId,
-        sentence: `${leader} est ${profile.shortLabel} que ${trailer} sur « ${indicator.label} » (${pair.best.displayValue} vs ${pair.worst.displayValue}).`,
+        sentence: `${leader} se distingue de ${trailer} sur « ${indicator.label} » (${pair.best.displayValue} vs ${pair.worst.displayValue}).`,
       });
       break;
     }

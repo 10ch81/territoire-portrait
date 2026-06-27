@@ -3,9 +3,12 @@ import type { EditorialProfileId } from "../../types";
 
 export type { EditorialProfileId };
 
+export type EditorialAudience = "citizen" | "collectivity" | "expert";
+
 export type EditorialProfile = {
   id: EditorialProfileId;
   label: string;
+  audienceTags: EditorialAudience[];
   preferredStrengthThemes: AnalysisFactTheme[];
   preferredWatchThemes: AnalysisFactTheme[];
   bannedWeakStrengthPatterns: RegExp[];
@@ -30,6 +33,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
   largeUrbanCenter: {
     id: "largeUrbanCenter",
     label: "grande centralité urbaine",
+    audienceTags: ["citizen", "collectivity"],
     preferredStrengthThemes: [
       "centrality",
       "employment_sectors",
@@ -58,6 +62,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
   growthEpciCentrality: {
     id: "growthEpciCentrality",
     label: "centralité en croissance dans l'EPCI",
+    audienceTags: ["collectivity"],
     preferredStrengthThemes: [
       "centrality",
       "demography",
@@ -79,6 +84,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
   mountainTourismCenter: {
     id: "mountainTourismCenter",
     label: "ville-centre de montagne à vocation touristique",
+    audienceTags: ["citizen", "collectivity"],
     preferredStrengthThemes: ["tourism", "employment_sectors", "equipments"],
     preferredWatchThemes: ["risks", "housing", "finances", "security", "demography"],
     bannedWeakStrengthPatterns: [...INVENTORY_STRENGTH_PATTERNS, FIBER_GENERIC, FRANCE_SERVICES_SINGLE],
@@ -90,6 +96,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
   smallPeriurbanGrowth: {
     id: "smallPeriurbanGrowth",
     label: "petite commune périurbaine en croissance",
+    audienceTags: ["citizen", "collectivity"],
     preferredStrengthThemes: ["centrality", "demography", "connectivity", "employment_sectors"],
     preferredWatchThemes: ["security", "risks"],
     bannedWeakStrengthPatterns: [...INVENTORY_STRENGTH_PATTERNS, FIBER_GENERIC],
@@ -99,6 +106,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
   employmentPole: {
     id: "employmentPole",
     label: "pôle d'emploi local",
+    audienceTags: ["collectivity"],
     preferredStrengthThemes: ["employment_sectors", "economy", "centrality"],
     preferredWatchThemes: ["employment", "mobility", "finances"],
     bannedWeakStrengthPatterns: [...INVENTORY_STRENGTH_PATTERNS, ESS_RGE_INVENTORY],
@@ -107,6 +115,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
   ruralDecline: {
     id: "ruralDecline",
     label: "commune rurale en recul démographique",
+    audienceTags: ["collectivity"],
     preferredStrengthThemes: ["centrality", "equipments", "public_services"],
     preferredWatchThemes: ["demography", "ageing", "housing", "finances"],
     bannedWeakStrengthPatterns: INVENTORY_STRENGTH_PATTERNS,
@@ -115,6 +124,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
   socialFragilityUrban: {
     id: "socialFragilityUrban",
     label: "territoire urbain avec fragilités sociales",
+    audienceTags: ["collectivity"],
     preferredStrengthThemes: ["equipments", "employment_sectors", "public_services"],
     preferredWatchThemes: ["employment", "policy_city", "security", "social_housing"],
     bannedWeakStrengthPatterns: [...INVENTORY_STRENGTH_PATTERNS, ESS_RGE_INVENTORY],
@@ -123,6 +133,7 @@ export const editorialProfiles: Record<EditorialProfileId, EditorialProfile> = {
   genericCentralite: {
     id: "genericCentralite",
     label: "centralité territoriale",
+    audienceTags: ["citizen", "collectivity"],
     preferredStrengthThemes: ["centrality", "equipments", "employment_sectors"],
     preferredWatchThemes: ["security", "risks", "finances"],
     bannedWeakStrengthPatterns: INVENTORY_STRENGTH_PATTERNS,

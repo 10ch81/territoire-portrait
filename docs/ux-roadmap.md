@@ -136,11 +136,11 @@ Principe : *une plateforme de données, plusieurs lentilles de lecture* (intenti
 
 ## Sprint 8 — Benchmark, confiance, export élu (Phase 2)
 
-- [ ] Param URL `benchmark=` — `lib/ux/benchmark.ts` ; écarts KPI hero et highlights
-- [ ] Panneau traçabilité indicateur — `components/IndicatorProvenance.tsx`
-- [ ] Export PDF « fiche conseil » — styles print + `CommuneExportActions`
-- [ ] IA contextualisée (promotion portrait narratif en `vue=analyse`)
-- [ ] Enrichissement `comparisonHint` / `readingAlert` sur catalogue indicateurs
+- [x] Param URL `benchmark=` — `lib/ux/benchmark.ts` ; écarts KPI hero et highlights
+- [x] Panneau traçabilité indicateur — `components/IndicatorProvenance.tsx`
+- [x] Export PDF « fiche conseil » — styles print + `CommuneExportActions`
+- [x] IA contextualisée (promotion portrait narratif en `vue=analyse`)
+- [x] Enrichissement `comparisonHint` / `readingAlert` sur catalogue indicateurs
 
 ## Sprint 9 — Wizards, CSV, catalogue audience (Phase 3)
 

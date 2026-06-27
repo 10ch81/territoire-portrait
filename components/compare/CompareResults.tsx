@@ -14,6 +14,7 @@ import {
 import { useComparePriorities } from "@/lib/ux/compare-user-profile";
 import { useHideSensitiveIndicators } from "@/lib/ux/sensitive-indicators";
 import { SensitiveIndicatorsToggle } from "@/components/SensitiveIndicatorsToggle";
+import { CompareBenchmarkSelector } from "./CompareBenchmarkSelector";
 import { CompareHighlights, CompareWarnings } from "./CompareHighlights";
 import { CompareProfileSelector } from "./CompareProfileSelector";
 import { CompareTable } from "./CompareTable";
@@ -48,6 +49,7 @@ export function CompareResults({ comparison }: CompareResultsProps) {
         Résultats de la comparaison
       </h2>
       <CompareProfileSelector />
+      <CompareBenchmarkSelector />
       <div className="print:hidden">
         <SensitiveIndicatorsToggle />
       </div>

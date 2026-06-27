@@ -480,6 +480,7 @@ const RAW_COMPARE_INDICATORS: CompareIndicatorInput[] = [
     sourceName: "INSEE RP",
     valueType: "ratio",
     higherIsBetter: false,
+    comparisonHint: "Comparer des communes de strate démographique proche (RP emploi).",
     extract: (t) => {
       const socio = t.enrichment?.sociodemographics;
       const value = socio?.unemploymentRate ?? null;

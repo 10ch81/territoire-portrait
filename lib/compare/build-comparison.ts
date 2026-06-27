@@ -6,6 +6,7 @@ import type { CompareCell, TerritoryComparisonResult } from "./types";
 
 export function buildTerritoryComparison(
   territories: TerritoryProfile[],
+  _options?: { benchmark?: string },
 ): TerritoryComparisonResult {
   const columns = territories.map((territory) => ({
     inseeCode: territory.inseeCode,

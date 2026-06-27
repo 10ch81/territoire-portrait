@@ -5,15 +5,17 @@ import {
   parseCompareCodesParam,
 } from "@/lib/compare";
 import { attachDepartmentRanksToComparison } from "@/lib/indicators/department-ranks";
+import { parseBenchmarkParam } from "@/lib/ux/benchmark";
 import { ComparePageContent } from "@/components/compare/ComparePageContent";
 
 interface ComparePageProps {
-  searchParams: Promise<{ codes?: string }>;
+  searchParams: Promise<{ codes?: string; benchmark?: string }>;
 }
 
 export default async function ComparePage({ searchParams }: ComparePageProps) {
   const params = await searchParams;
   const selectedCodes = parseCompareCodesParam(params.codes);
+  const benchmark = parseBenchmarkParam(params.benchmark);
 
   const resolved = await Promise.all(
     selectedCodes.map(async (code) => ({
@@ -38,7 +40,9 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
 
   const comparison =
     territories.length >= MIN_COMPARE_COMMUNES
-      ? attachDepartmentRanksToComparison(buildTerritoryComparison(territories))
+      ? attachDepartmentRanksToComparison(
+          buildTerritoryComparison(territories, { benchmark }),
+        )
       : null;
 
   return (

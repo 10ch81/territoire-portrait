@@ -28,6 +28,11 @@ export function KpiHero({ kpis }: KpiHeroProps) {
               {kpi.hint}
             </p>
           ) : null}
+          {kpi.benchmarkHint ? (
+            <p className="mt-0.5 text-xs text-blue-700" title={kpi.benchmarkHint}>
+              {kpi.benchmarkHint}
+            </p>
+          ) : null}
         </article>
       ))}
     </section>

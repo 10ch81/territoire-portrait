@@ -41,7 +41,7 @@ describe("buildCompareHighlights", () => {
 
     assert.ok(
       highlights.some(
-        (item) => item.indicatorId === "density" && /plus dense/i.test(item.sentence),
+        (item) => item.indicatorId === "density" && /se distingue/i.test(item.sentence),
       ),
     );
   });

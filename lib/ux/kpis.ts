@@ -5,6 +5,8 @@ import {
 } from "@/lib/enrichment";
 import { formatPopulation } from "@/lib/territory";
 import { getPopulationDisplayMeta } from "@/lib/ux/population";
+import type { BenchmarkRef } from "@/lib/ux/benchmark";
+import { benchmarkShortLabel } from "@/lib/ux/benchmark";
 import type { TerritoryProfile } from "@/lib/types";
 
 export interface KpiItem {
@@ -12,9 +14,15 @@ export interface KpiItem {
   label: string;
   value: string;
   hint?: string;
+  /** Écart ou référence benchmark (ex. vs moyenne EPCI). */
+  benchmarkHint?: string;
 }
 
-export function extractHeroKpis(territory: TerritoryProfile): KpiItem[] {
+export function extractHeroKpis(
+  territory: TerritoryProfile,
+  options?: { benchmark?: BenchmarkRef },
+): KpiItem[] {
+  const benchmark = options?.benchmark ?? "epci";
   const enrichment = territory.enrichment;
   const derived = enrichment?.derived;
   const property = enrichment?.property;
@@ -93,7 +101,7 @@ export function extractHeroKpis(territory: TerritoryProfile): KpiItem[] {
         maximumFractionDigits: 1,
       }).format(derived.equipmentsPer1000Residents),
     });
-  } else if (derived?.irvePointsPer1000Residents != null) {
+  } else   if (derived?.irvePointsPer1000Residents != null) {
     kpis.push({
       id: "irve",
       label: "Points IRVE / 1 000 hab.",
@@ -103,5 +111,38 @@ export function extractHeroKpis(territory: TerritoryProfile): KpiItem[] {
     });
   }
 
-  return kpis.slice(0, 6);
+  return appendBenchmarkHints(kpis.slice(0, 6), territory, benchmark);
+}
+
+function appendBenchmarkHints(
+  kpis: KpiItem[],
+  territory: TerritoryProfile,
+  benchmark: BenchmarkRef,
+): KpiItem[] {
+  if (benchmark !== "epci") {
+    return kpis;
+  }
+
+  const epci = territory.enrichment?.geography?.epciComparison;
+  if (!epci?.available) {
+    return kpis;
+  }
+
+  const refLabel = benchmarkShortLabel(benchmark);
+
+  return kpis.map((kpi) => {
+    if (kpi.id === "density" && epci.epciAverageDensity != null) {
+      return {
+        ...kpi,
+        benchmarkHint: `vs ${refLabel} : ${formatDensity(epci.epciAverageDensity)}`,
+      };
+    }
+    if (kpi.id === "population" && epci.epciAveragePopulation != null) {
+      return {
+        ...kpi,
+        benchmarkHint: `vs ${refLabel} : ${formatPopulation(epci.epciAveragePopulation)}`,
+      };
+    }
+    return kpi;
+  });
 }

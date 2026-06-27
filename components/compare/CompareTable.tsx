@@ -1,6 +1,7 @@
 import { getIndicatorRows } from "@/lib/compare/indicator-rows";
 import type { CompareCell, TerritoryComparisonResult } from "@/lib/compare/types";
 import { getSourceUrlById } from "@/lib/sources";
+import { IndicatorProvenance } from "@/components/IndicatorProvenance";
 import {
   buildCompareCellAccessibleName,
   buildCompareTableCaption,
@@ -51,23 +52,28 @@ function IndicatorMeta({
   sourceId,
   sourceName,
   vintage,
+  readingAlert,
+  comparisonHint,
 }: {
   label: string;
   definition: string;
   sourceId: string;
   sourceName: string;
   vintage: number | string | null;
+  readingAlert?: string | null;
+  comparisonHint?: string | null;
 }) {
-  const vintageLabel = vintage != null ? ` · ${vintage}` : "";
   return (
-    <div className="space-y-1">
-      <div className="font-medium text-slate-900">{label}</div>
-      <p className="text-xs leading-relaxed text-slate-600">{definition}</p>
-      <p className="text-xs text-slate-500">
-        <SourceReference sourceId={sourceId} sourceName={sourceName} inline />
-        {vintageLabel}
-      </p>
-    </div>
+    <IndicatorProvenance
+      label={label}
+      definition={definition}
+      sourceId={sourceId}
+      sourceName={sourceName}
+      vintage={vintage}
+      readingAlert={readingAlert}
+      comparisonHint={comparisonHint}
+      inlineSource
+    />
   );
 }
 
@@ -203,6 +209,8 @@ export function CompareTable({ comparison, hiddenIndicatorIds }: CompareTablePro
                             sourceId={indicator.sourceId}
                             sourceName={indicator.sourceName}
                             vintage={sampleCell?.vintage ?? null}
+                            readingAlert={indicator.readingAlert}
+                            comparisonHint={indicator.comparisonHint}
                           />
                         </th>
                         {comparison.columns.map((column) => {

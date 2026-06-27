@@ -5,6 +5,7 @@ import { AiAnalysisClient } from "@/components/AiAnalysisClient";
 import { PortraitNarratifClient } from "@/components/PortraitNarratifClient";
 import { AnalysisReadyProvider } from "@/components/AnalysisReadyProvider";
 import { ComparableCommunesPanel } from "@/components/commune/ComparableCommunesPanel";
+import { CommuneExportActions } from "@/components/commune/CommuneExportActions";
 import { CommuneViewPreferenceApplier } from "@/components/commune/CommuneViewPreferenceApplier";
 import { CommuneSourcesView } from "@/components/commune/CommuneSourcesView";
 import { HashSectionScroll } from "@/components/commune/HashSectionScroll";
@@ -52,7 +53,7 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
     notFound();
   }
 
-  const kpis = extractHeroKpis(territory);
+  const kpis = extractHeroKpis(territory, { benchmark: "epci" });
   const completeness = computeCompleteness(territory);
   const sections = getVisibleSections(territory);
   const portraitNarrativeAvailable = isPortraitNarrativeAvailable();
@@ -84,6 +85,9 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
               ← Nouvelle recherche
             </Link>
             <ShareActions communeName={territory.name} codeInsee={territory.inseeCode} />
+            {vue === "analyse" ? (
+              <CommuneExportActions communeName={territory.name} />
+            ) : null}
           </div>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -123,16 +127,22 @@ export default async function CommunePage({ params, searchParams }: CommunePageP
             {vue === "analyse" ? (
               <>
                 <HashSectionScroll />
-                <SectionNav sections={sections} />
-                <AiAnalysisClient codeInsee={territory.inseeCode} />
+                <div data-print-hide-conseil="">
+                  <SectionNav sections={sections} />
+                </div>
+                <div data-print-hide-conseil="">
+                  <AiAnalysisClient codeInsee={territory.inseeCode} />
+                </div>
                 {portraitNarrativeAvailable ? (
-                  <PortraitNarratifClient codeInsee={territory.inseeCode} />
+                  <div data-print-hide-conseil="">
+                    <PortraitNarratifClient codeInsee={territory.inseeCode} />
+                  </div>
                 ) : null}
-                <div className="space-y-4">
+                <div className="space-y-4" data-print-hide-conseil="">
                   <EnrichmentIntro />
                   <EnrichmentSections territory={territory} />
                 </div>
-                <div id="sources">
+                <div id="sources" data-print-hide-conseil="">
                   <SourcesList sources={territory.sources} />
                 </div>
               </>
