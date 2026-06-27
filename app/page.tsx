@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { CollectivityBenchmarkWizard } from "@/components/wizards/CollectivityBenchmarkWizard";
+import { ImplantationWizard } from "@/components/wizards/ImplantationWizard";
 import { HabitatProfileWizard } from "@/components/HabitatProfileWizard";
 import { IntentCards } from "@/components/IntentCards";
 import { SearchForm } from "@/components/SearchForm";
@@ -29,12 +31,20 @@ export default function HomePage() {
         </Link>
       </header>
 
-      <div id="habiter">
-        <HabitatProfileWizard />
-      </div>
+      <IntentCards />
+
+      <section className="space-y-6" aria-labelledby="guided-heading">
+        <h2 id="guided-heading" className="text-base font-semibold text-slate-900">
+          Parcours guidés
+        </h2>
+        <div id="habiter">
+          <HabitatProfileWizard />
+        </div>
+        <CollectivityBenchmarkWizard />
+        <ImplantationWizard />
+      </section>
       <SearchForm />
       <SearchSuggestions />
-      <IntentCards />
 
       <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
         <h2 className="text-base font-semibold text-slate-900">

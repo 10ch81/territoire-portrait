@@ -10,6 +10,7 @@ interface CommuneSourcesViewProps {
 
 export function CommuneSourcesView({ territory, completeness }: CommuneSourcesViewProps) {
   const jsonLdUrl = `/api/commune/${encodeURIComponent(territory.inseeCode)}/jsonld`;
+  const csvUrl = `/api/commune/${encodeURIComponent(territory.inseeCode)}/indicators.csv`;
   const catalogUrl = "/api/indicators/catalog";
 
   return (
@@ -38,6 +39,16 @@ export function CommuneSourcesView({ territory, completeness }: CommuneSourcesVi
         <h2 className="text-base font-semibold text-slate-900">Réutiliser les données</h2>
         <ul className="mt-3 space-y-2 text-sm">
           <li>
+            <a
+              href={csvUrl}
+              className="font-medium text-blue-700 hover:underline"
+              download
+            >
+              Export CSV des indicateurs
+            </a>
+            <span className="text-slate-500"> — synthèse publique tabulaire</span>
+          </li>
+          <li>
             <Link href={jsonLdUrl} className="font-medium text-blue-700 hover:underline">
               Export JSON-LD de la commune
             </Link>
@@ -53,6 +64,19 @@ export function CommuneSourcesView({ territory, completeness }: CommuneSourcesVi
               Catalogue API des indicateurs
             </a>
             <span className="text-slate-500"> — définitions et métadonnées publiques</span>
+            <span className="block text-xs text-slate-500">
+              Filtres :{" "}
+              <a href={`${catalogUrl}?audience=citizen`} className="text-blue-700 hover:underline">
+                citizen
+              </a>
+              {" · "}
+              <a
+                href={`${catalogUrl}?audience=collectivity`}
+                className="text-blue-700 hover:underline"
+              >
+                collectivity
+              </a>
+            </span>
           </li>
         </ul>
       </section>

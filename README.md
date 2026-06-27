@@ -81,6 +81,19 @@ docs/mcp-datagouv.md              # Guide MCP data.gouv.fr
 docs/data-quality.md              # Boucle qualité des données
 ```
 
+## Réutiliser les données
+
+API ouverte (sans clé) pour intégrateurs, journalistes et chercheurs :
+
+| Endpoint | Description |
+| -------- | ----------- |
+| `GET /api/indicators/catalog` | Catalogue des indicateurs publics (`?audience=citizen\|collectivity\|expert`) |
+| `GET /api/commune/[codeInsee]/jsonld` | Export JSON-LD (indicateurs + sources) |
+| `GET /api/commune/[codeInsee]/indicators.csv` | Export CSV tabulaire (synthèse publique) |
+| `GET /api/compare/jsonld?codes=…` | JSON-LD comparateur |
+
+Décision UX multi-audience : [`docs/ux-multi-audience.md`](docs/ux-multi-audience.md).
+
 ## Sources de données
 
 | Source | Usage |

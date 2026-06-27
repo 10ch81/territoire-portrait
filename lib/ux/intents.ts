@@ -51,10 +51,8 @@ export const USER_INTENTS: UserIntent[] = [
     title: "Préparer un dossier",
     description:
       "Fiscalité, finances locales et benchmark EPCI — pour élus et cadres communaux.",
-    href: buildCompareUrl([DOSSIER_EXAMPLE_INSEE, EXAMPLE_COMMUNES[1]!.inseeCode], {
-      priorities: ["fiscalite", "collectivite"],
-    }),
-    cta: "Comparer Nantes · Lyon",
+    href: "/#collectivite",
+    cta: "Lancer le benchmark",
   },
   {
     id: "explorer",

@@ -144,11 +144,11 @@ Principe : *une plateforme de données, plusieurs lentilles de lecture* (intenti
 
 ## Sprint 9 — Wizards, CSV, catalogue audience (Phase 3)
 
-- [ ] Wizard benchmark collectivité — `CollectivityBenchmarkWizard`
-- [ ] Wizard implantation pro — `ImplantationWizard`
-- [ ] Export CSV — `GET /api/commune/[codeInsee]/indicators.csv`
-- [ ] Filtre `?audience=` sur `/api/indicators/catalog`
-- [ ] Doc README « Réutiliser les données »
+- [x] Wizard benchmark collectivité — `CollectivityBenchmarkWizard`
+- [x] Wizard implantation pro — `ImplantationWizard`
+- [x] Export CSV — `GET /api/commune/[codeInsee]/indicators.csv`
+- [x] Filtre `?audience=` sur `/api/indicators/catalog`
+- [x] Doc README « Réutiliser les données »
 
 ---
 

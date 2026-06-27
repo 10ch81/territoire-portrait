@@ -28,6 +28,7 @@ export interface PublicIndicatorCatalogEntry {
   sourceId: string;
   sourceName: string;
   sensitive?: boolean;
+  audienceTags: Array<"citizen" | "collectivity" | "expert">;
   /** Mise en garde de lecture (millésime, comparabilité limitée). */
   readingAlert?: string | null;
   /** Conseil pour comparer cet indicateur entre communes. */

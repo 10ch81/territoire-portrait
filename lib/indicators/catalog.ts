@@ -1,4 +1,5 @@
 import { COMPARE_INDICATORS } from "@/lib/compare/indicators";
+import { deriveIndicatorAudienceTags } from "./audience-tags";
 import type { PublicIndicatorCatalogEntry } from "./types";
 
 export function buildPublicIndicatorCatalog(): PublicIndicatorCatalogEntry[] {
@@ -11,6 +12,7 @@ export function buildPublicIndicatorCatalog(): PublicIndicatorCatalogEntry[] {
     sourceId: indicator.sourceId,
     sourceName: indicator.sourceName,
     sensitive: indicator.sensitive,
+    audienceTags: deriveIndicatorAudienceTags(indicator.questionIds),
     readingAlert: indicator.readingAlert ?? null,
     comparisonHint: indicator.comparisonHint ?? null,
   }));
