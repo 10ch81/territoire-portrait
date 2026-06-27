@@ -218,37 +218,19 @@ function buildHighlightForIndicator(input: {
 }): CompareHighlight | null {
   switch (input.benchmark) {
     case "epci":
-      return (
-        buildEpciHighlight(
-          input.profile,
-          input.indicator,
-          input.cells,
-          input.territories,
-          input.nameByInsee,
-        ) ??
-        buildGroupMeanHighlight(
-          input.profile,
-          input.indicator,
-          input.cells,
-          input.nameByInsee,
-          benchmarkLabel("similaires"),
-        )
+      return buildEpciHighlight(
+        input.profile,
+        input.indicator,
+        input.cells,
+        input.territories,
+        input.nameByInsee,
       );
     case "departement":
-      return (
-        buildDepartementHighlight(
-          input.profile,
-          input.indicator,
-          input.cells,
-          input.nameByInsee,
-        ) ??
-        buildGroupMeanHighlight(
-          input.profile,
-          input.indicator,
-          input.cells,
-          input.nameByInsee,
-          benchmarkLabel("similaires"),
-        )
+      return buildDepartementHighlight(
+        input.profile,
+        input.indicator,
+        input.cells,
+        input.nameByInsee,
       );
     case "similaires":
       return buildGroupMeanHighlight(

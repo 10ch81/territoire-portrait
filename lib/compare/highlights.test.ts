@@ -86,4 +86,65 @@ describe("buildCompareHighlights", () => {
 
     assert.ok(!highlights.some((item) => item.indicatorId === "schools_open"));
   });
+
+  it("en mode departement, ne retombe pas sur communes similaires", () => {
+    const columns = [
+      { inseeCode: "35238", name: "Rennes" },
+      { inseeCode: "57535", name: "Bousse" },
+    ];
+    const cells: CompareCell[] = [
+      {
+        indicatorId: "share_under_30",
+        communeInsee: "35238",
+        displayValue: "48,3 %",
+        numericValue: 48.3,
+        vintage: 2022,
+        fragile: false,
+        warning: null,
+        available: true,
+      },
+      {
+        indicatorId: "share_under_30",
+        communeInsee: "57535",
+        displayValue: "31,3 %",
+        numericValue: 31.3,
+        vintage: 2022,
+        fragile: false,
+        warning: null,
+        available: true,
+      },
+      {
+        indicatorId: "price_per_m2",
+        communeInsee: "35238",
+        displayValue: "4 500 €",
+        numericValue: 4500,
+        vintage: 2024,
+        fragile: false,
+        warning: null,
+        available: true,
+      },
+      {
+        indicatorId: "price_per_m2",
+        communeInsee: "57535",
+        displayValue: "1 800 €",
+        numericValue: 1800,
+        vintage: 2024,
+        fragile: false,
+        warning: null,
+        available: true,
+      },
+    ];
+
+    const highlights = buildCompareHighlights({
+      columns,
+      cells,
+      indicators: COMPARE_INDICATORS,
+      benchmark: "departement",
+    });
+
+    assert.ok(highlights.every((item) => !/communes similaires/i.test(item.sentence)));
+    assert.ok(
+      highlights.some((item) => /moyenne départementale/i.test(item.sentence)),
+    );
+  });
 });
